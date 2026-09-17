@@ -139,6 +139,19 @@ export class Game {
     this._showOverlay(null);
   }
 
+  /** Vuelve al hub sin perder progreso: congela la partida (el loop sigue vivo pero inerte). */
+  pauseForMenu() {
+    this.state = "paused";
+    this._saveBestScore();
+  }
+
+  _saveBestScore() {
+    if (this.score > this.progress.bestScore) {
+      this.progress.bestScore = this.score;
+      saveProgress(this.progress);
+    }
+  }
+
   _tryJump() {
     if (this.state !== "playing") return;
     if (this.player.isJumping || this.player.jumpCooldown > 0) return;
@@ -355,7 +368,7 @@ export class Game {
     audio.playMissionComplete();
     const isLast = this.levelIndex === LEVELS.length - 1;
     this.progress.unlockedLevel = Math.max(this.progress.unlockedLevel, this.levelIndex + 1);
-    this.progress.bestScore = Math.max(this.progress.bestScore, this.score);
+    this._saveBestScore();
     saveProgress(this.progress);
 
     if (isLast) {
@@ -373,6 +386,7 @@ export class Game {
   _onLose() {
     this.state = "lose";
     audio.playLose();
+    this._saveBestScore();
     this.els.loseText.textContent = `Recolectaste ${this.collected} de ${this.level.target} golosinas. ¡Tú puedes lograrlo!`;
     this._showOverlay("lose");
   }
@@ -389,6 +403,12 @@ export class Game {
     this.score = 0;
     this.els.hudScore.textContent = "0";
     this.loadLevel(0);
+  }
+
+  /** Usado por el hub para (re)lanzar una partida, incluso si se cambió de Matichico. */
+  startRun(character) {
+    this.character = character;
+    this.restartGame();
   }
 
   render() {
