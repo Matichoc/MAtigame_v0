@@ -44,6 +44,8 @@ html, body {
 .menu-card {
   max-width: 720px;
   width: 100%;
+  max-height: 94vh;
+  overflow-y: auto;
   background: linear-gradient(180deg, #1e2f52, #101a30);
   border: 3px solid var(--dorado);
   border-radius: 20px;
@@ -139,6 +141,156 @@ html, body {
   font-size: 0.8rem;
   color: #93a0bd;
 }
+
+/* ---------- CAMPOS Y BOTONES SECUNDARIOS ---------- */
+.field-label {
+  display: block;
+  text-align: left;
+  font-size: 0.8rem;
+  color: #cfd8ea;
+  margin-bottom: 6px;
+}
+
+.text-input {
+  width: 100%;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  border: 2px solid rgba(244,197,61,0.4);
+  background: rgba(255,255,255,0.08);
+  color: var(--crema);
+  font-family: inherit;
+  font-size: 1rem;
+}
+.text-input:focus {
+  outline: none;
+  border-color: var(--dorado);
+}
+
+.menu-secondary-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.08);
+  color: var(--crema);
+  border: 2px solid rgba(244,197,61,0.5);
+  padding: 8px 16px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.14); }
+
+/* ---------- TIENDA ---------- */
+.coins-banner {
+  display: inline-block;
+  background: rgba(244,197,61,0.15);
+  border: 2px solid var(--dorado);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-weight: 800;
+  color: var(--dorado);
+  margin-bottom: 14px;
+}
+
+.shop-character-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.shop-switch-btn {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  overflow: hidden;
+}
+.shop-switch-btn canvas { width: 100%; height: 100%; }
+.shop-switch-btn.active { border-color: var(--dorado); background: rgba(244,197,61,0.2); }
+
+.shop-character-name {
+  font-weight: 700;
+  color: var(--crema);
+  margin-bottom: 10px;
+}
+
+.outfit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media (max-width: 560px) {
+  .outfit-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.outfit-card {
+  background: rgba(255,255,255,0.06);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 10px 6px 12px;
+  text-align: center;
+}
+.outfit-card.equipped { border-color: var(--dorado); background: rgba(244,197,61,0.15); }
+.outfit-card canvas { width: 100%; aspect-ratio: 1/1; }
+.outfit-card .oname { display: block; font-weight: 700; font-size: 0.78rem; margin: 4px 0; color: var(--crema); }
+.outfit-card .oprice { display: block; font-size: 0.72rem; color: var(--dorado); margin-bottom: 6px; }
+.outfit-card button {
+  background: var(--rojo);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.72rem;
+  cursor: pointer;
+  width: 100%;
+}
+.outfit-card button:disabled {
+  background: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.outfit-card button.equip-btn { background: var(--azul); }
+
+/* ---------- TABLA DE PUNTAJES ---------- */
+.leaderboard-list {
+  list-style: none;
+  counter-reset: rank;
+  margin: 0 0 20px;
+  padding: 0;
+  text-align: left;
+}
+.leaderboard-list li {
+  counter-increment: rank;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+}
+.leaderboard-list li::before {
+  content: counter(rank);
+  font-weight: 800;
+  color: var(--dorado);
+  min-width: 22px;
+}
+.leaderboard-list .lb-name { flex: 1; font-weight: 700; }
+.leaderboard-list .lb-score { font-weight: 800; color: var(--dorado); }
+.leaderboard-empty { color: #93a0bd; font-size: 0.9rem; margin-bottom: 16px; }
 
 /* ---------- GAME ---------- */
 #screen-game {
@@ -243,6 +395,7 @@ html, body {
   #touch-controls { display: flex; }
 }
 
+#touch-controls { align-items: center; gap: 16px; }
 .dpad { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .dpad-row { display: flex; gap: 4px; }
 .dpad-btn {
@@ -256,3 +409,11 @@ html, body {
   user-select: none;
 }
 .dpad-btn:active { background: var(--rojo); }
+
+.jump-btn {
+  width: 88px;
+  height: 56px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 999px;
+}

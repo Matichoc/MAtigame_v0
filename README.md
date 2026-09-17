@@ -1,8 +1,9 @@
 # MAtigame_v0 — Matichoc: La Aventura del Cacao
 
 Minijuego web de Matichoc: elige a tu Matichico (Choco Capitán, Choco Estrella,
-Choco Baller o Choco Cheer) y recórrelo por distintas canchas recolectando
-chocolates para cumplir la misión de cada nivel antes de que se acabe el tiempo.
+Choco Baller o Choco Cheer), personalízalo con atuendos comprados en la tienda,
+y recórrelo por 5 canchas recolectando golosinas para cumplir la misión de
+cada nivel antes de que se acabe el tiempo.
 
 Es una v0 intencionalmente simple: HTML + CSS + JavaScript puro (sin frameworks
 ni build step), pensada como base fácil de evolucionar (más niveles, power-ups,
@@ -10,25 +11,34 @@ sprites con arte final, multijugador, etc.).
 
 ## Cómo jugar
 
-1. Elige uno de los 4 Matichicos en la pantalla de inicio.
-2. Muévete con las flechas / WASD (o el D-pad táctil en móvil).
-3. Recolecta los chocolates para cumplir la misión de cada nivel antes de que
-   se acabe el tiempo.
-4. Completa las 3 canchas (Fútbol, Básquet, Cheer) para ser Campeón Matichoc.
+1. Escribe tu nombre y elige uno de los 4 Matichicos en la pantalla de inicio.
+2. Muévete con las flechas / WASD, salta con ESPACIO (o usa el D-pad y el
+   botón de salto táctiles en móvil).
+3. Recolecta golosinas (chocolate, alfajor, cuchuflín, barquillo) para cumplir
+   la misión de cada nivel antes de que se acabe el tiempo, y esquiva los
+   conos y vallas de cada cancha.
+4. Cada cierto tiempo aparece por solo 3 segundos un **Chocolate Dubai**: un
+   bonus especial que da monedas persistentes entre partidas.
+5. Usa esas monedas en la **Tienda** para comprar atuendos (recolores de
+   uniforme) para cualquiera de tus Matichicos.
+6. Completa las 5 canchas (Fútbol, Básquet, Cheer, Revancha en La Liga y
+   Básquet Pro) para ser Campeón Matichoc y entrar a la **Tabla de Puntajes**.
 
-El progreso (mejor puntaje y nivel desbloqueado) se guarda en el navegador
+Todo el progreso (personaje, atuendos comprados, monedas, mejor puntaje,
+nivel desbloqueado y tabla de puntajes) se guarda en el navegador
 (`localStorage`), sin necesidad de backend.
 
 ## Estructura del proyecto
 
 ```
-index.html          Pantallas (menú, HUD, overlays) y estructura del juego
+index.html          Pantallas (menú, tienda, puntajes, HUD, overlays)
 css/style.css        Estilos, tema visual y controles táctiles
-js/characters.js      Definición y dibujo procedural de los Matichicos
-js/levels.js          Mapas, obstáculos, chocolates y misiones por nivel
+js/characters.js      Definición/dibujo procedural de los Matichicos y atuendos
+js/levels.js          Mapas, obstáculos, coleccionables y misiones por nivel
 js/audio.js           Efectos de sonido generados con Web Audio API
 js/game.js            Motor del juego: loop, física simple, colisiones, HUD
-js/main.js            Arranque: selección de personaje y wiring de la UI
+js/storage.js         Progreso persistente (personaje, monedas, atuendos, ranking)
+js/main.js            Arranque: menú, tienda, tabla de puntajes y wiring de la UI
 .github/workflows/    Despliegue automático a GitHub Pages
 ```
 
@@ -66,6 +76,7 @@ Cloudflare Pages, etc.) apuntando a la raíz del repositorio.
 ## Próximos pasos sugeridos
 
 - Reemplazar los sprites procedurales por ilustraciones/spritesheets finales.
-- Agregar más niveles y tipos de misión (cronómetro, evitar rivales, combos).
-- Sumar power-ups (velocidad, imán de chocolates, tiempo extra).
-- Tabla de puntajes o compartir resultado en redes.
+- Agregar más niveles y tipos de misión (rivales, combos, jefes de cancha).
+- Sumar más power-ups además del Chocolate Dubai (velocidad, imán, tiempo extra).
+- Botón para volver al menú/tienda sin recargar la página durante una partida.
+- Tabla de puntajes online (backend) para competir entre dispositivos.
