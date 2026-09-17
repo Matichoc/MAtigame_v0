@@ -35,6 +35,8 @@ export const LEVELS = [
     timeLimit: 42,
     chocoCount: 14,
     requiresFlag: false,
+    // Lejos del muro central (x 388-412) para no aparecer atrapado dentro de él.
+    spawn: { x: 200, y: 410 },
     obstacles: [
       { x: 0, y: 0, w: 800, h: 24 },
       { x: 0, y: 456, w: 800, h: 24 },

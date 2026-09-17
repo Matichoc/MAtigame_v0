@@ -86,8 +86,9 @@ export class Game {
     this.chocolates = generateChocolates(level);
     this.collected = 0;
     this.timeLeft = level.timeLimit;
-    this.player.x = CANVAS_W / 2;
-    this.player.y = CANVAS_H - 70;
+    const spawn = level.spawn || { x: CANVAS_W / 2, y: CANVAS_H - 70 };
+    this.player.x = spawn.x;
+    this.player.y = spawn.y;
     this.flagActive = false;
     this.moving = (level.movingObstacles || []).map((m) => ({ ...m, t: Math.random() * 10, baseX: m.x, baseY: m.y }));
     this.state = "intro";
