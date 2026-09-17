@@ -1,11 +1,16 @@
 :root {
-  --rojo: #c8102e;
-  --rojo-osc: #8f0b20;
-  --azul: #14213d;
-  --dorado: #f4c53d;
+  /* Paleta oficial de marca Matichoc */
+  --rosa: #D4216C;
+  --rosa-osc: #9c1650;
+  --marron: #64321B;
+  --marron-osc: #3d1f10;
+  --verde: #CFD767;
+  --verde-osc: #a3ac4c;
+  --dorado: #FFC800;
+  --dorado-osc: #c99900;
   --choco: #5a3320;
   --choco-claro: #8a5a36;
-  --crema: #fff6e6;
+  --crema: #FFF6E6;
   font-size: 16px;
 }
 
@@ -15,10 +20,15 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: radial-gradient(ellipse at top, #1c2b4a 0%, #0c1424 70%);
+  background: radial-gradient(ellipse at top, #3a2110 0%, #170c05 70%);
   color: var(--crema);
-  font-family: "Baloo 2", "Trebuchet MS", sans-serif;
+  font-family: "Fredoka", "Trebuchet MS", sans-serif;
   overflow: hidden;
+}
+
+.script {
+  font-family: "Caveat", cursive;
+  font-weight: 700;
 }
 
 #app {
@@ -46,7 +56,7 @@ html, body {
   width: 100%;
   max-height: 94vh;
   overflow-y: auto;
-  background: linear-gradient(180deg, #1e2f52, #101a30);
+  background: linear-gradient(180deg, #3a2213, #170c05);
   border: 3px solid var(--dorado);
   border-radius: 20px;
   padding: 28px 24px;
@@ -54,22 +64,36 @@ html, body {
   box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.brand-icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+
 .logo {
-  margin: 0 0 6px;
+  margin: 0;
   font-size: 2.4rem;
-  font-weight: 800;
-  letter-spacing: 2px;
-  color: var(--dorado);
-  text-shadow: 2px 2px 0 var(--rojo-osc);
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--rosa);
+  text-shadow: 2px 2px 0 var(--marron-osc);
 }
 .logo span {
   display: block;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--crema);
-  letter-spacing: 1px;
+  font-family: "Caveat", cursive;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--verde);
+  letter-spacing: 0.5px;
   text-shadow: none;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .tagline {
@@ -86,7 +110,7 @@ html, body {
   flex-wrap: wrap;
 }
 .stat-chip {
-  background: rgba(244,197,61,0.15);
+  background: rgba(255,200,0,0.15);
   border: 2px solid var(--dorado);
   border-radius: 999px;
   padding: 6px 14px;
@@ -124,7 +148,7 @@ html, body {
 .character-card:hover { transform: translateY(-3px); background: rgba(255,255,255,0.1); }
 .character-card.selected {
   border-color: var(--dorado);
-  background: rgba(244,197,61,0.15);
+  background: rgba(255,200,0,0.15);
 }
 .character-card canvas {
   width: 100%;
@@ -140,7 +164,7 @@ html, body {
 }
 
 .btn-primary {
-  background: linear-gradient(180deg, #e2394f, var(--rojo));
+  background: linear-gradient(180deg, #e8478f, var(--rosa));
   color: white;
   border: none;
   padding: 12px 26px;
@@ -149,10 +173,10 @@ html, body {
   font-size: 1.05rem;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: 0 6px 0 var(--rojo-osc);
+  box-shadow: 0 6px 0 var(--rosa-osc);
   transition: transform .08s ease, box-shadow .08s ease;
 }
-.btn-primary:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--rojo-osc); }
+.btn-primary:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--rosa-osc); }
 .btn-primary:disabled {
   background: #555;
   box-shadow: 0 6px 0 #333;
@@ -180,7 +204,7 @@ html, body {
   padding: 10px 14px;
   margin-bottom: 18px;
   border-radius: 10px;
-  border: 2px solid rgba(244,197,61,0.4);
+  border: 2px solid rgba(255,200,0,0.4);
   background: rgba(255,255,255,0.08);
   color: var(--crema);
   font-family: inherit;
@@ -201,7 +225,7 @@ html, body {
 .btn-secondary {
   background: rgba(255,255,255,0.08);
   color: var(--crema);
-  border: 2px solid rgba(244,197,61,0.5);
+  border: 2px solid rgba(255,200,0,0.5);
   padding: 8px 16px;
   font-family: inherit;
   font-weight: 700;
@@ -239,6 +263,7 @@ html, body {
 .game-card .gicon { font-size: 1.8rem; display: block; margin-bottom: 6px; }
 .game-card .gname { display: block; font-weight: 700; font-size: 0.85rem; color: var(--crema); }
 .game-card .gtagline { display: block; font-size: 0.7rem; color: #b8c2d9; margin-top: 4px; }
+.game-card .gbest { display: block; font-size: 0.68rem; color: var(--dorado); font-weight: 700; margin-top: 6px; }
 .game-card .gbadge {
   display: inline-block;
   margin-top: 8px;
@@ -259,7 +284,7 @@ html, body {
 /* ---------- TIENDA ---------- */
 .coins-banner {
   display: inline-block;
-  background: rgba(244,197,61,0.15);
+  background: rgba(255,200,0,0.15);
   border: 2px solid var(--dorado);
   border-radius: 999px;
   padding: 6px 16px;
@@ -285,7 +310,7 @@ html, body {
   overflow: hidden;
 }
 .shop-switch-btn canvas { width: 100%; height: 100%; }
-.shop-switch-btn.active { border-color: var(--dorado); background: rgba(244,197,61,0.2); }
+.shop-switch-btn.active { border-color: var(--dorado); background: rgba(255,200,0,0.2); }
 
 .shop-character-name {
   font-weight: 700;
@@ -310,12 +335,12 @@ html, body {
   padding: 10px 6px 12px;
   text-align: center;
 }
-.outfit-card.equipped { border-color: var(--dorado); background: rgba(244,197,61,0.15); }
+.outfit-card.equipped { border-color: var(--dorado); background: rgba(255,200,0,0.15); }
 .outfit-card canvas { width: 100%; aspect-ratio: 1/1; }
 .outfit-card .oname { display: block; font-weight: 700; font-size: 0.78rem; margin: 4px 0; color: var(--crema); }
 .outfit-card .oprice { display: block; font-size: 0.72rem; color: var(--dorado); margin-bottom: 6px; }
 .outfit-card button {
-  background: var(--rojo);
+  background: var(--rosa);
   color: white;
   border: none;
   padding: 5px 10px;
@@ -331,7 +356,7 @@ html, body {
   cursor: not-allowed;
   opacity: 0.6;
 }
-.outfit-card button.equip-btn { background: var(--azul); }
+.outfit-card button.equip-btn { background: var(--marron); }
 
 /* ---------- TABLA DE PUNTAJES ---------- */
 .leaderboard-list {
@@ -362,7 +387,7 @@ html, body {
 .leaderboard-empty { color: #93a0bd; font-size: 0.9rem; margin-bottom: 16px; }
 
 /* ---------- GAME ---------- */
-#screen-game {
+#screen-game, #screen-tetris {
   flex-direction: column;
   gap: 8px;
   padding: 10px;
@@ -370,13 +395,13 @@ html, body {
   margin: 0 auto;
 }
 
-#hud {
+.hud {
   width: 100%;
   max-width: 800px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(16, 26, 48, 0.9);
+  background: rgba(40, 22, 10, 0.9);
   border: 2px solid var(--dorado);
   border-radius: 14px;
   padding: 8px 14px;
@@ -403,7 +428,7 @@ html, body {
   font-weight: 700;
   white-space: nowrap;
 }
-#hud-timer-chip.low { background: var(--rojo); animation: pulse 0.6s infinite; }
+#hud-timer-chip.low { background: var(--rosa); animation: pulse 0.6s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
 
 .btn-icon {
@@ -416,14 +441,14 @@ html, body {
   font-size: 1rem;
 }
 
-#canvas-wrap {
+.canvas-wrap {
   position: relative;
   width: 100%;
   max-width: 800px;
   aspect-ratio: 800 / 480;
 }
 
-#game-canvas {
+.canvas-wrap canvas {
   width: 100%;
   height: 100%;
   display: block;
@@ -432,10 +457,12 @@ html, body {
   background: #2f8f3e;
 }
 
+#tetris-canvas { background: #1c0f07; }
+
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(5, 10, 24, 0.72);
+  background: rgba(20, 10, 4, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -443,7 +470,7 @@ html, body {
 }
 
 .overlay-card {
-  background: linear-gradient(180deg, #1e2f52, #101a30);
+  background: linear-gradient(180deg, #3a2213, #170c05);
   border: 3px solid var(--dorado);
   border-radius: 18px;
   padding: 22px 26px;
@@ -453,18 +480,19 @@ html, body {
 .overlay-card h2 { margin: 0 0 8px; color: var(--dorado); }
 .overlay-card p { margin: 0 0 16px; color: var(--crema); font-size: 0.95rem; }
 
-#touch-controls {
+#touch-controls, #tetris-touch-controls {
   display: none;
   width: 100%;
   justify-content: center;
+  align-items: center;
+  gap: 16px;
   margin-top: 4px;
 }
 
 @media (pointer: coarse) {
-  #touch-controls { display: flex; }
+  #touch-controls, #tetris-touch-controls { display: flex; }
 }
 
-#touch-controls { align-items: center; gap: 16px; }
 .dpad { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .dpad-row { display: flex; gap: 4px; }
 .dpad-btn {
@@ -477,7 +505,7 @@ html, body {
   touch-action: none;
   user-select: none;
 }
-.dpad-btn:active { background: var(--rojo); }
+.dpad-btn:active { background: var(--rosa); }
 
 .jump-btn {
   width: 88px;
@@ -486,3 +514,38 @@ html, body {
   font-weight: 700;
   border-radius: 999px;
 }
+
+.tetris-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 2px solid var(--dorado);
+  background: rgba(255,255,255,0.1);
+  color: var(--crema);
+  font-size: 1.2rem;
+  touch-action: none;
+  user-select: none;
+}
+.tetris-btn:active { background: var(--rosa); }
+.tetris-btn.wide { width: 88px; font-size: 0.85rem; font-weight: 700; }
+
+/* ---------- TABLA DE PUNTAJES: TABS POR JUEGO ---------- */
+.leaderboard-tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.leaderboard-tab {
+  background: rgba(255,255,255,0.08);
+  border: 2px solid transparent;
+  color: var(--crema);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.leaderboard-tab.active { border-color: var(--dorado); background: rgba(255,200,0,0.15); color: var(--dorado); }
