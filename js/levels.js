@@ -30,7 +30,7 @@ export const LEVELS = [
     id: "basket",
     name: "Nivel 2 · Cancha de Básquet",
     theme: "court",
-    missionText: "Recolecta 10 chocolates rebotando y esquiva los conos.",
+    missionText: "Recolecta 10 chocolates y esquiva los conos que se mueven de un lado a otro.",
     target: 10,
     timeLimit: 42,
     chocoCount: 14,

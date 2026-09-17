@@ -172,12 +172,14 @@ export class Game {
       vy = (vy / len) * this.player.speed * dt;
 
       const nx = this.player.x + vx;
-      if (!this._collides(nx, this.player.y)) this.player.x = nx;
-      else audio.playBump();
+      const hitX = this._collides(nx, this.player.y);
+      if (!hitX) this.player.x = nx;
+      else this._onObstacleHit(hitX);
 
       const ny = this.player.y + vy;
-      if (!this._collides(this.player.x, ny)) this.player.y = ny;
-      else audio.playBump();
+      const hitY = this._collides(this.player.x, ny);
+      if (!hitY) this.player.y = ny;
+      else this._onObstacleHit(hitY);
     }
 
     this.player.x = clamp(this.player.x, 26, CANVAS_W - 26);
@@ -193,10 +195,27 @@ export class Game {
         if (y > gy0 - r && y < gy1 + r) continue;
       }
       if (x + r > o.x && x - r < o.x + o.w && y + r > o.y && y - r < o.y + o.h) {
-        return true;
+        return o;
       }
     }
-    return false;
+    return null;
+  }
+
+  /** Reacciona a un choque: los conos en movimiento rebotan al jugador; los muros solo lo detienen. */
+  _onObstacleHit(obstacle) {
+    if (this.moving.includes(obstacle)) {
+      const cx = obstacle.x + obstacle.w / 2;
+      const cy = obstacle.y + obstacle.h / 2;
+      const dx = this.player.x - cx;
+      const dy = this.player.y - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      const bounce = 14;
+      this.player.x = clamp(this.player.x + (dx / len) * bounce, 26, CANVAS_W - 26);
+      this.player.y = clamp(this.player.y + (dy / len) * bounce, 26, CANVAS_H - 26);
+      audio.playBounce();
+    } else {
+      audio.playBump();
+    }
   }
 
   _checkChocolateCollisions() {

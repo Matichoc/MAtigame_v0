@@ -56,3 +56,8 @@ export function playVictory() {
 export function playBump() {
   tone(120, 0.08, "square", 0.1);
 }
+
+export function playBounce() {
+  tone(300, 0.06, "sine", 0.16);
+  tone(520, 0.09, "sine", 0.13, 0.05);
+}
