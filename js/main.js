@@ -1,26 +1,37 @@
 import { CHARACTERS, OUTFITS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { Game } from "./game.js";
 import * as audio from "./audio.js";
+import { GAMES_CATALOG } from "./games-catalog.js";
 import { loadProgress, saveProgress, ownsOutfit, equippedOutfitId, buyOutfit, equipOutfit } from "./storage.js";
 
 const progress = loadProgress();
 
-const screenMenu = document.getElementById("screen-menu");
+const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
 const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenGame = document.getElementById("screen-game");
 
 const grid = document.getElementById("character-grid");
-const btnStart = document.getElementById("btn-start");
+const gameGrid = document.getElementById("game-grid");
 const inputName = document.getElementById("input-name");
+const hubBestScoreEl = document.getElementById("hub-best-score");
+const hubTotalCoinsEl = document.getElementById("hub-total-coins");
 
 let selectedCharacter = CHARACTERS.find((c) => c.id === progress.selectedCharacterId) || null;
+let game = null; // instancia única del motor de "Recolecta y Corre", creada la primera vez que se juega
 
 inputName.value = progress.playerName || "";
 inputName.addEventListener("input", () => {
   progress.playerName = inputName.value.trim();
   saveProgress(progress);
 });
+
+function refreshHubStats() {
+  hubBestScoreEl.textContent = String(progress.bestScore);
+  hubTotalCoinsEl.textContent = String(progress.coins);
+}
+
+// ---------- SELECCIÓN DE PERSONAJE ----------
 
 function characterCard(char) {
   const card = document.createElement("div");
@@ -38,9 +49,9 @@ function characterCard(char) {
 
   card.appendChild(canvas);
   card.appendChild(label);
-  card.addEventListener("click", () => selectCharacter(char, card));
+  card.addEventListener("click", () => selectCharacter(char));
   card.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") selectCharacter(char, card);
+    if (e.key === "Enter" || e.key === " ") selectCharacter(char);
   });
 
   return card;
@@ -60,26 +71,77 @@ function selectCharacter(char) {
   progress.selectedCharacterId = char.id;
   saveProgress(progress);
   renderCharacterGrid();
-  btnStart.disabled = false;
-  btnStart.textContent = `Jugar como ${char.name}`;
+  renderGameGrid();
+}
+
+// ---------- SELECCIÓN DE JUEGO ----------
+
+function renderGameGrid() {
+  gameGrid.innerHTML = "";
+  GAMES_CATALOG.forEach((entry) => {
+    const card = document.createElement("div");
+    card.className = `game-card ${entry.status}`;
+
+    const icon = document.createElement("span");
+    icon.className = "gicon";
+    icon.textContent = entry.icon;
+
+    const name = document.createElement("span");
+    name.className = "gname";
+    name.textContent = entry.name;
+
+    const tagline = document.createElement("span");
+    tagline.className = "gtagline";
+    tagline.textContent = entry.tagline;
+
+    const badge = document.createElement("span");
+    badge.className = "gbadge";
+    badge.textContent = entry.status === "available" ? "Jugar" : "Próximamente";
+
+    card.appendChild(icon);
+    card.appendChild(name);
+    card.appendChild(tagline);
+    card.appendChild(badge);
+
+    if (entry.status === "available") {
+      card.addEventListener("click", () => playGame(entry.id));
+    }
+
+    gameGrid.appendChild(card);
+  });
+}
+
+function playGame(gameId) {
+  if (gameId !== "recolecta") return; // único modo implementado por ahora (ver ROADMAP.md)
+  if (!selectedCharacter) {
+    window.alert("Elige primero a tu Matichico.");
+    return;
+  }
+  if (!progress.playerName) {
+    progress.playerName = "Jugador";
+    inputName.value = progress.playerName;
+    saveProgress(progress);
+  }
+  showScreen(screenGame);
+  launchOrResumeGame();
+}
+
+// ---------- NAVEGACIÓN ENTRE PANTALLAS ----------
+
+function showScreen(target) {
+  [screenHub, screenShop, screenLeaderboard, screenGame].forEach((s) => s.classList.toggle("hidden", s !== target));
+}
+
+function goToHub() {
+  if (game) game.pauseForMenu();
+  refreshHubStats();
+  renderCharacterGrid();
+  showScreen(screenHub);
 }
 
 renderCharacterGrid();
-if (selectedCharacter) {
-  btnStart.disabled = false;
-  btnStart.textContent = `Jugar como ${selectedCharacter.name}`;
-}
-
-btnStart.addEventListener("click", () => {
-  if (!selectedCharacter) return;
-  if (!progress.playerName) {
-    progress.playerName = "Jugador";
-    saveProgress(progress);
-  }
-  screenMenu.classList.add("hidden");
-  screenGame.classList.remove("hidden");
-  launchGame(selectedCharacter);
-});
+renderGameGrid();
+refreshHubStats();
 
 // ---------- TIENDA ----------
 
@@ -95,16 +157,12 @@ const outfitGrid = document.getElementById("outfit-grid");
 let shopCharacterId = (selectedCharacter && selectedCharacter.id) || CHARACTERS[0].id;
 
 btnOpenShop.addEventListener("click", () => {
-  screenMenu.classList.add("hidden");
-  screenShop.classList.remove("hidden");
+  showScreen(screenShop);
   renderShopSwitcher();
   renderShop();
 });
 
-btnShopBack.addEventListener("click", () => {
-  screenShop.classList.add("hidden");
-  screenMenu.classList.remove("hidden");
-});
+btnShopBack.addEventListener("click", () => showScreen(screenHub));
 
 function renderShopSwitcher() {
   shopCharacterSwitcher.innerHTML = "";
@@ -171,6 +229,7 @@ function renderShop() {
           audio.playPurchase();
           renderShopSwitcher();
           renderShop();
+          refreshHubStats();
         }
       });
     }
@@ -191,15 +250,11 @@ const leaderboardList = document.getElementById("leaderboard-list");
 const leaderboardEmpty = document.getElementById("leaderboard-empty");
 
 btnOpenLeaderboard.addEventListener("click", () => {
-  screenMenu.classList.add("hidden");
-  screenLeaderboard.classList.remove("hidden");
+  showScreen(screenLeaderboard);
   renderLeaderboard();
 });
 
-btnLeaderboardBack.addEventListener("click", () => {
-  screenLeaderboard.classList.add("hidden");
-  screenMenu.classList.remove("hidden");
-});
+btnLeaderboardBack.addEventListener("click", () => showScreen(screenHub));
 
 function renderLeaderboard() {
   leaderboardList.innerHTML = "";
@@ -221,51 +276,62 @@ function renderLeaderboard() {
   });
 }
 
-// ---------- JUEGO ----------
+// ---------- JUEGO: "RECOLECTA Y CORRE" ----------
 
-function launchGame(character) {
-  const canvas = document.getElementById("game-canvas");
+function updateHudAvatar(character) {
   const hudAvatar = document.getElementById("hud-avatar");
   const avatarCanvas = document.createElement("canvas");
   avatarCanvas.width = 40;
   avatarCanvas.height = 40;
   renderCharacterThumb(avatarCanvas, character, getOutfit(equippedOutfitId(progress, character.id)));
   hudAvatar.src = avatarCanvas.toDataURL();
+}
 
-  const els = {
-    hudLevel: document.getElementById("hud-level"),
-    hudMission: document.getElementById("hud-mission"),
-    hudChoco: document.getElementById("hud-choco"),
-    hudTarget: document.getElementById("hud-target"),
-    hudScore: document.getElementById("hud-score"),
-    hudCoins: document.getElementById("hud-coins"),
-    hudTimer: document.getElementById("hud-timer"),
-    hudTimerChip: document.getElementById("hud-timer-chip"),
-    introTitle: document.getElementById("intro-title"),
-    introText: document.getElementById("intro-text"),
-    winText: document.getElementById("win-text"),
-    loseText: document.getElementById("lose-text"),
-    victoryText: document.getElementById("victory-text"),
-    overlays: {
-      intro: document.getElementById("overlay-intro"),
-      win: document.getElementById("overlay-win"),
-      lose: document.getElementById("overlay-lose"),
-      victory: document.getElementById("overlay-victory"),
-    },
-  };
+function launchOrResumeGame() {
+  updateHudAvatar(selectedCharacter);
 
-  const game = new Game(canvas, character, progress, els);
-  game.start();
+  if (!game) {
+    const canvas = document.getElementById("game-canvas");
+    const els = {
+      hudLevel: document.getElementById("hud-level"),
+      hudMission: document.getElementById("hud-mission"),
+      hudChoco: document.getElementById("hud-choco"),
+      hudTarget: document.getElementById("hud-target"),
+      hudScore: document.getElementById("hud-score"),
+      hudCoins: document.getElementById("hud-coins"),
+      hudTimer: document.getElementById("hud-timer"),
+      hudTimerChip: document.getElementById("hud-timer-chip"),
+      introTitle: document.getElementById("intro-title"),
+      introText: document.getElementById("intro-text"),
+      winText: document.getElementById("win-text"),
+      loseText: document.getElementById("lose-text"),
+      victoryText: document.getElementById("victory-text"),
+      overlays: {
+        intro: document.getElementById("overlay-intro"),
+        win: document.getElementById("overlay-win"),
+        lose: document.getElementById("overlay-lose"),
+        victory: document.getElementById("overlay-victory"),
+      },
+    };
 
-  document.getElementById("btn-intro-continue").addEventListener("click", () => game.beginPlaying());
-  document.getElementById("btn-next-level").addEventListener("click", () => game.nextLevel());
-  document.getElementById("btn-retry").addEventListener("click", () => game.retry());
-  document.getElementById("btn-play-again").addEventListener("click", () => game.restartGame());
+    game = new Game(canvas, selectedCharacter, progress, els);
+    game.start();
 
-  const btnMute = document.getElementById("btn-mute");
-  btnMute.addEventListener("click", () => {
-    const next = !audio.isMuted();
-    audio.setMuted(next);
-    btnMute.textContent = next ? "🔇" : "🔊";
-  });
+    document.getElementById("btn-intro-continue").addEventListener("click", () => game.beginPlaying());
+    document.getElementById("btn-next-level").addEventListener("click", () => game.nextLevel());
+    document.getElementById("btn-retry").addEventListener("click", () => game.retry());
+    document.getElementById("btn-play-again").addEventListener("click", () => game.startRun(selectedCharacter));
+    document.getElementById("btn-menu").addEventListener("click", goToHub);
+    document.getElementById("btn-lose-menu").addEventListener("click", goToHub);
+    document.getElementById("btn-victory-menu").addEventListener("click", goToHub);
+
+    const btnMute = document.getElementById("btn-mute");
+    btnMute.addEventListener("click", () => {
+      const next = !audio.isMuted();
+      audio.setMuted(next);
+      btnMute.textContent = next ? "🔇" : "🔊";
+    });
+  } else {
+    game.startRun(selectedCharacter);
+  }
 }

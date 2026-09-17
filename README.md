@@ -6,22 +6,29 @@ y recórrelo por 5 canchas recolectando golosinas para cumplir la misión de
 cada nivel antes de que se acabe el tiempo.
 
 Es una v0 intencionalmente simple: HTML + CSS + JavaScript puro (sin frameworks
-ni build step), pensada como base fácil de evolucionar (más niveles, power-ups,
-sprites con arte final, multijugador, etc.).
+ni build step), pensada como base fácil de evolucionar. El plan es que esto
+crezca hasta ser una pequeña **plataforma de arcade** con varios modos de
+juego que comparten personaje, atuendos y monedas — ver
+[`ROADMAP.md`](./ROADMAP.md) para el plan por etapas y los 6 juegos
+planeados (el hub ya muestra los 6, marcando cuáles están disponibles).
 
 ## Cómo jugar
 
-1. Escribe tu nombre y elige uno de los 4 Matichicos en la pantalla de inicio.
-2. Muévete con las flechas / WASD, salta con ESPACIO (o usa el D-pad y el
+1. En el **hub** (pantalla de inicio), escribe tu nombre y elige uno de los
+   4 Matichicos. Ahí mismo ves tu mejor puntaje y tus monedas acumuladas.
+2. Elige un juego de la grilla (por ahora solo "Recolecta y Corre" está
+   disponible; el resto son los próximos modos del [`ROADMAP.md`](./ROADMAP.md)).
+3. Muévete con las flechas / WASD, salta con ESPACIO (o usa el D-pad y el
    botón de salto táctiles en móvil).
-3. Recolecta golosinas (chocolate, alfajor, cuchuflín, barquillo) para cumplir
+4. Recolecta golosinas (chocolate, alfajor, cuchuflín, barquillo) para cumplir
    la misión de cada nivel antes de que se acabe el tiempo, y esquiva los
    conos y vallas de cada cancha.
-4. Cada cierto tiempo aparece por solo 3 segundos un **Chocolate Dubai**: un
+5. Cada cierto tiempo aparece por solo 3 segundos un **Chocolate Dubai**: un
    bonus especial que da monedas persistentes entre partidas.
-5. Usa esas monedas en la **Tienda** para comprar atuendos (recolores de
-   uniforme) para cualquiera de tus Matichicos.
-6. Completa las 5 canchas (Fútbol, Básquet, Cheer, Revancha en La Liga y
+6. Usa esas monedas en la **Tienda** para comprar atuendos (recolores de
+   uniforme) para cualquiera de tus Matichicos. Puedes ir a la Tienda o
+   volver al hub en cualquier momento con el botón 🏠 del HUD.
+7. Completa las 5 canchas (Fútbol, Básquet, Cheer, Revancha en La Liga y
    Básquet Pro) para ser Campeón Matichoc y entrar a la **Tabla de Puntajes**.
 
 Todo el progreso (personaje, atuendos comprados, monedas, mejor puntaje,
@@ -31,15 +38,17 @@ nivel desbloqueado y tabla de puntajes) se guarda en el navegador
 ## Estructura del proyecto
 
 ```
-index.html          Pantallas (menú, tienda, puntajes, HUD, overlays)
+index.html          Pantallas (hub, tienda, puntajes, HUD, overlays)
 css/style.css        Estilos, tema visual y controles táctiles
 js/characters.js      Definición/dibujo procedural de los Matichicos y atuendos
+js/games-catalog.js  Catálogo de modos de juego (disponibles y "próximamente")
 js/levels.js          Mapas, obstáculos, coleccionables y misiones por nivel
 js/audio.js           Efectos de sonido generados con Web Audio API
-js/game.js            Motor del juego: loop, física simple, colisiones, HUD
+js/game.js            Motor de "Recolecta y Corre": loop, colisiones, HUD
 js/storage.js         Progreso persistente (personaje, monedas, atuendos, ranking)
-js/main.js            Arranque: menú, tienda, tabla de puntajes y wiring de la UI
+js/main.js            Hub, tienda, tabla de puntajes y navegación entre juegos
 .github/workflows/    Despliegue automático a GitHub Pages
+ROADMAP.md            Plan por etapas hacia la plataforma multi-juego
 ```
 
 Los personajes se dibujan con `canvas` (sin imágenes externas), lo que
@@ -75,8 +84,12 @@ Cloudflare Pages, etc.) apuntando a la raíz del repositorio.
 
 ## Próximos pasos sugeridos
 
+Ver [`ROADMAP.md`](./ROADMAP.md) para el plan detallado por etapas. En
+resumen, lo siguiente:
+
 - Reemplazar los sprites procedurales por ilustraciones/spritesheets finales.
-- Agregar más niveles y tipos de misión (rivales, combos, jefes de cancha).
-- Sumar más power-ups además del Chocolate Dubai (velocidad, imán, tiempo extra).
-- Botón para volver al menú/tienda sin recargar la página durante una partida.
+- Construir el segundo juego del catálogo (Salto Choco) como primer caso
+  real de "varios juegos comparten hub, personaje y monedas".
+- Definir si la tabla de puntajes conviene separarla por juego además del
+  ranking global.
 - Tabla de puntajes online (backend) para competir entre dispositivos.
