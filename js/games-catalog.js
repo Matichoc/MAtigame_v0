@@ -30,7 +30,7 @@ export const GAMES_CATALOG = [
     name: "Tetris de Productos",
     icon: "🧱",
     tagline: "Encaja golosinas cayendo antes de que se acumulen.",
-    status: "soon",
+    status: "available",
   },
   {
     id: "memoria",

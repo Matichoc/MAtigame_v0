@@ -41,12 +41,15 @@ export const CHARACTERS = [
   },
 ];
 
-/** Atuendos (recolores de uniforme) comprables en la tienda con monedas Chocolate Dubai. */
+/**
+ * Atuendos (recolores de uniforme) comprables en la tienda con monedas
+ * Chocolate Dubai. Colores tomados de la paleta de marca de Matichoc.
+ */
 export const OUTFITS = [
-  { id: "liga", name: "Local La Liga", price: 0, jersey: "#c8102e", trim: "#f4c53d" },
-  { id: "visita", name: "Visita Azul", price: 30, jersey: "#14213d", trim: "#ffffff" },
-  { id: "oro", name: "Edición Oro", price: 60, jersey: "#f4c53d", trim: "#14213d" },
-  { id: "noche", name: "Edición Noche", price: 90, jersey: "#1a1a1a", trim: "#c8102e" },
+  { id: "liga", name: "Local Matichoc", price: 0, jersey: "#D4216C", trim: "#FFC800" },
+  { id: "visita", name: "Visita Cacao", price: 30, jersey: "#CFD767", trim: "#64321B" },
+  { id: "oro", name: "Edición Oro", price: 60, jersey: "#FFC800", trim: "#64321B" },
+  { id: "noche", name: "Edición Choco Oscuro", price: 90, jersey: "#3d1f10", trim: "#D4216C" },
 ];
 
 export function getOutfit(id) {
@@ -74,13 +77,16 @@ export function drawCharacter(ctx, char, outfit, cx, cy, size, t, moving, facing
   const bodyW = size * 0.56;
   const bodyH = size * 0.34;
 
-  // Sombra
+  // Sombra (degradado radial para un contacto con el suelo más suave)
   ctx.save();
   ctx.translate(0, size * 0.46 - bob);
   ctx.scale(1, 0.35);
+  const shadowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.34);
+  shadowGrad.addColorStop(0, "rgba(0,0,0,0.32)");
+  shadowGrad.addColorStop(1, "rgba(0,0,0,0)");
   ctx.beginPath();
   ctx.arc(0, 0, size * 0.34, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(0,0,0,0.28)";
+  ctx.fillStyle = shadowGrad;
   ctx.fill();
   ctx.restore();
 
@@ -93,9 +99,12 @@ export function drawCharacter(ctx, char, outfit, cx, cy, size, t, moving, facing
   ctx.fillRect(-bodyW * 0.30 - legSwing * 0.3, size * 0.33, size * 0.2, size * 0.07);
   ctx.fillRect(bodyW * 0.10 + legSwing * 0.3, size * 0.33, size * 0.2, size * 0.07);
 
-  // Cuerpo / jersey
+  // Cuerpo / jersey (degradado para dar volumen en vez de un color plano)
   roundRect(ctx, -bodyW / 2, -size * 0.06, bodyW, bodyH, size * 0.12);
-  ctx.fillStyle = outfit.jersey;
+  const jerseyGrad = ctx.createLinearGradient(0, -size * 0.06, 0, -size * 0.06 + bodyH);
+  jerseyGrad.addColorStop(0, shadeColor(outfit.jersey, 18));
+  jerseyGrad.addColorStop(1, shadeColor(outfit.jersey, -12));
+  ctx.fillStyle = jerseyGrad;
   ctx.fill();
   ctx.lineWidth = size * 0.03;
   ctx.strokeStyle = outfit.trim;
@@ -116,7 +125,7 @@ export function drawCharacter(ctx, char, outfit, cx, cy, size, t, moving, facing
   // Número en el jersey
   if (char.number) {
     ctx.fillStyle = outfit.trim;
-    ctx.font = `bold ${size * 0.16}px "Baloo 2", sans-serif`;
+    ctx.font = `bold ${size * 0.16}px "Fredoka", sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(char.number, 0, size * 0.1);
@@ -136,7 +145,10 @@ export function drawCharacter(ctx, char, outfit, cx, cy, size, t, moving, facing
   ctx.save();
   ctx.translate(0, -size * 0.32);
   roundRect(ctx, -headW / 2, -headH / 2, headW, headH, size * 0.14);
-  ctx.fillStyle = char.choco;
+  const headGrad = ctx.createLinearGradient(0, -headH / 2, 0, headH / 2);
+  headGrad.addColorStop(0, shadeColor(char.choco, 14));
+  headGrad.addColorStop(1, char.chocoDark);
+  ctx.fillStyle = headGrad;
   ctx.fill();
 
   // Ranuras de chocolate
@@ -181,7 +193,7 @@ function drawFace(ctx, char, size) {
 
   // Rubor (solo personajes femeninos, para un look más tierno)
   if (isGirl) {
-    ctx.fillStyle = "rgba(232,98,98,0.35)";
+    ctx.fillStyle = "rgba(212,33,108,0.3)";
     ctx.beginPath();
     ctx.arc(-eyeDX - eyeR * 1.4, eyeY + eyeR * 1.4, eyeR * 0.55, 0, Math.PI * 2);
     ctx.arc(eyeDX + eyeR * 1.4, eyeY + eyeR * 1.4, eyeR * 0.55, 0, Math.PI * 2);
@@ -289,6 +301,16 @@ function drawHairAccessory(ctx, char, outfit, size) {
     ctx.closePath();
     ctx.fill();
   }
+}
+
+/** Aclara (percent>0) u oscurece (percent<0) un color hexadecimal, para degradados. */
+function shadeColor(hex, percent) {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const amt = Math.round(2.55 * percent);
+  const r = Math.min(255, Math.max(0, (num >> 16) + amt));
+  const g = Math.min(255, Math.max(0, ((num >> 8) & 0xff) + amt));
+  const b = Math.min(255, Math.max(0, (num & 0xff) + amt));
+  return `rgb(${r},${g},${b})`;
 }
 
 function roundRect(ctx, x, y, w, h, r) {

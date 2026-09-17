@@ -1,12 +1,17 @@
 import { drawCharacter, getOutfit } from "./characters.js";
-import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates, findFreeSpot } from "./levels.js";
+import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates, findFreeSpot, getObstacles, getSpawn } from "./levels.js";
 import * as audio from "./audio.js";
-import { saveProgress, addToLeaderboard, equippedOutfitId } from "./storage.js";
+import { saveProgress, addToLeaderboard, equippedOutfitId, reportScore } from "./storage.js";
+import { BRAND } from "./theme.js";
 
+const GAME_ID = "recolecta";
+
+// Los fondos son colores "realistas" de cada cancha (césped, madera, piso de
+// gimnasio); los muros del camino usan la paleta de marca de Matichoc.
 const THEME_COLORS = {
-  field: { bg: "#2f8f3e", line: "#e8f5e8", accent: "#256c30" },
-  court: { bg: "#c98a4b", line: "#3a2411", accent: "#a86e37" },
-  gym: { bg: "#dfe6f0", line: "#b9c4d6", accent: "#c7d0e0" },
+  field: { bg: "#2f8f3e", line: "#e8f5e8", accent: BRAND.brown },
+  court: { bg: "#c98a4b", line: "#3a2411", accent: BRAND.brown },
+  gym: { bg: "#f7ecd9", line: "#d8c39f", accent: BRAND.pink },
 };
 
 function randRange(a, b) {
@@ -96,7 +101,7 @@ export class Game {
     this.chocolates = generateChocolates(level);
     this.collected = 0;
     this.timeLeft = level.timeLimit;
-    const spawn = level.spawn || { x: CANVAS_W / 2, y: CANVAS_H - 70 };
+    const spawn = getSpawn(level);
     this.player.x = spawn.x;
     this.player.y = spawn.y;
     this.player.isJumping = false;
@@ -146,10 +151,7 @@ export class Game {
   }
 
   _saveBestScore() {
-    if (this.score > this.progress.bestScore) {
-      this.progress.bestScore = this.score;
-      saveProgress(this.progress);
-    }
+    reportScore(this.progress, GAME_ID, this.score);
   }
 
   _tryJump() {
@@ -238,18 +240,24 @@ export class Game {
 
   _collides(x, y) {
     const r = this.player.radius * 0.8;
-    const all = [...(this.level.obstacles || []), ...this.moving];
+    const all = [...getObstacles(this.level), ...this.moving];
     for (const o of all) {
       if (o.jumpable && this.player.isJumping) continue;
-      if (o.gap) {
-        const [gy0, gy1] = this.level.gapY;
-        if (y > gy0 - r && y < gy1 + r) continue;
-      }
       if (x + r > o.x && x - r < o.x + o.w && y + r > o.y && y - r < o.y + o.h) {
         return o;
       }
     }
     return null;
+  }
+
+  /** Como _collides, pero solo contra muros del camino (no contra conos en movimiento). */
+  _collidesWalls(x, y) {
+    const r = this.player.radius * 0.8;
+    for (const o of getObstacles(this.level)) {
+      if (o.jumpable && this.player.isJumping) continue;
+      if (x + r > o.x && x - r < o.x + o.w && y + r > o.y && y - r < o.y + o.h) return true;
+    }
+    return false;
   }
 
   /** Reacciona a un choque: los conos en movimiento rebotan al jugador; los muros solo lo detienen. */
@@ -261,8 +269,12 @@ export class Game {
       const dy = this.player.y - cy;
       const len = Math.hypot(dx, dy) || 1;
       const bounce = 14;
-      this.player.x = clamp(this.player.x + (dx / len) * bounce, 26, CANVAS_W - 26);
-      this.player.y = clamp(this.player.y + (dy / len) * bounce, 26, CANVAS_H - 26);
+      const nx = clamp(this.player.x + (dx / len) * bounce, 26, CANVAS_W - 26);
+      const ny = clamp(this.player.y + (dy / len) * bounce, 26, CANVAS_H - 26);
+      // Nunca empujar al jugador dentro de un muro: en corredores angostos
+      // eso lo dejaría incrustado y atascado contra la pared.
+      if (!this._collidesWalls(nx, this.player.y)) this.player.x = nx;
+      if (!this._collidesWalls(this.player.x, ny)) this.player.y = ny;
       audio.playBounce();
     } else {
       audio.playBump();
@@ -346,7 +358,7 @@ export class Game {
         y: -20 - Math.random() * 100,
         vy: 80 + Math.random() * 120,
         vx: (Math.random() - 0.5) * 60,
-        color: ["#f4c53d", "#c8102e", "#ffffff", "#14213d"][Math.floor(Math.random() * 4)],
+        color: [BRAND.gold, BRAND.pink, BRAND.green, "#ffffff"][Math.floor(Math.random() * 4)],
         life: 3 + Math.random() * 2,
         maxLife: 5,
         size: 4 + Math.random() * 4,
@@ -375,7 +387,7 @@ export class Game {
       this.els.victoryText.textContent = `Completaste las ${LEVELS.length} canchas con ${this.score} puntos y ${this.progress.coins} monedas Dubai. ¡Toda La Liga te aplaude!`;
       audio.playVictory();
       this._spawnConfetti();
-      addToLeaderboard(this.progress, this.progress.playerName, this.score);
+      addToLeaderboard(this.progress, GAME_ID, this.progress.playerName, this.score);
       this._showOverlay("victory");
     } else {
       this.els.winText.textContent = `¡Cumpliste la misión con ${this.score} puntos! Prepárate para el siguiente reto.`;
@@ -440,16 +452,9 @@ export class Game {
     ctx.strokeStyle = theme.line;
     ctx.lineWidth = 2;
     if (this.level.theme === "field") {
-      ctx.strokeRect(60, 60, CANVAS_W - 120, CANVAS_H - 120);
       ctx.beginPath();
-      ctx.moveTo(CANVAS_W / 2, 60);
-      ctx.lineTo(CANVAS_W / 2, CANVAS_H - 60);
-      ctx.moveTo(CANVAS_W / 2, CANVAS_H / 2);
       ctx.arc(CANVAS_W / 2, CANVAS_H / 2, 50, 0, Math.PI * 2);
       ctx.stroke();
-      // áreas chicas
-      ctx.strokeRect(60, 150, 46, 180);
-      ctx.strokeRect(CANVAS_W - 106, 150, 46, 180);
     } else if (this.level.theme === "court") {
       for (let i = 0; i < CANVAS_W; i += 40) {
         ctx.beginPath();
@@ -462,8 +467,11 @@ export class Game {
       ctx.arc(CANVAS_W / 2, CANVAS_H / 2, 60, 0, Math.PI * 2);
       ctx.strokeStyle = theme.line;
       ctx.stroke();
-      this._drawHoop(34, 1);
-      this._drawHoop(CANVAS_W - 34, -1);
+      // Los aros se ubican en los extremos del camino, no en el borde fijo
+      // del lienzo, para que no queden tapados por los muros del corredor.
+      const xs = this.level.path.map((p) => p.x);
+      this._drawHoop(Math.min(...xs), 1);
+      this._drawHoop(Math.max(...xs), -1);
     } else if (this.level.theme === "gym") {
       for (let x = 0; x < CANVAS_W; x += 48) {
         for (let y = 0; y < CANVAS_H; y += 48) {
@@ -494,23 +502,18 @@ export class Game {
   _renderObstacles() {
     const ctx = this.ctx;
     const theme = THEME_COLORS[this.level.theme];
-    for (const o of this.level.obstacles) {
+    for (const o of getObstacles(this.level)) {
       if (o.jumpable) {
         this._drawHurdle(o);
         continue;
       }
-      if (o.w >= CANVAS_W || o.h >= CANVAS_H) {
+      if (o.corridor || o.w >= CANVAS_W || o.h >= CANVAS_H) {
+        // Muros del camino y bordes: relleno sólido sin costuras entre celdas.
         ctx.fillStyle = theme.accent;
         ctx.fillRect(o.x, o.y, o.w, o.h);
         continue;
       }
-      if (this.level.theme === "field" && o.h === 100) {
-        // poste de arco
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(o.x, o.y, o.w, o.h);
-        ctx.strokeStyle = "#1c1c1c";
-        ctx.strokeRect(o.x, o.y, o.w, o.h);
-      } else if (this.level.theme === "field") {
+      if (this.level.theme === "field") {
         this._drawCone(o.x + o.w / 2, o.y + o.h / 2, o.w);
       } else {
         ctx.fillStyle = "#4a3624";
@@ -556,14 +559,14 @@ export class Game {
     const glow = this.flagActive;
     ctx.save();
     if (glow) {
-      ctx.shadowColor = "#f4c53d";
+      ctx.shadowColor = BRAND.gold;
       ctx.shadowBlur = 18;
     } else {
       ctx.globalAlpha = 0.4;
     }
-    ctx.fillStyle = "#14213d";
+    ctx.fillStyle = BRAND.brownDark;
     ctx.fillRect(f.x + f.w / 2 - 2, f.y - 20, 4, f.h + 20);
-    ctx.fillStyle = glow ? "#f4c53d" : "#8a8f9b";
+    ctx.fillStyle = glow ? BRAND.gold : "#8a8f9b";
     ctx.beginPath();
     ctx.moveTo(f.x + f.w / 2 + 2, f.y - 18);
     ctx.lineTo(f.x + f.w + 6, f.y - 6);
@@ -578,9 +581,25 @@ export class Game {
     for (const c of this.chocolates) {
       if (c.taken) continue;
       const bob = Math.sin(this.time * 4 + c.bobSeed) * 3;
+
+      // sombra de contacto (siempre a la altura del suelo, no sigue el rebote)
+      ctx.save();
+      ctx.translate(c.x, c.y + 12);
+      ctx.scale(1, 0.35);
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,0.22)";
+      ctx.fill();
+      ctx.restore();
+
       ctx.save();
       ctx.translate(c.x, c.y + bob);
       this._drawCollectible(c.kind || "choco");
+      // brillo: un toque de luz para que se vean menos planas
+      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.beginPath();
+      ctx.ellipse(-4, -5, 2.6, 1.6, -0.5, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
     }
   }
@@ -654,7 +673,7 @@ export class Game {
       ctx.moveTo(-4, -8); ctx.lineTo(-4, 8);
       ctx.moveTo(4, -8); ctx.lineTo(4, 8);
       ctx.stroke();
-      ctx.fillStyle = "#f4c53d";
+      ctx.fillStyle = BRAND.gold;
       ctx.beginPath();
       ctx.arc(-11, -8, 2, 0, Math.PI * 2);
       ctx.fill();
@@ -668,8 +687,8 @@ export class Game {
     const pulse = 1 + Math.sin(this.time * 10) * 0.08;
 
     const grad = ctx.createRadialGradient(x, y, 2, x, y, 28);
-    grad.addColorStop(0, "rgba(244,197,61,0.5)");
-    grad.addColorStop(1, "rgba(244,197,61,0)");
+    grad.addColorStop(0, "rgba(255,200,0,0.5)");
+    grad.addColorStop(1, "rgba(255,200,0,0)");
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(x, y, 28, 0, Math.PI * 2);
@@ -685,12 +704,12 @@ export class Game {
     ctx.translate(x, y);
     ctx.scale(pulse, pulse);
     roundRectPath(ctx, -14, -9, 28, 18, 5);
-    ctx.fillStyle = "#8bc34a";
+    ctx.fillStyle = BRAND.green;
     ctx.fill();
-    ctx.strokeStyle = "#5a8f2c";
+    ctx.strokeStyle = BRAND.greenDark;
     ctx.lineWidth = 1.5;
     ctx.stroke();
-    ctx.strokeStyle = "#f4c53d";
+    ctx.strokeStyle = BRAND.gold;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(-12, -4); ctx.lineTo(-4, 4); ctx.lineTo(4, -4); ctx.lineTo(12, 4);
@@ -704,8 +723,8 @@ export class Game {
       const alpha = Math.max(0, p.life / p.maxLife);
       if (p.type === "popup") {
         ctx.globalAlpha = alpha;
-        ctx.fillStyle = "#f4c53d";
-        ctx.font = "bold 16px 'Baloo 2', sans-serif";
+        ctx.fillStyle = BRAND.gold;
+        ctx.font = "bold 16px 'Fredoka', sans-serif";
         ctx.textAlign = "center";
         ctx.fillText(p.text, p.x, p.y);
         ctx.globalAlpha = 1;

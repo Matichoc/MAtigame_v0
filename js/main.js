@@ -1,8 +1,12 @@
 import { CHARACTERS, OUTFITS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { Game } from "./game.js";
+import { TetrisGame } from "./tetris-game.js";
 import * as audio from "./audio.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
-import { loadProgress, saveProgress, ownsOutfit, equippedOutfitId, buyOutfit, equipOutfit } from "./storage.js";
+import {
+  loadProgress, saveProgress, ownsOutfit, equippedOutfitId, buyOutfit, equipOutfit,
+  getBestScore, getLeaderboard,
+} from "./storage.js";
 
 const progress = loadProgress();
 
@@ -10,15 +14,18 @@ const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
 const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenGame = document.getElementById("screen-game");
+const screenTetris = document.getElementById("screen-tetris");
+const ALL_SCREENS = [screenHub, screenShop, screenLeaderboard, screenGame, screenTetris];
 
 const grid = document.getElementById("character-grid");
 const gameGrid = document.getElementById("game-grid");
 const inputName = document.getElementById("input-name");
-const hubBestScoreEl = document.getElementById("hub-best-score");
 const hubTotalCoinsEl = document.getElementById("hub-total-coins");
 
 let selectedCharacter = CHARACTERS.find((c) => c.id === progress.selectedCharacterId) || null;
-let game = null; // instancia única del motor de "Recolecta y Corre", creada la primera vez que se juega
+
+// Instancias únicas de cada motor, creadas recién la primera vez que se juegan.
+const instances = { recolecta: null, tetris: null };
 
 inputName.value = progress.playerName || "";
 inputName.addEventListener("input", () => {
@@ -27,7 +34,6 @@ inputName.addEventListener("input", () => {
 });
 
 function refreshHubStats() {
-  hubBestScoreEl.textContent = String(progress.bestScore);
   hubTotalCoinsEl.textContent = String(progress.coins);
 }
 
@@ -94,17 +100,28 @@ function renderGameGrid() {
     tagline.className = "gtagline";
     tagline.textContent = entry.tagline;
 
-    const badge = document.createElement("span");
-    badge.className = "gbadge";
-    badge.textContent = entry.status === "available" ? "Jugar" : "Próximamente";
-
     card.appendChild(icon);
     card.appendChild(name);
     card.appendChild(tagline);
-    card.appendChild(badge);
 
     if (entry.status === "available") {
+      const best = getBestScore(progress, entry.id);
+      if (best > 0) {
+        const bestEl = document.createElement("span");
+        bestEl.className = "gbest";
+        bestEl.textContent = `Tu mejor: ${best} pts`;
+        card.appendChild(bestEl);
+      }
+      const badge = document.createElement("span");
+      badge.className = "gbadge";
+      badge.textContent = "Jugar";
+      card.appendChild(badge);
       card.addEventListener("click", () => playGame(entry.id));
+    } else {
+      const badge = document.createElement("span");
+      badge.className = "gbadge";
+      badge.textContent = "Próximamente";
+      card.appendChild(badge);
     }
 
     gameGrid.appendChild(card);
@@ -112,7 +129,6 @@ function renderGameGrid() {
 }
 
 function playGame(gameId) {
-  if (gameId !== "recolecta") return; // único modo implementado por ahora (ver ROADMAP.md)
   if (!selectedCharacter) {
     window.alert("Elige primero a tu Matichico.");
     return;
@@ -122,20 +138,31 @@ function playGame(gameId) {
     inputName.value = progress.playerName;
     saveProgress(progress);
   }
-  showScreen(screenGame);
-  launchOrResumeGame();
+
+  // Nunca deben quedar dos juegos "activos" a la vez (evita que uno siga
+  // corriendo lógica de fondo mientras se muestra el otro).
+  Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
+
+  if (gameId === "recolecta") {
+    showScreen(screenGame);
+    launchOrResumeRecolecta();
+  } else if (gameId === "tetris") {
+    showScreen(screenTetris);
+    launchOrResumeTetris();
+  }
 }
 
 // ---------- NAVEGACIÓN ENTRE PANTALLAS ----------
 
 function showScreen(target) {
-  [screenHub, screenShop, screenLeaderboard, screenGame].forEach((s) => s.classList.toggle("hidden", s !== target));
+  ALL_SCREENS.forEach((s) => s.classList.toggle("hidden", s !== target));
 }
 
 function goToHub() {
-  if (game) game.pauseForMenu();
+  Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
   refreshHubStats();
   renderCharacterGrid();
+  renderGameGrid();
   showScreen(screenHub);
 }
 
@@ -246,23 +273,44 @@ function renderShop() {
 
 const btnOpenLeaderboard = document.getElementById("btn-open-leaderboard");
 const btnLeaderboardBack = document.getElementById("btn-leaderboard-back");
+const leaderboardTabs = document.getElementById("leaderboard-tabs");
 const leaderboardList = document.getElementById("leaderboard-list");
 const leaderboardEmpty = document.getElementById("leaderboard-empty");
 
+const availableGames = GAMES_CATALOG.filter((g) => g.status === "available");
+let leaderboardGameId = availableGames[0]?.id;
+
 btnOpenLeaderboard.addEventListener("click", () => {
   showScreen(screenLeaderboard);
+  renderLeaderboardTabs();
   renderLeaderboard();
 });
 
 btnLeaderboardBack.addEventListener("click", () => showScreen(screenHub));
 
+function renderLeaderboardTabs() {
+  leaderboardTabs.innerHTML = "";
+  availableGames.forEach((g) => {
+    const tab = document.createElement("button");
+    tab.className = "leaderboard-tab" + (g.id === leaderboardGameId ? " active" : "");
+    tab.textContent = `${g.icon} ${g.name}`;
+    tab.addEventListener("click", () => {
+      leaderboardGameId = g.id;
+      renderLeaderboardTabs();
+      renderLeaderboard();
+    });
+    leaderboardTabs.appendChild(tab);
+  });
+}
+
 function renderLeaderboard() {
   leaderboardList.innerHTML = "";
-  const isEmpty = progress.leaderboard.length === 0;
+  const board = getLeaderboard(progress, leaderboardGameId);
+  const isEmpty = board.length === 0;
   leaderboardEmpty.classList.toggle("hidden", !isEmpty);
   leaderboardList.classList.toggle("hidden", isEmpty);
   if (isEmpty) return;
-  progress.leaderboard.forEach((entry) => {
+  board.forEach((entry) => {
     const li = document.createElement("li");
     const name = document.createElement("span");
     name.className = "lb-name";
@@ -278,8 +326,8 @@ function renderLeaderboard() {
 
 // ---------- JUEGO: "RECOLECTA Y CORRE" ----------
 
-function updateHudAvatar(character) {
-  const hudAvatar = document.getElementById("hud-avatar");
+function updateHudAvatar(imgId, character) {
+  const hudAvatar = document.getElementById(imgId);
   const avatarCanvas = document.createElement("canvas");
   avatarCanvas.width = 40;
   avatarCanvas.height = 40;
@@ -287,10 +335,10 @@ function updateHudAvatar(character) {
   hudAvatar.src = avatarCanvas.toDataURL();
 }
 
-function launchOrResumeGame() {
-  updateHudAvatar(selectedCharacter);
+function launchOrResumeRecolecta() {
+  updateHudAvatar("hud-avatar", selectedCharacter);
 
-  if (!game) {
+  if (!instances.recolecta) {
     const canvas = document.getElementById("game-canvas");
     const els = {
       hudLevel: document.getElementById("hud-level"),
@@ -314,7 +362,8 @@ function launchOrResumeGame() {
       },
     };
 
-    game = new Game(canvas, selectedCharacter, progress, els);
+    const game = new Game(canvas, selectedCharacter, progress, els);
+    instances.recolecta = game;
     game.start();
 
     document.getElementById("btn-intro-continue").addEventListener("click", () => game.beginPlaying());
@@ -332,6 +381,45 @@ function launchOrResumeGame() {
       btnMute.textContent = next ? "🔇" : "🔊";
     });
   } else {
-    game.startRun(selectedCharacter);
+    instances.recolecta.startRun(selectedCharacter);
+  }
+}
+
+// ---------- JUEGO: "TETRIS DE PRODUCTOS" ----------
+
+function launchOrResumeTetris() {
+  updateHudAvatar("tetris-hud-avatar", selectedCharacter);
+
+  if (!instances.tetris) {
+    const canvas = document.getElementById("tetris-canvas");
+    const els = {
+      hudScore: document.getElementById("tetris-hud-score"),
+      hudLines: document.getElementById("tetris-hud-lines"),
+      hudLevel: document.getElementById("tetris-hud-level"),
+      hudCoins: document.getElementById("tetris-hud-coins"),
+      gameoverText: document.getElementById("tetris-gameover-text"),
+      overlays: {
+        intro: document.getElementById("tetris-overlay-intro"),
+        gameover: document.getElementById("tetris-overlay-gameover"),
+      },
+    };
+
+    const tetris = new TetrisGame(canvas, selectedCharacter, progress, els);
+    instances.tetris = tetris;
+    tetris.start();
+
+    document.getElementById("tetris-btn-start").addEventListener("click", () => tetris.beginPlaying());
+    document.getElementById("tetris-btn-retry").addEventListener("click", () => tetris.retry());
+    document.getElementById("tetris-btn-menu").addEventListener("click", goToHub);
+    document.getElementById("tetris-btn-gameover-menu").addEventListener("click", goToHub);
+
+    const btnMute = document.getElementById("tetris-btn-mute");
+    btnMute.addEventListener("click", () => {
+      const next = !audio.isMuted();
+      audio.setMuted(next);
+      btnMute.textContent = next ? "🔇" : "🔊";
+    });
+  } else {
+    instances.tetris.startRun(selectedCharacter);
   }
 }

@@ -1,9 +1,11 @@
 # MAtigame_v0 — Matichoc: La Aventura del Cacao
 
-Minijuego web de Matichoc: elige a tu Matichico (Choco Capitán, Choco Estrella,
-Choco Baller o Choco Cheer), personalízalo con atuendos comprados en la tienda,
-y recórrelo por 5 canchas recolectando golosinas para cumplir la misión de
-cada nivel antes de que se acabe el tiempo.
+Arcade web de Matichoc: elige a tu Matichico (Choco Capitán, Choco Estrella,
+Choco Baller o Choco Cheer), personalízalo con atuendos comprados en la
+tienda, y juega cualquiera de los minijuegos disponibles con ese mismo
+personaje: **Recolecta y Corre** (recorrer 5 canchas por un camino guiado
+recolectando golosinas) y **Tetris de Productos** (encajar golosinas
+cayendo).
 
 Es una v0 intencionalmente simple: HTML + CSS + JavaScript puro (sin frameworks
 ni build step), pensada como base fácil de evolucionar. El plan es que esto
@@ -15,37 +17,52 @@ planeados (el hub ya muestra los 6, marcando cuáles están disponibles).
 ## Cómo jugar
 
 1. En el **hub** (pantalla de inicio), escribe tu nombre y elige uno de los
-   4 Matichicos. Ahí mismo ves tu mejor puntaje y tus monedas acumuladas.
-2. Elige un juego de la grilla (por ahora solo "Recolecta y Corre" está
-   disponible; el resto son los próximos modos del [`ROADMAP.md`](./ROADMAP.md)).
-3. Muévete con las flechas / WASD, salta con ESPACIO (o usa el D-pad y el
-   botón de salto táctiles en móvil).
-4. Recolecta golosinas (chocolate, alfajor, cuchuflín, barquillo) para cumplir
-   la misión de cada nivel antes de que se acabe el tiempo, y esquiva los
-   conos y vallas de cada cancha.
-5. Cada cierto tiempo aparece por solo 3 segundos un **Chocolate Dubai**: un
-   bonus especial que da monedas persistentes entre partidas.
+   4 Matichicos. Ese personaje (y sus atuendos) se usa en todos los juegos.
+2. Elige un juego de la grilla: **Recolecta y Corre** y **Tetris de
+   Productos** están disponibles; el resto son los próximos modos del
+   [`ROADMAP.md`](./ROADMAP.md). Cada tarjeta muestra tu mejor puntaje en
+   ese juego.
+3. En **Recolecta y Corre**: sigue el camino marcado en cada cancha,
+   recolectando golosinas (chocolate, alfajor, cuchuflín, barquillo) antes
+   de que se acabe el tiempo, esquivando o saltando (ESPACIO) los
+   obstáculos que aparecen sobre el camino. Muévete con las flechas / WASD
+   (o el D-pad táctil en móvil).
+4. En **Tetris de Productos**: encaja las piezas con ← → ↑ (rotar) ↓
+   (bajar) y ESPACIO (caída instantánea) para completar líneas. Las piezas
+   brillantes son Chocolate Dubai: dan monedas extra al limpiar su línea.
+5. En cualquier juego, cada cierto tiempo/con cierta probabilidad aparece
+   un **Chocolate Dubai**: da monedas persistentes entre partidas y entre
+   juegos.
 6. Usa esas monedas en la **Tienda** para comprar atuendos (recolores de
    uniforme) para cualquiera de tus Matichicos. Puedes ir a la Tienda o
    volver al hub en cualquier momento con el botón 🏠 del HUD.
-7. Completa las 5 canchas (Fútbol, Básquet, Cheer, Revancha en La Liga y
-   Básquet Pro) para ser Campeón Matichoc y entrar a la **Tabla de Puntajes**.
+7. Completa las 5 canchas de Recolecta y Corre para ser Campeón Matichoc, o
+   consigue el mejor puntaje posible en Tetris — ambos quedan en la
+   **Tabla de Puntajes**, con una pestaña por juego.
 
-Todo el progreso (personaje, atuendos comprados, monedas, mejor puntaje,
-nivel desbloqueado y tabla de puntajes) se guarda en el navegador
-(`localStorage`), sin necesidad de backend.
+Todo el progreso (personaje, atuendos comprados, monedas, mejor puntaje y
+tabla de puntajes por juego) se guarda en el navegador (`localStorage`),
+sin necesidad de backend.
+
+Toda la interfaz usa la paleta oficial de marca Matichoc (marrón, verde,
+rosa y dorado) en vez de colores genéricos — ver `js/theme.js` y las
+variables de `css/style.css`.
 
 ## Estructura del proyecto
 
 ```
-index.html          Pantallas (hub, tienda, puntajes, HUD, overlays)
-css/style.css        Estilos, tema visual y controles táctiles
+index.html          Pantallas (hub, tienda, puntajes, HUD y juegos)
+favicon.svg          Ícono de marca (vaina de cacao + chocolate)
+css/style.css        Estilos, paleta de marca y controles táctiles
+js/theme.js           Paleta de marca Matichoc para usar en canvas
 js/characters.js      Definición/dibujo procedural de los Matichicos y atuendos
 js/games-catalog.js  Catálogo de modos de juego (disponibles y "próximamente")
-js/levels.js          Mapas, obstáculos, coleccionables y misiones por nivel
+js/levels.js          Camino/corredor, obstáculos, coleccionables y misiones
 js/audio.js           Efectos de sonido generados con Web Audio API
 js/game.js            Motor de "Recolecta y Corre": loop, colisiones, HUD
-js/storage.js         Progreso persistente (personaje, monedas, atuendos, ranking)
+js/tetris-pieces.js  Formas y colores de "Tetris de Productos"
+js/tetris-game.js    Motor de "Tetris de Productos": tablero, piezas, HUD
+js/storage.js         Progreso persistente (personaje, monedas, atuendos, ranking por juego)
 js/main.js            Hub, tienda, tabla de puntajes y navegación entre juegos
 .github/workflows/    Despliegue automático a GitHub Pages
 ROADMAP.md            Plan por etapas hacia la plataforma multi-juego
@@ -88,8 +105,7 @@ Ver [`ROADMAP.md`](./ROADMAP.md) para el plan detallado por etapas. En
 resumen, lo siguiente:
 
 - Reemplazar los sprites procedurales por ilustraciones/spritesheets finales.
-- Construir el segundo juego del catálogo (Salto Choco) como primer caso
-  real de "varios juegos comparten hub, personaje y monedas".
-- Definir si la tabla de puntajes conviene separarla por juego además del
-  ranking global.
+- Construir el tercer juego del catálogo (Salto Choco).
+- Mover cada juego a su propia carpeta `js/games/<id>/` cuando se sume el
+  tercero (ver ROADMAP.md → Consideraciones técnicas).
 - Tabla de puntajes online (backend) para competir entre dispositivos.
