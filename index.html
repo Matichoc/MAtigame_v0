@@ -16,10 +16,44 @@
   <section id="screen-menu" class="screen">
     <div class="menu-card">
       <h1 class="logo">MATICHOC<span>La Aventura del Cacao</span></h1>
-      <p class="tagline">Elige a tu Matichico y recorre la cancha recolectando chocolates para cumplir cada misión.</p>
+      <p class="tagline">Elige a tu Matichico y recorre la cancha recolectando golosinas para cumplir cada misión.</p>
+
+      <label class="field-label" for="input-name">Tu nombre (para la tabla de puntajes)</label>
+      <input id="input-name" class="text-input" type="text" maxlength="16" placeholder="Jugador">
+
       <div id="character-grid" class="character-grid"></div>
+
+      <div class="menu-secondary-row">
+        <button id="btn-open-shop" class="btn-secondary">🛒 Tienda</button>
+        <button id="btn-open-leaderboard" class="btn-secondary">🏆 Puntajes</button>
+      </div>
+
       <button id="btn-start" class="btn-primary" disabled>Elige un personaje</button>
-      <p class="hint">Muévete con las flechas / WASD o los botones táctiles.</p>
+      <p class="hint">Muévete con las flechas / WASD, salta con ESPACIO, o usa los botones táctiles.</p>
+    </div>
+  </section>
+
+  <!-- TIENDA DE ATUENDOS -->
+  <section id="screen-shop" class="screen hidden">
+    <div class="menu-card">
+      <h1 class="logo" style="font-size:1.8rem">TIENDA</h1>
+      <p class="tagline">Compra atuendos para tu Matichico con monedas Chocolate Dubai.</p>
+      <div class="coins-banner">🍫✨ <span id="shop-coins">0</span> monedas</div>
+      <div id="shop-character-switcher" class="shop-character-switcher"></div>
+      <div id="shop-character-name" class="shop-character-name"></div>
+      <div id="outfit-grid" class="outfit-grid"></div>
+      <button id="btn-shop-back" class="btn-primary">Volver</button>
+    </div>
+  </section>
+
+  <!-- TABLA DE PUNTAJES -->
+  <section id="screen-leaderboard" class="screen hidden">
+    <div class="menu-card">
+      <h1 class="logo" style="font-size:1.8rem">TABLA DE PUNTAJES</h1>
+      <p class="tagline">Los mejores Campeones Matichoc.</p>
+      <ol id="leaderboard-list" class="leaderboard-list"></ol>
+      <p id="leaderboard-empty" class="leaderboard-empty hidden">Todavía no hay puntajes. ¡Completa las canchas para ser el primer Campeón Matichoc!</p>
+      <button id="btn-leaderboard-back" class="btn-primary">Volver</button>
     </div>
   </section>
 
@@ -34,8 +68,9 @@
         </div>
       </div>
       <div class="hud-right">
-        <div class="hud-chip">🍫 <span id="hud-choco">0</span>/<span id="hud-target">0</span></div>
+        <div class="hud-chip">🍬 <span id="hud-choco">0</span>/<span id="hud-target">0</span></div>
         <div class="hud-chip">⭐ <span id="hud-score">0</span></div>
+        <div class="hud-chip">🍫✨ <span id="hud-coins">0</span></div>
         <div class="hud-chip" id="hud-timer-chip">⏱ <span id="hud-timer">00</span></div>
         <button id="btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
       </div>
@@ -86,6 +121,7 @@
           <button class="dpad-btn" id="btn-right" data-dir="right">▶</button>
         </div>
       </div>
+      <button class="dpad-btn jump-btn" id="btn-jump">⤴ Saltar</button>
     </div>
   </section>
 

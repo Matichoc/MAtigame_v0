@@ -1,8 +1,7 @@
-import { drawCharacter } from "./characters.js";
-import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates } from "./levels.js";
+import { drawCharacter, getOutfit } from "./characters.js";
+import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates, findFreeSpot } from "./levels.js";
 import * as audio from "./audio.js";
-
-const STORAGE_KEY = "matichoc_save_v1";
+import { saveProgress, addToLeaderboard, equippedOutfitId } from "./storage.js";
 
 const THEME_COLORS = {
   field: { bg: "#2f8f3e", line: "#e8f5e8", accent: "#256c30" },
@@ -10,42 +9,47 @@ const THEME_COLORS = {
   gym: { bg: "#dfe6f0", line: "#b9c4d6", accent: "#c7d0e0" },
 };
 
+function randRange(a, b) {
+  return a + Math.random() * (b - a);
+}
+
 export class Game {
-  constructor(canvas, character, els) {
+  /** progress: objeto de storage.js, compartido con el menú y persistido entre partidas. */
+  constructor(canvas, character, progress, els) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
     this.character = character;
+    this.progress = progress;
     this.els = els; // referencias DOM del HUD/overlays
 
     this.levelIndex = 0;
     this.score = 0;
     this.keys = {};
-    this.player = { x: CANVAS_W / 2, y: CANVAS_H / 2, radius: 16, speed: 190, facing: "down" };
+    this.player = {
+      x: CANVAS_W / 2,
+      y: CANVAS_H / 2,
+      radius: 16,
+      speed: 190,
+      facing: "down",
+      isMoving: false,
+      isJumping: false,
+      jumpTimer: 0,
+      jumpDuration: 0.45,
+      jumpCooldown: 0,
+    };
     this.particles = [];
+    this.bonus = null;
+    this.bonusSpawnTimer = randRange(6, 10);
     this.state = "intro"; // intro | playing | win | lose | victory
     this.time = 0;
     this.lastTs = null;
 
-    this._loadProgress();
     this._bindInput();
     this._loop = this._loop.bind(this);
   }
 
-  _loadProgress() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      this.progress = raw ? JSON.parse(raw) : { bestScore: 0, unlockedLevel: 0 };
-    } catch (e) {
-      this.progress = { bestScore: 0, unlockedLevel: 0 };
-    }
-  }
-
-  _saveProgress() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.progress));
-    } catch (e) {
-      /* almacenamiento no disponible: se ignora silenciosamente */
-    }
+  get outfit() {
+    return getOutfit(equippedOutfitId(this.progress, this.character.id));
   }
 
   _bindInput() {
@@ -57,6 +61,7 @@ export class Game {
     window.addEventListener("keydown", (e) => {
       const dir = dirKeys[e.key];
       if (dir) { this.keys[dir] = true; e.preventDefault(); }
+      if (e.code === "Space" || e.key === " ") { this._tryJump(); e.preventDefault(); }
     });
     window.addEventListener("keyup", (e) => {
       const dir = dirKeys[e.key];
@@ -72,6 +77,11 @@ export class Game {
       btn.addEventListener("pointerleave", release);
       btn.addEventListener("pointercancel", release);
     });
+
+    const jumpBtn = document.getElementById("btn-jump");
+    if (jumpBtn) {
+      jumpBtn.addEventListener("pointerdown", (e) => { e.preventDefault(); this._tryJump(); });
+    }
   }
 
   start() {
@@ -89,8 +99,13 @@ export class Game {
     const spawn = level.spawn || { x: CANVAS_W / 2, y: CANVAS_H - 70 };
     this.player.x = spawn.x;
     this.player.y = spawn.y;
+    this.player.isJumping = false;
+    this.player.jumpTimer = 0;
+    this.player.jumpCooldown = 0;
     this.flagActive = false;
     this.moving = (level.movingObstacles || []).map((m) => ({ ...m, t: Math.random() * 10, baseX: m.x, baseY: m.y }));
+    this.bonus = null;
+    this.bonusSpawnTimer = randRange(6, 10);
     this.state = "intro";
     this.particles = [];
 
@@ -100,9 +115,14 @@ export class Game {
     this.els.hudChoco.textContent = "0";
     this.els.hudTimer.textContent = String(level.timeLimit).padStart(2, "0");
     this.els.hudTimerChip.classList.remove("low");
+    this._updateCoinsHud();
     this.els.introTitle.textContent = level.name;
     this.els.introText.textContent = level.missionText;
     this._showOverlay("intro");
+  }
+
+  _updateCoinsHud() {
+    if (this.els.hudCoins) this.els.hudCoins.textContent = String(this.progress.coins);
   }
 
   _showOverlay(name) {
@@ -117,6 +137,15 @@ export class Game {
   beginPlaying() {
     this.state = "playing";
     this._showOverlay(null);
+  }
+
+  _tryJump() {
+    if (this.state !== "playing") return;
+    if (this.player.isJumping || this.player.jumpCooldown > 0) return;
+    this.player.isJumping = true;
+    this.player.jumpTimer = this.player.jumpDuration;
+    this.player.jumpCooldown = this.player.jumpDuration + 0.15;
+    audio.playJump();
   }
 
   _loop(ts) {
@@ -135,9 +164,16 @@ export class Game {
     this._updateParticles(dt);
     if (this.state !== "playing") return;
 
+    if (this.player.jumpCooldown > 0) this.player.jumpCooldown -= dt;
+    if (this.player.isJumping) {
+      this.player.jumpTimer -= dt;
+      if (this.player.jumpTimer <= 0) this.player.isJumping = false;
+    }
+
     this._updateMoving(dt);
     this._updatePlayer(dt);
     this._checkChocolateCollisions();
+    this._updateBonus(dt);
     this._checkFlag();
 
     this.timeLeft -= dt;
@@ -191,6 +227,7 @@ export class Game {
     const r = this.player.radius * 0.8;
     const all = [...(this.level.obstacles || []), ...this.moving];
     for (const o of all) {
+      if (o.jumpable && this.player.isJumping) continue;
       if (o.gap) {
         const [gy0, gy1] = this.level.gapY;
         if (y > gy0 - r && y < gy1 + r) continue;
@@ -243,6 +280,39 @@ export class Game {
     }
   }
 
+  /** El Chocolate Dubai: bonus especial que aparece unos segundos y da monedas persistentes. */
+  _updateBonus(dt) {
+    if (this.bonus) {
+      this.bonus.timer -= dt;
+      const d = Math.hypot(this.bonus.x - this.player.x, this.bonus.y - this.player.y);
+      if (d < this.player.radius + 16) {
+        this.progress.coins += this.bonus.value;
+        this.score += 30;
+        this.els.hudScore.textContent = String(this.score);
+        this._updateCoinsHud();
+        audio.playBonusCollect();
+        this._spawnPopup(this.bonus.x, this.bonus.y, `+${this.bonus.value} 🍫✨`);
+        saveProgress(this.progress);
+        this.bonus = null;
+        this.bonusSpawnTimer = randRange(10, 16);
+        return;
+      }
+      if (this.bonus.timer <= 0) {
+        this.bonus = null;
+        this.bonusSpawnTimer = randRange(8, 14);
+      }
+    } else {
+      this.bonusSpawnTimer -= dt;
+      if (this.bonusSpawnTimer <= 0) {
+        const spot = findFreeSpot(this.level, this.player);
+        if (spot) {
+          this.bonus = { x: spot.x, y: spot.y, timer: 3, value: 8 };
+        }
+        this.bonusSpawnTimer = randRange(10, 16);
+      }
+    }
+  }
+
   _checkFlag() {
     if (!this.flagActive || !this.level.flag) return;
     const f = this.level.flag;
@@ -286,12 +356,13 @@ export class Game {
     const isLast = this.levelIndex === LEVELS.length - 1;
     this.progress.unlockedLevel = Math.max(this.progress.unlockedLevel, this.levelIndex + 1);
     this.progress.bestScore = Math.max(this.progress.bestScore, this.score);
-    this._saveProgress();
+    saveProgress(this.progress);
 
     if (isLast) {
-      this.els.victoryText.textContent = `Completaste las 3 canchas con ${this.score} puntos. ¡Toda La Liga te aplaude!`;
+      this.els.victoryText.textContent = `Completaste las ${LEVELS.length} canchas con ${this.score} puntos y ${this.progress.coins} monedas Dubai. ¡Toda La Liga te aplaude!`;
       audio.playVictory();
       this._spawnConfetti();
+      addToLeaderboard(this.progress, this.progress.playerName, this.score);
       this._showOverlay("victory");
     } else {
       this.els.winText.textContent = `¡Cumpliste la misión con ${this.score} puntos! Prepárate para el siguiente reto.`;
@@ -302,7 +373,7 @@ export class Game {
   _onLose() {
     this.state = "lose";
     audio.playLose();
-    this.els.loseText.textContent = `Recolectaste ${this.collected} de ${this.level.target} chocolates. ¡Tú puedes lograrlo!`;
+    this.els.loseText.textContent = `Recolectaste ${this.collected} de ${this.level.target} golosinas. ¡Tú puedes lograrlo!`;
     this._showOverlay("lose");
   }
 
@@ -327,7 +398,16 @@ export class Game {
     this._renderObstacles();
     this._renderFlag();
     this._renderChocolates();
-    drawCharacter(ctx, this.character, this.player.x, this.player.y, 48, this.time, this.player.isMoving, this.player.facing);
+    this._renderBonus();
+
+    const jumpProgress = this.player.isJumping ? 1 - this.player.jumpTimer / this.player.jumpDuration : 0;
+    const jumpOffset = this.player.isJumping ? Math.sin(jumpProgress * Math.PI) * 20 : 0;
+    drawCharacter(
+      ctx, this.character, this.outfit,
+      this.player.x, this.player.y - jumpOffset, 48,
+      this.time, this.player.isMoving, this.player.facing
+    );
+
     this._renderParticles();
   }
 
@@ -347,6 +427,9 @@ export class Game {
       ctx.moveTo(CANVAS_W / 2, CANVAS_H / 2);
       ctx.arc(CANVAS_W / 2, CANVAS_H / 2, 50, 0, Math.PI * 2);
       ctx.stroke();
+      // áreas chicas
+      ctx.strokeRect(60, 150, 46, 180);
+      ctx.strokeRect(CANVAS_W - 106, 150, 46, 180);
     } else if (this.level.theme === "court") {
       for (let i = 0; i < CANVAS_W; i += 40) {
         ctx.beginPath();
@@ -359,6 +442,8 @@ export class Game {
       ctx.arc(CANVAS_W / 2, CANVAS_H / 2, 60, 0, Math.PI * 2);
       ctx.strokeStyle = theme.line;
       ctx.stroke();
+      this._drawHoop(34, 1);
+      this._drawHoop(CANVAS_W - 34, -1);
     } else if (this.level.theme === "gym") {
       for (let x = 0; x < CANVAS_W; x += 48) {
         for (let y = 0; y < CANVAS_H; y += 48) {
@@ -366,25 +451,46 @@ export class Game {
           ctx.strokeRect(x, y, 48, 48);
         }
       }
+      ctx.fillStyle = "rgba(200,16,46,0.12)";
+      ctx.fillRect(0, 30, CANVAS_W, 16);
+      ctx.fillStyle = theme.accent;
+      for (let x = 50; x < CANVAS_W - 40; x += 70) {
+        ctx.fillRect(x, CANVAS_H - 46, 6, 22);
+      }
     }
+  }
+
+  _drawHoop(x, dir) {
+    const ctx = this.ctx;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(x, 170, dir * 5, 90);
+    ctx.strokeStyle = "#e8622c";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(x + dir * 16, 218, 10, 0, Math.PI * 2);
+    ctx.stroke();
   }
 
   _renderObstacles() {
     const ctx = this.ctx;
     const theme = THEME_COLORS[this.level.theme];
     for (const o of this.level.obstacles) {
+      if (o.jumpable) {
+        this._drawHurdle(o);
+        continue;
+      }
       if (o.w >= CANVAS_W || o.h >= CANVAS_H) {
         ctx.fillStyle = theme.accent;
         ctx.fillRect(o.x, o.y, o.w, o.h);
         continue;
       }
-      if (this.level.id === "liga" && o.h === 100) {
+      if (this.level.theme === "field" && o.h === 100) {
         // poste de arco
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(o.x, o.y, o.w, o.h);
         ctx.strokeStyle = "#1c1c1c";
         ctx.strokeRect(o.x, o.y, o.w, o.h);
-      } else if (this.level.id === "liga") {
+      } else if (this.level.theme === "field") {
         this._drawCone(o.x + o.w / 2, o.y + o.h / 2, o.w);
       } else {
         ctx.fillStyle = "#4a3624";
@@ -393,6 +499,20 @@ export class Game {
     }
     for (const m of this.moving) {
       this._drawCone(m.x + m.w / 2, m.y + m.h / 2, m.w);
+    }
+  }
+
+  _drawHurdle(o) {
+    const ctx = this.ctx;
+    ctx.fillStyle = "#3a2411";
+    ctx.fillRect(o.x - 3, o.y - 6, 4, o.h + 12);
+    ctx.fillRect(o.x + o.w - 1, o.y - 6, 4, o.h + 12);
+    ctx.fillStyle = "#b8261b";
+    ctx.fillRect(o.x, o.y, o.w, o.h);
+    ctx.fillStyle = "#ffffff";
+    const stripeW = 10;
+    for (let sx = o.x; sx < o.x + o.w; sx += stripeW * 2) {
+      ctx.fillRect(sx, o.y, Math.min(stripeW, o.x + o.w - sx), o.h);
     }
   }
 
@@ -440,6 +560,71 @@ export class Game {
       const bob = Math.sin(this.time * 4 + c.bobSeed) * 3;
       ctx.save();
       ctx.translate(c.x, c.y + bob);
+      this._drawCollectible(c.kind || "choco");
+      ctx.restore();
+    }
+  }
+
+  _drawCollectible(kind) {
+    const ctx = this.ctx;
+    if (kind === "alfajor") {
+      // alfajor: disco con relleno claro y azúcar flor
+      ctx.fillStyle = "#a9702f";
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#e8c98a";
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "#a9702f";
+      ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.85)";
+      for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a) * 5, Math.sin(a) * 5, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (kind === "cuchuflin") {
+      // cuchuflín: barquillo tubular con dulce de leche en las puntas
+      ctx.fillStyle = "#e0ab52";
+      roundRectPath(ctx, -12, -5, 24, 10, 5);
+      ctx.fill();
+      ctx.strokeStyle = "#a9702f";
+      ctx.lineWidth = 1;
+      for (let x = -8; x <= 8; x += 4) {
+        ctx.beginPath();
+        ctx.moveTo(x, -5);
+        ctx.lineTo(x + 3, 5);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "#7a4a1e";
+      ctx.beginPath();
+      ctx.arc(-12, 0, 4, 0, Math.PI * 2);
+      ctx.arc(12, 0, 4, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (kind === "barquillo") {
+      // barquillo/cono con bocado de chocolate
+      ctx.fillStyle = "#d9a463";
+      ctx.beginPath();
+      ctx.moveTo(-8, -2);
+      ctx.lineTo(8, -2);
+      ctx.lineTo(0, 13);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "#a9702f";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-6, 2); ctx.lineTo(6, -4);
+      ctx.moveTo(-4, 7); ctx.lineTo(6, 0);
+      ctx.stroke();
+      ctx.fillStyle = "#5a3320";
+      ctx.beginPath();
+      ctx.arc(0, -6, 7, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // chocolate clásico
       ctx.fillStyle = "#5a3320";
       roundRectPath(ctx, -11, -8, 22, 16, 4);
       ctx.fill();
@@ -453,8 +638,44 @@ export class Game {
       ctx.beginPath();
       ctx.arc(-11, -8, 2, 0, Math.PI * 2);
       ctx.fill();
-      ctx.restore();
     }
+  }
+
+  _renderBonus() {
+    if (!this.bonus) return;
+    const ctx = this.ctx;
+    const { x, y, timer } = this.bonus;
+    const pulse = 1 + Math.sin(this.time * 10) * 0.08;
+
+    const grad = ctx.createRadialGradient(x, y, 2, x, y, 28);
+    grad.addColorStop(0, "rgba(244,197,61,0.5)");
+    grad.addColorStop(1, "rgba(244,197,61,0)");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(x, y, 28, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(255,255,255,0.85)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(x, y, 22, -Math.PI / 2, -Math.PI / 2 + (timer / 3) * Math.PI * 2);
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(pulse, pulse);
+    roundRectPath(ctx, -14, -9, 28, 18, 5);
+    ctx.fillStyle = "#8bc34a";
+    ctx.fill();
+    ctx.strokeStyle = "#5a8f2c";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.strokeStyle = "#f4c53d";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(-12, -4); ctx.lineTo(-4, 4); ctx.lineTo(4, -4); ctx.lineTo(12, 4);
+    ctx.stroke();
+    ctx.restore();
   }
 
   _renderParticles() {

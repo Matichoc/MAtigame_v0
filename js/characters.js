@@ -7,9 +7,8 @@ export const CHARACTERS = [
     id: "capitan",
     name: "Choco Capitán",
     type: "futbol_chico",
+    gender: "boy",
     number: "10",
-    jersey: "#c8102e",
-    trim: "#f4c53d",
     choco: "#6b3d22",
     chocoDark: "#4a2a17",
   },
@@ -17,9 +16,8 @@ export const CHARACTERS = [
     id: "estrella",
     name: "Choco Estrella",
     type: "futbol_chica",
+    gender: "girl",
     number: "7",
-    jersey: "#c8102e",
-    trim: "#f4c53d",
     choco: "#6b3d22",
     chocoDark: "#4a2a17",
   },
@@ -27,9 +25,8 @@ export const CHARACTERS = [
     id: "baller",
     name: "Choco Baller",
     type: "basket",
+    gender: "boy",
     number: "12",
-    jersey: "#c8102e",
-    trim: "#ffffff",
     choco: "#7a4a2a",
     chocoDark: "#54331c",
   },
@@ -37,21 +34,33 @@ export const CHARACTERS = [
     id: "cheer",
     name: "Choco Cheer",
     type: "cheer",
+    gender: "girl",
     number: "",
-    jersey: "#c8102e",
-    trim: "#14213d",
     choco: "#8a5a36",
     chocoDark: "#5e3c22",
   },
 ];
 
+/** Atuendos (recolores de uniforme) comprables en la tienda con monedas Chocolate Dubai. */
+export const OUTFITS = [
+  { id: "liga", name: "Local La Liga", price: 0, jersey: "#c8102e", trim: "#f4c53d" },
+  { id: "visita", name: "Visita Azul", price: 30, jersey: "#14213d", trim: "#ffffff" },
+  { id: "oro", name: "Edición Oro", price: 60, jersey: "#f4c53d", trim: "#14213d" },
+  { id: "noche", name: "Edición Noche", price: 90, jersey: "#1a1a1a", trim: "#c8102e" },
+];
+
+export function getOutfit(id) {
+  return OUTFITS.find((o) => o.id === id) || OUTFITS[0];
+}
+
 /**
  * Dibuja un Matichico dentro de un cuadro size x size, centrado en (cx, cy).
+ * outfit: paleta { jersey, trim } comprada/equipada (ver OUTFITS).
  * t: tiempo en segundos (para animación de caminata/rebote).
  * moving: si el personaje se está desplazando.
  * facing: 'up' | 'down' | 'left' | 'right'
  */
-export function drawCharacter(ctx, char, cx, cy, size, t, moving, facing = "down") {
+export function drawCharacter(ctx, char, outfit, cx, cy, size, t, moving, facing = "down") {
   const bob = moving ? Math.sin(t * 12) * size * 0.03 : Math.sin(t * 3) * size * 0.01;
   const legSwing = moving ? Math.sin(t * 12) * size * 0.12 : 0;
   const flip = facing === "left" ? -1 : 1;
@@ -86,15 +95,27 @@ export function drawCharacter(ctx, char, cx, cy, size, t, moving, facing = "down
 
   // Cuerpo / jersey
   roundRect(ctx, -bodyW / 2, -size * 0.06, bodyW, bodyH, size * 0.12);
-  ctx.fillStyle = char.jersey;
+  ctx.fillStyle = outfit.jersey;
   ctx.fill();
   ctx.lineWidth = size * 0.03;
-  ctx.strokeStyle = char.trim;
+  ctx.strokeStyle = outfit.trim;
   ctx.stroke();
+
+  // Falda (solo cheer) para reforzar la silueta femenina del uniforme
+  if (char.type === "cheer") {
+    ctx.beginPath();
+    ctx.moveTo(-bodyW / 2, size * 0.1);
+    ctx.lineTo(bodyW / 2, size * 0.1);
+    ctx.lineTo(bodyW / 2 + size * 0.05, size * 0.2);
+    ctx.lineTo(-bodyW / 2 - size * 0.05, size * 0.2);
+    ctx.closePath();
+    ctx.fillStyle = outfit.trim;
+    ctx.fill();
+  }
 
   // Número en el jersey
   if (char.number) {
-    ctx.fillStyle = char.trim;
+    ctx.fillStyle = outfit.trim;
     ctx.font = `bold ${size * 0.16}px "Baloo 2", sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -128,17 +149,44 @@ export function drawCharacter(ctx, char, cx, cy, size, t, moving, facing = "down
   ctx.lineTo(headW * 0.16, headH / 2 - size * 0.03);
   ctx.stroke();
 
+  drawHairBase(ctx, char, size);
   drawFace(ctx, char, size);
-  drawHairAccessory(ctx, char, size);
+  drawHairAccessory(ctx, char, outfit, size);
   ctx.restore();
 
   ctx.restore();
+}
+
+function drawHairBase(ctx, char, size) {
+  // Peinado corto de base para los personajes varones, para que se lean
+  // claramente como "matichicos" y no queden con cabeza pelada.
+  // Nota: estas coordenadas son locales a la cabeza (centro en 0,0,
+  // mitad de alto ≈ size*0.31), por eso el flequillo va pegado al borde superior.
+  if (char.gender !== "boy" || char.type !== "futbol_chico") return;
+  ctx.fillStyle = "#2a180d";
+  ctx.beginPath();
+  ctx.moveTo(-size * 0.29, -size * 0.3);
+  ctx.quadraticCurveTo(0, -size * 0.4, size * 0.29, -size * 0.3);
+  ctx.lineTo(size * 0.29, -size * 0.2);
+  ctx.quadraticCurveTo(0, -size * 0.3, -size * 0.29, -size * 0.2);
+  ctx.closePath();
+  ctx.fill();
 }
 
 function drawFace(ctx, char, size) {
   const eyeY = -size * 0.03;
   const eyeDX = size * 0.13;
   const eyeR = size * 0.09;
+  const isGirl = char.gender === "girl";
+
+  // Rubor (solo personajes femeninos, para un look más tierno)
+  if (isGirl) {
+    ctx.fillStyle = "rgba(232,98,98,0.35)";
+    ctx.beginPath();
+    ctx.arc(-eyeDX - eyeR * 1.4, eyeY + eyeR * 1.4, eyeR * 0.55, 0, Math.PI * 2);
+    ctx.arc(eyeDX + eyeR * 1.4, eyeY + eyeR * 1.4, eyeR * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   // Ojos (blanco)
   ctx.fillStyle = "#ffffff";
@@ -148,7 +196,7 @@ function drawFace(ctx, char, size) {
   ctx.fill();
 
   // Iris
-  ctx.fillStyle = char.type === "baller" ? "#2f6fd6" : "#2b1a10";
+  ctx.fillStyle = char.type === "basket" ? "#2f6fd6" : "#2b1a10";
   ctx.beginPath();
   ctx.arc(-eyeDX + size * 0.02, eyeY, eyeR * 0.55, 0, Math.PI * 2);
   ctx.arc(eyeDX + size * 0.02, eyeY, eyeR * 0.55, 0, Math.PI * 2);
@@ -189,8 +237,8 @@ function drawFace(ctx, char, size) {
     ctx.stroke();
   }
 
-  if (char.type === "futbol_chica") {
-    // pestañas
+  if (isGirl) {
+    // pestañas: marca femenina común a ambas matichicas
     ctx.strokeStyle = "#2b1a10";
     ctx.lineWidth = size * 0.015;
     [-1, 1].forEach((side) => {
@@ -202,7 +250,7 @@ function drawFace(ctx, char, size) {
   }
 }
 
-function drawHairAccessory(ctx, char, size) {
+function drawHairAccessory(ctx, char, outfit, size) {
   ctx.fillStyle = "#3b2414";
   if (char.type === "futbol_chica") {
     // cola de caballo
@@ -211,6 +259,11 @@ function drawHairAccessory(ctx, char, size) {
     ctx.quadraticCurveTo(size * 0.46, -size * 0.1, size * 0.34, size * 0.16);
     ctx.quadraticCurveTo(size * 0.28, -size * 0.05, size * 0.2, -size * 0.24);
     ctx.closePath();
+    ctx.fill();
+    // moño sobre la cola, en zona sólida de cabello (no sobre el borde redondeado de la cabeza)
+    ctx.fillStyle = outfit.jersey;
+    ctx.beginPath();
+    ctx.arc(size * 0.3, -size * 0.06, size * 0.045, 0, Math.PI * 2);
     ctx.fill();
   } else if (char.type === "basket") {
     // mechón/copete
@@ -224,7 +277,7 @@ function drawHairAccessory(ctx, char, size) {
     ctx.beginPath();
     ctx.arc(0, -size * 0.36, size * 0.16, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = char.jersey;
+    ctx.fillStyle = outfit.jersey;
     ctx.beginPath();
     ctx.moveTo(size * 0.06, -size * 0.46);
     ctx.lineTo(size * 0.2, -size * 0.52);
@@ -248,10 +301,10 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-/** Dibuja una miniatura de personaje en un canvas pequeño (para el selector). */
-export function renderCharacterThumb(canvas, char) {
+/** Dibuja una miniatura de personaje en un canvas pequeño (para el selector/tienda). */
+export function renderCharacterThumb(canvas, char, outfit = getOutfit("liga")) {
   const ctx = canvas.getContext("2d");
   const size = canvas.width;
   ctx.clearRect(0, 0, size, size);
-  drawCharacter(ctx, char, size / 2, size * 0.6, size * 0.8, 0, false, "down");
+  drawCharacter(ctx, char, outfit, size / 2, size * 0.6, size * 0.8, 0, false, "down");
 }

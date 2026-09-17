@@ -61,3 +61,17 @@ export function playBounce() {
   tone(300, 0.06, "sine", 0.16);
   tone(520, 0.09, "sine", 0.13, 0.05);
 }
+
+export function playJump() {
+  tone(400, 0.08, "square", 0.12);
+  tone(700, 0.1, "square", 0.1, 0.06);
+}
+
+export function playBonusCollect() {
+  [660, 880, 1100, 1320, 1568].forEach((f, i) => tone(f, 0.16, "triangle", 0.15, i * 0.06));
+}
+
+export function playPurchase() {
+  tone(523, 0.1, "triangle", 0.15);
+  tone(784, 0.14, "triangle", 0.13, 0.08);
+}
