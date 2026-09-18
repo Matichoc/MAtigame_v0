@@ -1,6 +1,8 @@
 import { CHARACTERS, OUTFITS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { Game } from "./game.js";
 import { TetrisGame } from "./tetris-game.js";
+import { BasquetGame } from "./basquet-game.js";
+import { PorristasGame } from "./porristas-game.js";
 import * as audio from "./audio.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
@@ -24,7 +26,12 @@ const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenAchievements = document.getElementById("screen-achievements");
 const screenGame = document.getElementById("screen-game");
 const screenTetris = document.getElementById("screen-tetris");
-const ALL_SCREENS = [screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements, screenGame, screenTetris];
+const screenBasquet = document.getElementById("screen-basquet");
+const screenPorristas = document.getElementById("screen-porristas");
+const ALL_SCREENS = [
+  screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
+  screenGame, screenTetris, screenBasquet, screenPorristas,
+];
 
 const grid = document.getElementById("character-grid");
 const gameGrid = document.getElementById("game-grid");
@@ -34,7 +41,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { recolecta: null, tetris: null };
+const instances = { recolecta: null, tetris: null, basquet: null, porristas: null };
 
 let toastTimer = null;
 function showToast(message) {
@@ -373,6 +380,12 @@ function playGame(gameId) {
   } else if (gameId === "tetris") {
     showScreen(screenTetris);
     launchOrResumeTetris();
+  } else if (gameId === "basquet_tiros") {
+    showScreen(screenBasquet);
+    launchOrResumeBasquet();
+  } else if (gameId === "porristas") {
+    showScreen(screenPorristas);
+    launchOrResumePorristas();
   }
 }
 
@@ -643,6 +656,85 @@ function launchOrResumeTetris() {
     });
   } else {
     instances.tetris.startRun(selectedCharacter, progress);
+  }
+}
+
+// ---------- JUEGO: "LANZAMIENTOS DE BÁSQUET" ----------
+
+function launchOrResumeBasquet() {
+  updateHudAvatar("basquet-hud-avatar", selectedCharacter);
+
+  if (!instances.basquet) {
+    const canvas = document.getElementById("basquet-canvas");
+    const els = {
+      hudScore: document.getElementById("basquet-hud-score"),
+      hudMade: document.getElementById("basquet-hud-made"),
+      hudAttempts: document.getElementById("basquet-hud-attempts"),
+      hudCoins: document.getElementById("basquet-hud-coins"),
+      hudTimer: document.getElementById("basquet-hud-timer"),
+      hudTimerChip: document.getElementById("basquet-hud-timer-chip"),
+      gameoverText: document.getElementById("basquet-gameover-text"),
+      overlays: {
+        intro: document.getElementById("basquet-overlay-intro"),
+        gameover: document.getElementById("basquet-overlay-gameover"),
+      },
+    };
+
+    const basquet = new BasquetGame(canvas, selectedCharacter, progress, els);
+    instances.basquet = basquet;
+    basquet.start();
+
+    document.getElementById("basquet-btn-start").addEventListener("click", () => basquet.beginPlaying());
+    document.getElementById("basquet-btn-retry").addEventListener("click", () => basquet.retry());
+    document.getElementById("basquet-btn-menu").addEventListener("click", goToHub);
+    document.getElementById("basquet-btn-gameover-menu").addEventListener("click", goToHub);
+
+    const btnMute = document.getElementById("basquet-btn-mute");
+    btnMute.addEventListener("click", () => {
+      const next = !audio.isMuted();
+      audio.setMuted(next);
+      btnMute.textContent = next ? "🔇" : "🔊";
+    });
+  } else {
+    instances.basquet.startRun(selectedCharacter, progress);
+  }
+}
+
+// ---------- JUEGO: "SALTOS DE PORRISTAS" ----------
+
+function launchOrResumePorristas() {
+  updateHudAvatar("porristas-hud-avatar", selectedCharacter);
+
+  if (!instances.porristas) {
+    const canvas = document.getElementById("porristas-canvas");
+    const els = {
+      hudScore: document.getElementById("porristas-hud-score"),
+      hudCombo: document.getElementById("porristas-hud-combo"),
+      hudCoins: document.getElementById("porristas-hud-coins"),
+      gameoverText: document.getElementById("porristas-gameover-text"),
+      overlays: {
+        intro: document.getElementById("porristas-overlay-intro"),
+        gameover: document.getElementById("porristas-overlay-gameover"),
+      },
+    };
+
+    const porristas = new PorristasGame(canvas, selectedCharacter, progress, els);
+    instances.porristas = porristas;
+    porristas.start();
+
+    document.getElementById("porristas-btn-start").addEventListener("click", () => porristas.beginPlaying());
+    document.getElementById("porristas-btn-retry").addEventListener("click", () => porristas.retry());
+    document.getElementById("porristas-btn-menu").addEventListener("click", goToHub);
+    document.getElementById("porristas-btn-gameover-menu").addEventListener("click", goToHub);
+
+    const btnMute = document.getElementById("porristas-btn-mute");
+    btnMute.addEventListener("click", () => {
+      const next = !audio.isMuted();
+      audio.setMuted(next);
+      btnMute.textContent = next ? "🔇" : "🔊";
+    });
+  } else {
+    instances.porristas.startRun(selectedCharacter, progress);
   }
 }
 
