@@ -171,47 +171,63 @@ demás modos de acción/tiempo.
 - Mecánica: grilla de cartas boca abajo, encontrar parejas con el menor
   número de intentos o en el menor tiempo posible.
 
-### Etapa 6 — Lanzamientos de Básquet 🔜
+### Etapa 6 — Lanzamientos de Básquet ✅
 
 Reemplaza a la idea original de "Penales Choc" (pedido del usuario).
-Minijuego corto de tiros libres: el Matichico lanza al aro una y otra
-vez contra el reloj, con dificultad creciente.
+Minijuego corto de tiros libres (`js/basquet-game.js`): el Matichico
+lanza al aro una y otra vez contra un reloj de 60 segundos, con
+dificultad creciente.
 
-- Mecánica: barra de potencia con temporización (se llena y se vacía en
-  loop; tocar/soltar en el momento justo fija la potencia) más un
-  ángulo simple (arriba/abajo o arrastrar), en vez de apuntar libre —
-  más accesible en táctil que un control de física completo.
-- El aro se aleja y se achica a medida que suben las rondas; encestar
-  "limpio" (sin tocar el aro) da bonus de puntaje.
-- Reutiliza el dibujo de aro/tablero ya construido en
-  `Game._drawHoop()` (Nivel 2/5 de "Recolecta y Corre") como base
-  visual en vez de crear uno nuevo desde cero.
-- Coleccionables: aparece cada cierto número de rondas un aro dorado
-  "Chocolate Dubai" — encestar ahí da monedas además de puntos.
+- **Mecánica implementada**: dos barras de temporización secuenciales,
+  una de puntería (horizontal) y una de potencia (vertical), cada una
+  con un marcador que oscila; ESPACIO/tap fija primero la puntería y
+  luego la potencia, y con ambas fijadas la pelota vuela en un arco
+  hacia el aro. Encestar requiere que el error de puntería y de potencia
+  queden dentro de una "zona verde" que se va achicando con cada tiro
+  (más difícil con el correr de la partida); un acierto muy centrado en
+  ambas ("limpio") da un bonus de puntaje extra.
+- Cada 5° tiro es un aro dorado "Chocolate Dubai": encestarlo da monedas
+  además de puntos, con un brillo dorado distintivo en el aro.
+- Puntaje y ranking van al mismo sistema compartido (`bestScores`/
+  `leaderboards` con id `basquet_tiros`), visibles en el hub y en la
+  Tabla de Puntajes.
 
-### Etapa 7 — Saltos de Porristas 🔜
+### Etapa 7 — Saltos de Porristas ✅
 
-Segundo juego nuevo pedido por el usuario. **Corrección de diseño**: no
-es un endless-runner de obstáculos (esa mecánica quedó cubierta por el
-Nivel 6 de "Recolecta y Corre", ver Etapa 1.6 más arriba); es un juego de
-equilibrio tipo cheerleading con una rebotadora (trampolín/base de
-acrobacia) que hay que mover para mantener a la Matichica rebotando.
+Segundo juego nuevo pedido por el usuario (`js/porristas-game.js`).
+**Corrección de diseño hecha antes de construirlo**: no es un
+endless-runner de obstáculos (esa mecánica ya la cubre el Nivel 6 de
+"Recolecta y Corre", ver Etapa 1.6 más arriba); es un juego de
+equilibrio tipo cheerleading con una rebotadora (trampolín) que hay que
+mover para mantener a la Matichica rebotando.
 
-- Mecánica: el jugador mueve la rebotadora horizontalmente (flechas /
-  arrastre táctil) para ubicarla justo debajo de la Matichica antes de
-  que caiga; un rebote logrado la impulsa más alto y suma puntos, uno
-  fallado (rebotadora fuera de posición cuando ella cae) termina la
-  partida — más parecido a un juego de paleta/equilibrio (estilo
-  "Breakout" vertical) que a un endless-runner de saltar obstáculos.
-- Dificultad creciente: la Matichica cae en puntos horizontales cada vez
-  más variados/erráticos y con menos tiempo de reacción a medida que
-  sube el puntaje o la altura alcanzada.
-- Coleccionables: pompones flotando a distintas alturas que dan puntos
-  extra si se tocan durante el rebote; una racha de rebotes perfectos
-  seguidos sube un multiplicador de puntaje.
+- **Mecánica implementada**: la Matichica cae con física simple
+  (gravedad + arrastre horizontal aleatorio); el jugador mueve la
+  rebotadora con ← → o los botones táctiles para que quede debajo de
+  ella antes de que toque el "piso". Un rebote logrado la impulsa hacia
+  arriba de nuevo y suma puntos (más si el rebote quedó centrado,
+  acumulando combo); uno fallado termina la partida al instante — es un
+  juego de supervivencia sin límite de tiempo, no contrarreloj.
+- Dificultad creciente: el rango de deriva horizontal y la fuerza del
+  rebote aumentan con el puntaje, y la rebotadora se va angostando
+  (con un piso mínimo de ancho) para que siga siendo posible.
+- Pompones flotantes dan puntos extra al tocarlos en pleno vuelo; un
+  pompón dorado ocasional también da monedas Chocolate Dubai.
 - Comparte el estilo visual del Nivel 6 de "Recolecta y Corre" (gimnasio
-  cheer, acento rosa de marca) y usa el mismo Matichico/atuendo elegido
-  en el hub.
+  cheer, fondo crema con acento rosa de marca) y usa el mismo
+  Matichico/atuendo elegido en el hub. Puntaje y ranking usan el id
+  `porristas` en el sistema compartido.
+
+Ambos juegos se probaron con Playwright: flujo completo de tiros/rebotes
+con resultados deterministas (fijando los valores de las barras/la
+posición de la rebotadora), bonus dorado, combo, colección de pompones,
+fin de partida y reporte a mejor puntaje/ranking, botones de silencio y
+controles táctiles, además del aislamiento y rebind correcto entre
+perfiles (igual que "Recolecta y Corre" y "Tetris de Productos") y
+regresión completa del resto de la plataforma. Se agregaron además dos
+logros nuevos ("Encestador Estrella" y "Equilibrista Matichoc") para
+que también alimenten el sistema de recompensa diaria/logros de la
+Etapa 1.6.
 
 ## Diseño de "Tetris de Productos" (Etapa 2)
 
@@ -284,7 +300,7 @@ Pensados como el gancho de "por qué volver mañana":
 
 ## Tabla de puntajes por juego
 
-Con dos juegos ya activos, `js/storage.js` pasó de un `bestScore`/
+Con varios juegos ya activos, `js/storage.js` pasó de un `bestScore`/
 `leaderboard` únicos a `bestScores`/`leaderboards` **por juego**
 (`{ [gameId]: ... }`, con migración automática del guardado anterior
 hacia `recolecta`). El hub muestra el mejor puntaje de cada juego en su
@@ -322,18 +338,21 @@ gameId, nombre, score)` con su propio id.
 
 ## Consideraciones técnicas para los próximos juegos
 
-- Por ahora los módulos de cada juego viven sueltos en `js/` (por
-  ejemplo `game.js`/`levels.js` para "Recolecta y Corre",
-  `tetris-game.js`/`tetris-pieces.js` para Tetris) en vez de carpetas
-  `js/games/<id>/`. Con 2 juegos todavía es manejable; conviene mover a
-  carpetas recién al sumar el tercero, para no reorganizar dos veces.
+- Los módulos de cada juego siguen viviendo sueltos en `js/` (`game.js`/
+  `levels.js` para "Recolecta y Corre", `tetris-game.js`/
+  `tetris-pieces.js` para Tetris, `basquet-game.js` y `porristas-game.js`
+  para los dos juegos nuevos) en vez de carpetas `js/games/<id>/`. Ya son
+  4 módulos de juego con el mismo patrón — el umbral que esta misma
+  sección proponía como gatillo para reorganizar y/o extraer una interfaz
+  común ya se cumplió. No se hizo en esta vuelta a propósito (mover
+  archivos y tocar todos los imports es un cambio de alto riesgo/bajo
+  valor inmediato para meterlo junto con dos juegos nuevos); queda
+  pendiente como una tarea de orden aparte, sin apuro funcional porque
+  el patrón sigue funcionando bien tal como está.
 - Se recomienda seguir el mismo patrón de instancia única + métodos
-  (`start()`, `pauseForMenu()`, `startRun(character)`) usado en `Game` y
-  `TetrisGame` para que el hub pueda lanzar/pausar cualquier juego de
-  forma uniforme, sin necesidad de una clase base abstracta mientras el
-  número de juegos sea chico (se evaluará extraer una interfaz común
-  cuando el patrón se repita en 3-4 módulos y las diferencias reales
-  entre ellos sean claras).
+  (`start()`, `pauseForMenu()`, `startRun(character, progress)`) usado en
+  `Game`, `TetrisGame`, `BasquetGame` y `PorristasGame` para que el hub
+  pueda lanzar/pausar/rebindar cualquier juego de forma uniforme.
 - Mientras un juego esté "soon" en el catálogo, su tarjeta en el hub no
   debe ser interactiva (ver `js/main.js` → `renderGameGrid`).
 - Si un juego futuro usa un mapa/camino (como "Recolecta y Corre" o

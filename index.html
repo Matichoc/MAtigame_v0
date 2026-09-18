@@ -229,6 +229,103 @@
     </div>
   </section>
 
+  <!-- PANTALLA DE JUEGO: LANZAMIENTOS DE BÁSQUET -->
+  <section id="screen-basquet" class="screen hidden">
+    <div id="basquet-hud" class="hud">
+      <div class="hud-left">
+        <button id="basquet-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="basquet-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Lanzamientos de Básquet</div>
+          <div class="hud-mission">Fija puntería y potencia en el momento justo</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">🏀 <span id="basquet-hud-made">0</span>/<span id="basquet-hud-attempts">0</span></div>
+        <div class="hud-chip">⭐ <span id="basquet-hud-score">0</span></div>
+        <div class="hud-chip">🍫✨ <span id="basquet-hud-coins">0</span></div>
+        <div class="hud-chip" id="basquet-hud-timer-chip">⏱ <span id="basquet-hud-timer">00</span></div>
+        <button id="basquet-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="basquet-canvas-wrap" class="canvas-wrap">
+      <canvas id="basquet-canvas" width="800" height="480"></canvas>
+
+      <div id="basquet-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Lanzamientos de Básquet</h2>
+          <p>ESPACIO/tap para fijar la barra de puntería, y de nuevo para
+            fijar la de potencia. Encesta antes de que se acabe el tiempo —
+            cada 5° tiro es un aro dorado Chocolate Dubai, ¡vale monedas extra!</p>
+          <button class="btn-primary" id="basquet-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="basquet-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>¡Se acabó el tiempo!</h2>
+          <p id="basquet-gameover-text"></p>
+          <button class="btn-primary" id="basquet-btn-retry">Reintentar</button>
+          <button class="btn-secondary overlay-secondary-btn" id="basquet-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="basquet-touch-controls">
+      <button class="tetris-btn wide" id="basquet-btn-shoot">🏀 Lanzar</button>
+    </div>
+  </section>
+
+  <!-- PANTALLA DE JUEGO: SALTOS DE PORRISTAS -->
+  <section id="screen-porristas" class="screen hidden">
+    <div id="porristas-hud" class="hud">
+      <div class="hud-left">
+        <button id="porristas-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="porristas-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Saltos de Porristas</div>
+          <div class="hud-mission">Mueve la rebotadora y no la dejes caer</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">🤸 <span id="porristas-hud-score">0</span></div>
+        <div class="hud-chip">🔥 <span id="porristas-hud-combo">0</span></div>
+        <div class="hud-chip">🍫✨ <span id="porristas-hud-coins">0</span></div>
+        <button id="porristas-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="porristas-canvas-wrap" class="canvas-wrap">
+      <canvas id="porristas-canvas" width="800" height="480"></canvas>
+
+      <div id="porristas-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Saltos de Porristas</h2>
+          <p>Mueve la rebotadora con ← → (o los botones táctiles) para que
+            quede justo debajo de tu Matichica cada vez que cae. Rebotar
+            centrado suma combo; recoge los pompones para puntos extra.
+            ¡Si cae fuera de la rebotadora, se acaba la partida!</p>
+          <button class="btn-primary" id="porristas-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="porristas-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>¡Se cayó!</h2>
+          <p id="porristas-gameover-text"></p>
+          <button class="btn-primary" id="porristas-btn-retry">Reintentar</button>
+          <button class="btn-secondary overlay-secondary-btn" id="porristas-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="porristas-touch-controls">
+      <button class="tetris-btn" id="porristas-btn-left">◀</button>
+      <button class="tetris-btn" id="porristas-btn-right">▶</button>
+    </div>
+  </section>
+
 </div>
 
 <script type="module" src="js/main.js"></script>

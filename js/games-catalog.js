@@ -44,13 +44,13 @@ export const GAMES_CATALOG = [
     name: "Lanzamientos de Básquet",
     icon: "🏀",
     tagline: "Calcula la potencia y encesta antes de que se acabe el tiempo.",
-    status: "soon",
+    status: "available",
   },
   {
     id: "porristas",
     name: "Saltos de Porristas",
     icon: "🤸",
     tagline: "Mueve la rebotadora para mantener a tu Matichica rebotando.",
-    status: "soon",
+    status: "available",
   },
 ];

@@ -45,4 +45,20 @@ export const ACHIEVEMENTS = [
     desc: "Gana 200 monedas Chocolate Dubai en total.",
     isDone: (p) => (p.stats.totalCoinsEarned || 0) >= 200,
   },
+  {
+    id: "encestador",
+    name: "Encestador Estrella",
+    icon: "🏀",
+    reward: 20,
+    desc: "Consigue 100 puntos en Lanzamientos de Básquet.",
+    isDone: (p) => getBestScore(p, "basquet_tiros") >= 100,
+  },
+  {
+    id: "equilibrista",
+    name: "Equilibrista Matichoc",
+    icon: "🤸",
+    reward: 20,
+    desc: "Consigue 80 puntos en Saltos de Porristas.",
+    isDone: (p) => getBestScore(p, "porristas") >= 80,
+  },
 ];

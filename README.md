@@ -4,8 +4,11 @@ Arcade web de Matichoc: cada persona elige su perfil, su Matichico (Choco
 Capitán, Choco Estrella, Choco Baller o Choco Cheer) y lo personaliza con
 atuendos comprados en la tienda, para jugar cualquiera de los minijuegos
 disponibles con ese mismo personaje: **Recolecta y Corre** (recorrer 6
-canchas por un camino guiado recolectando golosinas) y **Tetris de
-Productos** (encajar golosinas cayendo).
+canchas por un camino guiado recolectando golosinas), **Tetris de
+Productos** (encajar golosinas cayendo), **Lanzamientos de Básquet**
+(tiro libre con barras de puntería y potencia contrarreloj) y **Saltos
+de Porristas** (mover una rebotadora para mantener a la Matichica
+rebotando sin que se caiga).
 
 Es una v0 intencionalmente simple: HTML + CSS + JavaScript puro (sin frameworks
 ni build step), pensada como base fácil de evolucionar. El plan es que esto
@@ -25,8 +28,9 @@ planeados (el hub ya muestra los 7, marcando cuáles están disponibles).
    juegos de tu perfil.
 3. Reclama tu **🎁 Recompensa diaria** (una vez por día, con racha) y revisa
    tus **🏅 Logros** — ambos dan monedas Chocolate Dubai extra.
-4. Elige un juego de la grilla: **Recolecta y Corre** y **Tetris de
-   Productos** están disponibles; el resto son los próximos modos del
+4. Elige un juego de la grilla: **Recolecta y Corre**, **Tetris de
+   Productos**, **Lanzamientos de Básquet** y **Saltos de Porristas**
+   están disponibles; el resto son los próximos modos del
    [`ROADMAP.md`](./ROADMAP.md). Cada tarjeta muestra tu mejor puntaje en
    ese juego.
 5. En **Recolecta y Corre**: sigue el camino marcado en cada cancha,
@@ -38,16 +42,24 @@ planeados (el hub ya muestra los 7, marcando cuáles están disponibles).
 6. En **Tetris de Productos**: encaja las piezas con ← → ↑ (rotar) ↓
    (bajar) y ESPACIO (caída instantánea) para completar líneas. Las piezas
    brillantes son Chocolate Dubai: dan monedas extra al limpiar su línea.
-7. En cualquier juego, cada cierto tiempo/con cierta probabilidad aparece
+7. En **Lanzamientos de Básquet**: presiona ESPACIO/tap para fijar la
+   barra de puntería, y de nuevo para fijar la de potencia — con ambas
+   bien centradas encestas. Tienes 60 segundos y la dificultad sube con
+   cada tiro; cada 5° tiro es un aro dorado que da monedas extra.
+8. En **Saltos de Porristas**: mueve la rebotadora con ← → (o los botones
+   táctiles) para que quede debajo de tu Matichica antes de que caiga.
+   Rebotar centrado suma combo, los pompones flotantes dan puntos extra;
+   si se cae fuera de la rebotadora se acaba la partida.
+9. En cualquier juego, cada cierto tiempo/con cierta probabilidad aparece
    un **Chocolate Dubai**: da monedas persistentes entre partidas y entre
    juegos.
-8. Usa esas monedas en la **Tienda** para comprar atuendos (recolores de
-   uniforme) para cualquiera de tus Matichicos. Puedes ir a la Tienda o
-   volver al hub en cualquier momento con el botón 🏠 del HUD, y cambiar de
-   perfil con el botón "Cambiar" junto a tu nombre.
-9. Completa las 6 canchas de Recolecta y Corre para ser Campeón Matichoc, o
-   consigue el mejor puntaje posible en Tetris — ambos quedan en la
-   **Tabla de Puntajes**, con una pestaña por juego.
+10. Usa esas monedas en la **Tienda** para comprar atuendos (recolores de
+    uniforme) para cualquiera de tus Matichicos. Puedes ir a la Tienda o
+    volver al hub en cualquier momento con el botón 🏠 del HUD, y cambiar
+    de perfil con el botón "Cambiar" junto a tu nombre.
+11. Completa las 6 canchas de Recolecta y Corre para ser Campeón Matichoc,
+    o consigue el mejor puntaje posible en cualquier otro juego — todos
+    quedan en la **Tabla de Puntajes**, con una pestaña por juego.
 
 Todo el progreso (por perfil: personaje, atuendos comprados, monedas,
 mejor puntaje, racha diaria, logros y tabla de puntajes por juego) se
@@ -73,6 +85,8 @@ js/audio.js           Efectos de sonido generados con Web Audio API
 js/game.js            Motor de "Recolecta y Corre": loop, colisiones, HUD
 js/tetris-pieces.js  Formas y colores de "Tetris de Productos"
 js/tetris-game.js    Motor de "Tetris de Productos": tablero, piezas, HUD
+js/basquet-game.js    Motor de "Lanzamientos de Básquet": barras de tiro, HUD
+js/porristas-game.js  Motor de "Saltos de Porristas": física de rebote, HUD
 js/storage.js         Progreso persistente por perfil (monedas, atuendos, ranking, logros)
 js/main.js            Perfiles, hub, tienda, puntajes y navegación entre juegos
 .github/workflows/    Despliegue automático a GitHub Pages
@@ -117,8 +131,9 @@ resumen, lo siguiente:
 
 - Reemplazar los sprites procedurales por ilustraciones/spritesheets finales
   (el techo de fidelidad visual actual está explicado en el ROADMAP).
-- Construir "Lanzamientos de Básquet" y "Saltos de Porristas", los dos
-  juegos nuevos ya diseñados en el ROADMAP.
-- Mover cada juego a su propia carpeta `js/games/<id>/` cuando se sume el
-  tercero (ver ROADMAP.md → Consideraciones técnicas).
+- Construir "Salto Choco", "Autos de Chocolate" y "Memoria Matichoc", los
+  tres modos que quedan como "próximamente" en el catálogo.
+- Mover cada juego a su propia carpeta `js/games/<id>/` (ver ROADMAP.md →
+  Consideraciones técnicas: ya hay 4 módulos con el mismo patrón, así que
+  el umbral para reorganizar ya se cumplió).
 - Tabla de puntajes online (backend) para competir entre dispositivos.

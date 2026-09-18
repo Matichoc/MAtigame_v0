@@ -640,6 +640,8 @@ html, body {
 }
 
 #tetris-canvas { background: #1c0f07; }
+#basquet-canvas { background: #c98a4b; }
+#porristas-canvas { background: #f7ecd9; }
 
 .overlay {
   position: absolute;
@@ -662,7 +664,7 @@ html, body {
 .overlay-card h2 { margin: 0 0 8px; color: var(--dorado); }
 .overlay-card p { margin: 0 0 16px; color: var(--crema); font-size: 0.95rem; }
 
-#touch-controls, #tetris-touch-controls {
+#touch-controls, #tetris-touch-controls, #basquet-touch-controls, #porristas-touch-controls {
   display: none;
   width: 100%;
   justify-content: center;
@@ -672,7 +674,7 @@ html, body {
 }
 
 @media (pointer: coarse) {
-  #touch-controls, #tetris-touch-controls { display: flex; }
+  #touch-controls, #tetris-touch-controls, #basquet-touch-controls, #porristas-touch-controls { display: flex; }
 }
 
 .dpad { display: flex; flex-direction: column; align-items: center; gap: 4px; }
