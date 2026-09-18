@@ -1,10 +1,16 @@
 // Estado persistente compartido entre el hub y todos los juegos (localStorage).
 // El personaje, sus atuendos y las monedas Chocolate Dubai son globales a toda
 // la plataforma; el puntaje y el ranking se llevan por juego (ver GAMES_CATALOG).
+// Todo el progreso vive dentro de un "perfil" (ver js/profiles.js), para que
+// varias personas puedan jugar desde el mismo navegador sin mezclar su avance.
 
-const STORAGE_KEY = "matichoc_save_v3";
+const SAVE_PREFIX = "matichoc_save_v3_profile_";
 const DEFAULT_OUTFIT = "liga";
 const MAX_LEADERBOARD = 10;
+
+export function storageKeyForProfile(profileId) {
+  return `${SAVE_PREFIX}${profileId}`;
+}
 
 function defaultProgress() {
   return {
@@ -16,55 +22,41 @@ function defaultProgress() {
     unlockedLevel: 0, // progreso dentro de "Recolecta y Corre"
     bestScores: {}, // { [gameId]: number }
     leaderboards: {}, // { [gameId]: [{ name, score, date }] }
+    stats: { totalCoinsEarned: 0 },
+    dailyStreak: 0,
+    lastDailyRewardDate: null, // "YYYY-MM-DD"
+    claimedAchievements: [], // [achievementId, ...]
   };
 }
 
-export function loadProgress() {
+/** Carga (o crea) el progreso de un perfil. El id queda "pegado" al objeto
+ * (no enumerable, así no se guarda dentro del JSON) para que saveProgress
+ * sepa a qué perfil escribir sin que cada llamador tenga que pasarlo. */
+export function loadProgress(profileId) {
+  let progress;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return migrateFromV2();
-    const parsed = JSON.parse(raw);
-    return {
+    const raw = localStorage.getItem(storageKeyForProfile(profileId));
+    const parsed = raw ? JSON.parse(raw) : {};
+    progress = {
       ...defaultProgress(),
       ...parsed,
+      equippedOutfit: { ...parsed.equippedOutfit },
+      ownedOutfits: { ...parsed.ownedOutfits },
       bestScores: { ...parsed.bestScores },
       leaderboards: { ...parsed.leaderboards },
+      stats: { ...defaultProgress().stats, ...parsed.stats },
+      claimedAchievements: parsed.claimedAchievements || [],
     };
   } catch (e) {
-    return defaultProgress();
+    progress = defaultProgress();
   }
-}
-
-function migrateFromV2() {
-  // Compatibilidad con el guardado v2 (bestScore/leaderboard únicos, sin
-  // distinguir juego): todo ese progreso pasa a pertenecer a "recolecta",
-  // que era el único juego que existía en ese momento.
-  try {
-    const raw = localStorage.getItem("matichoc_save_v2");
-    if (!raw) return defaultProgress();
-    const old = JSON.parse(raw);
-    const progress = {
-      ...defaultProgress(),
-      playerName: old.playerName || "",
-      selectedCharacterId: old.selectedCharacterId || null,
-      equippedOutfit: old.equippedOutfit || {},
-      ownedOutfits: old.ownedOutfits || {},
-      coins: old.coins || 0,
-      unlockedLevel: old.unlockedLevel || 0,
-    };
-    if (old.bestScore) progress.bestScores.recolecta = old.bestScore;
-    if (Array.isArray(old.leaderboard) && old.leaderboard.length) {
-      progress.leaderboards.recolecta = old.leaderboard;
-    }
-    return progress;
-  } catch (e) {
-    return defaultProgress();
-  }
+  Object.defineProperty(progress, "_profileId", { value: profileId, enumerable: false });
+  return progress;
 }
 
 export function saveProgress(progress) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    localStorage.setItem(storageKeyForProfile(progress._profileId), JSON.stringify(progress));
   } catch (e) {
     /* almacenamiento no disponible: se ignora silenciosamente */
   }
@@ -120,6 +112,42 @@ export function addToLeaderboard(progress, gameId, name, score) {
   board.sort((a, b) => b.score - a.score);
   progress.leaderboards[gameId] = board.slice(0, MAX_LEADERBOARD);
   saveProgress(progress);
+}
+
+/** Suma monedas y lleva la cuenta de cuántas se han ganado en total (para logros). */
+export function earnCoins(progress, amount) {
+  progress.coins += amount;
+  progress.stats.totalCoinsEarned += amount;
+}
+
+/** Reclama un logro (ver js/achievements.js) si está cumplido y no reclamado. */
+export function claimAchievement(progress, achievement) {
+  if (progress.claimedAchievements.includes(achievement.id)) return false;
+  if (!achievement.isDone(progress)) return false;
+  progress.claimedAchievements.push(achievement.id);
+  earnCoins(progress, achievement.reward);
+  saveProgress(progress);
+  return true;
+}
+
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export function canClaimDailyReward(progress) {
+  return progress.lastDailyRewardDate !== todayKey();
+}
+
+/** Reclama la recompensa diaria (si corresponde) y devuelve { reward, streak }, o null si ya se reclamó hoy. */
+export function claimDailyReward(progress) {
+  if (!canClaimDailyReward(progress)) return null;
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  progress.dailyStreak = progress.lastDailyRewardDate === yesterday ? progress.dailyStreak + 1 : 1;
+  const reward = Math.min(10 + (progress.dailyStreak - 1) * 5, 50);
+  earnCoins(progress, reward);
+  progress.lastDailyRewardDate = todayKey();
+  saveProgress(progress);
+  return { reward, streak: progress.dailyStreak };
 }
 
 export { DEFAULT_OUTFIT };

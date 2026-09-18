@@ -40,10 +40,17 @@ export const GAMES_CATALOG = [
     status: "soon",
   },
   {
-    id: "penales",
-    name: "Penales Choc",
-    icon: "⚽",
-    tagline: "Pica el balón al arco en la tanda de penales.",
+    id: "basquet_tiros",
+    name: "Lanzamientos de Básquet",
+    icon: "🏀",
+    tagline: "Calcula la potencia y encesta antes de que se acabe el tiempo.",
+    status: "soon",
+  },
+  {
+    id: "porristas",
+    name: "Saltos de Porristas",
+    icon: "🤸",
+    tagline: "Mueve la rebotadora para mantener a tu Matichica rebotando.",
     status: "soon",
   },
 ];

@@ -1,5 +1,5 @@
 import { drawCharacter, getOutfit } from "./characters.js";
-import { saveProgress, addToLeaderboard, equippedOutfitId, reportScore } from "./storage.js";
+import { saveProgress, addToLeaderboard, equippedOutfitId, reportScore, earnCoins } from "./storage.js";
 import { SHAPES, PIECE_STYLE, createBag, spawnPiece, pieceCells } from "./tetris-pieces.js";
 import * as audio from "./audio.js";
 import { BRAND } from "./theme.js";
@@ -107,8 +107,9 @@ export class TetrisGame {
     reportScore(this.progress, GAME_ID, this.score);
   }
 
-  startRun(character) {
+  startRun(character, progress) {
     this.character = character;
+    if (progress) this.progress = progress;
     this._resetBoard();
   }
 
@@ -251,7 +252,7 @@ export class TetrisGame {
 
     if (specialCleared > 0) {
       const reward = specialCleared * SPECIAL_COIN_REWARD;
-      this.progress.coins += reward;
+      earnCoins(this.progress, reward);
       this.coinsEarned += reward;
       saveProgress(this.progress);
       audio.playBonusCollect();

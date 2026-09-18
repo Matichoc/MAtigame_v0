@@ -72,8 +72,8 @@ export function drawCharacter(ctx, char, outfit, cx, cy, size, t, moving, facing
   ctx.translate(cx, cy + bob);
   ctx.scale(flip, 1);
 
-  const headW = size * 0.62;
-  const headH = size * 0.62;
+  const headW = size * 0.66;
+  const headH = size * 0.66;
   const bodyW = size * 0.56;
   const bodyH = size * 0.34;
 
@@ -162,7 +162,7 @@ export function drawCharacter(ctx, char, outfit, cx, cy, size, t, moving, facing
   ctx.stroke();
 
   drawHairBase(ctx, char, size);
-  drawFace(ctx, char, size);
+  drawFace(ctx, char, size, t);
   drawHairAccessory(ctx, char, outfit, size);
   ctx.restore();
 
@@ -185,10 +185,10 @@ function drawHairBase(ctx, char, size) {
   ctx.fill();
 }
 
-function drawFace(ctx, char, size) {
+function drawFace(ctx, char, size, t = 0) {
   const eyeY = -size * 0.03;
   const eyeDX = size * 0.13;
-  const eyeR = size * 0.09;
+  const eyeR = size * 0.105;
   const isGirl = char.gender === "girl";
 
   // Rubor (solo personajes femeninos, para un look más tierno)
@@ -200,26 +200,43 @@ function drawFace(ctx, char, size) {
     ctx.fill();
   }
 
-  // Ojos (blanco)
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath();
-  ctx.arc(-eyeDX, eyeY, eyeR, 0, Math.PI * 2);
-  ctx.arc(eyeDX, eyeY, eyeR, 0, Math.PI * 2);
-  ctx.fill();
+  // Parpadeo periódico: un abrir/cerrar breve cada pocos segundos le da vida
+  // al personaje aunque esté quieto (t=0 en las miniaturas nunca parpadea).
+  const cycle = t % 3.6;
+  const blinking = cycle > 3.45 && cycle < 3.6;
 
-  // Iris
-  ctx.fillStyle = char.type === "basket" ? "#2f6fd6" : "#2b1a10";
-  ctx.beginPath();
-  ctx.arc(-eyeDX + size * 0.02, eyeY, eyeR * 0.55, 0, Math.PI * 2);
-  ctx.arc(eyeDX + size * 0.02, eyeY, eyeR * 0.55, 0, Math.PI * 2);
-  ctx.fill();
+  if (blinking) {
+    ctx.strokeStyle = char.chocoDark;
+    ctx.lineWidth = size * 0.02;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(-eyeDX - eyeR * 0.8, eyeY);
+    ctx.quadraticCurveTo(-eyeDX, eyeY + eyeR * 0.3, -eyeDX + eyeR * 0.8, eyeY);
+    ctx.moveTo(eyeDX - eyeR * 0.8, eyeY);
+    ctx.quadraticCurveTo(eyeDX, eyeY + eyeR * 0.3, eyeDX + eyeR * 0.8, eyeY);
+    ctx.stroke();
+  } else {
+    // Ojos (blanco)
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(-eyeDX, eyeY, eyeR, 0, Math.PI * 2);
+    ctx.arc(eyeDX, eyeY, eyeR, 0, Math.PI * 2);
+    ctx.fill();
 
-  // Brillo
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath();
-  ctx.arc(-eyeDX + size * 0.04, eyeY - size * 0.02, eyeR * 0.18, 0, Math.PI * 2);
-  ctx.arc(eyeDX + size * 0.04, eyeY - size * 0.02, eyeR * 0.18, 0, Math.PI * 2);
-  ctx.fill();
+    // Iris
+    ctx.fillStyle = char.type === "basket" ? "#2f6fd6" : "#2b1a10";
+    ctx.beginPath();
+    ctx.arc(-eyeDX + size * 0.02, eyeY, eyeR * 0.55, 0, Math.PI * 2);
+    ctx.arc(eyeDX + size * 0.02, eyeY, eyeR * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Brillo
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(-eyeDX + size * 0.04, eyeY - size * 0.02, eyeR * 0.18, 0, Math.PI * 2);
+    ctx.arc(eyeDX + size * 0.04, eyeY - size * 0.02, eyeR * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
   // Cejas
   ctx.strokeStyle = char.chocoDark;
