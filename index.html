@@ -10,19 +10,47 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<div id="toast" class="toast hidden"></div>
 <div id="app">
 
-  <!-- HUB PRINCIPAL: perfil, estadísticas, selección de juego -->
-  <section id="screen-hub" class="screen">
+  <!-- SELECCIÓN DE PERFIL: "¿Quién juega?" -->
+  <section id="screen-profiles" class="screen">
     <div class="menu-card">
       <div class="brand-row">
         <img src="favicon.svg" alt="" class="brand-icon">
         <h1 class="logo">MATICHOC<span>arcade de golosinas</span></h1>
       </div>
-      <p class="tagline">Elige a tu Matichico, personalízalo y juega cualquiera de los modos disponibles.</p>
+      <p class="tagline">¿Quién juega? Cada perfil guarda su propio progreso.</p>
+      <div id="profile-grid" class="profile-grid"></div>
+
+      <div id="new-profile-form" class="new-profile-form hidden">
+        <input id="new-profile-name" class="text-input" type="text" maxlength="16" placeholder="Nombre del jugador">
+        <div class="menu-secondary-row">
+          <button id="btn-create-profile" class="btn-primary">Crear perfil</button>
+          <button id="btn-cancel-profile" class="btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HUB PRINCIPAL: perfil, estadísticas, selección de juego -->
+  <section id="screen-hub" class="screen hidden">
+    <div class="menu-card">
+      <div class="brand-row">
+        <img src="favicon.svg" alt="" class="brand-icon">
+        <h1 class="logo">MATICHOC<span>arcade de golosinas</span></h1>
+      </div>
+
+      <div class="profile-chip">
+        <img id="hub-profile-avatar" class="hub-profile-avatar" alt="">
+        <span id="hub-profile-name">Jugador</span>
+        <button id="btn-switch-profile" class="btn-tiny">Cambiar</button>
+      </div>
 
       <div class="hub-stats">
         <div class="stat-chip">🍫✨ Monedas: <span id="hub-total-coins">0</span></div>
+        <button id="btn-daily-reward" class="stat-chip stat-chip-btn">🎁 Recompensa diaria</button>
+        <button id="btn-open-achievements" class="stat-chip stat-chip-btn">🏅 Logros</button>
       </div>
 
       <label class="field-label" for="input-name">Tu nombre (para la tabla de puntajes)</label>
@@ -40,6 +68,16 @@
       <div id="game-grid" class="game-grid"></div>
 
       <p class="hint">Muévete con las flechas / WASD, salta con ESPACIO, o usa los botones táctiles.</p>
+    </div>
+  </section>
+
+  <!-- LOGROS -->
+  <section id="screen-achievements" class="screen hidden">
+    <div class="menu-card">
+      <h1 class="logo" style="font-size:1.8rem">LOGROS</h1>
+      <p class="tagline">Cumple objetivos y gana monedas Chocolate Dubai extra.</p>
+      <div id="achievement-list" class="achievement-list"></div>
+      <button id="btn-achievements-back" class="btn-primary">Volver</button>
     </div>
   </section>
 

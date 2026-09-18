@@ -37,7 +37,7 @@ usable:
 
 - El menú pasó de ser una simple pantalla de "elige personaje" a un
   **hub** con estadísticas visibles y una sección "Elige un juego" que ya
-  muestra los 6 modos planeados, para que la dirección del proyecto sea
+  muestra los 7 modos planeados, para que la dirección del proyecto sea
   visible desde ya.
 - Botón **🏠 Volver al menú** disponible durante la partida (HUD) y en las
   pantallas de fin de nivel, para poder ir a la Tienda o iniciar otra
@@ -90,6 +90,44 @@ el arte pedía un salto de calidad adicional. Cambios:
   propio inspirado en el logo real (vaina de cacao + chocolate +
   brillo) en vez del emoji genérico usado antes.
 
+### Etapa 1.6 — Perfiles, retención y tienda ✅
+
+Feedback del usuario tras probar la Etapa 1.5: "no es un juego que la
+gente quiera volver a jugar", la tienda no se veía bien, y la "sesión de
+cada usuario" no estaba resuelta (todos compartían un solo guardado en
+el navegador). Cambios:
+
+- **Perfiles por jugador** (ver "Perfiles / sesión por usuario" más
+  abajo): pantalla "¿Quién juega?" al abrir la app, hasta 4 perfiles por
+  navegador, cada uno con su propio progreso, monedas y personaje. Se
+  recuerda el último perfil usado para que volver a entrar sea
+  inmediato (sin fricción).
+- **Recompensa diaria y logros** (ver sección dedicada más abajo): una
+  razón concreta para volver mañana. Recompensa diaria con racha
+  creciente, y 5 logros que pagan monedas la primera vez que se cumplen.
+- **Tienda rediseñada**: tarjetas más grandes con degradado y sombra,
+  cinta "EQUIPADO" en la esquina, precio como cápsula dorada, y un
+  estado "bloqueado" claro (atenuado + candado) cuando no alcanzan las
+  monedas, en vez de solo deshabilitar el botón.
+- **Personajes más tiernos**: cabeza más grande en proporción al cuerpo
+  (más "chibi"), ojos más grandes, y parpadeo periódico para que se
+  sientan vivos aunque no se estén moviendo. Sigue siendo dibujo por
+  canvas, no arte 3D ilustrado — ver nota honesta sobre el techo de
+  fidelidad visual al final de esta sección.
+- **Nivel 6 en "Recolecta y Corre"**: "Gran Final Cheer", el gimnasio
+  cheer ahora tiene un nivel final propio con 7 vallas saltables
+  seguidas (antes el salto obligatorio solo estaba en los niveles 4 y
+  5) — el cierre de la campaña es, literalmente, el nivel de más salto.
+
+**Nota honesta sobre el techo visual**: se pidió acercar el estilo al de
+apps como *Avatar World* (personajes 3D ilustrados con acabado
+profesional). Este proyecto dibuja todo por código con `canvas` 2D — es
+liviano y fácil de mantener, pero no puede llegar a esa fidelidad sin
+arte ilustrado real (sprites/spritesheets hechos por un diseñador). El
+proyecto ya está preparado para ese salto (`drawCharacter`/
+`renderCharacterThumb` son la única puerta de entrada al dibujo del
+personaje), pero requiere encargar arte, no solo escribir más código.
+
 ### Etapa 2 — Segundo juego: Tetris de Productos ✅
 
 Ver la sección dedicada más abajo con el diseño completo. En resumen:
@@ -133,14 +171,47 @@ demás modos de acción/tiempo.
 - Mecánica: grilla de cartas boca abajo, encontrar parejas con el menor
   número de intentos o en el menor tiempo posible.
 
-### Etapa 6 — Penales Choc 🔜
+### Etapa 6 — Lanzamientos de Básquet 🔜
 
-Minijuego corto de penales de fútbol: elegir dirección y potencia del
-disparo (o del atajada, alternando), unas rondas cortas y tabla de
-"racha" de penales convertidos.
+Reemplaza a la idea original de "Penales Choc" (pedido del usuario).
+Minijuego corto de tiros libres: el Matichico lanza al aro una y otra
+vez contra el reloj, con dificultad creciente.
 
-- Mecánica: apuntar con el mouse/touch o flechas + barra de potencia con
-  temporización (tap para fijar), 5 rondas por partida.
+- Mecánica: barra de potencia con temporización (se llena y se vacía en
+  loop; tocar/soltar en el momento justo fija la potencia) más un
+  ángulo simple (arriba/abajo o arrastrar), en vez de apuntar libre —
+  más accesible en táctil que un control de física completo.
+- El aro se aleja y se achica a medida que suben las rondas; encestar
+  "limpio" (sin tocar el aro) da bonus de puntaje.
+- Reutiliza el dibujo de aro/tablero ya construido en
+  `Game._drawHoop()` (Nivel 2/5 de "Recolecta y Corre") como base
+  visual en vez de crear uno nuevo desde cero.
+- Coleccionables: aparece cada cierto número de rondas un aro dorado
+  "Chocolate Dubai" — encestar ahí da monedas además de puntos.
+
+### Etapa 7 — Saltos de Porristas 🔜
+
+Segundo juego nuevo pedido por el usuario. **Corrección de diseño**: no
+es un endless-runner de obstáculos (esa mecánica quedó cubierta por el
+Nivel 6 de "Recolecta y Corre", ver Etapa 1.6 más arriba); es un juego de
+equilibrio tipo cheerleading con una rebotadora (trampolín/base de
+acrobacia) que hay que mover para mantener a la Matichica rebotando.
+
+- Mecánica: el jugador mueve la rebotadora horizontalmente (flechas /
+  arrastre táctil) para ubicarla justo debajo de la Matichica antes de
+  que caiga; un rebote logrado la impulsa más alto y suma puntos, uno
+  fallado (rebotadora fuera de posición cuando ella cae) termina la
+  partida — más parecido a un juego de paleta/equilibrio (estilo
+  "Breakout" vertical) que a un endless-runner de saltar obstáculos.
+- Dificultad creciente: la Matichica cae en puntos horizontales cada vez
+  más variados/erráticos y con menos tiempo de reacción a medida que
+  sube el puntaje o la altura alcanzada.
+- Coleccionables: pompones flotando a distintas alturas que dan puntos
+  extra si se tocan durante el rebote; una racha de rebotes perfectos
+  seguidos sube un multiplicador de puntaje.
+- Comparte el estilo visual del Nivel 6 de "Recolecta y Corre" (gimnasio
+  cheer, acento rosa de marca) y usa el mismo Matichico/atuendo elegido
+  en el hub.
 
 ## Diseño de "Tetris de Productos" (Etapa 2)
 
@@ -167,6 +238,50 @@ disparo (o del atajada, alternando), unas rondas cortas y tabla de
   visible aunque el juego en sí no lo controle, para mantener la
   sensación de "es tu mismo personaje en todos los juegos".
 
+## Perfiles / sesión por usuario
+
+`js/profiles.js` guarda una lista liviana de perfiles (`{ id, name,
+characterId }`) bajo una clave de `localStorage` separada del progreso
+en sí. Cada perfil tiene su propio progreso completo, guardado con
+`storageKeyForProfile(id)` (`js/storage.js`) — así dos personas en el
+mismo navegador no se pisan el nombre, las monedas ni los puntajes.
+
+- Al abrir la app se recuerda el último perfil activo
+  (`getLastActiveProfileId`) y se entra directo a su hub; si no hay
+  ninguno (primera vez, o se acaba de eliminar el último) se muestra la
+  pantalla "¿Quién juega?".
+- Máximo 4 perfiles por navegador (`MAX_PROFILES`); se puede eliminar
+  uno desde su tarjeta (con confirmación, porque borra su progreso).
+- El progreso guardado antes de que existieran los perfiles se migra
+  automáticamente al primer perfil ("Jugador 1") la primera vez que se
+  abre la app tras esta actualización — nadie pierde su avance.
+- `Game`/`TetrisGame` exponen `startRun(character, progress)`: al elegir
+  un juego desde el hub siempre se le vuelve a "atar" (rebind) el
+  personaje y el progreso activos, así una instancia ya creada para el
+  perfil A no sigue escribiendo por error en su guardado cuando el
+  perfil B se pone a jugar.
+
+## Recompensa diaria y logros
+
+Pensados como el gancho de "por qué volver mañana":
+
+- **Recompensa diaria** (`canClaimDailyReward`/`claimDailyReward` en
+  `js/storage.js`): una vez por día calendario, botón en el hub que da
+  monedas Chocolate Dubai; la racha sube si se reclama en días
+  consecutivos y baja a 1 si se corta, con la recompensa creciendo con
+  la racha hasta un tope (10 → 50 monedas).
+- **Logros** (`js/achievements.js`): 5 objetivos simples que se
+  verifican contra el progreso ya guardado (primera partida, puntaje en
+  cada juego, completar "Recolecta y Corre", monedas totales ganadas
+  históricamente vía `stats.totalCoinsEarned`), cada uno reclamable una
+  sola vez por su propia recompensa en monedas. Agregar un logro nuevo
+  es sumar una entrada a `ACHIEVEMENTS` con su función `isDone(progress)`
+  — no requiere tocar la lógica de ningún juego.
+- Ambos usan `earnCoins(progress, monto)` en vez de sumar directo a
+  `progress.coins`, para que `stats.totalCoinsEarned` quede correcto sin
+  importar de qué juego o mecánica vino la moneda (necesario para el
+  logro "Ahorrista de Cacao").
+
 ## Tabla de puntajes por juego
 
 Con dos juegos ya activos, `js/storage.js` pasó de un `bestScore`/
@@ -180,6 +295,10 @@ gameId, nombre, score)` con su propio id.
 
 ## Sistema compartido entre juegos
 
+- **Perfiles** (`js/profiles.js`): todo progreso vive dentro de un
+  perfil (ver sección dedicada arriba); ningún juego nuevo debe leer o
+  guardar directo en una clave fija de `localStorage`, siempre a través
+  de `loadProgress(profileId)`/`saveProgress(progress)`.
 - **Paleta e identidad de marca** (`js/theme.js`, variables CSS en
   `css/style.css`): todo juego/pantalla nuevo debe usar estos colores
   (marrón, verde, rosa, dorado de Matichoc) en vez de inventar una

@@ -5,36 +5,258 @@ import * as audio from "./audio.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
   loadProgress, saveProgress, ownsOutfit, equippedOutfitId, buyOutfit, equipOutfit,
-  getBestScore, getLeaderboard,
+  getBestScore, getLeaderboard, canClaimDailyReward, claimDailyReward, claimAchievement,
 } from "./storage.js";
+import {
+  listProfiles, createProfile, deleteProfile, updateProfileMeta,
+  getLastActiveProfileId, setLastActiveProfileId, MAX_PROFILES,
+} from "./profiles.js";
+import { ACHIEVEMENTS } from "./achievements.js";
 
-const progress = loadProgress();
+let progress = null;
+let selectedCharacter = null;
+let shopCharacterId = CHARACTERS[0].id;
 
+const screenProfiles = document.getElementById("screen-profiles");
 const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
 const screenLeaderboard = document.getElementById("screen-leaderboard");
+const screenAchievements = document.getElementById("screen-achievements");
 const screenGame = document.getElementById("screen-game");
 const screenTetris = document.getElementById("screen-tetris");
-const ALL_SCREENS = [screenHub, screenShop, screenLeaderboard, screenGame, screenTetris];
+const ALL_SCREENS = [screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements, screenGame, screenTetris];
 
 const grid = document.getElementById("character-grid");
 const gameGrid = document.getElementById("game-grid");
 const inputName = document.getElementById("input-name");
 const hubTotalCoinsEl = document.getElementById("hub-total-coins");
+const toastEl = document.getElementById("toast");
 
-let selectedCharacter = CHARACTERS.find((c) => c.id === progress.selectedCharacterId) || null;
-
-// Instancias únicas de cada motor, creadas recién la primera vez que se juegan.
+// Instancias únicas de cada motor, creadas recién la primera vez que se juegan
+// y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
 const instances = { recolecta: null, tetris: null };
 
-inputName.value = progress.playerName || "";
+let toastTimer = null;
+function showToast(message) {
+  toastEl.textContent = message;
+  toastEl.classList.remove("hidden");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.add("hidden"), 2600);
+}
+
+function showScreen(target) {
+  ALL_SCREENS.forEach((s) => s.classList.toggle("hidden", s !== target));
+}
+
 inputName.addEventListener("input", () => {
   progress.playerName = inputName.value.trim();
   saveProgress(progress);
+  if (progress.playerName) updateProfileMeta(progress._profileId, { name: progress.playerName });
+  updateProfileChip();
 });
 
 function refreshHubStats() {
   hubTotalCoinsEl.textContent = String(progress.coins);
+}
+
+// ---------- PERFILES ("¿Quién juega?") ----------
+
+const profileGridEl = document.getElementById("profile-grid");
+const newProfileForm = document.getElementById("new-profile-form");
+const newProfileNameInput = document.getElementById("new-profile-name");
+
+function renderProfileScreen() {
+  profileGridEl.innerHTML = "";
+  newProfileForm.classList.add("hidden");
+  const profiles = listProfiles();
+
+  profiles.forEach((p) => {
+    const card = document.createElement("div");
+    card.className = "profile-card";
+
+    const char = CHARACTERS.find((c) => c.id === p.characterId);
+    if (char) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 64;
+      canvas.height = 64;
+      renderCharacterThumb(canvas, char, getOutfit("liga"));
+      card.appendChild(canvas);
+    } else {
+      const placeholder = document.createElement("div");
+      placeholder.className = "profile-placeholder";
+      placeholder.textContent = "🍫";
+      card.appendChild(placeholder);
+    }
+
+    const name = document.createElement("span");
+    name.className = "pname";
+    name.textContent = p.name;
+    card.appendChild(name);
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn-delete-profile";
+    delBtn.textContent = "✕";
+    delBtn.title = "Eliminar perfil";
+    delBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (window.confirm(`¿Eliminar el perfil de ${p.name}? Se borrará todo su progreso.`)) {
+        deleteProfile(p.id);
+        renderProfileScreen();
+      }
+    });
+    card.appendChild(delBtn);
+
+    card.addEventListener("click", () => chooseProfile(p.id));
+    profileGridEl.appendChild(card);
+  });
+
+  if (profiles.length < MAX_PROFILES) {
+    const addCard = document.createElement("div");
+    addCard.className = "profile-card add-profile";
+    const plus = document.createElement("span");
+    plus.className = "plus-icon";
+    plus.textContent = "+";
+    const label = document.createElement("span");
+    label.textContent = "Nuevo jugador";
+    addCard.appendChild(plus);
+    addCard.appendChild(label);
+    addCard.addEventListener("click", () => {
+      newProfileForm.classList.remove("hidden");
+      newProfileNameInput.value = "";
+      newProfileNameInput.focus();
+    });
+    profileGridEl.appendChild(addCard);
+  }
+}
+
+document.getElementById("btn-create-profile").addEventListener("click", () => {
+  const name = newProfileNameInput.value.trim() || "Jugador";
+  const p = createProfile(name);
+  chooseProfile(p.id);
+});
+document.getElementById("btn-cancel-profile").addEventListener("click", () => {
+  newProfileForm.classList.add("hidden");
+});
+
+function chooseProfile(id) {
+  setLastActiveProfileId(id);
+  progress = loadProgress(id);
+  selectedCharacter = CHARACTERS.find((c) => c.id === progress.selectedCharacterId) || null;
+  shopCharacterId = (selectedCharacter && selectedCharacter.id) || CHARACTERS[0].id;
+  bootHub();
+  showScreen(screenHub);
+}
+
+function goToProfiles() {
+  Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
+  renderProfileScreen();
+  showScreen(screenProfiles);
+}
+
+document.getElementById("btn-switch-profile").addEventListener("click", goToProfiles);
+
+function updateProfileChip() {
+  const profiles = listProfiles();
+  const current = profiles.find((p) => p.id === progress._profileId);
+  document.getElementById("hub-profile-name").textContent = (current && current.name) || progress.playerName || "Jugador";
+  const avatarImg = document.getElementById("hub-profile-avatar");
+  if (selectedCharacter) {
+    const c = document.createElement("canvas");
+    c.width = 40;
+    c.height = 40;
+    renderCharacterThumb(c, selectedCharacter, getOutfit(equippedOutfitId(progress, selectedCharacter.id)));
+    avatarImg.src = c.toDataURL();
+  }
+}
+
+function bootHub() {
+  inputName.value = progress.playerName || "";
+  renderCharacterGrid();
+  renderGameGrid();
+  refreshHubStats();
+  updateDailyRewardButton();
+  updateProfileChip();
+}
+
+// ---------- RECOMPENSA DIARIA ----------
+
+const btnDailyReward = document.getElementById("btn-daily-reward");
+
+function updateDailyRewardButton() {
+  const can = canClaimDailyReward(progress);
+  btnDailyReward.disabled = !can;
+  btnDailyReward.textContent = can
+    ? "🎁 Recompensa diaria"
+    : `🎁 Reclamado (racha ${progress.dailyStreak} día${progress.dailyStreak === 1 ? "" : "s"})`;
+}
+
+btnDailyReward.addEventListener("click", () => {
+  const result = claimDailyReward(progress);
+  if (!result) return;
+  audio.playPurchase();
+  refreshHubStats();
+  updateDailyRewardButton();
+  showToast(`¡+${result.reward} monedas! Racha de ${result.streak} día${result.streak === 1 ? "" : "s"} 🔥`);
+});
+
+// ---------- LOGROS ----------
+
+const achievementListEl = document.getElementById("achievement-list");
+
+document.getElementById("btn-open-achievements").addEventListener("click", () => {
+  showScreen(screenAchievements);
+  renderAchievements();
+});
+document.getElementById("btn-achievements-back").addEventListener("click", () => showScreen(screenHub));
+
+function renderAchievements() {
+  achievementListEl.innerHTML = "";
+  ACHIEVEMENTS.forEach((a) => {
+    const done = a.isDone(progress);
+    const claimed = progress.claimedAchievements.includes(a.id);
+
+    const card = document.createElement("div");
+    card.className = "achievement-card" + (done ? " done" : "");
+
+    const icon = document.createElement("span");
+    icon.className = "aicon";
+    icon.textContent = a.icon;
+
+    const body = document.createElement("div");
+    body.className = "abody";
+    const name = document.createElement("span");
+    name.className = "aname";
+    name.textContent = a.name;
+    const desc = document.createElement("div");
+    desc.className = "adesc";
+    desc.textContent = `${a.desc} (+${a.reward} 🍫✨)`;
+    body.appendChild(name);
+    body.appendChild(desc);
+
+    const button = document.createElement("button");
+    if (claimed) {
+      button.textContent = "Reclamado ✓";
+      button.disabled = true;
+    } else if (done) {
+      button.textContent = "Reclamar";
+      button.addEventListener("click", () => {
+        if (claimAchievement(progress, a)) {
+          audio.playPurchase();
+          refreshHubStats();
+          renderAchievements();
+          showToast(`¡Logro cumplido! +${a.reward} monedas 🎉`);
+        }
+      });
+    } else {
+      button.textContent = "Bloqueado";
+      button.disabled = true;
+    }
+
+    card.appendChild(icon);
+    card.appendChild(body);
+    card.appendChild(button);
+    achievementListEl.appendChild(card);
+  });
 }
 
 // ---------- SELECCIÓN DE PERSONAJE ----------
@@ -76,8 +298,10 @@ function selectCharacter(char) {
   selectedCharacter = char;
   progress.selectedCharacterId = char.id;
   saveProgress(progress);
+  updateProfileMeta(progress._profileId, { characterId: char.id });
   renderCharacterGrid();
   renderGameGrid();
+  updateProfileChip();
 }
 
 // ---------- SELECCIÓN DE JUEGO ----------
@@ -152,23 +376,14 @@ function playGame(gameId) {
   }
 }
 
-// ---------- NAVEGACIÓN ENTRE PANTALLAS ----------
-
-function showScreen(target) {
-  ALL_SCREENS.forEach((s) => s.classList.toggle("hidden", s !== target));
-}
-
 function goToHub() {
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
   refreshHubStats();
   renderCharacterGrid();
   renderGameGrid();
+  updateDailyRewardButton();
   showScreen(screenHub);
 }
-
-renderCharacterGrid();
-renderGameGrid();
-refreshHubStats();
 
 // ---------- TIENDA ----------
 
@@ -178,10 +393,6 @@ const shopCoinsEl = document.getElementById("shop-coins");
 const shopCharacterSwitcher = document.getElementById("shop-character-switcher");
 const shopCharacterNameEl = document.getElementById("shop-character-name");
 const outfitGrid = document.getElementById("outfit-grid");
-
-// Personaje que se está personalizando en la tienda: no tiene por qué ser el
-// mismo que el elegido para jugar, así se pueden ver los atuendos de todos.
-let shopCharacterId = (selectedCharacter && selectedCharacter.id) || CHARACTERS[0].id;
 
 btnOpenShop.addEventListener("click", () => {
   showScreen(screenShop);
@@ -219,9 +430,17 @@ function renderShop() {
   OUTFITS.forEach((outfit) => {
     const owned = ownsOutfit(progress, shopCharacter.id, outfit.id);
     const equipped = equippedOutfitId(progress, shopCharacter.id) === outfit.id;
+    const affordable = progress.coins >= outfit.price;
 
     const card = document.createElement("div");
-    card.className = "outfit-card" + (equipped ? " equipped" : "");
+    card.className = "outfit-card" + (equipped ? " equipped" : "") + (!owned && !affordable ? " locked" : "");
+
+    if (equipped) {
+      const ribbon = document.createElement("span");
+      ribbon.className = "oribbon";
+      ribbon.textContent = "EQUIPADO";
+      card.appendChild(ribbon);
+    }
 
     const canvas = document.createElement("canvas");
     canvas.width = 96;
@@ -233,8 +452,8 @@ function renderShop() {
     name.textContent = outfit.name;
 
     const price = document.createElement("span");
-    price.className = "oprice";
-    price.textContent = owned ? (equipped ? "Equipado" : "Adquirido") : `${outfit.price} 🍫✨`;
+    price.className = "oprice" + (owned ? " owned" : "");
+    price.textContent = owned ? (equipped ? "Equipado" : "Adquirido") : `🍫✨ ${outfit.price}`;
 
     const button = document.createElement("button");
     if (equipped) {
@@ -249,14 +468,15 @@ function renderShop() {
         renderShop();
       });
     } else {
-      button.textContent = "Comprar";
-      button.disabled = progress.coins < outfit.price;
+      button.textContent = affordable ? "Comprar" : "🔒 Bloqueado";
+      button.disabled = !affordable;
       button.addEventListener("click", () => {
         if (buyOutfit(progress, shopCharacter.id, outfit)) {
           audio.playPurchase();
           renderShopSwitcher();
           renderShop();
           refreshHubStats();
+          showToast(`¡Compraste ${outfit.name}!`);
         }
       });
     }
@@ -369,7 +589,7 @@ function launchOrResumeRecolecta() {
     document.getElementById("btn-intro-continue").addEventListener("click", () => game.beginPlaying());
     document.getElementById("btn-next-level").addEventListener("click", () => game.nextLevel());
     document.getElementById("btn-retry").addEventListener("click", () => game.retry());
-    document.getElementById("btn-play-again").addEventListener("click", () => game.startRun(selectedCharacter));
+    document.getElementById("btn-play-again").addEventListener("click", () => game.startRun(selectedCharacter, progress));
     document.getElementById("btn-menu").addEventListener("click", goToHub);
     document.getElementById("btn-lose-menu").addEventListener("click", goToHub);
     document.getElementById("btn-victory-menu").addEventListener("click", goToHub);
@@ -381,7 +601,9 @@ function launchOrResumeRecolecta() {
       btnMute.textContent = next ? "🔇" : "🔊";
     });
   } else {
-    instances.recolecta.startRun(selectedCharacter);
+    // Rebind: si se cambió de perfil desde la última vez, hay que apuntar
+    // el motor al nuevo personaje/progreso (nunca se recrea la instancia).
+    instances.recolecta.startRun(selectedCharacter, progress);
   }
 }
 
@@ -420,6 +642,16 @@ function launchOrResumeTetris() {
       btnMute.textContent = next ? "🔇" : "🔊";
     });
   } else {
-    instances.tetris.startRun(selectedCharacter);
+    instances.tetris.startRun(selectedCharacter, progress);
   }
+}
+
+// ---------- ARRANQUE ----------
+
+const existingProfiles = listProfiles();
+const lastActiveId = getLastActiveProfileId();
+if (lastActiveId && existingProfiles.some((p) => p.id === lastActiveId)) {
+  chooseProfile(lastActiveId);
+} else {
+  goToProfiles();
 }

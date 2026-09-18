@@ -1,7 +1,7 @@
 import { drawCharacter, getOutfit } from "./characters.js";
 import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates, findFreeSpot, getObstacles, getSpawn } from "./levels.js";
 import * as audio from "./audio.js";
-import { saveProgress, addToLeaderboard, equippedOutfitId, reportScore } from "./storage.js";
+import { saveProgress, addToLeaderboard, equippedOutfitId, reportScore, earnCoins } from "./storage.js";
 import { BRAND } from "./theme.js";
 
 const GAME_ID = "recolecta";
@@ -311,7 +311,7 @@ export class Game {
       this.bonus.timer -= dt;
       const d = Math.hypot(this.bonus.x - this.player.x, this.bonus.y - this.player.y);
       if (d < this.player.radius + 16) {
-        this.progress.coins += this.bonus.value;
+        earnCoins(this.progress, this.bonus.value);
         this.score += 30;
         this.els.hudScore.textContent = String(this.score);
         this._updateCoinsHud();
@@ -417,9 +417,13 @@ export class Game {
     this.loadLevel(0);
   }
 
-  /** Usado por el hub para (re)lanzar una partida, incluso si se cambió de Matichico. */
-  startRun(character) {
+  /**
+   * Usado por el hub para (re)lanzar una partida, incluso si se cambió de
+   * Matichico o de perfil (progress) desde la última vez que se jugó.
+   */
+  startRun(character, progress) {
     this.character = character;
+    if (progress) this.progress = progress;
     this.restartGame();
   }
 

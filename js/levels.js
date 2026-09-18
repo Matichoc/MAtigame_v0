@@ -146,6 +146,37 @@ export const LEVELS = [
       { x: 690, y: 250, w: 24, h: 24, axis: "x", range: 30, speed: 90 },
     ],
   },
+  {
+    id: "cheer_final",
+    name: "Nivel 6 · Gran Final Cheer",
+    theme: "gym",
+    missionText: "La rutina final: salta cada valla con ESPACIO y recolecta 14 pompones antes de llegar a la meta.",
+    target: 14,
+    timeLimit: 55,
+    chocoCount: 15,
+    requiresFlag: true,
+    path: [
+      { x: 110, y: 410 },
+      { x: 110, y: 300 },
+      { x: 280, y: 300 },
+      { x: 280, y: 150 },
+      { x: 480, y: 150 },
+      { x: 480, y: 320 },
+      { x: 690, y: 320 },
+      { x: 690, y: 60 },
+    ],
+    corridorWidth: 90,
+    flag: { x: 672, y: 28, w: 36, h: 36 },
+    obstacles: [
+      { x: 65, y: 355, w: 90, h: 16, jumpable: true },
+      { x: 187, y: 255, w: 16, h: 90, jumpable: true },
+      { x: 235, y: 225, w: 90, h: 16, jumpable: true },
+      { x: 372, y: 105, w: 16, h: 90, jumpable: true },
+      { x: 435, y: 235, w: 90, h: 16, jumpable: true },
+      { x: 577, y: 275, w: 16, h: 90, jumpable: true },
+      { x: 645, y: 190, w: 90, h: 16, jumpable: true },
+    ],
+  },
 ];
 
 // ---------- CAMINO / CORREDOR ----------
