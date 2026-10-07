@@ -53,4 +53,12 @@ export const GAMES_CATALOG = [
     tagline: "Mueve la rebotadora para mantener a tu Matichica rebotando.",
     status: "available",
   },
+  {
+    id: "fps3d",
+    name: "Choco Blaster 3D",
+    icon: "🎯",
+    tagline: "Primera persona: baña de chocolate a los malvaviscos traviesos.",
+    status: "available",
+    tag: "Propuesta 3D",
+  },
 ];

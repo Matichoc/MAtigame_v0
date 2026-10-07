@@ -2,7 +2,7 @@ import { drawCharacter, getOutfit } from "./characters.js";
 import { saveProgress, addToLeaderboard, equippedOutfitId, reportScore, earnCoins } from "./storage.js";
 import { SHAPES, PIECE_STYLE, createBag, spawnPiece, pieceCells } from "./tetris-pieces.js";
 import * as audio from "./audio.js";
-import { BRAND } from "./theme.js";
+import { BRAND, FONT_DISPLAY } from "./theme.js";
 
 const GAME_ID = "tetris";
 
@@ -400,7 +400,7 @@ export class TetrisGame {
     const panelX = BOARD_X + COLS * CELL + 40;
 
     ctx.fillStyle = BRAND.gold;
-    ctx.font = "bold 15px 'Fredoka', sans-serif";
+    ctx.font = `15px ${FONT_DISPLAY}`;
     ctx.textAlign = "left";
     ctx.fillText("Siguiente", panelX, BOARD_Y + 20);
 
@@ -418,7 +418,7 @@ export class TetrisGame {
 
     const statY = BOARD_Y + 150;
     ctx.fillStyle = "#fff6e6";
-    ctx.font = "bold 14px 'Fredoka', sans-serif";
+    ctx.font = `14px ${FONT_DISPLAY}`;
     ctx.fillText(`Puntaje: ${this.score}`, panelX, statY);
     ctx.fillText(`Líneas: ${this.lines}`, panelX, statY + 22);
     ctx.fillText(`Nivel: ${this.level}`, panelX, statY + 44);
