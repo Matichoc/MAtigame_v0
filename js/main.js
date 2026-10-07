@@ -58,6 +58,47 @@ function showToast(message) {
 
 function showScreen(target) {
   ALL_SCREENS.forEach((s) => s.classList.toggle("hidden", s !== target));
+  syncLobby(target === screenHub);
+}
+
+// ---------- ESCENARIO 3D DEL MENÚ ----------
+
+let lobby = null;
+let lobbyFailed = false;
+
+async function syncLobby(visible) {
+  if (!visible) {
+    if (lobby) lobby.setActive(false);
+    return;
+  }
+  if (!selectedCharacter && !CHARACTERS.length) return;
+  const char = selectedCharacter || CHARACTERS[0];
+  const outfit = getOutfit(equippedOutfitId(progress, char.id));
+  const key = `${char.id}|${outfit.id}`;
+  const nameEl = document.getElementById("lb-char-name");
+  if (nameEl) nameEl.textContent = selectedCharacter ? char.name : "Elige tu Matichico";
+  const fb = document.getElementById("lobby-fallback");
+  const cv = document.getElementById("lobby-canvas");
+  const useFallback = () => {
+    lobbyFailed = true;
+    cv.classList.add("hidden");
+    fb.classList.remove("hidden");
+    renderCharacterThumb(fb, char, outfit);
+  };
+  try {
+    if (lobbyFailed) { useFallback(); return; }
+    if (!lobby) {
+      const { Lobby3D } = await import("./lobby3d.js");
+      lobby = new Lobby3D(cv);
+      lobby.init();
+    }
+    if (lobby.key !== key) lobby.setHero(char, outfit, key);
+    if (!screenHub.classList.contains("hidden")) lobby.setActive(true);
+  } catch (err) {
+    console.warn("Escenario 3D del menú no disponible:", err);
+    lobby = null;
+    useFallback();
+  }
 }
 
 inputName.addEventListener("input", () => {
@@ -314,37 +355,68 @@ function selectCharacter(char) {
   renderCharacterGrid();
   renderGameGrid();
   updateProfileChip();
+  syncLobby(true);
 }
 
 // ---------- SELECCIÓN DE JUEGO ----------
 
+function gameThumb(entry) {
+  const wrap = document.createElement("div");
+  wrap.className = "gthumb";
+  const img = document.createElement("img");
+  img.src = `assets/games/${entry.id}.jpg`;
+  img.alt = "";
+  img.loading = "lazy";
+  img.addEventListener("error", () => { img.remove(); wrap.textContent = entry.icon; wrap.style.cssText = "display:flex;align-items:center;justify-content:center;font-size:3rem"; });
+  wrap.appendChild(img);
+  if (entry.tag) {
+    const tag = document.createElement("span");
+    tag.className = "gtag";
+    tag.textContent = entry.tag;
+    wrap.appendChild(tag);
+  }
+  const play = document.createElement("span");
+  play.className = "gplay";
+  play.textContent = "▶ Jugar";
+  wrap.appendChild(play);
+  return wrap;
+}
+
 function renderGameGrid() {
   gameGrid.innerHTML = "";
+  const featureEl = document.getElementById("game-feature");
+  featureEl.innerHTML = "";
+  const available = GAMES_CATALOG.filter((g) => g.status === "available");
+  const last = available.find((g) => g.id === progress.lastGameId);
+  const featured = last || available.find((g) => g.id === "parkour") || available[0];
+
+  if (featured) {
+    featureEl.style.backgroundImage = `url("assets/games/${featured.id}.jpg")`;
+    const best = getBestScore(progress, featured.id);
+    featureEl.innerHTML = `<div class="lf-body"><span class="lf-kicker">${last ? "Seguir jugando" : "¡Novedad!"}</span>` +
+      `<span class="lf-name"></span><span class="lf-tag"></span>` +
+      (best > 0 ? `<span class="lf-best">Tu mejor: ${best} pts</span>` : "") +
+      `<button class="btn-primary" type="button">▶ ¡Jugar!</button></div>`;
+    featureEl.querySelector(".lf-name").textContent = `${featured.icon} ${featured.name}`;
+    featureEl.querySelector(".lf-tag").textContent = featured.tagline;
+    featureEl.onclick = () => playGame(featured.id);
+  }
+
   GAMES_CATALOG.forEach((entry) => {
+    if (featured && entry.id === featured.id) return;
     const card = document.createElement("div");
     card.className = `game-card ${entry.status}`;
+    card.appendChild(gameThumb(entry));
 
-    const icon = document.createElement("span");
-    icon.className = "gicon";
-    icon.textContent = entry.icon;
-
+    const body = document.createElement("div");
+    body.className = "gbody";
     const name = document.createElement("span");
     name.className = "gname";
-    name.textContent = entry.name;
-
+    name.textContent = `${entry.icon} ${entry.name}`;
     const tagline = document.createElement("span");
     tagline.className = "gtagline";
     tagline.textContent = entry.tagline;
-
-    card.appendChild(icon);
-    card.appendChild(name);
-    card.appendChild(tagline);
-    if (entry.tag) {
-      const tag = document.createElement("span");
-      tag.className = "gtag";
-      tag.textContent = entry.tag;
-      card.appendChild(tag);
-    }
+    body.append(name, tagline);
 
     if (entry.status === "available") {
       const best = getBestScore(progress, entry.id);
@@ -352,20 +424,11 @@ function renderGameGrid() {
         const bestEl = document.createElement("span");
         bestEl.className = "gbest";
         bestEl.textContent = `Tu mejor: ${best} pts`;
-        card.appendChild(bestEl);
+        body.appendChild(bestEl);
       }
-      const badge = document.createElement("span");
-      badge.className = "gbadge";
-      badge.textContent = "Jugar";
-      card.appendChild(badge);
       card.addEventListener("click", () => playGame(entry.id));
-    } else {
-      const badge = document.createElement("span");
-      badge.className = "gbadge";
-      badge.textContent = "Próximamente";
-      card.appendChild(badge);
     }
-
+    card.appendChild(body);
     gameGrid.appendChild(card);
   });
 }
@@ -380,6 +443,9 @@ function playGame(gameId) {
     inputName.value = progress.playerName;
     saveProgress(progress);
   }
+
+  progress.lastGameId = gameId;
+  saveProgress(progress);
 
   // Nunca deben quedar dos juegos "activos" a la vez (evita que uno siga
   // corriendo lógica de fondo mientras se muestra el otro).

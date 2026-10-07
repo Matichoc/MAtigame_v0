@@ -82,6 +82,7 @@ index.html          Pantallas (perfiles, hub, tienda, puntajes, logros, juegos)
 assets/brand/        Logos, patrón e íconos oficiales (copiados de matichoc.cl)
 assets/fonts/        Baby Chipmunk y Adorable Mother Script (fuentes de marca)
 assets/products/     Recortes de fotos reales de productos
+assets/games/        Capturas de cada juego (imagen de sus tarjetas en el menú)
 vendor/              Three.js (MIT) y sus efectos de postprocesado
 docs/                Propuestas y documentos de diseño
 css/style.css        Estilos, paleta de marca y controles táctiles
@@ -98,6 +99,7 @@ js/tetris-pieces.js  Formas y colores de "Tetris de Productos"
 js/tetris3d-game.js  Tetris de Productos 3D
 js/basquet3d-game.js  Lanzamientos de Básquet 3D (física del balón, red, hinchada)
 js/porristas3d-game.js  Saltos de Porristas 3D
+js/lobby3d.js         Escenario 3D del menú principal (tu Matichico sobre un pedestal)
 js/three-kit.js       Base 3D compartida (Game3D, bloom, partículas, popups)
 js/matichico3d.js     Matichico en 3D con atuendo de la tienda
 js/salto-game.js      Salto Choco 3D
