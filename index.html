@@ -420,6 +420,158 @@
     </div>
   </section>
 
+  <!-- PANTALLA DE JUEGO 3D: SALTO CHOCO 3D -->
+  <section id="screen-salto" class="screen game-screen hidden">
+    <div id="salto-hud" class="hud">
+      <div class="hud-left">
+        <button id="salto-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="salto-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Salto Choco 3D</div>
+          <div class="hud-mission">Rebota y sube sin caer</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">⭐ <span id="salto-hud-score">0</span></div>
+        <div class="hud-chip">⛰️ <span id="salto-hud-height">0 m</span></div>
+        <div class="hud-chip">🍫✨ <span id="salto-hud-coins">0</span></div>
+        <button id="salto-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="salto-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="salto-canvas"></canvas>
+      <div id="salto-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="salto-popups" class="fps-popups" aria-hidden="true"></div>
+      <div class="g3d-touch" id="salto-touch">
+        <button class="g3d-tbtn" id="salto-btn-left" aria-label="Izquierda">◀</button>
+        <button class="g3d-tbtn" id="salto-btn-right" aria-label="Derecha">▶</button>
+      </div>
+
+      <div id="salto-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Salto Choco 3D</h2>
+          <p class="fps-tag">Nuevo · en 3D</p>
+          <p>Tu Matichico rebota solo: ¡tú lo mueves! Usa ← → (o A / D), o arrastra el dedo o el mouse. Sube por las plataformas de chocolate, junta alfajores y busca el jetpack Matidubai. Cuidado con las plataformas blancas: se rompen.</p>
+          <button class="btn-primary" id="salto-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="salto-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>¡Se cayó el Matichico!</h2>
+          <p id="salto-gameover-text"></p>
+          <button class="btn-primary" id="salto-btn-retry">Jugar de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" id="salto-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANTALLA DE JUEGO 3D: AUTOS DE CHOCOLATE 3D -->
+  <section id="screen-autos" class="screen game-screen hidden">
+    <div id="autos-hud" class="hud">
+      <div class="hud-left">
+        <button id="autos-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="autos-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Autos de Chocolate 3D</div>
+          <div class="hud-mission">Esquiva y acelera</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">⭐ <span id="autos-hud-score">0</span></div>
+        <div class="hud-chip">🏁 <span id="autos-hud-speed">0</span></div>
+        <div class="hud-chip">❤ <span id="autos-hud-hearts">❤❤❤</span></div>
+        <div class="hud-chip">🍫✨ <span id="autos-hud-coins">0</span></div>
+        <button id="autos-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="autos-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="autos-canvas"></canvas>
+      <div id="autos-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="autos-popups" class="fps-popups" aria-hidden="true"></div>
+      <div class="g3d-touch" id="autos-touch">
+        <button class="g3d-tbtn" id="autos-btn-left" aria-label="Izquierda">◀</button>
+        <button class="g3d-tbtn" id="autos-btn-right" aria-label="Derecha">▶</button>
+      </div>
+
+      <div id="autos-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Autos de Chocolate 3D</h2>
+          <p class="fps-tag">Nuevo · en 3D</p>
+          <p>Maneja tu auto de chocolate por la ruta de Matichoc. Cambia de carril con ← → (o A / D), toca/desliza a los lados en el celular. Esquiva conos y barriles, junta alfajores y toma el nitro Matidubai. ¡Tienes 3 vidas!</p>
+          <button class="btn-primary" id="autos-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="autos-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>¡Fin de la carrera!</h2>
+          <p id="autos-gameover-text"></p>
+          <button class="btn-primary" id="autos-btn-retry">Jugar de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" id="autos-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANTALLA DE JUEGO 3D: MEMORIA MATICHOC 3D -->
+  <section id="screen-memoria" class="screen game-screen hidden">
+    <div id="memoria-hud" class="hud">
+      <div class="hud-left">
+        <button id="memoria-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="memoria-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Memoria Matichoc 3D</div>
+          <div class="hud-mission">Encuentra las parejas</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">🎴 <span id="memoria-hud-level">1</span></div>
+        <div class="hud-chip">👆 <span id="memoria-hud-moves">0</span></div>
+        <div class="hud-chip">⏱ <span id="memoria-hud-time">0:00</span></div>
+        <div class="hud-chip">⭐ <span id="memoria-hud-score">0</span></div>
+        <div class="hud-chip">🍫✨ <span id="memoria-hud-coins">0</span></div>
+        <button id="memoria-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="memoria-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="memoria-canvas"></canvas>
+      <div id="memoria-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="memoria-popups" class="fps-popups" aria-hidden="true"></div>
+
+      <div id="memoria-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Memoria Matichoc 3D</h2>
+          <p class="fps-tag">Nuevo · en 3D</p>
+          <p>Toca las cartas para darlas vuelta y encuentra las parejas de productos Matichoc. Menos intentos y menos tiempo dan más estrellas. ¡Tu Matichico te anima desde la mesa!</p>
+          <button class="btn-primary" id="memoria-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+      <div id="memoria-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="memoria-win-title">¡Nivel completado!</h2>
+          <div id="memoria-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="memoria-win-text"></p>
+          <button class="btn-primary" id="memoria-btn-next">Siguiente nivel</button>
+          <button class="btn-secondary overlay-secondary-btn" id="memoria-btn-win-menu">Volver al menú</button>
+        </div>
+      </div>
+
+      <div id="memoria-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>¡Terminaste todos los niveles!</h2>
+          <p id="memoria-gameover-text"></p>
+          <button class="btn-primary" id="memoria-btn-retry">Jugar de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" id="memoria-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <script type="module" src="js/main.js"></script>

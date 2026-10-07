@@ -901,3 +901,28 @@ h1, h2, h3 {
   display: inline-block; margin: 4px 4px 0 0; padding: 1px 8px; border-radius: 999px;
   background: var(--rosa); color: #fff; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
 }
+
+/* ---------- JUEGOS 3D (Salto Choco, Autos de Chocolate, Memoria Matichoc) ---------- */
+.g3d-wrap { aspect-ratio: 16 / 9; overflow: hidden; border-radius: 14px; user-select: none; -webkit-user-select: none; max-width: 900px; }
+#screen-salto .hud, #screen-autos .hud, #screen-memoria .hud { max-width: 900px; }
+.g3d-wrap canvas { background: #9fdcf5; touch-action: none; }
+.g3d-touch {
+  position: absolute; left: 0; right: 0; bottom: 10px; z-index: 5; display: none;
+  justify-content: space-between; padding: 0 14px; pointer-events: none;
+}
+@media (pointer: coarse) { .g3d-touch { display: flex; } }
+.g3d-tbtn {
+  pointer-events: auto; width: 64px; height: 64px; border-radius: 50%; font-size: 1.5rem; color: #fff;
+  border: 2px solid rgba(255,255,255,0.75); background: rgba(212,33,108,0.55); touch-action: none; user-select: none;
+}
+.g3d-tbtn:active { background: rgba(212,33,108,0.95); }
+.g3d-stars { font-size: 2.4rem; letter-spacing: 6px; color: var(--dorado); text-shadow: 0 0 12px rgba(255,200,0,0.6), 2px 2px 0 var(--marron-osc); margin-bottom: 8px; }
+.g3d-stars .off { color: rgba(255,255,255,0.22); text-shadow: none; }
+@media (pointer: coarse) and (orientation: portrait) {
+  .g3d-wrap { aspect-ratio: 3 / 4; }
+}
+@media (max-width: 520px) {
+  #screen-salto .hud-mission, #screen-autos .hud-mission, #screen-memoria .hud-mission { display: none; }
+  #screen-salto .hud-chip, #screen-autos .hud-chip, #screen-memoria .hud-chip { padding: 3px 7px; font-size: 0.75rem; }
+  #screen-salto .hud, #screen-autos .hud, #screen-memoria .hud { padding: 6px 8px; gap: 6px; }
+}

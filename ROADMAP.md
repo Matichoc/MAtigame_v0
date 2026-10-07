@@ -169,37 +169,47 @@ El personaje elegido aparece animado en el panel lateral.
 Esta etapa también dejó resuelto el pendiente de puntajes: ver "Tabla de
 puntajes por juego" más abajo.
 
-### Etapa 3 — Salto Choco 🔜
+### Etapa 3 — Salto Choco 3D ✅
 
-Plataformero vertical simple (estilo "Icy Tower" / POW): el Matichico va
-subiendo saltando entre plataformas que aparecen cada vez más espaciadas
-y estrechas; si te caes de la pantalla, pierdes. Ideal para reutilizar la
-mecánica de salto ya construida en la Etapa 0.
+Saltador vertical infinito en 3D (`js/salto-game.js`). Tu Matichico (modelo 3D
+con el atuendo de la tienda) rebota solo y se mueve con ← → / A D o arrastrando
+el dedo o el mouse.
 
-- Mecánica: scroll vertical infinito, plataformas generadas
-  proceduralmente, dificultad creciente por altura.
-- Coleccionables: golosinas que dan puntos extra; el Chocolate Dubai
-  aparece como plataforma dorada especial.
+- Plataformas de chocolate con glaseado y chispitas: normales, móviles
+  (pistacho), que se rompen (chocolate blanco) y con resorte (pompón).
+- **Alfajores reales** (fotos de la web) como monedas; barras Matidubai que dan
+  monedas Dubai; **jetpack Matidubai** que impulsa unos segundos.
+- El cielo cambia con la altura: bosque de cacao, día, atardecer, crepúsculo y
+  noche con estrellas (nubes que se oscurecen). Hitos cada 100 m.
+- Validado con un piloto automático que sube cientos de metros: la generación
+  de plataformas es siempre alcanzable.
 
-### Etapa 4 — Autos de Chocolate 🔜
+### Etapa 4 — Autos de Chocolate 3D ✅
 
-Carrera top-down: el Matichico maneja un autito de chocolate esquivando
-obstáculos (conos, otros autos) y recolectando boosts de velocidad, en
-pistas basadas en las mismas canchas/temas ya existentes.
+Carrera infinita en 3 carriles (`js/autos-game.js`) con ruta curva, banderines
+y arcos con el letrero de Matichoc, curbas rosadas de la marca y árboles de
+cacao. Tu Matichico maneja un auto hecho de barra de chocolate (con el logo en
+la patente) y mira a la cámara cuando juntas algo.
 
-- Mecánica: control de aceleración/dirección simple (arriba/abajo para
-  acelerar-frenar, izquierda/derecha para carriles), distancia o tiempo
-  como objetivo.
-- Coleccionables: golosinas = puntos; Chocolate Dubai = nitro temporal.
+- Cambio de carril con ← → / A D, deslizar o tocar los lados en el celular.
+- Obstáculos (conos, barriles, cajones de la marca); alfajores reales; **nitro
+  Matidubai** (más velocidad, invulnerable, FOV más abierto, +monedas Dubai).
+- 3 vidas, choque con invulnerabilidad breve; la velocidad sube con la distancia.
+- Ciclo de día a noche (mañana, tarde, atardecer, noche con luz de faros).
+- Las curvas son una ilusión barata: todo se desplaza lateralmente en función
+  de la distancia al cuadrado, sin geometría curva real.
 
-### Etapa 5 — Memoria Matichoc 🔜
+### Etapa 5 — Memoria Matichoc 3D ✅
 
-Juego de memoria/parejas con cartas ilustradas de las golosinas y de los
-4 Matichicos. Pensado como modo corto y relajado, contrastando con los
-demás modos de acción/tiempo.
+Juego de parejas en una mesa de feria 3D (`js/memoria-game.js`) con cartas
+que giran en 3D y muestran **fotos reales** de alfajores (por sabor), bombas y
+cuchuflí. Se juega tocando o haciendo click (raycast).
 
-- Mecánica: grilla de cartas boca abajo, encontrar parejas con el menor
-  número de intentos o en el menor tiempo posible.
+- 4 niveles: 6, 8, 10 y 12 parejas; el tablero se reordena en vertical para el
+  celular.
+- Estrellas (menos intentos = más estrellas), tiempo, combo de parejas
+  seguidas; 3 estrellas dan monedas Dubai.
+- Un Matichico 3D en la mesa festeja las parejas y se apena con los fallos.
 
 ### Etapa 6 — Lanzamientos de Básquet ✅
 
@@ -276,8 +286,18 @@ fotorrealistas). Detalle, techo honesto de calidad, alternativas
 - Probado con Playwright (WebGL por software): carga, pointer lock, mouse,
   teclado, disparo a cabeza/cuerpo, daño, recarga, oleadas, fin de partida,
   reintento, ranking, logros y layout móvil.
-- Las Etapas 3-5 (Salto Choco, Autos de Chocolate, Memoria Matichoc) quedan
-  a la espera de decidir si van en 3D o en 2D mejorado.
+- Tras evaluar la propuesta ("ahora sí, me gusta"), las Etapas 3-5 (Salto
+  Choco, Autos de Chocolate, Memoria Matichoc) se construyeron también en 3D
+  sobre una base compartida (`js/three-kit.js`, clase `Game3D`) y un Matichico
+  3D reutilizable (`js/matichico3d.js`).
+
+### Etapa 9 — Crea tu propio chocolate 🔜
+
+Pedido del dueño: un juego donde el usuario **crea su propio chocolate**
+eligiendo entre productos reales de Matichoc (formato, chocolate, relleno,
+toppings, envoltorio y etiqueta), con vista 3D en vivo, galería "Mis
+creaciones" en el perfil y la opción de pedir algo parecido por WhatsApp (solo
+texto, sin precios ni promesas). En desarrollo en el siguiente PR.
 
 ## Diseño de "Tetris de Productos" (Etapa 2)
 
