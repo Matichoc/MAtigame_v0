@@ -1,3 +1,8 @@
+> **Este juego ahora se publica en https://matichoc.cl/matijuego/** y se edita en el repositorio
+> [`Matichoc/matiweb`](https://github.com/Matichoc/matiweb), carpeta `matijuego/`. Esta página solo
+> redirige a la nueva dirección (`index.html` y `404.html`); el código de abajo queda como respaldo y
+> ya no se publica desde aquí (el `index.html` original está en el historial, commit `3f4d513`). No hagas cambios en este repositorio: no llegarían al sitio.
+
 # MAtigame_v0 — Matichoc: La Aventura del Cacao
 
 Arcade web de Matichoc: cada persona elige su perfil, su Matichico (Choco
