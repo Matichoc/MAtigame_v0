@@ -64,4 +64,12 @@ export const GAMES_CATALOG = [
     status: "available",
     tag: "Propuesta 3D",
   },
+  {
+    id: "creador",
+    name: "Crea tu Chocolate",
+    icon: "🍫",
+    tagline: "Elige producto, sabor, toppings, envoltorio y etiqueta, y crea tu propio chocolate.",
+    status: "available",
+    tag: "Nuevo 3D",
+  },
 ];

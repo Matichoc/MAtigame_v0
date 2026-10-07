@@ -10,7 +10,9 @@ Productos** (encajar golosinas cayendo), **Lanzamientos de Básquet**
 de Porristas** (mover una rebotadora para mantener a la Matichica
 rebotando sin que se caiga) **Choco Blaster 3D** (propuesta en primera persona, ver
 [`docs/PROPUESTA-3D.md`](./docs/PROPUESTA-3D.md)), **Salto Choco 3D**, **Autos de
-Chocolate 3D** y **Memoria Matichoc 3D** (con fotos reales de los productos).
+Chocolate 3D** y **Memoria Matichoc 3D** (con fotos reales de los productos) y
+**Crea tu Chocolate** (configurador 3D: elige producto, sabor, toppings,
+envoltorio y diseña tu etiqueta; puedes pedir algo parecido por WhatsApp).
 
 Es una v0 intencionalmente simple: HTML + CSS + JavaScript puro (sin frameworks
 ni build step), pensada como base fácil de evolucionar. El plan es que esto
@@ -98,6 +100,9 @@ js/matichico3d.js     Matichico en 3D con atuendo de la tienda
 js/salto-game.js      Salto Choco 3D
 js/autos-game.js      Autos de Chocolate 3D
 js/memoria-game.js    Memoria Matichoc 3D
+js/creador-game.js    Crea tu Chocolate: asistente, galería, puntaje
+js/creador-data.js    Opciones, maridajes, reto del día y etiqueta
+js/creador-3d.js      Modelos 3D de los productos, toppings y envoltorios
 js/fps-game.js        Motor de "Choco Blaster 3D" (primera persona, Three.js)
 js/fps-world.js       Mundo 3D: feria de Matichoc
 js/fps-enemies.js     Malvaviscos enemigos del juego 3D
@@ -145,8 +150,6 @@ resumen, lo siguiente:
 
 - Reemplazar los sprites procedurales por ilustraciones/spritesheets finales
   (el techo de fidelidad visual actual está explicado en el ROADMAP).
-- "Crea tu propio chocolate": configurador con vista 3D, etiqueta y galería
-  (ver ROADMAP, Etapa 9).
 - Mover cada juego a su propia carpeta `js/games/<id>/` (ver ROADMAP.md →
   Consideraciones técnicas: ya hay 4 módulos con el mismo patrón, así que
   el umbral para reorganizar ya se cumplió).

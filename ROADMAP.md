@@ -291,13 +291,38 @@ fotorrealistas). Detalle, techo honesto de calidad, alternativas
   sobre una base compartida (`js/three-kit.js`, clase `Game3D`) y un Matichico
   3D reutilizable (`js/matichico3d.js`).
 
-### Etapa 9 — Crea tu propio chocolate 🔜
+### Etapa 9 — Crea tu Chocolate 3D ✅
 
 Pedido del dueño: un juego donde el usuario **crea su propio chocolate**
-eligiendo entre productos reales de Matichoc (formato, chocolate, relleno,
-toppings, envoltorio y etiqueta), con vista 3D en vivo, galería "Mis
-creaciones" en el perfil y la opción de pedir algo parecido por WhatsApp (solo
-texto, sin precios ni promesas). En desarrollo en el siguiente PR.
+(`js/creador-game.js`, datos en `js/creador-data.js`, modelos en
+`js/creador-3d.js`). Asistente de 6 pasos con vista 3D en vivo (se puede girar
+arrastrando) y tu Matichico animando desde la mesa:
+
+1. **Producto**: barra, alfajor, cuchuflí, bomba o cono (inspirados en el
+   catálogo real de la web).
+2. **Chocolate** (leche, oscuro, blanco, rosa) y 3. **sabor/relleno** (10
+   sabores, entre ellos los alfajores reales de la web).
+4. **Toppings** (hasta 3): pistacho, kataifi, almendras, coco, chispas,
+   frambuesa liofilizada, hojuelas doradas.
+5. **Envoltorio**: sin envoltorio, papel de colores, bolsita con cinta o cajita,
+   con 6 colores (como los papeles de los alfajores reales).
+6. **Etiqueta**: nombre, "para quién" y un dibujo; el sticker circular lleva el
+   logo de Matichoc en el centro y el nombre en el anillo, como las etiquetas
+   reales.
+
+- **Puntaje de creatividad** por maridajes que combinan (p. ej. oscuro +
+  frambuesa), toppings que acompañan, nombre, envoltorio y dedicatoria; 1 a 5
+  estrellas.
+- **Mis creaciones**: galería por perfil (hasta 12) guardada en
+  `progress.creations`; se pueden reabrir, editar y borrar.
+- **Reto del día** (igual para todos los perfiles, calculado por fecha): +5
+  monedas Dubai al cumplirlo; +2 monedas por cada receta nueva guardada.
+- **Pedir algo parecido por WhatsApp**: abre `wa.me` con un mensaje que solo
+  describe la creación, sin precios ni promesas. El número es el público que ya
+  usa matichoc.cl; conviene que el dueño confirme que quiere recibir estos
+  mensajes y qué respuesta tipo darles.
+- Los nombres de producto/sabor son de juego: no prometen disponibilidad. Las
+  etiquetas del juego no incluyen datos legales (resolución sanitaria, etc.).
 
 ## Diseño de "Tetris de Productos" (Etapa 2)
 

@@ -572,6 +572,57 @@
     </div>
   </section>
 
+  <!-- PANTALLA DE JUEGO 3D: CREA TU CHOCOLATE -->
+  <section id="screen-creador" class="screen game-screen cr-screen hidden">
+    <div id="creador-hud" class="hud cr-hud">
+      <div class="hud-left">
+        <button id="creador-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="creador-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Crea tu Chocolate</div>
+          <div class="hud-mission">Diseña tu producto y su etiqueta</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">⭐ <span id="creador-hud-score">0</span></div>
+        <div class="hud-chip">🎨 <span id="creador-hud-count">0</span></div>
+        <div class="hud-chip">🍫✨ <span id="creador-hud-coins">0</span></div>
+        <button id="creador-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div class="cr-main">
+      <div id="creador-canvas-wrap" class="canvas-wrap g3d-wrap cr-canvas">
+        <canvas id="creador-canvas"></canvas>
+        <div id="creador-banner" class="fps-banner" aria-live="polite"></div>
+        <div id="creador-popups" class="fps-popups" aria-hidden="true"></div>
+        <div class="cr-drag-hint" aria-hidden="true">↔ arrastra para girar</div>
+
+        <div id="creador-overlay-intro" class="overlay hidden">
+          <div class="overlay-card">
+            <h2>Crea tu Chocolate</h2>
+            <p class="fps-tag">Nuevo · en 3D</p>
+            <p>Elige el producto, el chocolate, el relleno, los toppings, el envoltorio y
+              diseña tu propia etiqueta. Mientras eliges ves tu creación en 3D. Los
+              maridajes que combinan dan más puntos, y cada día hay un reto con monedas.</p>
+            <button class="btn-primary" id="creador-btn-start">¡A crear!</button>
+          </div>
+        </div>
+
+        <div id="creador-overlay-gameover" class="overlay hidden">
+          <div class="overlay-card">
+            <h2>¡Listo!</h2>
+            <p id="creador-gameover-text"></p>
+            <button class="btn-primary" id="creador-btn-retry">Crear otro</button>
+            <button class="btn-secondary overlay-secondary-btn" id="creador-btn-gameover-menu">Volver al menú</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="creador-panel" class="cr-panel"></div>
+    </div>
+  </section>
+
 </div>
 
 <script type="module" src="js/main.js"></script>

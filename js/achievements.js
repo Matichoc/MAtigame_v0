@@ -86,6 +86,22 @@ export const ACHIEVEMENTS = [
     isDone: (p) => getBestScore(p, "memoria") >= 3000,
   },
   {
+    id: "chocolatero",
+    name: "Chocolatero",
+    icon: "🍫",
+    reward: 15,
+    desc: "Guarda tu primera creación en Crea tu Chocolate.",
+    isDone: (p) => (p.creations || []).length >= 1,
+  },
+  {
+    id: "obra_maestra",
+    name: "Obra Maestra",
+    icon: "🎨",
+    reward: 30,
+    desc: "Consigue 450 puntos de creatividad en Crea tu Chocolate.",
+    isDone: (p) => getBestScore(p, "creador") >= 450,
+  },
+  {
     id: "equilibrista",
     name: "Equilibrista Matichoc",
     icon: "🤸",

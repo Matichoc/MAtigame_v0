@@ -26,8 +26,12 @@ function defaultProgress() {
     dailyStreak: 0,
     lastDailyRewardDate: null, // "YYYY-MM-DD"
     claimedAchievements: [], // [achievementId, ...]
+    creations: [], // "Mis creaciones" de Crea tu Chocolate (ver js/creador-data.js)
+    creatorChallengeDate: null, // "YYYY-MM-DD" del último reto del día cumplido
   };
 }
+
+export const MAX_CREATIONS = 12;
 
 /** Carga (o crea) el progreso de un perfil. El id queda "pegado" al objeto
  * (no enumerable, así no se guarda dentro del JSON) para que saveProgress
@@ -46,6 +50,7 @@ export function loadProgress(profileId) {
       leaderboards: { ...parsed.leaderboards },
       stats: { ...defaultProgress().stats, ...parsed.stats },
       claimedAchievements: parsed.claimedAchievements || [],
+      creations: Array.isArray(parsed.creations) ? parsed.creations.slice(0, MAX_CREATIONS) : [],
     };
   } catch (e) {
     progress = defaultProgress();
@@ -130,7 +135,7 @@ export function claimAchievement(progress, achievement) {
   return true;
 }
 
-function todayKey() {
+export function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
@@ -151,3 +156,17 @@ export function claimDailyReward(progress) {
 }
 
 export { DEFAULT_OUTFIT };
+
+/** Guarda una creación en el perfil (las más nuevas primero, hasta MAX_CREATIONS). */
+export function saveCreation(progress, creation) {
+  const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+  progress.creations.unshift({ ...creation, id, date: new Date().toISOString() });
+  progress.creations = progress.creations.slice(0, MAX_CREATIONS);
+  saveProgress(progress);
+  return id;
+}
+
+export function deleteCreation(progress, id) {
+  progress.creations = progress.creations.filter((c) => c.id !== id);
+  saveProgress(progress);
+}

@@ -33,6 +33,7 @@ const screen3d = {
   salto: document.getElementById("screen-salto"),
   autos: document.getElementById("screen-autos"),
   memoria: document.getElementById("screen-memoria"),
+  creador: document.getElementById("screen-creador"),
 };
 const ALL_SCREENS = [
   screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
@@ -48,7 +49,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { recolecta: null, tetris: null, basquet: null, porristas: null, fps: null, salto: null, autos: null, memoria: null };
+const instances = { recolecta: null, tetris: null, basquet: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
 
 let toastTimer = null;
 function showToast(message) {
@@ -832,6 +833,7 @@ const GAMES_3D = {
   salto: { module: "./salto-game.js", cls: "SaltoGame", hud: ["score", "height", "coins"] },
   autos: { module: "./autos-game.js", cls: "AutosGame", hud: ["score", "speed", "hearts", "coins"] },
   memoria: { module: "./memoria-game.js", cls: "MemoriaGame", hud: ["level", "moves", "time", "score", "coins"] },
+  creador: { module: "./creador-game.js", cls: "CreadorGame", hud: ["score", "count", "coins"] },
 };
 
 async function launchOrResume3d(key) {
@@ -850,6 +852,7 @@ async function launchOrResume3d(key) {
         gameoverText: q("gameover-text"),
         overlays: { intro: q("overlay-intro"), gameover: q("overlay-gameover") },
         touch: { left: q("btn-left"), right: q("btn-right") },
+        panel: q("panel"),
         winTitle: q("win-title"),
         winText: q("win-text"),
         stars: q("stars"),
@@ -859,7 +862,7 @@ async function launchOrResume3d(key) {
       const game = new mod[cfg.cls](selectedCharacter, progress, els);
       instances[key] = game;
 
-      q("btn-start").addEventListener("click", () => game.beginPlaying());
+      if (q("btn-start")) q("btn-start").addEventListener("click", () => game.beginPlaying());
       q("btn-retry").addEventListener("click", () => game.retry());
       q("btn-menu").addEventListener("click", goToHub);
       q("btn-gameover-menu").addEventListener("click", goToHub);
