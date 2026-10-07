@@ -368,6 +368,56 @@
     </div>
   </section>
 
+  <!-- PANTALLA DE JUEGO: PARKOUR CHOCO 3D -->
+  <section id="screen-parkour" class="screen game-screen hidden">
+    <div id="parkour-hud" class="hud">
+      <div class="hud-left">
+        <button id="parkour-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="parkour-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Parkour Choco 3D</div>
+          <div class="hud-mission">Salta, esquiva y llega a la cima</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">🏁 <span id="parkour-hud-stage">Etapa 1/6</span></div>
+        <div class="hud-chip">🍬 <span id="parkour-hud-items">0</span></div>
+        <div class="hud-chip">⏱ <span id="parkour-hud-time">0:00</span></div>
+        <div class="hud-chip">🍫✨ <span id="parkour-hud-coins">0</span></div>
+        <button id="parkour-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="parkour-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="parkour-canvas"></canvas>
+      <div id="parkour-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="parkour-popups" class="fps-popups" aria-hidden="true"></div>
+      <div class="pk-touch" id="parkour-touch">
+        <div class="pk-joy" id="parkour-joy"><div class="pk-knob" id="parkour-knob"></div></div>
+        <button class="g3d-tbtn pk-jump" id="parkour-btn-jump" aria-label="Saltar">⤴</button>
+      </div>
+
+      <div id="parkour-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Parkour Choco 3D</h2>
+          <p class="fps-tag">Nuevo · en 3D</p>
+          <p>Corre y salta por 6 etapas de plataformas: unas se mueven, otras se rompen o parpadean, hay trampolines y molinos giratorios. Junta alfajores y barras Matidubai, activa los checkpoints y desbloquea capa, gafas brillantes y corona.</p>
+          <p class="fps-hint">Mover: WASD o flechas · Saltar (¡dos veces en el aire!): Espacio · Cámara: arrastra el mouse o Q / E.</p>
+          <button class="btn-primary" id="parkour-btn-start">¡A correr!</button>
+        </div>
+      </div>
+
+      <div id="parkour-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>¡Llegaste a la cima! 🏆</h2>
+          <p id="parkour-gameover-text"></p>
+          <button class="btn-primary" id="parkour-btn-retry">Correr de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" id="parkour-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- PANTALLA DE JUEGO: CHOCO BLASTER 3D (primera persona, propuesta) -->
   <section id="screen-fps" class="screen game-screen hidden">
     <div id="fps-hud" class="hud fps-hud">

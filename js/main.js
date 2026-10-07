@@ -24,6 +24,7 @@ const screenFps = document.getElementById("screen-fps");
 const screen3d = {
   recolecta: document.getElementById("screen-recolecta"),
   tetris: document.getElementById("screen-tetris"),
+  parkour: document.getElementById("screen-parkour"),
   porristas: document.getElementById("screen-porristas"),
   basquet_tiros: document.getElementById("screen-basquet"),
   salto: document.getElementById("screen-salto"),
@@ -45,7 +46,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
+const instances = { parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
 
 let toastTimer = null;
 function showToast(message) {
@@ -647,6 +648,7 @@ const GAMES_3D = {
   recolecta: { module: "./recolecta-game.js", cls: "RecolectaGame", hud: [] },
   basquet_tiros: { module: "./basquet3d-game.js", cls: "Basquet3DGame", hud: [], prefix: "basquet" },
   porristas: { module: "./porristas3d-game.js", cls: "Porristas3DGame", hud: ["score", "combo", "coins"] },
+  parkour: { module: "./parkour-game.js", cls: "ParkourGame", hud: [] },
   tetris: { module: "./tetris3d-game.js", cls: "Tetris3DGame", hud: ["score", "lines", "level", "coins"] },
   salto: { module: "./salto-game.js", cls: "SaltoGame", hud: ["score", "height", "coins"] },
   autos: { module: "./autos-game.js", cls: "AutosGame", hud: ["score", "speed", "hearts", "coins"] },
