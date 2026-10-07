@@ -29,9 +29,16 @@ const screenTetris = document.getElementById("screen-tetris");
 const screenBasquet = document.getElementById("screen-basquet");
 const screenPorristas = document.getElementById("screen-porristas");
 const screenFps = document.getElementById("screen-fps");
+const screen3d = {
+  salto: document.getElementById("screen-salto"),
+  autos: document.getElementById("screen-autos"),
+  memoria: document.getElementById("screen-memoria"),
+  creador: document.getElementById("screen-creador"),
+};
 const ALL_SCREENS = [
   screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
   screenGame, screenTetris, screenBasquet, screenPorristas, screenFps,
+  ...Object.values(screen3d),
 ];
 
 const grid = document.getElementById("character-grid");
@@ -42,7 +49,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { recolecta: null, tetris: null, basquet: null, porristas: null, fps: null };
+const instances = { recolecta: null, tetris: null, basquet: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
 
 let toastTimer = null;
 function showToast(message) {
@@ -396,6 +403,9 @@ function playGame(gameId) {
   } else if (gameId === "fps3d") {
     showScreen(screenFps);
     launchOrResumeFps();
+  } else if (GAMES_3D[gameId]) {
+    showScreen(screen3d[gameId]);
+    launchOrResume3d(gameId);
   }
 }
 
@@ -811,6 +821,65 @@ async function launchOrResumeFps() {
     console.error(err);
     showToast("Tu dispositivo no pudo cargar el modo 3D.");
     instances.fps = null;
+    goToHub();
+  }
+}
+
+// ---------- JUEGOS 3D (Salto Choco, Autos de Chocolate, Memoria Matichoc) ----------
+// Los tres comparten la base Game3D y la misma convención de ids en index.html:
+// "<prefijo>-canvas", "-hud-<nombre>", "-overlay-<intro|win|gameover>", "-btn-*".
+
+const GAMES_3D = {
+  salto: { module: "./salto-game.js", cls: "SaltoGame", hud: ["score", "height", "coins"] },
+  autos: { module: "./autos-game.js", cls: "AutosGame", hud: ["score", "speed", "hearts", "coins"] },
+  memoria: { module: "./memoria-game.js", cls: "MemoriaGame", hud: ["level", "moves", "time", "score", "coins"] },
+  creador: { module: "./creador-game.js", cls: "CreadorGame", hud: ["score", "count", "coins"] },
+};
+
+async function launchOrResume3d(key) {
+  const cfg = GAMES_3D[key];
+  updateHudAvatar(`${key}-hud-avatar`, selectedCharacter);
+  try {
+    if (!instances[key]) {
+      showToast("Cargando el mundo 3D…");
+      const mod = await import(cfg.module);
+      const q = (id) => document.getElementById(`${key}-${id}`);
+      const els = {
+        wrap: q("canvas-wrap"),
+        canvas: q("canvas"),
+        banner: q("banner"),
+        popups: q("popups"),
+        gameoverText: q("gameover-text"),
+        overlays: { intro: q("overlay-intro"), gameover: q("overlay-gameover") },
+        touch: { left: q("btn-left"), right: q("btn-right") },
+        panel: q("panel"),
+        winTitle: q("win-title"),
+        winText: q("win-text"),
+        stars: q("stars"),
+      };
+      if (q("overlay-win")) els.overlays.win = q("overlay-win");
+      for (const name of cfg.hud) els[`hud${name[0].toUpperCase()}${name.slice(1)}`] = q(`hud-${name}`);
+      const game = new mod[cfg.cls](selectedCharacter, progress, els);
+      instances[key] = game;
+
+      if (q("btn-start")) q("btn-start").addEventListener("click", () => game.beginPlaying());
+      q("btn-retry").addEventListener("click", () => game.retry());
+      q("btn-menu").addEventListener("click", goToHub);
+      q("btn-gameover-menu").addEventListener("click", goToHub);
+      if (q("btn-next")) q("btn-next").addEventListener("click", () => game.nextLevel());
+      if (q("btn-win-menu")) q("btn-win-menu").addEventListener("click", goToHub);
+      const btnMute = q("btn-mute");
+      btnMute.addEventListener("click", () => {
+        const next = !audio.isMuted();
+        audio.setMuted(next);
+        btnMute.textContent = next ? "🔇" : "🔊";
+      });
+    }
+    await instances[key].startRun(selectedCharacter, progress);
+  } catch (err) {
+    console.error(err);
+    showToast("Tu dispositivo no pudo cargar el modo 3D.");
+    instances[key] = null;
     goToHub();
   }
 }
