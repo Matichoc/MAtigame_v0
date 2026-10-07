@@ -340,6 +340,24 @@ haciendo parkour, con ropa y brillos (`js/parkour-game.js`):
 - Puntaje por alfajores, barras, etapas, rapidez y caídas; logro "Parkourista".
 - Verificado con un bot que recorre las 6 etapas hasta la meta sin caídas.
 
+### Etapa 12 — Menú principal tipo lobby de videojuego ✅
+
+El menú anterior era una columna larga de formularios (nombre, personajes, lista
+de juegos). Ahora se siente como la pantalla de inicio de un videojuego:
+
+- **Escenario 3D en vivo** (`js/lobby3d.js`): tu Matichico con el atuendo
+  equipado sobre un pedestal, alfajores girando y chispas; se arrastra para
+  girarlo y al tocarlo saluda. Si el equipo no soporta WebGL, cae a la imagen 2D.
+- **Selector de Matichico** con las 4 miniaturas bajo el escenario y botón grande
+  "Vestuario y Tienda".
+- **Juegos con imagen**: cada tarjeta usa una captura real del juego
+  (`assets/games/<id>.jpg`); arriba, una tarjeta destacada ("Seguir jugando" con el
+  último juego, o "¡Novedad!").
+- Barra superior con monedas, recompensa diaria, logros, puntajes y perfil; el nombre
+  para los puntajes pasó a un campo pequeño bajo el personaje.
+- Responsive: dos columnas desde 720 px; en celular, personaje → selector → tienda →
+  juegos → nombre.
+
 ### Etapa 9 — Crea tu Chocolate 3D ✅
 
 Pedido del dueño: un juego donde el usuario **crea su propio chocolate**

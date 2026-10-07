@@ -1030,3 +1030,136 @@ h1, h2, h3 {
 .pk-jump:active { background: rgba(255,200,0,1); }
 .g3d-wrap.pk-flash::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle, rgba(255,255,255,0) 30%, rgba(212,33,108,0.55)); pointer-events: none; z-index: 6; animation: pk-flash 0.45s ease-out forwards; }
 @keyframes pk-flash { from { opacity: 1; } to { opacity: 0; } }
+
+/* =====================================================================
+   LOBBY (hub principal): se siente como la pantalla de inicio de un juego
+   ===================================================================== */
+#screen-hub { padding: 10px; align-items: stretch; }
+.lobby {
+  width: 100%; max-width: 1240px; margin: 0 auto; height: 100%;
+  display: flex; flex-direction: column; gap: 10px; min-height: 0;
+}
+.lb-top {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  background: linear-gradient(180deg, #4a2c24, #35201f);
+  border: 3px solid var(--dorado); border-radius: 18px; padding: 8px 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+.lb-top .brand-badge img { height: 38px; }
+.lb-logo { font-size: 1.7rem; line-height: 1; text-align: left; }
+.lb-logo span { font-size: 1.15rem; }
+.lb-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; align-items: center; }
+.lb-actions .stat-chip { padding: 5px 12px; font-size: 0.82rem; }
+.lb-coins { background: rgba(255,200,0,0.28); font-size: 0.95rem !important; }
+.lb-profile { margin: 0; }
+.lb-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 12px; }
+
+.lb-stage {
+  display: flex; flex-direction: column; gap: 10px; min-height: 0; overflow-y: auto;
+  background: linear-gradient(180deg, #4d2e26, #2e1a18);
+  border: 3px solid var(--dorado); border-radius: 22px; padding: 12px;
+  box-shadow: 0 14px 36px rgba(0,0,0,0.4);
+}
+.lb-stage-view {
+  position: relative; flex: 1 1 320px; min-height: 260px; border-radius: 16px; overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(255,200,0,0.38), rgba(212,33,108,0.18) 45%, rgba(0,0,0,0) 70%),
+    linear-gradient(180deg, #6b3a2c, #2b1812);
+  border: 2px solid rgba(255,200,0,0.45);
+}
+.lb-stage-view canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
+#lobby-fallback { object-fit: contain; padding: 10%; cursor: default; }
+.lb-nameplate { position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; pointer-events: none; }
+.lb-nameplate span {
+  display: inline-block; font-family: var(--font-display); font-size: 1.15rem; color: var(--dorado);
+  background: rgba(28,15,7,0.72); border: 2px solid var(--dorado); border-radius: 999px; padding: 3px 18px;
+  text-shadow: 0 0 10px rgba(255,200,0,0.4);
+}
+.lb-drag-hint { position: absolute; left: 10px; top: 8px; font-size: 0.68rem; color: var(--crema); opacity: 0.7; pointer-events: none; }
+.lb-chars { grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0; }
+.lb-chars .character-card { padding: 5px 3px 6px; border-radius: 12px; }
+.lb-chars .character-card .cname { font-size: 0.62rem; margin-top: 2px; line-height: 1.1; }
+.lb-stage-actions { display: flex; }
+.lb-shop { width: 100%; font-size: 0.98rem; padding: 10px 14px; }
+.lb-stage .field-label { margin: 2px 0 -4px; }
+.lb-name { margin: 0; padding: 7px 12px; font-size: 0.9rem; }
+
+.lb-games { min-height: 0; overflow-y: auto; padding: 2px 6px 6px 2px; }
+.lb-title { text-align: left; font-size: 1.35rem; color: var(--dorado); margin: 4px 0 10px; text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
+
+.lb-feature {
+  position: relative; display: flex; align-items: flex-end; min-height: 210px; border-radius: 22px; overflow: hidden; cursor: pointer;
+  border: 3px solid var(--dorado); margin-bottom: 14px; background: #2b1812 center / cover no-repeat;
+  box-shadow: 0 14px 34px rgba(0,0,0,0.45); transition: transform .15s ease, box-shadow .15s ease;
+}
+.lb-feature:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(0,0,0,0.55), 0 0 26px rgba(255,200,0,0.35); }
+.lb-feature::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(28,15,7,0.92), rgba(28,15,7,0.55) 48%, rgba(28,15,7,0) 80%); }
+.lb-feature .lf-body { position: relative; padding: 20px 22px; max-width: 520px; text-align: left; }
+.lb-feature .lf-kicker { display: inline-block; font-size: 0.72rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #1c1c1c; background: var(--verde); border-radius: 999px; padding: 2px 10px; }
+.lb-feature .lf-name { display: block; font-family: var(--font-display); font-size: 2rem; color: var(--crema); margin: 6px 0 2px; text-shadow: 3px 3px 0 rgba(0,0,0,0.5); line-height: 1.05; }
+.lb-feature .lf-tag { display: block; color: #e9dcc6; font-size: 0.9rem; margin-bottom: 10px; }
+.lb-feature .lf-best { display: block; color: var(--dorado); font-weight: 800; font-size: 0.8rem; margin-bottom: 10px; }
+.lb-feature .btn-primary { font-size: 1.15rem; padding: 10px 30px; }
+
+.lb-grid { grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 14px; margin-bottom: 10px; }
+.lb-grid .game-card {
+  padding: 0; overflow: hidden; text-align: left; background: #3a2220; border: 3px solid rgba(255,200,0,0.55); border-radius: 18px;
+  display: flex; flex-direction: column; box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+}
+.lb-grid .game-card.available:hover { transform: translateY(-5px) scale(1.015); border-color: var(--dorado); box-shadow: 0 14px 28px rgba(0,0,0,0.5), 0 0 20px rgba(255,200,0,0.3); background: #442826; }
+.game-card .gthumb { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #2b1812; }
+.game-card .gthumb img { width: 100%; height: 100%; object-fit: cover; display: block; transform: scale(1.04); transition: transform .3s ease; }
+.game-card.available:hover .gthumb img { transform: scale(1.12); }
+.game-card .gthumb .gtag { position: absolute; left: 8px; top: 8px; }
+.game-card .gthumb .gplay {
+  position: absolute; inset: auto 0 0 0; padding: 18px 0 8px; text-align: center; font-weight: 800; color: #fff; font-size: 0.95rem;
+  background: linear-gradient(0deg, rgba(212,33,108,0.92), rgba(212,33,108,0)); opacity: 0; transition: opacity .15s ease;
+}
+.game-card.available:hover .gplay { opacity: 1; }
+.game-card .gbody { padding: 9px 12px 12px; display: flex; flex-direction: column; gap: 3px; }
+.lb-grid .game-card .gname { font-size: 1rem; }
+.lb-grid .game-card .gtagline { font-size: 0.72rem; margin-top: 0; min-height: 2.5em; }
+.lb-grid .game-card .gbest { margin-top: 2px; }
+.lb-links { margin: 12px 0 4px; justify-content: flex-start; }
+
+@media (max-width: 1000px) {
+  .lb-body { grid-template-columns: 290px 1fr; gap: 10px; }
+  .lb-logo span { display: none; }
+  .lb-actions .stat-chip { padding: 4px 9px; font-size: 0.74rem; }
+  .lb-top { gap: 8px; padding: 6px 10px; }
+  .lb-feature .lf-name { font-size: 1.6rem; }
+  .lb-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+  .lb-grid .game-card .gtagline { display: none; }
+}
+@media (max-width: 720px) {
+  #screen-hub { padding: 8px; }
+  .lobby { height: auto; min-height: 100%; overflow-y: auto; }
+  .lb-top { padding: 8px 10px; }
+  .lb-actions { margin-left: 0; width: 100%; justify-content: center; order: 3; }
+  .lb-profile { margin-left: auto; }
+  .lb-body { grid-template-columns: 1fr; flex: none; }
+  /* en celular: personaje, selector, tienda, juegos y al final el nombre */
+  .lb-stage { display: contents; }
+  .lb-stage-view { order: 1; flex: none; height: 250px; min-height: 0; }
+  .lb-chars { order: 2; }
+  .lb-stage-actions { order: 3; }
+  .lb-games { order: 4; overflow: visible; padding: 0; }
+  .lb-stage .field-label { order: 5; }
+  .lb-stage .lb-name { order: 6; }
+  .lb-feature { min-height: 170px; }
+  .lb-feature .lf-body { padding: 14px 16px; }
+  .lb-feature .lf-name { font-size: 1.35rem; }
+  .lb-feature .lf-tag { font-size: 0.78rem; }
+  .lb-grid { grid-template-columns: repeat(2, 1fr); }
+  .lb-chars { background: linear-gradient(180deg, #4d2e26, #2e1a18); border: 2px solid var(--dorado); border-radius: 16px; padding: 8px; }
+  .lb-chars .character-card canvas { max-width: 70px; margin: 0 auto; display: block; }
+  .lb-title { color: var(--rosa); text-shadow: 1px 1px 0 #fff; }
+  .lb-feature::before { background: linear-gradient(0deg, rgba(28,15,7,0.95), rgba(28,15,7,0.55) 60%, rgba(28,15,7,0.15)); }
+  .lb-links a { color: var(--rosa); }
+}
+@media (max-width: 420px) {
+  .lb-logo { font-size: 1.35rem; }
+  .lb-top .brand-badge img { height: 30px; }
+  .lb-stage-view { height: 230px; }
+  .lb-grid .game-card .gname { font-size: 0.82rem; }
+}

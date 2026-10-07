@@ -42,48 +42,54 @@
     </div>
   </section>
 
-  <!-- HUB PRINCIPAL: perfil, estadísticas, selección de juego -->
+  <!-- HUB PRINCIPAL (lobby): tu Matichico en 3D, juegos con imagen, monedas y accesos -->
   <section id="screen-hub" class="screen hidden">
-    <div class="menu-card">
-      <div class="brand-row">
+    <div class="lobby">
+      <header class="lb-top">
         <a class="brand-badge" href="https://matichoc.cl/" title="Ir a matichoc.cl">
           <img src="assets/brand/logo-horizontal.png" alt="Matichoc, pasión por el cacao">
         </a>
-        <h1 class="logo">Matijuego<span>el arcade de Matichoc</span></h1>
+        <h1 class="logo lb-logo">Matijuego<span>el arcade de Matichoc</span></h1>
+        <div class="lb-actions">
+          <div class="stat-chip lb-coins" title="Monedas Chocolate Dubai">🍫✨ <span id="hub-total-coins">0</span></div>
+          <button id="btn-daily-reward" class="stat-chip stat-chip-btn">🎁 Recompensa diaria</button>
+          <button id="btn-open-achievements" class="stat-chip stat-chip-btn">🏅 Logros</button>
+          <button id="btn-open-leaderboard" class="stat-chip stat-chip-btn">🏆 Puntajes</button>
+        </div>
+        <div class="profile-chip lb-profile">
+          <img id="hub-profile-avatar" class="hub-profile-avatar" alt="">
+          <span id="hub-profile-name">Jugador</span>
+          <button id="btn-switch-profile" class="btn-tiny">Cambiar</button>
+        </div>
+      </header>
+
+      <div class="lb-body">
+        <aside class="lb-stage">
+          <div class="lb-stage-view">
+            <canvas id="lobby-canvas"></canvas>
+            <canvas id="lobby-fallback" class="hidden" width="256" height="256"></canvas>
+            <div class="lb-nameplate"><span id="lb-char-name">Elige tu Matichico</span></div>
+            <span class="lb-drag-hint">arrastra para girarlo · toca para saludar</span>
+          </div>
+          <div id="character-grid" class="character-grid lb-chars"></div>
+          <div class="lb-stage-actions">
+            <button id="btn-open-shop" class="btn-primary lb-shop">👕 Vestuario y Tienda</button>
+          </div>
+          <label class="field-label" for="input-name">Tu nombre en los puntajes</label>
+          <input id="input-name" class="text-input lb-name" type="text" maxlength="16" placeholder="Jugador">
+        </aside>
+
+        <main class="lb-games">
+          <h2 class="lb-title">Elige un juego</h2>
+          <div id="game-feature" class="lb-feature"></div>
+          <div id="game-grid" class="game-grid lb-grid"></div>
+          <nav class="site-links lb-links" aria-label="Enlaces a matichoc.cl">
+            <a href="https://matichoc.cl/">← Volver a matichoc.cl</a>
+            <a href="https://matichoc.cl/pages/tienda.html">🍫 Tienda</a>
+            <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
+          </nav>
+        </main>
       </div>
-      <nav class="site-links" aria-label="Enlaces a matichoc.cl">
-        <a href="https://matichoc.cl/">← Volver a matichoc.cl</a>
-        <a href="https://matichoc.cl/pages/tienda.html">🍫 Tienda</a>
-        <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
-      </nav>
-
-      <div class="profile-chip">
-        <img id="hub-profile-avatar" class="hub-profile-avatar" alt="">
-        <span id="hub-profile-name">Jugador</span>
-        <button id="btn-switch-profile" class="btn-tiny">Cambiar</button>
-      </div>
-
-      <div class="hub-stats">
-        <div class="stat-chip">🍫✨ Monedas: <span id="hub-total-coins">0</span></div>
-        <button id="btn-daily-reward" class="stat-chip stat-chip-btn">🎁 Recompensa diaria</button>
-        <button id="btn-open-achievements" class="stat-chip stat-chip-btn">🏅 Logros</button>
-      </div>
-
-      <label class="field-label" for="input-name">Tu nombre (para la tabla de puntajes)</label>
-      <input id="input-name" class="text-input" type="text" maxlength="16" placeholder="Jugador">
-
-      <h2 class="section-title">Tu Matichico</h2>
-      <div id="character-grid" class="character-grid"></div>
-
-      <div class="menu-secondary-row">
-        <button id="btn-open-shop" class="btn-secondary">🛒 Tienda</button>
-        <button id="btn-open-leaderboard" class="btn-secondary">🏆 Puntajes</button>
-      </div>
-
-      <h2 class="section-title">Elige un juego</h2>
-      <div id="game-grid" class="game-grid"></div>
-
-      <p class="hint">Muévete con las flechas / WASD, salta con ESPACIO, o usa los botones táctiles.</p>
     </div>
   </section>
 
