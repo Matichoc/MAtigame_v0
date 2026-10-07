@@ -2,7 +2,7 @@ import { drawCharacter, getOutfit } from "./characters.js";
 import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates, findFreeSpot, getObstacles, getSpawn } from "./levels.js";
 import * as audio from "./audio.js";
 import { saveProgress, addToLeaderboard, equippedOutfitId, reportScore, earnCoins } from "./storage.js";
-import { BRAND } from "./theme.js";
+import { BRAND, FONT_DISPLAY } from "./theme.js";
 
 const GAME_ID = "recolecta";
 
@@ -728,7 +728,7 @@ export class Game {
       if (p.type === "popup") {
         ctx.globalAlpha = alpha;
         ctx.fillStyle = BRAND.gold;
-        ctx.font = "bold 16px 'Fredoka', sans-serif";
+        ctx.font = `16px ${FONT_DISPLAY}`;
         ctx.textAlign = "center";
         ctx.fillText(p.text, p.x, p.y);
         ctx.globalAlpha = 1;

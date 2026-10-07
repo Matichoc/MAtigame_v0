@@ -4,9 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>Matichoc Arcade</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Caveat:wght@600;700&display=swap">
+<meta name="theme-color" content="#4B2E2E">
+<link rel="icon" href="assets/brand/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/baby-chipmunk.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/fonts/adorable-mother-script.otf" as="font" type="font/otf" crossorigin>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,9 +19,16 @@
   <section id="screen-profiles" class="screen">
     <div class="menu-card">
       <div class="brand-row">
-        <img src="favicon.svg" alt="" class="brand-icon">
-        <h1 class="logo">MATICHOC<span>arcade de golosinas</span></h1>
+        <a class="brand-badge" href="https://matichoc.cl/" title="Ir a matichoc.cl">
+          <img src="assets/brand/logo-horizontal.png" alt="Matichoc, pasión por el cacao">
+        </a>
+        <h1 class="logo">Matijuego<span>el arcade de Matichoc</span></h1>
       </div>
+      <nav class="site-links" aria-label="Enlaces a matichoc.cl">
+        <a href="https://matichoc.cl/">← Volver a matichoc.cl</a>
+        <a href="https://matichoc.cl/pages/tienda.html">🍫 Tienda</a>
+        <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
+      </nav>
       <p class="tagline">¿Quién juega? Cada perfil guarda su propio progreso.</p>
       <div id="profile-grid" class="profile-grid"></div>
 
@@ -37,9 +46,16 @@
   <section id="screen-hub" class="screen hidden">
     <div class="menu-card">
       <div class="brand-row">
-        <img src="favicon.svg" alt="" class="brand-icon">
-        <h1 class="logo">MATICHOC<span>arcade de golosinas</span></h1>
+        <a class="brand-badge" href="https://matichoc.cl/" title="Ir a matichoc.cl">
+          <img src="assets/brand/logo-horizontal.png" alt="Matichoc, pasión por el cacao">
+        </a>
+        <h1 class="logo">Matijuego<span>el arcade de Matichoc</span></h1>
       </div>
+      <nav class="site-links" aria-label="Enlaces a matichoc.cl">
+        <a href="https://matichoc.cl/">← Volver a matichoc.cl</a>
+        <a href="https://matichoc.cl/pages/tienda.html">🍫 Tienda</a>
+        <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
+      </nav>
 
       <div class="profile-chip">
         <img id="hub-profile-avatar" class="hub-profile-avatar" alt="">
@@ -107,7 +123,7 @@
   </section>
 
   <!-- PANTALLA DE JUEGO -->
-  <section id="screen-game" class="screen hidden">
+  <section id="screen-game" class="screen game-screen hidden">
     <div id="hud" class="hud">
       <div class="hud-left">
         <button id="btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
@@ -178,7 +194,7 @@
   </section>
 
   <!-- PANTALLA DE JUEGO: TETRIS DE PRODUCTOS -->
-  <section id="screen-tetris" class="screen hidden">
+  <section id="screen-tetris" class="screen game-screen hidden">
     <div id="tetris-hud" class="hud">
       <div class="hud-left">
         <button id="tetris-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
@@ -230,7 +246,7 @@
   </section>
 
   <!-- PANTALLA DE JUEGO: LANZAMIENTOS DE BÁSQUET -->
-  <section id="screen-basquet" class="screen hidden">
+  <section id="screen-basquet" class="screen game-screen hidden">
     <div id="basquet-hud" class="hud">
       <div class="hud-left">
         <button id="basquet-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
@@ -278,7 +294,7 @@
   </section>
 
   <!-- PANTALLA DE JUEGO: SALTOS DE PORRISTAS -->
-  <section id="screen-porristas" class="screen hidden">
+  <section id="screen-porristas" class="screen game-screen hidden">
     <div id="porristas-hud" class="hud">
       <div class="hud-left">
         <button id="porristas-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
@@ -323,6 +339,84 @@
     <div id="porristas-touch-controls">
       <button class="tetris-btn" id="porristas-btn-left">◀</button>
       <button class="tetris-btn" id="porristas-btn-right">▶</button>
+    </div>
+  </section>
+
+  <!-- PANTALLA DE JUEGO: CHOCO BLASTER 3D (primera persona, propuesta) -->
+  <section id="screen-fps" class="screen game-screen hidden">
+    <div id="fps-hud" class="hud fps-hud">
+      <div class="hud-left">
+        <button id="fps-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="fps-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Choco Blaster 3D</div>
+          <div class="hud-mission">Baña de chocolate a los malvaviscos</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">⭐ <span id="fps-hud-score">0</span></div>
+        <div class="hud-chip">🌊 <span id="fps-hud-wave">0</span></div>
+        <div class="hud-chip">🔥 <span id="fps-hud-combo">x1</span></div>
+        <div class="hud-chip">🍫✨ <span id="fps-hud-coins">0</span></div>
+        <button id="fps-btn-full" class="btn-icon" title="Pantalla completa">⛶</button>
+        <button id="fps-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="fps-canvas-wrap" class="canvas-wrap fps-wrap">
+      <canvas id="fps-canvas"></canvas>
+      <div class="fps-crosshair" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div id="fps-hitmarker" class="fps-hitmarker" aria-hidden="true"></div>
+      <div id="fps-vignette" class="fps-vignette" aria-hidden="true"></div>
+      <div id="fps-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="fps-popups" class="fps-popups" aria-hidden="true"></div>
+      <div class="fps-hud-bottom">
+        <div id="fps-hearts" class="fps-hearts" aria-label="Vidas"></div>
+        <div class="fps-ammo">
+          <span id="fps-ammo">12/12</span>
+          <div class="fps-reload"><i id="fps-reload-bar"></i></div>
+        </div>
+      </div>
+
+      <div id="fps-touch" class="fps-touch">
+        <div id="fps-joy-zone" class="fps-joy-zone"><div class="fps-joy-base"><div id="fps-joy-knob" class="fps-joy-knob"></div></div></div>
+        <div id="fps-look-zone" class="fps-look-zone"></div>
+        <button id="fps-btn-fire" class="fps-tbtn fps-tbtn-fire" aria-label="Disparar">🍫</button>
+        <button id="fps-btn-jump" class="fps-tbtn fps-tbtn-jump" aria-label="Saltar">⤴</button>
+        <button id="fps-btn-reload" class="fps-tbtn fps-tbtn-reload" aria-label="Recargar">⟳</button>
+      </div>
+
+      <div id="fps-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Choco Blaster 3D</h2>
+          <p class="fps-tag">Propuesta jugable · primera persona</p>
+          <p>Los malvaviscos se colaron a la feria de Matichoc. ¡Báñalos de chocolate
+            con tu Choco Blaster antes de que te abracen! Apunta a la cabeza para
+            un cabezazo (daño doble) y encadena baños para subir el combo.</p>
+          <p class="fps-controls-hint"><b>PC:</b> mouse para apuntar · click para disparar · WASD moverse ·
+            ESPACIO saltar · SHIFT correr · R recargar · ESC pausa.<br>
+            <b>Móvil:</b> joystick izquierdo para moverte, arrastra a la derecha para mirar.</p>
+          <button class="btn-primary" id="fps-btn-start">¡A la feria!</button>
+        </div>
+      </div>
+
+      <div id="fps-overlay-paused" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Pausa</h2>
+          <p>Haz click para volver a la acción.</p>
+          <button class="btn-primary" id="fps-btn-resume">Continuar</button>
+          <button class="btn-secondary overlay-secondary-btn" id="fps-btn-paused-menu">Volver al menú</button>
+        </div>
+      </div>
+
+      <div id="fps-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>¡Te abrazaron los malvaviscos!</h2>
+          <p id="fps-gameover-text"></p>
+          <button class="btn-primary" id="fps-btn-retry">Reintentar</button>
+          <button class="btn-secondary overlay-secondary-btn" id="fps-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
     </div>
   </section>
 

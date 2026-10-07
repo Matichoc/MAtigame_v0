@@ -128,6 +128,36 @@ proyecto ya está preparado para ese salto (`drawCharacter`/
 `renderCharacterThumb` son la única puerta de entrada al dibujo del
 personaje), pero requiere encargar arte, no solo escribir más código.
 
+### Etapa 1.7 — Refresh de marca alineado a matichoc.cl ✅
+
+Se revisó el repo de la web (`Matichoc/matiweb`), de donde sale el botón
+"🎮 Matijuego", para que el juego se sienta parte del mismo sitio:
+
+- **Tipografías oficiales**: ahora se usan las fuentes reales de la marca
+  (Baby Chipmunk para títulos y números, Adorable Mother Script para
+  acentos), copiadas desde la web a `assets/fonts/` y cargadas con
+  `@font-face` locales. Reemplazan a Fredoka/Caveat de Google Fonts, así
+  que el juego ya no depende de ninguna CDN externa. (Antes se anotó que
+  las fuentes de marca "no se podían cargar" por ser de pago; al estar en el
+  repo de la web, ya hay archivos propios para usar.)
+- **Identidad visual de la web**: fondo crema con el patrón de cacao, tarjetas
+  café (`#4B2E2E`) con borde dorado, logo horizontal en insignia blanca (igual
+  al header de la web), título rosa con brillo, favicon e íconos oficiales
+  (`assets/brand/`, copias sin modificar de los originales).
+- **Enlaces de ida y vuelta**: el hub enlaza a `matichoc.cl`, la Tienda y La
+  Maestra. La web ya enlaza a Matijuego desde su header, banner y footer.
+- **Sprites reales de productos** (`assets/products/`): recortes de las fotos
+  reales (alfajores por sabor, bombas, cuchuflí) para usar como texturas y
+  cartas; hoy se ven en los mostradores del juego 3D.
+- Pantallas de juego con una clase compartida `.game-screen`, para que ningún
+  juego nuevo repita el bug de layout en mobile que tuvieron Básquet y
+  Porristas.
+- Pendiente a propósito: el progreso (monedas, racha) **no se comparte** con
+  la web porque viven en orígenes distintos (`matichoc.cl` vs
+  `matichoc.github.io`) y `localStorage` no cruza orígenes; unirlos requeriría
+  un backend o mover el juego al mismo dominio. Tampoco se prometen premios
+  reales: la web ya tiene su propia "racha" con reglas del dueño.
+
 ### Etapa 2 — Segundo juego: Tetris de Productos ✅
 
 Ver la sección dedicada más abajo con el diseño completo. En resumen:
@@ -228,6 +258,26 @@ regresión completa del resto de la plataforma. Se agregaron además dos
 logros nuevos ("Encestador Estrella" y "Equilibrista Matichoc") para
 que también alimenten el sistema de recompensa diaria/logros de la
 Etapa 1.6.
+
+### Etapa 8 — Choco Blaster 3D: propuesta en primera persona 🧪
+
+Prototipo jugable pedido para **evaluar el rumbo visual** ("realista" =
+como los juegos actuales en 3D y primera persona, no productos
+fotorrealistas). Detalle, techo honesto de calidad, alternativas
+(Three.js / Godot / Unity / arte 3D encargado) y decisiones pendientes en
+[`docs/PROPUESTA-3D.md`](./docs/PROPUESTA-3D.md).
+
+- Three.js r160 vendorizado en `vendor/` (MIT), cargado solo al entrar al
+  juego; mundo 3D de la feria (`js/fps-world.js`), malvaviscos enemigos
+  (`js/fps-enemies.js`) y lógica (`js/fps-game.js`).
+- Sin violencia: se "baña de chocolate" a malvaviscos; oleadas, combos,
+  cabezazos, malvavisco dorado que da monedas; mouse+teclado y controles
+  táctiles; calidad adaptativa.
+- Probado con Playwright (WebGL por software): carga, pointer lock, mouse,
+  teclado, disparo a cabeza/cuerpo, daño, recarga, oleadas, fin de partida,
+  reintento, ranking, logros y layout móvil.
+- Las Etapas 3-5 (Salto Choco, Autos de Chocolate, Memoria Matichoc) quedan
+  a la espera de decidir si van en 3D o en 2D mejorado.
 
 ## Diseño de "Tetris de Productos" (Etapa 2)
 

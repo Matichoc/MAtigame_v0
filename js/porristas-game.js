@@ -6,7 +6,7 @@
 import { drawCharacter, getOutfit } from "./characters.js";
 import { saveProgress, addToLeaderboard, equippedOutfitId, reportScore, earnCoins } from "./storage.js";
 import * as audio from "./audio.js";
-import { BRAND } from "./theme.js";
+import { BRAND, FONT_DISPLAY } from "./theme.js";
 
 const GAME_ID = "porristas";
 export const CANVAS_W = 800;
@@ -318,7 +318,7 @@ export class PorristasGame {
       const alpha = Math.max(0, p.life / p.maxLife);
       ctx.globalAlpha = alpha;
       ctx.fillStyle = BRAND.gold;
-      ctx.font = "bold 16px 'Fredoka', sans-serif";
+      ctx.font = `16px ${FONT_DISPLAY}`;
       ctx.textAlign = "center";
       ctx.fillText(p.text, p.x, p.y);
       ctx.globalAlpha = 1;

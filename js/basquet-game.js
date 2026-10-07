@@ -6,7 +6,7 @@
 import { drawCharacter, getOutfit } from "./characters.js";
 import { saveProgress, addToLeaderboard, equippedOutfitId, reportScore, earnCoins } from "./storage.js";
 import * as audio from "./audio.js";
-import { BRAND } from "./theme.js";
+import { BRAND, FONT_DISPLAY } from "./theme.js";
 
 const GAME_ID = "basquet_tiros";
 export const CANVAS_W = 800;
@@ -373,7 +373,7 @@ export class BasquetGame {
       ctx.fillRect(barX + this.aimLocked * barW - 2, barY - 4, 4, barH + 8);
     }
     ctx.fillStyle = "#fff6e6";
-    ctx.font = "bold 12px 'Fredoka', sans-serif";
+    ctx.font = `12px ${FONT_DISPLAY}`;
     ctx.textAlign = "center";
     ctx.fillText("Puntería", barX + barW / 2, barY - 10);
 
@@ -404,7 +404,7 @@ export class BasquetGame {
       if (p.type === "popup") {
         ctx.globalAlpha = alpha;
         ctx.fillStyle = BRAND.gold;
-        ctx.font = "bold 16px 'Fredoka', sans-serif";
+        ctx.font = `16px ${FONT_DISPLAY}`;
         ctx.textAlign = "center";
         ctx.fillText(p.text, p.x, p.y);
         ctx.globalAlpha = 1;

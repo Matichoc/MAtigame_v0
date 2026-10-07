@@ -1,3 +1,19 @@
+/* Tipografías oficiales de marca (las mismas de matichoc.cl) */
+@font-face {
+  font-family: "Baby Chipmunk";
+  src: url("../assets/fonts/baby-chipmunk.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Adorable Mother Script";
+  src: url("../assets/fonts/adorable-mother-script.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Paleta oficial de marca Matichoc */
   --rosa: #D4216C;
@@ -11,6 +27,11 @@
   --choco: #5a3320;
   --choco-claro: #8a5a36;
   --crema: #FFF6E6;
+  --cafe-web: #4B2E2E;
+  --fondo-web: #FFF8F0;
+  --font-display: "Baby Chipmunk", "Trebuchet MS", sans-serif;
+  --font-script: "Adorable Mother Script", cursive;
+  --font-body: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-size: 16px;
 }
 
@@ -20,15 +41,19 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: radial-gradient(ellipse at top, #3a2110 0%, #170c05 70%);
+  background: var(--fondo-web) url("../assets/brand/pattern-cacao-subtle.png");
   color: var(--crema);
-  font-family: "Fredoka", "Trebuchet MS", sans-serif;
+  font-family: var(--font-body);
   overflow: hidden;
 }
 
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
 .script {
-  font-family: "Caveat", cursive;
-  font-weight: 700;
+  font-family: var(--font-script);
 }
 
 #app {
@@ -75,7 +100,7 @@ html, body {
   width: 100%;
   max-height: 94vh;
   overflow-y: auto;
-  background: linear-gradient(180deg, #3a2213, #170c05);
+  background: linear-gradient(180deg, #5a3a37, var(--cafe-web) 40%, #35201f);
   border: 3px solid var(--dorado);
   border-radius: 20px;
   padding: 28px 24px;
@@ -90,30 +115,49 @@ html, body {
   gap: 10px;
   margin-bottom: 6px;
 }
-.brand-icon {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-}
 
 .logo {
   margin: 0;
-  font-size: 2.4rem;
-  font-weight: 700;
+  font-size: 2.2rem;
   letter-spacing: 1px;
   color: var(--rosa);
-  text-shadow: 2px 2px 0 var(--marron-osc);
+  text-shadow: 0 0 14px rgba(212,33,108,0.55), 2px 2px 0 var(--marron-osc);
 }
 .logo span {
   display: block;
-  font-family: "Caveat", cursive;
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-family: var(--font-script);
+  font-size: 1.5rem;
   color: var(--verde);
   letter-spacing: 0.5px;
   text-shadow: none;
   margin-top: 2px;
 }
+
+/* Insignia blanca con el logo horizontal, igual que el header de matichoc.cl */
+.brand-badge {
+  display: inline-flex;
+  background: #fff;
+  border-radius: 12px;
+  padding: 6px 10px;
+  line-height: 0;
+  flex-shrink: 0;
+}
+.brand-badge img { height: 46px; width: auto; display: block; }
+
+.site-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: center;
+  margin: 0 0 14px;
+}
+.site-links a {
+  color: var(--dorado);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+.site-links a:hover { text-decoration: underline; }
 
 .tagline {
   color: #cfd8ea;
@@ -302,7 +346,6 @@ html, body {
 .character-card canvas {
   width: 100%;
   aspect-ratio: 1 / 1;
-  image-rendering: pixelated;
 }
 .character-card .cname {
   display: block;
@@ -569,7 +612,7 @@ html, body {
 .leaderboard-empty { color: #93a0bd; font-size: 0.9rem; margin-bottom: 16px; }
 
 /* ---------- GAME ---------- */
-#screen-game, #screen-tetris, #screen-basquet, #screen-porristas {
+.game-screen {
   flex-direction: column;
   gap: 8px;
   padding: 10px;
@@ -596,7 +639,6 @@ html, body {
   border-radius: 50%;
   border: 2px solid var(--dorado);
   background: var(--choco);
-  image-rendering: pixelated;
 }
 .hud-level { font-weight: 800; color: var(--dorado); font-size: 0.85rem; }
 .hud-mission { font-size: 0.78rem; color: var(--crema); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
@@ -733,3 +775,129 @@ html, body {
   cursor: pointer;
 }
 .leaderboard-tab.active { border-color: var(--dorado); background: rgba(255,200,0,0.15); color: var(--dorado); }
+
+/* ---------- CHOCO BLASTER 3D (primera persona) ---------- */
+.fps-hud, .fps-wrap { max-width: 960px; }
+.fps-wrap { aspect-ratio: 16 / 9; overflow: hidden; border-radius: 14px; user-select: none; -webkit-user-select: none; }
+.fps-wrap canvas { background: #bfe3f7; cursor: crosshair; touch-action: none; }
+.fps-wrap:fullscreen { max-width: none; width: 100vw; height: 100vh; aspect-ratio: auto; border-radius: 0; }
+.fps-wrap:fullscreen canvas { border-radius: 0; border: none; }
+
+.fps-crosshair {
+  position: absolute; left: 50%; top: 50%; width: 0; height: 0;
+  pointer-events: none; z-index: 2;
+}
+.fps-crosshair i {
+  position: absolute; background: #fff; border-radius: 2px;
+  box-shadow: 0 0 0 1.5px rgba(61,31,16,0.75);
+}
+.fps-crosshair i:nth-child(1) { width: 3px; height: 10px; left: -1.5px; top: -20px; }
+.fps-crosshair i:nth-child(2) { width: 3px; height: 10px; left: -1.5px; top: 10px; }
+.fps-crosshair i:nth-child(3) { width: 10px; height: 3px; left: -20px; top: -1.5px; }
+.fps-crosshair i:nth-child(4) { width: 10px; height: 3px; left: 10px; top: -1.5px; }
+
+.fps-hitmarker {
+  position: absolute; left: 50%; top: 50%; width: 34px; height: 34px;
+  margin: -17px 0 0 -17px; pointer-events: none; opacity: 0; z-index: 3;
+}
+.fps-hitmarker::before, .fps-hitmarker::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 4px; height: 36px;
+  margin: -18px 0 0 -2px; background: #fff; border-radius: 2px;
+  box-shadow: 0 0 0 1.5px rgba(61,31,16,0.7);
+  transform: rotate(45deg);
+}
+.fps-hitmarker::after { transform: rotate(-45deg); }
+.fps-hitmarker.hit { animation: fps-hit 0.22s ease-out; }
+.fps-hitmarker.head::before, .fps-hitmarker.head::after { background: var(--dorado); }
+.fps-hitmarker.kill::before, .fps-hitmarker.kill::after { background: var(--rosa); }
+@keyframes fps-hit {
+  0% { opacity: 1; transform: scale(0.6); }
+  100% { opacity: 0; transform: scale(1.35); }
+}
+
+.fps-vignette {
+  position: absolute; inset: 0; pointer-events: none; opacity: 0; z-index: 2;
+  background: radial-gradient(ellipse at center, rgba(212,33,108,0) 45%, rgba(212,33,108,0.75) 100%);
+}
+
+.fps-banner {
+  position: absolute; left: 50%; top: 22%; transform: translateX(-50%);
+  font-family: var(--font-display); font-size: clamp(1.4rem, 5vw, 2.6rem);
+  color: var(--dorado); text-shadow: 0 0 18px rgba(212,33,108,0.8), 3px 3px 0 var(--marron-osc);
+  opacity: 0; pointer-events: none; z-index: 4; white-space: nowrap;
+}
+.fps-banner.show { animation: fps-banner 2.6s ease-out; }
+@keyframes fps-banner {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.6); }
+  12% { opacity: 1; transform: translateX(-50%) scale(1.08); }
+  20% { transform: translateX(-50%) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-14px); }
+}
+
+.fps-popups { position: absolute; inset: 0; pointer-events: none; z-index: 3; overflow: hidden; }
+.fps-popup {
+  position: absolute; left: 0; top: 0; display: none; white-space: nowrap;
+  font-family: var(--font-display); font-size: 1.15rem; color: #fff;
+  text-shadow: 0 0 6px rgba(61,31,16,0.9), 2px 2px 0 var(--marron-osc);
+}
+.fps-popup.combo { color: var(--dorado); font-size: 1.5rem; }
+.fps-popup.head { color: var(--verde); font-size: 1.3rem; }
+.fps-popup.coin { color: var(--verde); }
+
+.fps-hud-bottom {
+  position: absolute; left: 12px; right: 12px; bottom: 10px; z-index: 3;
+  display: flex; justify-content: space-between; align-items: flex-end; pointer-events: none;
+}
+.fps-hearts {
+  font-size: 1.5rem; letter-spacing: 2px; color: var(--rosa);
+  text-shadow: 0 0 6px rgba(0,0,0,0.6), 2px 2px 0 var(--marron-osc);
+}
+.fps-ammo { text-align: right; font-family: var(--font-display); font-size: 1.5rem; color: #fff; text-shadow: 2px 2px 0 var(--marron-osc); }
+.fps-reload { height: 5px; width: 110px; margin-top: 4px; background: rgba(0,0,0,0.35); border-radius: 3px; overflow: hidden; opacity: 0; transition: opacity .15s; margin-left: auto; }
+.fps-reload.active { opacity: 1; }
+.fps-reload i { display: block; height: 100%; background: var(--dorado); transform-origin: left; transform: scaleX(0); }
+
+.fps-tag { color: var(--verde) !important; font-family: var(--font-script); font-size: 1.3rem !important; margin: 0 0 8px !important; }
+.fps-controls-hint { font-size: 0.8rem !important; opacity: 0.9; }
+
+/* Controles táctiles: joystick a la izquierda, mirar arrastrando a la derecha */
+.fps-touch { position: absolute; inset: 0; z-index: 5; display: none; touch-action: none; }
+@media (pointer: coarse) { .fps-touch { display: block; } }
+.fps-joy-zone { position: absolute; left: 0; top: 0; width: 45%; height: 100%; touch-action: none; }
+.fps-joy-base {
+  position: absolute; left: 22px; bottom: 22px; width: 96px; height: 96px; border-radius: 50%;
+  background: rgba(255,255,255,0.14); border: 2px solid rgba(255,255,255,0.45);
+  display: flex; align-items: center; justify-content: center; pointer-events: none;
+}
+.fps-joy-knob { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.65); }
+.fps-look-zone { position: absolute; right: 0; top: 0; width: 55%; height: 100%; touch-action: none; }
+.fps-tbtn {
+  position: absolute; border: 2px solid rgba(255,255,255,0.7); color: #fff; cursor: pointer;
+  background: rgba(212,33,108,0.55); border-radius: 50%; font-size: 1.5rem; touch-action: none;
+  display: flex; align-items: center; justify-content: center; user-select: none;
+}
+.fps-tbtn:active { background: rgba(212,33,108,0.9); }
+.fps-tbtn-fire { right: 20px; bottom: 28px; width: 76px; height: 76px; font-size: 2rem; }
+.fps-tbtn-jump { right: 108px; bottom: 20px; width: 54px; height: 54px; background: rgba(255,200,0,0.5); }
+.fps-tbtn-reload { right: 24px; bottom: 116px; width: 48px; height: 48px; background: rgba(207,215,103,0.55); }
+@media (pointer: coarse) {
+  .fps-wrap { aspect-ratio: 16 / 10; }
+  /* vidas y munición arriba para no quedar bajo el joystick ni los botones */
+  .fps-hud-bottom { bottom: auto; top: 8px; align-items: flex-start; }
+  .fps-hearts { font-size: 1.1rem; }
+  .fps-ammo { font-size: 1.15rem; }
+}
+@media (max-width: 520px) {
+  .fps-hud .hud-mission { display: none; }
+  .fps-hud .hud-chip { padding: 3px 7px; font-size: 0.75rem; }
+  .fps-hud { padding: 6px 8px; gap: 6px; }
+}
+@media (pointer: coarse) and (orientation: portrait) {
+  .fps-wrap { aspect-ratio: 4 / 3; }
+}
+
+.gtag {
+  display: inline-block; margin: 4px 4px 0 0; padding: 1px 8px; border-radius: 999px;
+  background: var(--rosa); color: #fff; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px;
+}

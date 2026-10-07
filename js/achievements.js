@@ -54,6 +54,14 @@ export const ACHIEVEMENTS = [
     isDone: (p) => getBestScore(p, "basquet_tiros") >= 100,
   },
   {
+    id: "cazador",
+    name: "Cazador de Malvaviscos",
+    icon: "🎯",
+    reward: 25,
+    desc: "Consigue 1500 puntos en Choco Blaster 3D.",
+    isDone: (p) => getBestScore(p, "fps3d") >= 1500,
+  },
+  {
     id: "equilibrista",
     name: "Equilibrista Matichoc",
     icon: "🤸",

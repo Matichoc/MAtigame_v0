@@ -8,7 +8,8 @@ canchas por un camino guiado recolectando golosinas), **Tetris de
 Productos** (encajar golosinas cayendo), **Lanzamientos de Básquet**
 (tiro libre con barras de puntería y potencia contrarreloj) y **Saltos
 de Porristas** (mover una rebotadora para mantener a la Matichica
-rebotando sin que se caiga).
+rebotando sin que se caiga) y **Choco Blaster 3D**, una propuesta en
+primera persona (ver [`docs/PROPUESTA-3D.md`](./docs/PROPUESTA-3D.md)).
 
 Es una v0 intencionalmente simple: HTML + CSS + JavaScript puro (sin frameworks
 ni build step), pensada como base fácil de evolucionar. El plan es que esto
@@ -73,7 +74,11 @@ variables de `css/style.css`.
 
 ```
 index.html          Pantallas (perfiles, hub, tienda, puntajes, logros, juegos)
-favicon.svg          Ícono de marca (vaina de cacao + chocolate)
+assets/brand/        Logos, patrón e íconos oficiales (copiados de matichoc.cl)
+assets/fonts/        Baby Chipmunk y Adorable Mother Script (fuentes de marca)
+assets/products/     Recortes de fotos reales de productos
+vendor/              Three.js (MIT), solo se carga en el juego 3D
+docs/                Propuestas y documentos de diseño
 css/style.css        Estilos, paleta de marca y controles táctiles
 js/theme.js           Paleta de marca Matichoc para usar en canvas
 js/profiles.js        Perfiles de jugador (sesión por usuario en el navegador)
@@ -87,6 +92,9 @@ js/tetris-pieces.js  Formas y colores de "Tetris de Productos"
 js/tetris-game.js    Motor de "Tetris de Productos": tablero, piezas, HUD
 js/basquet-game.js    Motor de "Lanzamientos de Básquet": barras de tiro, HUD
 js/porristas-game.js  Motor de "Saltos de Porristas": física de rebote, HUD
+js/fps-game.js        Motor de "Choco Blaster 3D" (primera persona, Three.js)
+js/fps-world.js       Mundo 3D: feria de Matichoc
+js/fps-enemies.js     Malvaviscos enemigos del juego 3D
 js/storage.js         Progreso persistente por perfil (monedas, atuendos, ranking, logros)
 js/main.js            Perfiles, hub, tienda, puntajes y navegación entre juegos
 .github/workflows/    Despliegue automático a GitHub Pages

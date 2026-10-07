@@ -28,9 +28,10 @@ const screenGame = document.getElementById("screen-game");
 const screenTetris = document.getElementById("screen-tetris");
 const screenBasquet = document.getElementById("screen-basquet");
 const screenPorristas = document.getElementById("screen-porristas");
+const screenFps = document.getElementById("screen-fps");
 const ALL_SCREENS = [
   screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
-  screenGame, screenTetris, screenBasquet, screenPorristas,
+  screenGame, screenTetris, screenBasquet, screenPorristas, screenFps,
 ];
 
 const grid = document.getElementById("character-grid");
@@ -41,7 +42,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { recolecta: null, tetris: null, basquet: null, porristas: null };
+const instances = { recolecta: null, tetris: null, basquet: null, porristas: null, fps: null };
 
 let toastTimer = null;
 function showToast(message) {
@@ -84,8 +85,8 @@ function renderProfileScreen() {
     const char = CHARACTERS.find((c) => c.id === p.characterId);
     if (char) {
       const canvas = document.createElement("canvas");
-      canvas.width = 64;
-      canvas.height = 64;
+      canvas.width = 128;
+      canvas.height = 128;
       renderCharacterThumb(canvas, char, getOutfit("liga"));
       card.appendChild(canvas);
     } else {
@@ -169,8 +170,8 @@ function updateProfileChip() {
   const avatarImg = document.getElementById("hub-profile-avatar");
   if (selectedCharacter) {
     const c = document.createElement("canvas");
-    c.width = 40;
-    c.height = 40;
+    c.width = 80;
+    c.height = 80;
     renderCharacterThumb(c, selectedCharacter, getOutfit(equippedOutfitId(progress, selectedCharacter.id)));
     avatarImg.src = c.toDataURL();
   }
@@ -274,8 +275,8 @@ function characterCard(char) {
   card.tabIndex = 0;
 
   const canvas = document.createElement("canvas");
-  canvas.width = 96;
-  canvas.height = 96;
+  canvas.width = 192;
+  canvas.height = 192;
   renderCharacterThumb(canvas, char, getOutfit(equippedOutfitId(progress, char.id)));
 
   const label = document.createElement("span");
@@ -334,6 +335,12 @@ function renderGameGrid() {
     card.appendChild(icon);
     card.appendChild(name);
     card.appendChild(tagline);
+    if (entry.tag) {
+      const tag = document.createElement("span");
+      tag.className = "gtag";
+      tag.textContent = entry.tag;
+      card.appendChild(tag);
+    }
 
     if (entry.status === "available") {
       const best = getBestScore(progress, entry.id);
@@ -386,6 +393,9 @@ function playGame(gameId) {
   } else if (gameId === "porristas") {
     showScreen(screenPorristas);
     launchOrResumePorristas();
+  } else if (gameId === "fps3d") {
+    showScreen(screenFps);
+    launchOrResumeFps();
   }
 }
 
@@ -421,8 +431,8 @@ function renderShopSwitcher() {
     const btn = document.createElement("button");
     btn.className = "shop-switch-btn" + (char.id === shopCharacterId ? " active" : "");
     const canvas = document.createElement("canvas");
-    canvas.width = 48;
-    canvas.height = 48;
+    canvas.width = 96;
+    canvas.height = 96;
     renderCharacterThumb(canvas, char, getOutfit(equippedOutfitId(progress, char.id)));
     btn.appendChild(canvas);
     btn.addEventListener("click", () => {
@@ -456,8 +466,8 @@ function renderShop() {
     }
 
     const canvas = document.createElement("canvas");
-    canvas.width = 96;
-    canvas.height = 96;
+    canvas.width = 192;
+    canvas.height = 192;
     renderCharacterThumb(canvas, shopCharacter, outfit);
 
     const name = document.createElement("span");
@@ -562,8 +572,8 @@ function renderLeaderboard() {
 function updateHudAvatar(imgId, character) {
   const hudAvatar = document.getElementById(imgId);
   const avatarCanvas = document.createElement("canvas");
-  avatarCanvas.width = 40;
-  avatarCanvas.height = 40;
+  avatarCanvas.width = 80;
+  avatarCanvas.height = 80;
   renderCharacterThumb(avatarCanvas, character, getOutfit(equippedOutfitId(progress, character.id)));
   hudAvatar.src = avatarCanvas.toDataURL();
 }
@@ -735,6 +745,73 @@ function launchOrResumePorristas() {
     });
   } else {
     instances.porristas.startRun(selectedCharacter, progress);
+  }
+}
+
+// ---------- JUEGO: "CHOCO BLASTER 3D" (primera persona, carga perezosa) ----------
+
+async function launchOrResumeFps() {
+  updateHudAvatar("fps-hud-avatar", selectedCharacter);
+  try {
+    if (!instances.fps) {
+      showToast("Cargando el mundo 3D…");
+      const { FpsGame } = await import("./fps-game.js");
+      const q = (id) => document.getElementById(id);
+      const els = {
+        wrap: q("fps-canvas-wrap"),
+        canvas: q("fps-canvas"),
+        hudScore: q("fps-hud-score"),
+        hudWave: q("fps-hud-wave"),
+        hudCombo: q("fps-hud-combo"),
+        hudCoins: q("fps-hud-coins"),
+        hudHearts: q("fps-hearts"),
+        hudAmmo: q("fps-ammo"),
+        reloadBar: q("fps-reload-bar"),
+        banner: q("fps-banner"),
+        hitmarker: q("fps-hitmarker"),
+        vignette: q("fps-vignette"),
+        popups: q("fps-popups"),
+        gameoverText: q("fps-gameover-text"),
+        overlays: {
+          intro: q("fps-overlay-intro"),
+          paused: q("fps-overlay-paused"),
+          gameover: q("fps-overlay-gameover"),
+        },
+        touch: {
+          joyZone: q("fps-joy-zone"),
+          joyKnob: q("fps-joy-knob"),
+          lookZone: q("fps-look-zone"),
+          btnFire: q("fps-btn-fire"),
+          btnJump: q("fps-btn-jump"),
+          btnReload: q("fps-btn-reload"),
+        },
+      };
+      const fps = new FpsGame(selectedCharacter, progress, els);
+      instances.fps = fps;
+
+      q("fps-btn-start").addEventListener("click", () => fps.beginPlaying());
+      q("fps-btn-resume").addEventListener("click", () => fps.resume());
+      q("fps-btn-retry").addEventListener("click", () => fps.retry());
+      q("fps-btn-menu").addEventListener("click", goToHub);
+      q("fps-btn-paused-menu").addEventListener("click", goToHub);
+      q("fps-btn-gameover-menu").addEventListener("click", goToHub);
+      q("fps-btn-full").addEventListener("click", () => {
+        if (document.fullscreenElement) document.exitFullscreen();
+        else els.wrap.requestFullscreen?.();
+      });
+      const btnMute = q("fps-btn-mute");
+      btnMute.addEventListener("click", () => {
+        const next = !audio.isMuted();
+        audio.setMuted(next);
+        btnMute.textContent = next ? "🔇" : "🔊";
+      });
+    }
+    await instances.fps.startRun(selectedCharacter, progress);
+  } catch (err) {
+    console.error(err);
+    showToast("Tu dispositivo no pudo cargar el modo 3D.");
+    instances.fps = null;
+    goToHub();
   }
 }
 

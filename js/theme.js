@@ -13,3 +13,6 @@ export const BRAND = {
   goldDark: "#c99900",
   cream: "#FFF6E6",
 };
+
+/** Tipografía de marca para texto dentro del canvas (misma de matichoc.cl). */
+export const FONT_DISPLAY = '"Baby Chipmunk", "Trebuchet MS", sans-serif';

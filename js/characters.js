@@ -125,7 +125,7 @@ export function drawCharacter(ctx, char, outfit, cx, cy, size, t, moving, facing
   // Número en el jersey
   if (char.number) {
     ctx.fillStyle = outfit.trim;
-    ctx.font = `bold ${size * 0.16}px "Fredoka", sans-serif`;
+    ctx.font = `${size * 0.16}px "Baby Chipmunk", sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(char.number, 0, size * 0.1);
