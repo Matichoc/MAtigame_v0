@@ -291,6 +291,36 @@ fotorrealistas). Detalle, techo honesto de calidad, alternativas
   sobre una base compartida (`js/three-kit.js`, clase `Game3D`) y un Matichico
   3D reutilizable (`js/matichico3d.js`).
 
+### Etapa 10 — Todos los juegos en 3D ✅
+
+Pedido del dueño: "todos los juegos deben ser en 3D, realistas, con una imagen
+adictiva, tipo Roblox / Fortnite". Se rehicieron en 3D los cuatro juegos que
+seguían en 2D, **manteniendo sus reglas, ids, rankings y logros**:
+
+- **Recolecta y Corre** (`js/recolecta-game.js`): los 6 niveles de
+  `js/levels.js` en 3D (pasto con setos, cancha de básquet con aros, gimnasio),
+  cámara de seguimiento, vallas, conos móviles, bandera con haz dorado, alfajores
+  reales como golosinas y bonus Matidubai.
+- **Tetris de Productos** (`js/tetris3d-game.js`): vitrina de cristal con marco
+  dorado, cubos de chocolate brillantes, sombra fantasma, estallido de líneas,
+  siguiente pieza en pedestal y Matichico que celebra. Gestos táctiles.
+- **Lanzamientos de Básquet** (`js/basquet3d-game.js`): cámara tras tu Matichico,
+  gimnasio con hinchada, marcador colgante, barras de puntería y potencia,
+  balón con física (aro, tablero y piso), red animada y aro dorado cada 5 tiros.
+- **Saltos de Porristas** (`js/porristas3d-game.js`): escenario con foco y
+  cortina, rebotadora con resortes, volteretas por combo y pompones.
+
+Mejoras compartidas: bloom + corrección de color (`LOOK` en `js/three-kit.js`,
+con degradación automática en equipos lentos), convención `data-action` para
+los botones de cada pantalla en `js/main.js` y lanzador único `launchOrResume3d`.
+Se eliminaron los motores 2D (`game.js`, `tetris-game.js`, `basquet-game.js`,
+`porristas-game.js`). Para depurar, abrir el sitio con `?debug3d` expone
+`window.__g3d`.
+
+> Límite honesto: es 3D estilizado (tipo Fall Guys / Roblox) que corre en
+> cualquier navegador sin instalar nada; no iguala el fotorrealismo de
+> Fortnite o Call of Duty, que requiere motores nativos y equipos de arte.
+
 ### Etapa 9 — Crea tu Chocolate 3D ✅
 
 Pedido del dueño: un juego donde el usuario **crea su propio chocolate**
@@ -433,21 +463,12 @@ gameId, nombre, score)` con su propio id.
 
 ## Consideraciones técnicas para los próximos juegos
 
-- Los módulos de cada juego siguen viviendo sueltos en `js/` (`game.js`/
-  `levels.js` para "Recolecta y Corre", `tetris-game.js`/
-  `tetris-pieces.js` para Tetris, `basquet-game.js` y `porristas-game.js`
-  para los dos juegos nuevos) en vez de carpetas `js/games/<id>/`. Ya son
-  4 módulos de juego con el mismo patrón — el umbral que esta misma
-  sección proponía como gatillo para reorganizar y/o extraer una interfaz
-  común ya se cumplió. No se hizo en esta vuelta a propósito (mover
-  archivos y tocar todos los imports es un cambio de alto riesgo/bajo
-  valor inmediato para meterlo junto con dos juegos nuevos); queda
-  pendiente como una tarea de orden aparte, sin apuro funcional porque
-  el patrón sigue funcionando bien tal como está.
-- Se recomienda seguir el mismo patrón de instancia única + métodos
-  (`start()`, `pauseForMenu()`, `startRun(character, progress)`) usado en
-  `Game`, `TetrisGame`, `BasquetGame` y `PorristasGame` para que el hub
-  pueda lanzar/pausar/rebindar cualquier juego de forma uniforme.
+- Los 9 juegos comparten el patrón de instancia única + métodos
+  (`startRun(character, progress)`, `beginPlaying()`, `retry()`,
+  `pauseForMenu()`). Los 3D heredan de `Game3D` (`js/three-kit.js`) y se
+  registran en `GAMES_3D` de `js/main.js`; los ids del DOM siguen la
+  convención `<prefijo>-canvas`, `-hud-<nombre>`, `-overlay-<nombre>` y botones
+  con `data-action` (`begin`, `next`, `retry`, `restart`, `menu`).
 - Mientras un juego esté "soon" en el catálogo, su tarjeta en el hub no
   debe ser interactiva (ver `js/main.js` → `renderGameGrid`).
 - Si un juego futuro usa un mapa/camino (como "Recolecta y Corre" o
