@@ -1,5 +1,4 @@
 import { CHARACTERS, OUTFITS, getOutfit, renderCharacterThumb } from "./characters.js";
-import { BasquetGame } from "./basquet-game.js";
 import { PorristasGame } from "./porristas-game.js";
 import * as audio from "./audio.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
@@ -22,12 +21,12 @@ const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
 const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenAchievements = document.getElementById("screen-achievements");
-const screenBasquet = document.getElementById("screen-basquet");
 const screenPorristas = document.getElementById("screen-porristas");
 const screenFps = document.getElementById("screen-fps");
 const screen3d = {
   recolecta: document.getElementById("screen-recolecta"),
   tetris: document.getElementById("screen-tetris"),
+  basquet_tiros: document.getElementById("screen-basquet"),
   salto: document.getElementById("screen-salto"),
   autos: document.getElementById("screen-autos"),
   memoria: document.getElementById("screen-memoria"),
@@ -35,7 +34,7 @@ const screen3d = {
 };
 const ALL_SCREENS = [
   screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
-   screenBasquet, screenPorristas, screenFps,
+    screenPorristas, screenFps,
   ...Object.values(screen3d),
 ];
 
@@ -47,7 +46,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { recolecta: null, tetris: null, basquet: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
+const instances = { recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
 
 let toastTimer = null;
 function showToast(message) {
@@ -386,10 +385,7 @@ function playGame(gameId) {
   // corriendo lógica de fondo mientras se muestra el otro).
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
 
-  if (gameId === "basquet_tiros") {
-    showScreen(screenBasquet);
-    launchOrResumeBasquet();
-  } else if (gameId === "porristas") {
+  if (gameId === "porristas") {
     showScreen(screenPorristas);
     launchOrResumePorristas();
   } else if (gameId === "fps3d") {
@@ -580,47 +576,6 @@ function updateHudAvatar(imgId, character) {
   hudAvatar.src = avatarCanvas.toDataURL();
 }
 
-// ---------- JUEGO: "LANZAMIENTOS DE BÁSQUET" ----------
-
-function launchOrResumeBasquet() {
-  updateHudAvatar("basquet-hud-avatar", selectedCharacter);
-
-  if (!instances.basquet) {
-    const canvas = document.getElementById("basquet-canvas");
-    const els = {
-      hudScore: document.getElementById("basquet-hud-score"),
-      hudMade: document.getElementById("basquet-hud-made"),
-      hudAttempts: document.getElementById("basquet-hud-attempts"),
-      hudCoins: document.getElementById("basquet-hud-coins"),
-      hudTimer: document.getElementById("basquet-hud-timer"),
-      hudTimerChip: document.getElementById("basquet-hud-timer-chip"),
-      gameoverText: document.getElementById("basquet-gameover-text"),
-      overlays: {
-        intro: document.getElementById("basquet-overlay-intro"),
-        gameover: document.getElementById("basquet-overlay-gameover"),
-      },
-    };
-
-    const basquet = new BasquetGame(canvas, selectedCharacter, progress, els);
-    instances.basquet = basquet;
-    basquet.start();
-
-    document.getElementById("basquet-btn-start").addEventListener("click", () => basquet.beginPlaying());
-    document.getElementById("basquet-btn-retry").addEventListener("click", () => basquet.retry());
-    document.getElementById("basquet-btn-menu").addEventListener("click", goToHub);
-    document.getElementById("basquet-btn-gameover-menu").addEventListener("click", goToHub);
-
-    const btnMute = document.getElementById("basquet-btn-mute");
-    btnMute.addEventListener("click", () => {
-      const next = !audio.isMuted();
-      audio.setMuted(next);
-      btnMute.textContent = next ? "🔇" : "🔊";
-    });
-  } else {
-    instances.basquet.startRun(selectedCharacter, progress);
-  }
-}
-
 // ---------- JUEGO: "SALTOS DE PORRISTAS" ----------
 
 function launchOrResumePorristas() {
@@ -732,6 +687,7 @@ async function launchOrResumeFps() {
 
 const GAMES_3D = {
   recolecta: { module: "./recolecta-game.js", cls: "RecolectaGame", hud: [] },
+  basquet_tiros: { module: "./basquet3d-game.js", cls: "Basquet3DGame", hud: [], prefix: "basquet" },
   tetris: { module: "./tetris3d-game.js", cls: "Tetris3DGame", hud: ["score", "lines", "level", "coins"] },
   salto: { module: "./salto-game.js", cls: "SaltoGame", hud: ["score", "height", "coins"] },
   autos: { module: "./autos-game.js", cls: "AutosGame", hud: ["score", "speed", "hearts", "coins"] },
@@ -741,12 +697,13 @@ const GAMES_3D = {
 
 async function launchOrResume3d(key) {
   const cfg = GAMES_3D[key];
-  updateHudAvatar(`${key}-hud-avatar`, selectedCharacter);
+  const pre = cfg.prefix || key; // prefijo de ids en index.html
+  updateHudAvatar(`${pre}-hud-avatar`, selectedCharacter);
   try {
     if (!instances[key]) {
       showToast("Cargando el mundo 3D…");
       const mod = await import(cfg.module);
-      const q = (id) => document.getElementById(`${key}-${id}`);
+      const q = (id) => document.getElementById(`${pre}-${id}`);
       const els = {
         wrap: q("canvas-wrap"),
         canvas: q("canvas"),
@@ -776,7 +733,7 @@ async function launchOrResume3d(key) {
       if (q("btn-win-menu")) q("btn-win-menu").addEventListener("click", goToHub);
       // Convención nueva: cualquier botón con data-action dentro de la pantalla.
       const actions = { begin: () => game.beginPlaying(), next: () => game.nextLevel(), retry: () => game.retry(), restart: () => game.restart?.() ?? game.startRun(selectedCharacter, progress), menu: goToHub };
-      document.getElementById(`screen-${key}`).querySelectorAll("[data-action]").forEach((btn) => {
+      document.getElementById(`screen-${pre}`).querySelectorAll("[data-action]").forEach((btn) => {
         btn.addEventListener("click", () => actions[btn.dataset.action]?.());
       });
       const btnMute = q("btn-mute");

@@ -273,13 +273,28 @@
       </div>
     </div>
 
-    <div id="basquet-canvas-wrap" class="canvas-wrap">
-      <canvas id="basquet-canvas" width="800" height="480"></canvas>
+    <div id="basquet-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="basquet-canvas"></canvas>
+      <div id="basquet-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="basquet-popups" class="fps-popups" aria-hidden="true"></div>
+
+      <div id="basquet-meters" class="bq-meters">
+        <div id="basquet-hint" class="bq-hint"></div>
+        <div class="bq-aim">
+          <span class="bq-label">PUNTERÍA</span>
+          <div class="bq-track bq-h"><div id="basquet-aim-zone" class="bq-zone"></div><div id="basquet-aim-marker" class="bq-marker"></div></div>
+        </div>
+        <div class="bq-pow">
+          <span class="bq-label">POTENCIA</span>
+          <div class="bq-track bq-v"><div id="basquet-power-zone" class="bq-zone"></div><div id="basquet-power-marker" class="bq-marker"></div></div>
+        </div>
+      </div>
 
       <div id="basquet-overlay-intro" class="overlay hidden">
         <div class="overlay-card">
-          <h2>Lanzamientos de Básquet</h2>
-          <p>ESPACIO/tap para fijar la barra de puntería, y de nuevo para
+          <h2>Lanzamientos de Básquet 3D</h2>
+          <p class="fps-tag">Ahora en 3D</p>
+          <p>ESPACIO (o toca la pantalla) para fijar la barra de puntería, y de nuevo para
             fijar la de potencia. Encesta antes de que se acabe el tiempo —
             cada 5° tiro es un aro dorado Chocolate Dubai, ¡vale monedas extra!</p>
           <button class="btn-primary" id="basquet-btn-start">¡Vamos!</button>
@@ -297,7 +312,7 @@
     </div>
 
     <div id="basquet-touch-controls">
-      <button class="tetris-btn wide" id="basquet-btn-shoot">🏀 Lanzar</button>
+      <button class="dpad-btn jump-btn" id="basquet-btn-shoot">🏀 ¡Lanzar!</button>
     </div>
   </section>
 

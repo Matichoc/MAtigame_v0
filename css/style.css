@@ -1000,3 +1000,23 @@ h1, h2, h3 {
 }
 
 .fps-hint { font-size: 0.85rem !important; opacity: 0.85; }
+
+/* ---------- BÁSQUET 3D: barras de puntería y potencia ---------- */
+.bq-meters { position: absolute; inset: 0; pointer-events: none; transition: opacity 0.25s; }
+.bq-meters.off { opacity: 0.25; }
+.bq-label { font-family: var(--font-script); font-size: 1rem; white-space: nowrap; color: var(--dorado); text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+.bq-hint { position: absolute; bottom: 52px; left: 0; right: 0; text-align: center; font-family: var(--font-script); font-size: 1.7rem; color: var(--crema); text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
+.bq-aim { position: absolute; left: 50%; bottom: 12px; width: min(56%, 420px); transform: translateX(-50%); text-align: center; }
+.bq-pow { position: absolute; right: 8px; bottom: 12px; top: 18px; width: 70px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bq-track { position: relative; background: rgba(28, 15, 7, 0.82); border: 3px solid var(--dorado); border-radius: 999px; box-shadow: 0 4px 14px rgba(0,0,0,0.45); }
+.bq-h { height: 22px; }
+.bq-v { flex: 1; width: 22px; }
+.bq-zone { position: absolute; background: linear-gradient(var(--verde), #8fb03a); border-radius: 999px; opacity: 0.9; }
+.bq-h .bq-zone { top: 0; bottom: 0; }
+.bq-v .bq-zone { left: 0; right: 0; }
+.bq-marker { position: absolute; background: var(--rosa); border: 2px solid var(--crema); border-radius: 6px; box-shadow: 0 0 10px var(--rosa); }
+.bq-h .bq-marker { top: -7px; bottom: -7px; width: 10px; margin-left: -5px; }
+.bq-v .bq-marker { left: -7px; right: -7px; height: 10px; margin-bottom: -5px; }
+.bq-marker.locked { background: var(--dorado); box-shadow: 0 0 12px var(--dorado); }
+.bq-meters.golden .bq-track { border-color: #fff; box-shadow: 0 0 16px var(--dorado); }
+@media (max-width: 520px) { .bq-hint { font-size: 1.3rem; } .bq-aim { width: 70%; bottom: 8px; } }
