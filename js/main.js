@@ -1,5 +1,4 @@
 import { CHARACTERS, OUTFITS, getOutfit, renderCharacterThumb } from "./characters.js";
-import { TetrisGame } from "./tetris-game.js";
 import { BasquetGame } from "./basquet-game.js";
 import { PorristasGame } from "./porristas-game.js";
 import * as audio from "./audio.js";
@@ -23,12 +22,12 @@ const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
 const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenAchievements = document.getElementById("screen-achievements");
-const screenTetris = document.getElementById("screen-tetris");
 const screenBasquet = document.getElementById("screen-basquet");
 const screenPorristas = document.getElementById("screen-porristas");
 const screenFps = document.getElementById("screen-fps");
 const screen3d = {
   recolecta: document.getElementById("screen-recolecta"),
+  tetris: document.getElementById("screen-tetris"),
   salto: document.getElementById("screen-salto"),
   autos: document.getElementById("screen-autos"),
   memoria: document.getElementById("screen-memoria"),
@@ -36,7 +35,7 @@ const screen3d = {
 };
 const ALL_SCREENS = [
   screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
-  screenTetris, screenBasquet, screenPorristas, screenFps,
+   screenBasquet, screenPorristas, screenFps,
   ...Object.values(screen3d),
 ];
 
@@ -387,10 +386,7 @@ function playGame(gameId) {
   // corriendo lógica de fondo mientras se muestra el otro).
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
 
-  if (gameId === "tetris") {
-    showScreen(screenTetris);
-    launchOrResumeTetris();
-  } else if (gameId === "basquet_tiros") {
+  if (gameId === "basquet_tiros") {
     showScreen(screenBasquet);
     launchOrResumeBasquet();
   } else if (gameId === "porristas") {
@@ -584,45 +580,6 @@ function updateHudAvatar(imgId, character) {
   hudAvatar.src = avatarCanvas.toDataURL();
 }
 
-// ---------- JUEGO: "TETRIS DE PRODUCTOS" ----------
-
-function launchOrResumeTetris() {
-  updateHudAvatar("tetris-hud-avatar", selectedCharacter);
-
-  if (!instances.tetris) {
-    const canvas = document.getElementById("tetris-canvas");
-    const els = {
-      hudScore: document.getElementById("tetris-hud-score"),
-      hudLines: document.getElementById("tetris-hud-lines"),
-      hudLevel: document.getElementById("tetris-hud-level"),
-      hudCoins: document.getElementById("tetris-hud-coins"),
-      gameoverText: document.getElementById("tetris-gameover-text"),
-      overlays: {
-        intro: document.getElementById("tetris-overlay-intro"),
-        gameover: document.getElementById("tetris-overlay-gameover"),
-      },
-    };
-
-    const tetris = new TetrisGame(canvas, selectedCharacter, progress, els);
-    instances.tetris = tetris;
-    tetris.start();
-
-    document.getElementById("tetris-btn-start").addEventListener("click", () => tetris.beginPlaying());
-    document.getElementById("tetris-btn-retry").addEventListener("click", () => tetris.retry());
-    document.getElementById("tetris-btn-menu").addEventListener("click", goToHub);
-    document.getElementById("tetris-btn-gameover-menu").addEventListener("click", goToHub);
-
-    const btnMute = document.getElementById("tetris-btn-mute");
-    btnMute.addEventListener("click", () => {
-      const next = !audio.isMuted();
-      audio.setMuted(next);
-      btnMute.textContent = next ? "🔇" : "🔊";
-    });
-  } else {
-    instances.tetris.startRun(selectedCharacter, progress);
-  }
-}
-
 // ---------- JUEGO: "LANZAMIENTOS DE BÁSQUET" ----------
 
 function launchOrResumeBasquet() {
@@ -775,6 +732,7 @@ async function launchOrResumeFps() {
 
 const GAMES_3D = {
   recolecta: { module: "./recolecta-game.js", cls: "RecolectaGame", hud: [] },
+  tetris: { module: "./tetris3d-game.js", cls: "Tetris3DGame", hud: ["score", "lines", "level", "coins"] },
   salto: { module: "./salto-game.js", cls: "SaltoGame", hud: ["score", "height", "coins"] },
   autos: { module: "./autos-game.js", cls: "AutosGame", hud: ["score", "speed", "hearts", "coins"] },
   memoria: { module: "./memoria-game.js", cls: "MemoriaGame", hud: ["level", "moves", "time", "score", "coins"] },

@@ -746,7 +746,7 @@ h1, h2, h3 {
   height: 52px;
   border-radius: 12px;
   border: 2px solid var(--dorado);
-  background: rgba(255,255,255,0.1);
+  background: rgba(60, 30, 20, 0.88);
   color: var(--crema);
   font-size: 1.2rem;
   touch-action: none;

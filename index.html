@@ -217,15 +217,19 @@
       </div>
     </div>
 
-    <div id="tetris-canvas-wrap" class="canvas-wrap">
-      <canvas id="tetris-canvas" width="800" height="480"></canvas>
+    <div id="tetris-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="tetris-canvas"></canvas>
+      <div id="tetris-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="tetris-popups" class="fps-popups" aria-hidden="true"></div>
 
       <div id="tetris-overlay-intro" class="overlay hidden">
         <div class="overlay-card">
-          <h2>Tetris de Productos</h2>
+          <h2>Tetris de Productos 3D</h2>
+          <p class="fps-tag">Ahora en 3D</p>
           <p>Encaja las golosinas cayendo y completa líneas. ← → para mover,
             ↑ para rotar, ↓ para bajar rápido y ESPACIO para caída instantánea.
-            Las piezas brillantes son Chocolate Dubai: ¡dan monedas extra!</p>
+            En el celular: arrastra para mover, toca para girar y desliza hacia abajo para caer.
+            Las piezas doradas son Chocolate Dubai: ¡dan monedas extra!</p>
           <button class="btn-primary" id="tetris-btn-start">¡Vamos!</button>
         </div>
       </div>
