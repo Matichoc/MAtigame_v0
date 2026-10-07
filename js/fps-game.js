@@ -102,6 +102,15 @@ export class FpsGame {
     this.renderer.setSize(w, h, false);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    this._fitWeapon();
+  }
+
+  // En pantallas angostas (celular vertical) el arma se achica y se acerca al centro para no salirse.
+  _fitWeapon() {
+    if (!this.weapon) return;
+    const k = Math.min(1, Math.max(0.4, this.camera.aspect / 1.6));
+    this.weaponBase.x = 0.17 * k;
+    this.weapon.scale.setScalar(0.46 * (0.62 + 0.38 * k));
   }
 
   // ---------- arma en primera persona ----------
@@ -170,6 +179,7 @@ export class FpsGame {
     w.position.copy(this.weaponBase);
     this.weapon = w;
     this.camera.add(w);
+    this._fitWeapon();
   }
 
   _applyOutfit() {
