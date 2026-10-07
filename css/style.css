@@ -569,7 +569,7 @@ html, body {
 .leaderboard-empty { color: #93a0bd; font-size: 0.9rem; margin-bottom: 16px; }
 
 /* ---------- GAME ---------- */
-#screen-game, #screen-tetris {
+#screen-game, #screen-tetris, #screen-basquet, #screen-porristas {
   flex-direction: column;
   gap: 8px;
   padding: 10px;
