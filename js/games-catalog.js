@@ -13,6 +13,14 @@ export const GAMES_CATALOG = [
     tag: "3D",
   },
   {
+    id: "parkour",
+    name: "Parkour Choco",
+    icon: "🧗",
+    tagline: "Estilo Roblox: salta plataformas, esquiva molinos, junta alfajores y desbloquea capa, gafas y corona.",
+    status: "available",
+    tag: "Nuevo 3D",
+  },
+  {
     id: "salto",
     name: "Salto Choco",
     icon: "🦘",

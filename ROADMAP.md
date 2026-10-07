@@ -321,6 +321,25 @@ Se eliminaron los motores 2D (`game.js`, `tetris-game.js`, `basquet-game.js`,
 > cualquier navegador sin instalar nada; no iguala el fotorrealismo de
 > Fortnite o Call of Duty, que requiere motores nativos y equipos de arte.
 
+### Etapa 11 — Parkour Choco 3D (estilo Roblox) ✅
+
+Pedido del dueño: un juego tipo Roblox para ir capturando cosas con el personaje
+haciendo parkour, con ropa y brillos (`js/parkour-game.js`):
+
+- 6 etapas (Pradera, Camino de Caramelo, Nubes Saltarinas, Molinos de Cacao,
+  Noche Neón, Cumbre Matichoc) con plataformas de tachas y bordes de neón,
+  móviles, que se rompen, que parpadean, trampolines y molinos giratorios.
+- Física propia (cápsula contra cajas), doble salto, plataformas móviles que
+  arrastran, checkpoints con bandera, río de chocolate abajo (caer = volver al
+  checkpoint con 10 puntos menos).
+- Se juntan alfajores (+10) y barras Matidubai (+3 monedas Dubai, +50). Al avanzar
+  se desbloquean accesorios sobre el atuendo de la tienda: capa, gafas
+  brillantes y corona dorada, con estela de chispas por etapa.
+- Controles: WASD/flechas + Espacio (doble salto) + cámara con mouse o Q/E; en
+  celular, joystick y botón de salto.
+- Puntaje por alfajores, barras, etapas, rapidez y caídas; logro "Parkourista".
+- Verificado con un bot que recorre las 6 etapas hasta la meta sin caídas.
+
 ### Etapa 9 — Crea tu Chocolate 3D ✅
 
 Pedido del dueño: un juego donde el usuario **crea su propio chocolate**

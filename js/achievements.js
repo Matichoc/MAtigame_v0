@@ -102,6 +102,14 @@ export const ACHIEVEMENTS = [
     isDone: (p) => getBestScore(p, "creador") >= 450,
   },
   {
+    id: "parkourista",
+    name: "Parkourista Matichoc",
+    icon: "🧗",
+    reward: 30,
+    desc: "Llega a la meta del Parkour Choco 3D.",
+    isDone: (p) => (p.stats.parkourFinishes || 0) >= 1,
+  },
+  {
     id: "equilibrista",
     name: "Equilibrista Matichoc",
     icon: "🤸",

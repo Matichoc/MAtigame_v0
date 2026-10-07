@@ -3,8 +3,9 @@
 Arcade web de Matichoc: cada persona elige su perfil, su Matichico (Choco
 Capitán, Choco Estrella, Choco Baller o Choco Cheer) y lo personaliza con
 atuendos comprados en la tienda, para jugar cualquiera de los minijuegos
-disponibles con ese mismo personaje. **Los 9 juegos son 3D** (Three.js),
+disponibles con ese mismo personaje. **Los 10 juegos son 3D** (Three.js),
 con brillo (bloom), color vivo y un Matichico 3D que cambia con la tienda:
+**Parkour Choco** (estilo Roblox: 6 etapas de plataformas, checkpoints, accesorios que se desbloquean),
 **Recolecta y Corre** (6 canchas 3D con camino guiado, vallas y golosinas),
 **Tetris de Productos** (cubos de chocolate en una vitrina 3D),
 **Lanzamientos de Básquet** (tiro libre con física real, aro y red),
@@ -91,6 +92,7 @@ js/characters.js      Definición/dibujo procedural de los Matichicos y atuendos
 js/games-catalog.js  Catálogo de modos de juego (disponibles y "próximamente")
 js/levels.js          Camino/corredor, obstáculos, coleccionables y misiones
 js/audio.js           Efectos de sonido generados con Web Audio API
+js/parkour-game.js    Parkour Choco 3D (obby estilo Roblox)
 js/recolecta-game.js  Recolecta y Corre 3D (usa los niveles de js/levels.js)
 js/tetris-pieces.js  Formas y colores de "Tetris de Productos"
 js/tetris3d-game.js  Tetris de Productos 3D
