@@ -82,7 +82,7 @@ export function defaultCreation() {
     chocolate: "leche",
     flavor: "manjar",
     toppings: [],
-    wrap: "papel",
+    wrap: "ninguno",
     wrapColor: "rosado",
     name: "",
     motif: "🍫",

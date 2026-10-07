@@ -104,7 +104,7 @@ export class CreadorGame extends Game3D {
     ped.position.y = -0.31;
     ped.castShadow = true;
     ped.receiveShadow = true;
-    const cloth = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 3.4, 0.05, 48), std(0xd4216c, 0.7));
+    const cloth = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 3.4, 0.05, 48), std(0xf3dcc0, 0.7));
     cloth.position.y = 0.01;
     cloth.receiveShadow = true;
     const ring = new THREE.Mesh(new THREE.TorusGeometry(3.4, 0.05, 8, 60), new THREE.MeshStandardMaterial({ color: 0xffc800, roughness: 0.25, metalness: 0.6 }));
@@ -141,9 +141,11 @@ export class CreadorGame extends Game3D {
 
   async init() {
     await super.init();
+    if (this._dragBound) return;
+    this._dragBound = true;
     const wrap = this.els.wrap;
     let drag = null;
-    wrap.addEventListener("pointerdown", (e) => { drag = { x: e.clientX }; wrap.setPointerCapture?.(e.pointerId); });
+    wrap.addEventListener("pointerdown", (e) => { if (e.target.closest("button, .overlay, .cr-drag-hint")) return; drag = { x: e.clientX }; wrap.setPointerCapture?.(e.pointerId); });
     wrap.addEventListener("pointermove", (e) => {
       if (!drag) return;
       this.userYaw += (e.clientX - drag.x) * 0.012;
