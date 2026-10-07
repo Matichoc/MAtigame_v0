@@ -274,7 +274,7 @@ export class Porristas3DGame extends Game3D {
     const needH = 10.2;
     this.camDist = Math.max(needH / 2 / Math.tan(vfov), needW / 2 / (Math.tan(vfov) * aspect));
     this.camera.position.set(0, 4.3, this.camDist);
-    this.camera.lookAt(0, 3.55, 0);
+    this.camera.lookAt(0, aspect < 0.9 ? 4.9 : 3.55, 0);
   }
 
   // ---------- partida ----------

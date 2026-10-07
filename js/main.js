@@ -682,7 +682,7 @@ async function launchOrResume3d(key) {
       for (const name of cfg.hud) els[`hud${name[0].toUpperCase()}${name.slice(1)}`] = q(`hud-${name}`);
       const game = new mod[cfg.cls](selectedCharacter, progress, els);
       instances[key] = game;
-      (window.__g3d = window.__g3d || {})[key] = game;
+      if (location.search.includes("debug3d")) (window.__g3d = window.__g3d || {})[key] = game; // solo para pruebas
 
       if (q("btn-start")) q("btn-start").addEventListener("click", () => game.beginPlaying());
       if (q("btn-retry")) q("btn-retry").addEventListener("click", () => game.retry());

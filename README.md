@@ -3,16 +3,17 @@
 Arcade web de Matichoc: cada persona elige su perfil, su Matichico (Choco
 Capitán, Choco Estrella, Choco Baller o Choco Cheer) y lo personaliza con
 atuendos comprados en la tienda, para jugar cualquiera de los minijuegos
-disponibles con ese mismo personaje: **Recolecta y Corre** (recorrer 6
-canchas por un camino guiado recolectando golosinas), **Tetris de
-Productos** (encajar golosinas cayendo), **Lanzamientos de Básquet**
-(tiro libre con barras de puntería y potencia contrarreloj) y **Saltos
-de Porristas** (mover una rebotadora para mantener a la Matichica
-rebotando sin que se caiga) **Choco Blaster 3D** (propuesta en primera persona, ver
-[`docs/PROPUESTA-3D.md`](./docs/PROPUESTA-3D.md)), **Salto Choco 3D**, **Autos de
-Chocolate 3D** y **Memoria Matichoc 3D** (con fotos reales de los productos) y
-**Crea tu Chocolate** (configurador 3D: elige producto, sabor, toppings,
-envoltorio y diseña tu etiqueta; puedes pedir algo parecido por WhatsApp).
+disponibles con ese mismo personaje. **Los 9 juegos son 3D** (Three.js),
+con brillo (bloom), color vivo y un Matichico 3D que cambia con la tienda:
+**Recolecta y Corre** (6 canchas 3D con camino guiado, vallas y golosinas),
+**Tetris de Productos** (cubos de chocolate en una vitrina 3D),
+**Lanzamientos de Básquet** (tiro libre con física real, aro y red),
+**Saltos de Porristas** (rebotadora, volteretas y pompones), **Salto Choco**,
+**Autos de Chocolate**, **Memoria Matichoc** (fotos reales de los productos),
+**Choco Blaster** (primera persona, ver
+[`docs/PROPUESTA-3D.md`](./docs/PROPUESTA-3D.md)) y **Crea tu Chocolate**
+(configurador 3D: elige producto, sabor, toppings, envoltorio y diseña tu
+etiqueta; puedes pedir algo parecido por WhatsApp).
 
 Es una v0 intencionalmente simple: HTML + CSS + JavaScript puro (sin frameworks
 ni build step), pensada como base fácil de evolucionar. El plan es que esto
@@ -80,7 +81,7 @@ index.html          Pantallas (perfiles, hub, tienda, puntajes, logros, juegos)
 assets/brand/        Logos, patrón e íconos oficiales (copiados de matichoc.cl)
 assets/fonts/        Baby Chipmunk y Adorable Mother Script (fuentes de marca)
 assets/products/     Recortes de fotos reales de productos
-vendor/              Three.js (MIT), solo se carga en el juego 3D
+vendor/              Three.js (MIT) y sus efectos de postprocesado
 docs/                Propuestas y documentos de diseño
 css/style.css        Estilos, paleta de marca y controles táctiles
 js/theme.js           Paleta de marca Matichoc para usar en canvas
@@ -90,12 +91,12 @@ js/characters.js      Definición/dibujo procedural de los Matichicos y atuendos
 js/games-catalog.js  Catálogo de modos de juego (disponibles y "próximamente")
 js/levels.js          Camino/corredor, obstáculos, coleccionables y misiones
 js/audio.js           Efectos de sonido generados con Web Audio API
-js/game.js            Motor de "Recolecta y Corre": loop, colisiones, HUD
+js/recolecta-game.js  Recolecta y Corre 3D (usa los niveles de js/levels.js)
 js/tetris-pieces.js  Formas y colores de "Tetris de Productos"
-js/tetris-game.js    Motor de "Tetris de Productos": tablero, piezas, HUD
-js/basquet-game.js    Motor de "Lanzamientos de Básquet": barras de tiro, HUD
-js/porristas-game.js  Motor de "Saltos de Porristas": física de rebote, HUD
-js/three-kit.js       Base 3D compartida (Game3D, partículas, popups)
+js/tetris3d-game.js  Tetris de Productos 3D
+js/basquet3d-game.js  Lanzamientos de Básquet 3D (física del balón, red, hinchada)
+js/porristas3d-game.js  Saltos de Porristas 3D
+js/three-kit.js       Base 3D compartida (Game3D, bloom, partículas, popups)
 js/matichico3d.js     Matichico en 3D con atuendo de la tienda
 js/salto-game.js      Salto Choco 3D
 js/autos-game.js      Autos de Chocolate 3D
