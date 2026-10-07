@@ -1,5 +1,4 @@
 import { CHARACTERS, OUTFITS, getOutfit, renderCharacterThumb } from "./characters.js";
-import { PorristasGame } from "./porristas-game.js";
 import * as audio from "./audio.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
@@ -21,11 +20,11 @@ const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
 const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenAchievements = document.getElementById("screen-achievements");
-const screenPorristas = document.getElementById("screen-porristas");
 const screenFps = document.getElementById("screen-fps");
 const screen3d = {
   recolecta: document.getElementById("screen-recolecta"),
   tetris: document.getElementById("screen-tetris"),
+  porristas: document.getElementById("screen-porristas"),
   basquet_tiros: document.getElementById("screen-basquet"),
   salto: document.getElementById("screen-salto"),
   autos: document.getElementById("screen-autos"),
@@ -34,7 +33,7 @@ const screen3d = {
 };
 const ALL_SCREENS = [
   screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
-    screenPorristas, screenFps,
+    screenFps,
   ...Object.values(screen3d),
 ];
 
@@ -385,10 +384,7 @@ function playGame(gameId) {
   // corriendo lógica de fondo mientras se muestra el otro).
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
 
-  if (gameId === "porristas") {
-    showScreen(screenPorristas);
-    launchOrResumePorristas();
-  } else if (gameId === "fps3d") {
+  if (gameId === "fps3d") {
     showScreen(screenFps);
     launchOrResumeFps();
   } else if (GAMES_3D[gameId]) {
@@ -576,44 +572,6 @@ function updateHudAvatar(imgId, character) {
   hudAvatar.src = avatarCanvas.toDataURL();
 }
 
-// ---------- JUEGO: "SALTOS DE PORRISTAS" ----------
-
-function launchOrResumePorristas() {
-  updateHudAvatar("porristas-hud-avatar", selectedCharacter);
-
-  if (!instances.porristas) {
-    const canvas = document.getElementById("porristas-canvas");
-    const els = {
-      hudScore: document.getElementById("porristas-hud-score"),
-      hudCombo: document.getElementById("porristas-hud-combo"),
-      hudCoins: document.getElementById("porristas-hud-coins"),
-      gameoverText: document.getElementById("porristas-gameover-text"),
-      overlays: {
-        intro: document.getElementById("porristas-overlay-intro"),
-        gameover: document.getElementById("porristas-overlay-gameover"),
-      },
-    };
-
-    const porristas = new PorristasGame(canvas, selectedCharacter, progress, els);
-    instances.porristas = porristas;
-    porristas.start();
-
-    document.getElementById("porristas-btn-start").addEventListener("click", () => porristas.beginPlaying());
-    document.getElementById("porristas-btn-retry").addEventListener("click", () => porristas.retry());
-    document.getElementById("porristas-btn-menu").addEventListener("click", goToHub);
-    document.getElementById("porristas-btn-gameover-menu").addEventListener("click", goToHub);
-
-    const btnMute = document.getElementById("porristas-btn-mute");
-    btnMute.addEventListener("click", () => {
-      const next = !audio.isMuted();
-      audio.setMuted(next);
-      btnMute.textContent = next ? "🔇" : "🔊";
-    });
-  } else {
-    instances.porristas.startRun(selectedCharacter, progress);
-  }
-}
-
 // ---------- JUEGO: "CHOCO BLASTER 3D" (primera persona, carga perezosa) ----------
 
 async function launchOrResumeFps() {
@@ -688,6 +646,7 @@ async function launchOrResumeFps() {
 const GAMES_3D = {
   recolecta: { module: "./recolecta-game.js", cls: "RecolectaGame", hud: [] },
   basquet_tiros: { module: "./basquet3d-game.js", cls: "Basquet3DGame", hud: [], prefix: "basquet" },
+  porristas: { module: "./porristas3d-game.js", cls: "Porristas3DGame", hud: ["score", "combo", "coins"] },
   tetris: { module: "./tetris3d-game.js", cls: "Tetris3DGame", hud: ["score", "lines", "level", "coins"] },
   salto: { module: "./salto-game.js", cls: "SaltoGame", hud: ["score", "height", "coins"] },
   autos: { module: "./autos-game.js", cls: "AutosGame", hud: ["score", "speed", "hearts", "coins"] },
