@@ -706,7 +706,7 @@ h1, h2, h3 {
 .overlay-card h2 { margin: 0 0 8px; color: var(--dorado); }
 .overlay-card p { margin: 0 0 16px; color: var(--crema); font-size: 0.95rem; }
 
-#touch-controls, #tetris-touch-controls, #basquet-touch-controls, #porristas-touch-controls {
+#touch-controls, .touch-controls, #tetris-touch-controls, #basquet-touch-controls, #porristas-touch-controls {
   display: none;
   width: 100%;
   justify-content: center;
@@ -716,7 +716,7 @@ h1, h2, h3 {
 }
 
 @media (pointer: coarse) {
-  #touch-controls, #tetris-touch-controls, #basquet-touch-controls, #porristas-touch-controls { display: flex; }
+  #touch-controls, .touch-controls, #tetris-touch-controls, #basquet-touch-controls, #porristas-touch-controls { display: flex; }
 }
 
 .dpad { display: flex; flex-direction: column; align-items: center; gap: 4px; }
@@ -725,7 +725,7 @@ h1, h2, h3 {
   width: 56px; height: 56px;
   border-radius: 12px;
   border: 2px solid var(--dorado);
-  background: rgba(255,255,255,0.1);
+  background: rgba(60, 30, 20, 0.88);
   color: var(--crema);
   font-size: 1.3rem;
   touch-action: none;
@@ -922,8 +922,8 @@ h1, h2, h3 {
   .g3d-wrap { aspect-ratio: 3 / 4; }
 }
 @media (max-width: 520px) {
-  #screen-salto .hud-mission, #screen-autos .hud-mission, #screen-memoria .hud-mission { display: none; }
-  #screen-salto .hud-chip, #screen-autos .hud-chip, #screen-memoria .hud-chip { padding: 3px 7px; font-size: 0.75rem; }
+  .game-screen .hud-mission { display: none; }
+  .game-screen .hud-chip { padding: 3px 7px; font-size: 0.75rem; }
   #screen-salto .hud, #screen-autos .hud, #screen-memoria .hud { padding: 6px 8px; gap: 6px; }
 }
 
@@ -998,3 +998,5 @@ h1, h2, h3 {
   .cr-hud .hud-chip { padding: 3px 7px; font-size: 0.75rem; }
   .cr-hud { padding: 6px 8px; gap: 6px; }
 }
+
+.fps-hint { font-size: 0.85rem !important; opacity: 0.85; }

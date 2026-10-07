@@ -122,74 +122,78 @@
     </div>
   </section>
 
-  <!-- PANTALLA DE JUEGO -->
-  <section id="screen-game" class="screen game-screen hidden">
-    <div id="hud" class="hud">
+  <!-- PANTALLA DE JUEGO: RECOLECTA Y CORRE (3D) -->
+  <section id="screen-recolecta" class="screen game-screen hidden">
+    <div id="recolecta-hud" class="hud">
       <div class="hud-left">
-        <button id="btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
-        <img id="hud-avatar" class="hud-avatar" alt="">
+        <button id="recolecta-btn-menu" class="btn-icon" title="Volver al menú" data-action="menu">🏠</button>
+        <img id="recolecta-hud-avatar" class="hud-avatar" alt="">
         <div>
-          <div id="hud-level" class="hud-level">Nivel 1</div>
-          <div id="hud-mission" class="hud-mission">Misión</div>
+          <div id="recolecta-hud-level" class="hud-level">Nivel 1</div>
+          <div id="recolecta-hud-mission" class="hud-mission">Misión</div>
         </div>
       </div>
       <div class="hud-right">
-        <div class="hud-chip">🍬 <span id="hud-choco">0</span>/<span id="hud-target">0</span></div>
-        <div class="hud-chip">⭐ <span id="hud-score">0</span></div>
-        <div class="hud-chip">🍫✨ <span id="hud-coins">0</span></div>
-        <div class="hud-chip" id="hud-timer-chip">⏱ <span id="hud-timer">00</span></div>
-        <button id="btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+        <div class="hud-chip">🍬 <span id="recolecta-hud-choco">0</span>/<span id="recolecta-hud-target">0</span></div>
+        <div class="hud-chip">⭐ <span id="recolecta-hud-score">0</span></div>
+        <div class="hud-chip">🍫✨ <span id="recolecta-hud-coins">0</span></div>
+        <div class="hud-chip" id="recolecta-hud-timer-chip">⏱ <span id="recolecta-hud-timer">00</span></div>
+        <button id="recolecta-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
       </div>
     </div>
 
-    <div id="canvas-wrap" class="canvas-wrap">
-      <canvas id="game-canvas" width="800" height="480"></canvas>
+    <div id="recolecta-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="recolecta-canvas"></canvas>
+      <div id="recolecta-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="recolecta-popups" class="fps-popups" aria-hidden="true"></div>
 
-      <div id="overlay-intro" class="overlay hidden">
+      <div id="recolecta-overlay-intro" class="overlay hidden">
         <div class="overlay-card">
-          <h2 id="intro-title">Nivel</h2>
-          <p id="intro-text"></p>
-          <button class="btn-primary" id="btn-intro-continue">¡Vamos!</button>
+          <h2 id="recolecta-intro-title">Nivel</h2>
+          <p class="fps-tag">Ahora en 3D</p>
+          <p id="recolecta-intro-text"></p>
+          <p class="fps-hint">Mueve con ← ↑ ↓ → (o W A S D). Salta con Espacio.</p>
+          <button class="btn-primary" data-action="begin">¡Vamos!</button>
         </div>
       </div>
 
-      <div id="overlay-win" class="overlay hidden">
+      <div id="recolecta-overlay-win" class="overlay hidden">
         <div class="overlay-card">
           <h2>¡Misión cumplida! 🎉</h2>
-          <p id="win-text"></p>
-          <button class="btn-primary" id="btn-next-level">Siguiente nivel</button>
+          <p id="recolecta-win-text"></p>
+          <button class="btn-primary" data-action="next">Siguiente nivel</button>
         </div>
       </div>
 
-      <div id="overlay-lose" class="overlay hidden">
+      <div id="recolecta-overlay-lose" class="overlay hidden">
         <div class="overlay-card">
           <h2>¡Se acabó el tiempo!</h2>
-          <p id="lose-text">Casi lo logras. ¡Inténtalo de nuevo!</p>
-          <button class="btn-primary" id="btn-retry">Reintentar</button>
-          <button class="btn-secondary overlay-secondary-btn" id="btn-lose-menu">Volver al menú</button>
+          <p id="recolecta-lose-text">Casi lo logras. ¡Inténtalo de nuevo!</p>
+          <button class="btn-primary" data-action="retry">Reintentar</button>
+          <button class="btn-secondary overlay-secondary-btn" data-action="menu">Volver al menú</button>
         </div>
       </div>
 
-      <div id="overlay-victory" class="overlay hidden">
+      <div id="recolecta-overlay-victory" class="overlay hidden">
         <div class="overlay-card">
           <h2>🏆 ¡Eres Campeón Matichoc!</h2>
-          <p id="victory-text"></p>
-          <button class="btn-primary" id="btn-play-again">Jugar de nuevo</button>
-          <button class="btn-secondary overlay-secondary-btn" id="btn-victory-menu">Volver al menú</button>
+          <p id="recolecta-victory-text"></p>
+          <button class="btn-primary" data-action="restart">Jugar de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" data-action="menu">Volver al menú</button>
         </div>
       </div>
     </div>
 
-    <div id="touch-controls">
+    <div id="recolecta-touch" class="touch-controls">
       <div class="dpad">
-        <button class="dpad-btn" id="btn-up" data-dir="up">▲</button>
+        <button class="dpad-btn" data-dir="up">▲</button>
         <div class="dpad-row">
-          <button class="dpad-btn" id="btn-left" data-dir="left">◀</button>
-          <button class="dpad-btn" id="btn-down" data-dir="down">▼</button>
-          <button class="dpad-btn" id="btn-right" data-dir="right">▶</button>
+          <button class="dpad-btn" data-dir="left">◀</button>
+          <button class="dpad-btn" data-dir="down">▼</button>
+          <button class="dpad-btn" data-dir="right">▶</button>
         </div>
       </div>
-      <button class="dpad-btn jump-btn" id="btn-jump">⤴ Saltar</button>
+      <button class="dpad-btn jump-btn" id="recolecta-btn-jump">⤴ Saltar</button>
     </div>
   </section>
 
@@ -625,6 +629,7 @@
 
 </div>
 
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
 <script type="module" src="js/main.js"></script>
 </body>
 </html>

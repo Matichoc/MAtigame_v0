@@ -14,6 +14,24 @@ export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const lerp = (a, b, t) => a + (b - a) * t;
 export const rand = (a, b) => a + Math.random() * (b - a);
 
+// "Look" compartido (brillo suave estilo juego moderno); cada juego puede ajustarlo.
+export const LOOK = { bloom: { strength: 0.32, radius: 0.55, threshold: 0.92 }, grade: { sat: 1.16, contrast: 1.06, vig: 0.22 } };
+
+// Ajuste final de color (saturación, contraste y viñeta) sobre la imagen ya en sRGB.
+const GRADE_SHADER = {
+  uniforms: { tDiffuse: { value: null }, sat: { value: 1.16 }, contrast: { value: 1.06 }, vig: { value: 0.22 } },
+  vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float sat; uniform float contrast; uniform float vig; varying vec2 vUv;
+    void main(){
+      vec4 c = texture2D(tDiffuse, vUv);
+      float l = dot(c.rgb, vec3(0.2126, 0.7152, 0.0722));
+      c.rgb = mix(vec3(l), c.rgb, sat);
+      c.rgb = (c.rgb - 0.5) * contrast + 0.5;
+      c.rgb *= 1.0 - vig * smoothstep(0.45, 0.98, distance(vUv, vec2(0.5)));
+      gl_FragColor = c;
+    }`,
+};
+
 export function loadTexture(url, { repeat = 0, anisotropy = 4 } = {}) {
   const tex = new THREE.TextureLoader().load(url);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -223,8 +241,9 @@ export class Popups {
  * Subclases: build() crea la escena, reset() prepara una partida, update(dt) la avanza.
  */
 export class Game3D {
-  constructor(gameId, character, progress, els, { fov = 50 } = {}) {
+  constructor(gameId, character, progress, els, { fov = 50, bloom = true } = {}) {
     this.gameId = gameId;
+    this.bloom = bloom === true ? LOOK.bloom : bloom;
     this.character = character;
     this.progress = progress;
     this.els = els;
@@ -236,6 +255,7 @@ export class Game3D {
     this.lastTs = null;
     this.frameTimes = [];
     this.qualityStep = 0;
+    this.qualityDone = false;
     this.coarse = window.matchMedia("(pointer: coarse)").matches;
   }
 
@@ -259,11 +279,16 @@ export class Game3D {
     this.popups = new Popups(this.els.popups, wrap, this.camera);
 
     await this.build();
+    await this._setupPost();
 
     this._onResize = () => {
       const w = Math.max(1, wrap.clientWidth);
       const h = Math.max(1, wrap.clientHeight);
       this.renderer.setSize(w, h, false);
+      if (this.composer) {
+        this.composer.setPixelRatio(this.renderer.getPixelRatio());
+        this.composer.setSize(w, h);
+      }
       this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
       this.onResize?.(w, h);
@@ -272,6 +297,37 @@ export class Game3D {
     this._onResize();
     this._loop = this._loop.bind(this);
     this.ready = true;
+  }
+
+  /** Brillo suave (bloom) con degradación automática si el equipo va lento. */
+  async _setupPost() {
+    if (!this.bloom) return;
+    try {
+      const base = "../vendor/three-examples/";
+      const [{ EffectComposer }, { RenderPass }, { UnrealBloomPass }, { OutputPass }, { ShaderPass }] = await Promise.all([
+        import(`${base}postprocessing/EffectComposer.js`),
+        import(`${base}postprocessing/RenderPass.js`),
+        import(`${base}postprocessing/UnrealBloomPass.js`),
+        import(`${base}postprocessing/OutputPass.js`),
+        import(`${base}postprocessing/ShaderPass.js`),
+      ]);
+      const w = Math.max(1, this.els.wrap.clientWidth);
+      const h = Math.max(1, this.els.wrap.clientHeight);
+      const target = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: this.coarse ? 0 : 4 });
+      this.composer = new EffectComposer(this.renderer, target);
+      this.composer.addPass(new RenderPass(this.scene, this.camera));
+      this.bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), this.bloom.strength, this.bloom.radius, this.bloom.threshold);
+      this.composer.addPass(this.bloomPass);
+      this.composer.addPass(new OutputPass());
+      const grade = new ShaderPass(GRADE_SHADER);
+      grade.uniforms.sat.value = LOOK.grade.sat;
+      grade.uniforms.contrast.value = LOOK.grade.contrast;
+      grade.uniforms.vig.value = LOOK.grade.vig;
+      this.composer.addPass(grade);
+    } catch (e) {
+      console.warn("Postprocesado no disponible:", e);
+      this.composer = null;
+    }
   }
 
   async startRun(character, progress) {
@@ -333,27 +389,32 @@ export class Game3D {
     this.update(dt);
     this.particles.update(dt);
     this.popups.update(dt);
-    this.renderer.render(this.scene, this.camera);
+    if (this.composer) this.composer.render(dt);
+    else this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this._loop);
   }
 
   _adaptQuality(dt) {
-    if (this.qualityStep >= 2) return;
+    if (this.qualityDone) return;
     this.frameTimes.push(dt);
     if (this.frameTimes.length < 90) return;
     const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
     this.frameTimes = [];
     if (avg <= 0.034) {
-      this.qualityStep = 2;
+      this.qualityDone = true;
       return;
     }
     this.qualityStep++;
-    if (this.qualityStep === 1) {
-      this.pixelRatio = Math.max(0.6, this.pixelRatio * 0.75);
+    if (this.qualityStep === 1 && this.composer) {
+      this.composer = null; // 1) sin brillo
+    } else if (this.qualityStep <= 2) {
+      this.composer = null;
+      this.pixelRatio = Math.max(0.6, this.pixelRatio * 0.75); // 2) menos resolución
       this.renderer.setPixelRatio(this.pixelRatio);
       this._onResize();
     } else {
-      this.onLowQuality?.();
+      this.onLowQuality?.(); // 3) sin sombras
+      this.qualityDone = true;
     }
   }
 

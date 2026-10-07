@@ -1,5 +1,4 @@
 import { CHARACTERS, OUTFITS, getOutfit, renderCharacterThumb } from "./characters.js";
-import { Game } from "./game.js";
 import { TetrisGame } from "./tetris-game.js";
 import { BasquetGame } from "./basquet-game.js";
 import { PorristasGame } from "./porristas-game.js";
@@ -24,12 +23,12 @@ const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
 const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenAchievements = document.getElementById("screen-achievements");
-const screenGame = document.getElementById("screen-game");
 const screenTetris = document.getElementById("screen-tetris");
 const screenBasquet = document.getElementById("screen-basquet");
 const screenPorristas = document.getElementById("screen-porristas");
 const screenFps = document.getElementById("screen-fps");
 const screen3d = {
+  recolecta: document.getElementById("screen-recolecta"),
   salto: document.getElementById("screen-salto"),
   autos: document.getElementById("screen-autos"),
   memoria: document.getElementById("screen-memoria"),
@@ -37,7 +36,7 @@ const screen3d = {
 };
 const ALL_SCREENS = [
   screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
-  screenGame, screenTetris, screenBasquet, screenPorristas, screenFps,
+  screenTetris, screenBasquet, screenPorristas, screenFps,
   ...Object.values(screen3d),
 ];
 
@@ -388,10 +387,7 @@ function playGame(gameId) {
   // corriendo lógica de fondo mientras se muestra el otro).
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
 
-  if (gameId === "recolecta") {
-    showScreen(screenGame);
-    launchOrResumeRecolecta();
-  } else if (gameId === "tetris") {
+  if (gameId === "tetris") {
     showScreen(screenTetris);
     launchOrResumeTetris();
   } else if (gameId === "basquet_tiros") {
@@ -588,58 +584,6 @@ function updateHudAvatar(imgId, character) {
   hudAvatar.src = avatarCanvas.toDataURL();
 }
 
-function launchOrResumeRecolecta() {
-  updateHudAvatar("hud-avatar", selectedCharacter);
-
-  if (!instances.recolecta) {
-    const canvas = document.getElementById("game-canvas");
-    const els = {
-      hudLevel: document.getElementById("hud-level"),
-      hudMission: document.getElementById("hud-mission"),
-      hudChoco: document.getElementById("hud-choco"),
-      hudTarget: document.getElementById("hud-target"),
-      hudScore: document.getElementById("hud-score"),
-      hudCoins: document.getElementById("hud-coins"),
-      hudTimer: document.getElementById("hud-timer"),
-      hudTimerChip: document.getElementById("hud-timer-chip"),
-      introTitle: document.getElementById("intro-title"),
-      introText: document.getElementById("intro-text"),
-      winText: document.getElementById("win-text"),
-      loseText: document.getElementById("lose-text"),
-      victoryText: document.getElementById("victory-text"),
-      overlays: {
-        intro: document.getElementById("overlay-intro"),
-        win: document.getElementById("overlay-win"),
-        lose: document.getElementById("overlay-lose"),
-        victory: document.getElementById("overlay-victory"),
-      },
-    };
-
-    const game = new Game(canvas, selectedCharacter, progress, els);
-    instances.recolecta = game;
-    game.start();
-
-    document.getElementById("btn-intro-continue").addEventListener("click", () => game.beginPlaying());
-    document.getElementById("btn-next-level").addEventListener("click", () => game.nextLevel());
-    document.getElementById("btn-retry").addEventListener("click", () => game.retry());
-    document.getElementById("btn-play-again").addEventListener("click", () => game.startRun(selectedCharacter, progress));
-    document.getElementById("btn-menu").addEventListener("click", goToHub);
-    document.getElementById("btn-lose-menu").addEventListener("click", goToHub);
-    document.getElementById("btn-victory-menu").addEventListener("click", goToHub);
-
-    const btnMute = document.getElementById("btn-mute");
-    btnMute.addEventListener("click", () => {
-      const next = !audio.isMuted();
-      audio.setMuted(next);
-      btnMute.textContent = next ? "🔇" : "🔊";
-    });
-  } else {
-    // Rebind: si se cambió de perfil desde la última vez, hay que apuntar
-    // el motor al nuevo personaje/progreso (nunca se recrea la instancia).
-    instances.recolecta.startRun(selectedCharacter, progress);
-  }
-}
-
 // ---------- JUEGO: "TETRIS DE PRODUCTOS" ----------
 
 function launchOrResumeTetris() {
@@ -830,6 +774,7 @@ async function launchOrResumeFps() {
 // "<prefijo>-canvas", "-hud-<nombre>", "-overlay-<intro|win|gameover>", "-btn-*".
 
 const GAMES_3D = {
+  recolecta: { module: "./recolecta-game.js", cls: "RecolectaGame", hud: [] },
   salto: { module: "./salto-game.js", cls: "SaltoGame", hud: ["score", "height", "coins"] },
   autos: { module: "./autos-game.js", cls: "AutosGame", hud: ["score", "speed", "hearts", "coins"] },
   memoria: { module: "./memoria-game.js", cls: "MemoriaGame", hud: ["level", "moves", "time", "score", "coins"] },
@@ -853,21 +798,29 @@ async function launchOrResume3d(key) {
         overlays: { intro: q("overlay-intro"), gameover: q("overlay-gameover") },
         touch: { left: q("btn-left"), right: q("btn-right") },
         panel: q("panel"),
+        q,
         winTitle: q("win-title"),
         winText: q("win-text"),
         stars: q("stars"),
       };
-      if (q("overlay-win")) els.overlays.win = q("overlay-win");
+      for (const name of ["win", "lose", "victory"]) if (q(`overlay-${name}`)) els.overlays[name] = q(`overlay-${name}`);
+      if (!els.overlays.gameover) delete els.overlays.gameover;
       for (const name of cfg.hud) els[`hud${name[0].toUpperCase()}${name.slice(1)}`] = q(`hud-${name}`);
       const game = new mod[cfg.cls](selectedCharacter, progress, els);
       instances[key] = game;
+      (window.__g3d = window.__g3d || {})[key] = game;
 
       if (q("btn-start")) q("btn-start").addEventListener("click", () => game.beginPlaying());
-      q("btn-retry").addEventListener("click", () => game.retry());
-      q("btn-menu").addEventListener("click", goToHub);
-      q("btn-gameover-menu").addEventListener("click", goToHub);
+      if (q("btn-retry")) q("btn-retry").addEventListener("click", () => game.retry());
+      if (q("btn-menu")) q("btn-menu").addEventListener("click", goToHub);
+      if (q("btn-gameover-menu")) q("btn-gameover-menu").addEventListener("click", goToHub);
       if (q("btn-next")) q("btn-next").addEventListener("click", () => game.nextLevel());
       if (q("btn-win-menu")) q("btn-win-menu").addEventListener("click", goToHub);
+      // Convención nueva: cualquier botón con data-action dentro de la pantalla.
+      const actions = { begin: () => game.beginPlaying(), next: () => game.nextLevel(), retry: () => game.retry(), restart: () => game.restart?.() ?? game.startRun(selectedCharacter, progress), menu: goToHub };
+      document.getElementById(`screen-${key}`).querySelectorAll("[data-action]").forEach((btn) => {
+        btn.addEventListener("click", () => actions[btn.dataset.action]?.());
+      });
       const btnMute = q("btn-mute");
       btnMute.addEventListener("click", () => {
         const next = !audio.isMuted();
