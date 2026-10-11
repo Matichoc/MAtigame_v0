@@ -4,6 +4,7 @@ La app de Android es **el mismo juego** empaquetado con [Capacitor](https://capa
 
 - **Sin enlaces a matichoc.cl** (ni a la tienda, ni a "La Maestra", ni el botón de WhatsApp del creador de chocolates).
 - Se conserva el logo de Matichoc y aparece el crédito **"Un juego promovido por Matichoc"** en el menú.
+- **Sin Choco Blaster** (el juego de disparos): la app queda con 9 juegos, pensados para niñas y niños pequeños.
 - Pantalla completa, sin barra de estado, y respeta la muesca de la cámara.
 - Funciona sin conexión (todo va dentro de la app; no hace falta dominio ni servidor).
 
@@ -27,8 +28,8 @@ La web de matichoc.cl/matijuego **no cambia**: sigue con sus enlaces.
 1. **Nombre público**: "Matijuego" (hoy). Máx. 30 caracteres.
 2. **ID del paquete**: `cl.matichoc.matijuego`. **No se puede cambiar una vez publicada la app.** Si prefieres otro (por ejemplo `cl.matichoc.arcade`), avísame antes del paso 4.
 3. **Correo de contacto público** y **política de privacidad**: usé los datos legales que ya publica matichoc.cl (Chocolatería Matichoc Inés Saavedra EIRL, i.saavedra.nu@gmail.com). Confirma que quieres mostrarlos en Google Play.
-4. **¿Choco Blaster dentro de la app?** Es el único juego con "disparos" (de chocolate a malvaviscos, sin sangre) y puede subir la clasificación por edad. Se puede dejar o sacar.
-5. **Público objetivo**: si marcas niños (menos de 13 años), Google exige cumplir su política "Diseñada para familias" (el juego ya cumple lo principal: sin anuncios, sin datos personales, con política de privacidad).
+4. ~~¿Choco Blaster dentro de la app?~~ **Decidido: no.** La app es solo para público infantil, así que Choco Blaster (el único juego con "disparos") queda fuera de la app. En la web de matichoc.cl sigue.
+5. ~~Público objetivo~~ **Decidido: niñas y niños pequeños.** Al marcar rangos de edad infantiles, Google incluye la app en su política "Diseñada para familias": el juego ya cumple lo principal (sin anuncios, sin datos personales, sin enlaces externos, con política de privacidad). Los nombres de perfil se piden como "apodo".
 
 ### 1. Cuenta de desarrollador de Google Play
 1. Entra a <https://play.google.com/console> con una cuenta de Google que quieras dejar como dueña.

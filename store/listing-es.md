@@ -4,12 +4,12 @@
 Matijuego
 
 ## Descripción breve (máx. 80 caracteres)
-Parkour, básquet, tetris y más: el arcade 3D de Matichoc para toda la familia
+Parkour, básquet, memoria y más: juegos 3D de Matichoc para niñas y niños
 
 ## Descripción completa (máx. 4000 caracteres)
 ¡Bienvenido al Matijuego, el arcade de Matichoc! 🍫
 
-Elige a tu Matichico, vístelo con atuendos que ganas con monedas del juego y salta a más de 10 aventuras en 3D hechas con mucho cacao:
+Elige a tu Matichico, vístelo con atuendos que ganas con monedas del juego y juega 9 aventuras en 3D hechas con mucho cacao:
 
 🧗 PARKOUR CHOCO — Corre y salta por 6 etapas de plataformas que se mueven, se rompen o parpadean. Desbloquea una capa, gafas brillantes y una corona dorada mientras avanzas.
 
@@ -23,15 +23,13 @@ Elige a tu Matichico, vístelo con atuendos que ganas con monedas del juego y sa
 
 🦘 SALTO CHOCO · 🏎️ AUTOS DE CHOCOLATE · 🧠 MEMORIA MATICHOC — Más aventuras: sube sin parar, esquiva en la ruta y encuentra las parejas de golosinas.
 
-🎯 CHOCO BLASTER — Primera persona: baña de chocolate a los malvaviscos traviesos de la feria.
-
 🍫 CREA TU CHOCOLATE — Elige el producto, el sabor, los toppings, el envoltorio y diseña tu propia etiqueta. ¡Cada día hay un reto con monedas!
 
 Además:
-• Perfiles para toda la familia: cada persona guarda sus puntajes, monedas y logros.
+• Perfiles para cada niña o niño de la casa: cada uno guarda sus puntajes, monedas y logros.
 • Tabla de mejores puntajes por juego y recompensa diaria.
 • Gratis, sin publicidad y sin compras dentro del juego.
-• No pide cuentas ni datos personales: todo se guarda en tu celular.
+• Sin chat ni enlaces externos. No pide cuentas ni datos personales: todo se guarda en el celular.
 
 Un juego promovido por Matichoc · pasión por el cacao.
 
@@ -54,10 +52,8 @@ Arcade, Aventura, Familia, Niños, 3D
 **Acceso a la app:** Todo el contenido es accesible sin iniciar sesión ni credenciales.
 **Seguridad de los datos:** No recopila ni comparte datos. Los datos del juego se guardan solo en el dispositivo. (Marcar "no recopila ningún dato de usuario requerido".)
 **Eliminación de datos:** no aplica; el usuario puede borrar los datos de la app o desinstalarla.
-**Clasificación de contenido (cuestionario IARC):**
-  - Violencia: el único juego con "disparos" es Choco Blaster, donde se lanza chocolate a malvaviscos de fantasía, sin sangre. Respóndelo con honestidad (violencia fantástica leve); puede resultar en una clasificación para mayores de 7 o 10 años. Si prefieres la clasificación más baja, puedes sacar ese juego de la app (se puede hacer en una versión posterior).
-  - Sin contenido sexual, sin lenguaje fuerte, sin drogas ni apuestas, sin compras, sin chat ni contenido generado por usuarios visible a otros.
-**Público objetivo y contenido:** si marcas niños (menores de 13), la app entra a la política "Diseñada para familias": requiere política de privacidad (ya está), no tener anuncios (no tiene) y no recolectar datos personales (no recolecta). Decisión tuya.
+**Clasificación de contenido (cuestionario IARC):** la app para niños **no incluye Choco Blaster** (el juego de "disparos"). Respuestas: sin violencia, sin sangre, sin contenido sexual, sin lenguaje fuerte, sin drogas ni apuestas, sin compras, sin chat ni contenido de usuarios visible para otros, sin ubicación compartida. Debería resultar una clasificación para todo público. (Los obstáculos de Parkour y los choques de Autos de Chocolate son de caricatura: si el cuestionario pregunta por "violencia de dibujos animados", responde con lo que mejor lo describa; no hay daño a personajes ni sangre.)
+**Público objetivo y contenido:** marcar rangos de edad infantiles (por ejemplo 5 o menos, 6-8 y 9-12). Eso incluye la app en el programa **"Diseñada para familias"** de Google. Requisitos que ya cumple: sin anuncios, sin recolección de datos personales, sin enlaces externos, con política de privacidad. Pide que la ficha tenga un correo de contacto válido y que el contenido sea apropiado para niños en toda la app.
 **Permisos:** solo internet (lo agrega el motor de la app; el juego funciona sin conexión).
 
 ## Material gráfico (en esta carpeta)

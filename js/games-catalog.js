@@ -3,7 +3,11 @@
 // lo único que cambia es la mecánica y las canchas de cada modo.
 // Ver ROADMAP.md para el plan de etapas de cada juego "próximamente".
 
-export const GAMES_CATALOG = [
+// En la app de tienda (data-app="1") se ocultan los juegos marcados con `appHidden`:
+// la app está pensada para público infantil y no incluye juegos de "disparos".
+const IN_APP = typeof document !== "undefined" && document.documentElement.dataset.app === "1";
+
+const ALL_GAMES = [
   {
     id: "recolecta",
     name: "Recolecta y Corre",
@@ -74,6 +78,7 @@ export const GAMES_CATALOG = [
     icon: "🎯",
     tagline: "Primera persona: baña de chocolate a los malvaviscos traviesos.",
     status: "available",
+    appHidden: true,
     tag: "3D",
   },
   {
@@ -85,3 +90,5 @@ export const GAMES_CATALOG = [
     tag: "3D",
   },
 ];
+
+export const GAMES_CATALOG = ALL_GAMES.filter((g) => !(IN_APP && g.appHidden));
