@@ -1,4 +1,4 @@
-package cl.matichoc.matijuego;
+package cl.chocojuego.matichoc;
 
 import android.os.Bundle;
 

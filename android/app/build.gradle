@@ -5,10 +5,10 @@ apply plugin: 'com.android.application'
 def keystorePath = System.getenv("KEYSTORE_PATH")
 
 android {
-    namespace = "cl.matichoc.matijuego"
+    namespace = "cl.chocojuego.matichoc"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "cl.matichoc.matijuego"
+        applicationId "cl.chocojuego.matichoc"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode Integer.parseInt(System.getenv("VERSION_CODE") ?: "1")

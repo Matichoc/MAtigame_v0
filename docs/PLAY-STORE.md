@@ -16,7 +16,7 @@ La web de matichoc.cl/matijuego **no cambia**: sigue con sus enlaces.
 | --- | --- |
 | Página de la app sin enlaces + crédito de marca | `app/index.html` |
 | Botón de WhatsApp oculto en modo app | `js/creador-game.js` |
-| Proyecto Android (nombre "Matijuego", id `cl.matichoc.matijuego`, íconos, pantalla de carga, pantalla completa) | `android/`, `capacitor.config.json`, `resources/` |
+| Proyecto Android (nombre "Matijuego", id `cl.chocojuego.matichoc`, íconos, pantalla de carga, pantalla completa) | `android/`, `capacitor.config.json`, `resources/` |
 | Compilación automática en GitHub (APK de prueba + paquete firmado `.aab`) | `.github/workflows/android.yml` |
 | Política de privacidad | `app/privacy.html` |
 | Textos de la ficha, respuestas sugeridas a los formularios | `store/listing-es.md` |
@@ -26,7 +26,7 @@ La web de matichoc.cl/matijuego **no cambia**: sigue con sus enlaces.
 
 ### 0. Decisiones (respóndeme o cámbialas tú)
 1. **Nombre público**: "Matijuego" (hoy). Máx. 30 caracteres.
-2. **ID del paquete**: `cl.matichoc.matijuego`. **No se puede cambiar una vez publicada la app.** Si prefieres otro (por ejemplo `cl.matichoc.arcade`), avísame antes del paso 4.
+2. **ID del paquete**: `cl.chocojuego.matichoc` (elegido por el dueño). **No se puede cambiar una vez publicada la app.**
 3. **Correo de contacto público** y **política de privacidad**: usé los datos legales que ya publica matichoc.cl (Chocolatería Matichoc Inés Saavedra EIRL, i.saavedra.nu@gmail.com). Confirma que quieres mostrarlos en Google Play.
 4. ~~¿Choco Blaster dentro de la app?~~ **Decidido: no.** La app es solo para público infantil, así que Choco Blaster (el único juego con "disparos") queda fuera de la app. En la web de matichoc.cl sigue.
 5. ~~Público objetivo~~ **Decidido: niñas y niños pequeños.** Al marcar rangos de edad infantiles, Google incluye la app en su política "Diseñada para familias": el juego ya cumple lo principal (sin anuncios, sin datos personales, sin enlaces externos, con política de privacidad). Los nombres de perfil se piden como "apodo".
