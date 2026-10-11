@@ -48,7 +48,13 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - uses: android-actions/setup-android@v3
+      # El Android SDK ya viene instalado en el servidor de GitHub; solo se aceptan las licencias
+      # y se asegura la plataforma que usa la app.
+      - name: Preparar el Android SDK
+        run: |
+          SDKM=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | head -1)
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Instalar dependencias y preparar la carpeta de la app
         run: |
