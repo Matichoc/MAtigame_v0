@@ -1,0 +1,98 @@
+# Matijuego en Google Play: qué está hecho y qué falta
+
+La app de Android es **el mismo juego** empaquetado con [Capacitor](https://capacitorjs.com/): el código vive en `js/`, `css/` y `assets/`, y la carpeta `app/` tiene la página de la app. Diferencias de la versión app:
+
+- **Sin enlaces a matichoc.cl** (ni a la tienda, ni a "La Maestra", ni el botón de WhatsApp del creador de chocolates).
+- Se conserva el logo de Matichoc y aparece el crédito **"Un juego promovido por Matichoc"** en el menú.
+- Pantalla completa, sin barra de estado, y respeta la muesca de la cámara.
+- Funciona sin conexión (todo va dentro de la app; no hace falta dominio ni servidor).
+
+La web de matichoc.cl/matijuego **no cambia**: sigue con sus enlaces.
+
+## ✅ Lo que ya está hecho (en el repositorio)
+
+| Qué | Dónde |
+| --- | --- |
+| Página de la app sin enlaces + crédito de marca | `app/index.html` |
+| Botón de WhatsApp oculto en modo app | `js/creador-game.js` |
+| Proyecto Android (nombre "Matijuego", id `cl.matichoc.matijuego`, íconos, pantalla de carga, pantalla completa) | `android/`, `capacitor.config.json`, `resources/` |
+| Compilación automática en GitHub (APK de prueba + paquete firmado `.aab`) | `.github/workflows/android.yml` |
+| Política de privacidad | `app/privacy.html` |
+| Textos de la ficha, respuestas sugeridas a los formularios | `store/listing-es.md` |
+| Ícono 512, gráfico de funciones 1024×500 y 8 capturas 1080×1920 | `store/` |
+
+## 🧭 Tu misión, paso a paso
+
+### 0. Decisiones (respóndeme o cámbialas tú)
+1. **Nombre público**: "Matijuego" (hoy). Máx. 30 caracteres.
+2. **ID del paquete**: `cl.matichoc.matijuego`. **No se puede cambiar una vez publicada la app.** Si prefieres otro (por ejemplo `cl.matichoc.arcade`), avísame antes del paso 4.
+3. **Correo de contacto público** y **política de privacidad**: usé los datos legales que ya publica matichoc.cl (Chocolatería Matichoc Inés Saavedra EIRL, i.saavedra.nu@gmail.com). Confirma que quieres mostrarlos en Google Play.
+4. **¿Choco Blaster dentro de la app?** Es el único juego con "disparos" (de chocolate a malvaviscos, sin sangre) y puede subir la clasificación por edad. Se puede dejar o sacar.
+5. **Público objetivo**: si marcas niños (menos de 13 años), Google exige cumplir su política "Diseñada para familias" (el juego ya cumple lo principal: sin anuncios, sin datos personales, con política de privacidad).
+
+### 1. Cuenta de desarrollador de Google Play
+1. Entra a <https://play.google.com/console> con una cuenta de Google que quieras dejar como dueña.
+2. Paga el registro (pago único, unos US$25; confírmalo en la consola) y verifica tu identidad.
+3. Elige el tipo de cuenta: **Personal** u **Organización**. La de organización suele pedir un número D-U-N-S de la empresa; la personal, para cuentas nuevas, suele exigir una **prueba cerrada con al menos 12 testers durante 14 días seguidos** antes de poder publicar. Estas reglas cambian: lee lo que te muestre la consola.
+
+### 2. Crear la llave de firma (una sola vez, guárdala muy bien)
+En tu computador con Java instalado (o en <https://shell.cloud.google.com>):
+
+```bash
+keytool -genkeypair -v -keystore upload.keystore -alias upload \
+  -keyalg RSA -keysize 2048 -validity 10000
+```
+Te pedirá una contraseña y algunos datos. **Guarda `upload.keystore` y la contraseña en un lugar seguro con copia de respaldo.** Si los pierdes, solo se puede recuperar pidiéndole ayuda a Google. Nunca subas ese archivo al repositorio.
+
+Conviértelo a texto para GitHub:
+```bash
+base64 -w0 upload.keystore        # en Mac: base64 -i upload.keystore
+```
+
+### 3. Cargar los secretos en GitHub
+Repositorio `Matichoc/MAtigame_v0` → **Settings → Secrets and variables → Actions → New repository secret**. Crea estos cuatro:
+
+| Nombre | Valor |
+| --- | --- |
+| `ANDROID_KEYSTORE_BASE64` | el texto largo del paso anterior |
+| `ANDROID_KEYSTORE_PASSWORD` | la contraseña del keystore |
+| `ANDROID_KEY_ALIAS` | `upload` |
+| `ANDROID_KEY_PASSWORD` | la contraseña de la llave (la misma, si no pusiste otra) |
+
+### 4. Compilar la app
+Pestaña **Actions → "Compilar app Android" → Run workflow**. Pon el nombre de versión (por ejemplo `1.0.0`) y el número de versión (`1`). Al terminar (varios minutos) se descargan dos archivos desde la ejecución:
+- `matijuego-prueba-apk` → un APK que puedes instalar **directo en un celular** (hay que permitir "instalar apps desconocidas"). **Pruébalo con tu hija antes de subir nada.**
+- `matijuego-play-store-aab` → el paquete firmado que se sube a Google Play.
+
+> Si la primera compilación falla, copia el error del registro y pásamelo: con ese texto lo corrijo.
+
+### 5. Probar el APK (lista de revisión)
+- [ ] Abre a pantalla completa, con el logo de Matichoc en la pantalla de carga.
+- [ ] No hay ningún enlace que saque del juego (menú, creador de chocolates).
+- [ ] Se ve el crédito "Un juego promovido por Matichoc".
+- [ ] Todos los juegos abren y se pueden jugar con los controles táctiles.
+- [ ] Al cerrar y volver a abrir, se conservan perfiles y monedas.
+- [ ] Sonido y rendimiento aceptables en un teléfono modesto.
+
+### 6. Crear la app en Play Console
+1. **Crear app** → nombre `Matijuego`, idioma Español (Chile), tipo **Juego**, **Gratis**.
+2. **Contenido de la app**: política de privacidad (URL en `store/listing-es.md`), anuncios (no), acceso a la app (sin inicio de sesión), clasificación de contenido, público objetivo, seguridad de los datos (no recopila). Hay respuestas sugeridas en `store/listing-es.md`.
+3. **Ficha de la tienda**: copia los textos de `store/listing-es.md` y sube de la carpeta `store/`: `icon-512.png`, `feature-graphic.png` y las capturas de `screenshots/`.
+
+### 7. Publicar
+1. **Pruebas → Pruebas internas** (o cerradas): sube el `.aab`, agrega a los testers (correos de Google) y pruébalo desde la tienda.
+2. Cuando Google lo permita (ver paso 1.3), pasa a **Producción**, envía a revisión y espera la aprobación (puede tardar días).
+
+### 8. Cada actualización
+1. Se hacen los cambios en el repo (los hago yo).
+2. Vuelve a correr "Compilar app Android" subiendo el número de versión (**debe ser mayor que el anterior**: 2, 3, 4…).
+3. Sube el nuevo `.aab` en Play Console.
+
+## Cómo se arma la app (para quien mantenga el repo)
+
+```bash
+npm ci
+npm run sync:android   # arma app-www/ y lo copia al proyecto Android
+cd android && ./gradlew assembleDebug   # requiere Android SDK
+```
+La carpeta `app-www/` se genera sola (`scripts/build-app.mjs`) copiando `app/index.html`, `js/`, `css/`, `assets/` y `vendor/`. Los íconos y la pantalla de carga se regeneran con `npx @capacitor/assets generate --android --assetPath resources`.

@@ -358,6 +358,14 @@ de juegos). Ahora se siente como la pantalla de inicio de un videojuego:
 - Responsive: dos columnas desde 720 px; en celular, personaje → selector → tienda →
   juegos → nombre.
 
+### Etapa 13 — App de Android para Google Play 🚧
+
+- Versión app (`app/index.html`): sin enlaces a matichoc.cl ni WhatsApp; logo + crédito "promovido por Matichoc".
+- Empaquetado con Capacitor (`android/`, `capacitor.config.json`), pantalla completa, íconos y pantalla de carga de marca.
+- Compilación en GitHub Actions (`.github/workflows/android.yml`): APK de prueba y `.aab` firmado con secretos.
+- Política de privacidad (`app/privacy.html`) y material de la ficha (`store/`).
+- Pendiente (dueño): cuenta de Google Play, llave de firma y secretos, subida y revisión. Ver `docs/PLAY-STORE.md`.
+
 ### Etapa 9 — Crea tu Chocolate 3D ✅
 
 Pedido del dueño: un juego donde el usuario **crea su propio chocolate**

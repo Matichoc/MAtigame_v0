@@ -164,3 +164,10 @@ resumen, lo siguiente:
   Consideraciones técnicas: ya hay 4 módulos con el mismo patrón, así que
   el umbral para reorganizar ya se cumplió).
 - Tabla de puntajes online (backend) para competir entre dispositivos.
+
+
+## App de Android (Google Play)
+
+El juego también se empaqueta como app de Android (versión **sin enlaces a matichoc.cl**, con el crédito
+"Un juego promovido por Matichoc"). Todo está explicado, con los pasos que faltan, en
+[`docs/PLAY-STORE.md`](./docs/PLAY-STORE.md). Los textos y el material gráfico de la ficha están en `store/`.
