@@ -1,0 +1,90 @@
+name: Compilar app Android
+
+# Arma la app de Matijuego para Android:
+#  - siempre: un APK de prueba (se instala directo en un celular, para probar antes de subir a Play Store)
+#  - si están cargados los secretos de firma: el paquete .aab firmado para subir a Google Play
+# Se ejecuta a mano (pestaña Actions → "Compilar app Android" → Run workflow) y en los PR que tocan la app.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: "Nombre de versión que verá el público (ej. 1.0.0)"
+        default: "1.0.0"
+      version_code:
+        description: "Número de versión interno: debe SUBIR en cada actualización que envíes a Play Store"
+        default: "1"
+  pull_request:
+    paths:
+      - "android/**"
+      - "app/**"
+      - "capacitor.config.json"
+      - "package.json"
+      - "package-lock.json"
+      - "scripts/**"
+      - "resources/**"
+      - ".github/workflows/android.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VERSION_NAME: ${{ inputs.version_name || '1.0.0' }}
+      VERSION_CODE: ${{ inputs.version_code || '1' }}
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # El Android SDK ya viene instalado en el servidor de GitHub; solo se aceptan las licencias
+      # y se asegura la plataforma que usa la app.
+      - name: Preparar el Android SDK
+        run: |
+          SDKM=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | head -1)
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Instalar dependencias y preparar la carpeta de la app
+        run: |
+          npm ci
+          npm run build:app
+          npx cap sync android
+
+      - name: APK de prueba
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: matijuego-prueba-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Paquete firmado para Play Store (.aab)
+        if: env.HAS_KEYSTORE == 'true'
+        working-directory: android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/upload.keystore"
+          export KEYSTORE_PATH="$RUNNER_TEMP/upload.keystore"
+          ./gradlew bundleRelease --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KEYSTORE == 'true'
+        with:
+          name: matijuego-play-store-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab

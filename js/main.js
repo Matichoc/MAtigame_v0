@@ -36,7 +36,7 @@ const ALL_SCREENS = [
   screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
     screenFps,
   ...Object.values(screen3d),
-];
+].filter(Boolean); // (en la app infantil no existe la pantalla de Choco Blaster)
 
 const grid = document.getElementById("character-grid");
 const gameGrid = document.getElementById("game-grid");

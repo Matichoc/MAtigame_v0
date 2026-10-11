@@ -1204,3 +1204,20 @@ h1, h2, h3 {
   #tetris-touch-controls [data-action="drop"] { order: 5; }
   .game-screen:has(.overlay:not(.hidden)) :is(#recolecta-touch, #tetris-touch-controls, #basquet-touch-controls, #porristas-touch-controls) { display: none !important; }
 }
+
+/* Versión app: crédito de marca (sin enlaces externos) */
+.app-credit { margin: 14px 0 4px; font-size: 0.78rem; color: #cfd8ea; text-align: center; }
+.app-credit b { color: var(--dorado); }
+.lb-games .app-credit { text-align: left; color: var(--marron); }
+.lb-games .app-credit b { color: var(--rosa); }
+@media (min-width: 721px) { .lb-games .app-credit { color: #e9dcc6; } .lb-games .app-credit b { color: var(--dorado); } }
+.brand-badge { text-decoration: none; }
+
+/* Versión app (Android): respetar muescas y bordes redondeados de la pantalla */
+html[data-app] .screen,
+html[data-app] .game-screen:not(.cr-screen) {
+  padding-top: max(8px, env(safe-area-inset-top));
+  padding-right: max(8px, env(safe-area-inset-right));
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  padding-left: max(8px, env(safe-area-inset-left));
+}

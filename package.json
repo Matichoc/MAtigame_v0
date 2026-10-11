@@ -1,0 +1,18 @@
+{
+  "name": "matijuego-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Matijuego, el arcade de Matichoc, empaquetado como app Android con Capacitor.",
+  "scripts": {
+    "build:app": "node scripts/build-app.mjs",
+    "sync:android": "npm run build:app && npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.0.0"
+  }
+}

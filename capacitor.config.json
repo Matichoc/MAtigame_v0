@@ -1,0 +1,10 @@
+{
+  "appId": "cl.chocojuego.matichoc",
+  "appName": "Matijuego",
+  "webDir": "app-www",
+  "backgroundColor": "#3d1f10",
+  "android": {
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  }
+}
