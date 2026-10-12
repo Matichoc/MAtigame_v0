@@ -97,3 +97,13 @@ npm run sync:android   # arma app-www/ y lo copia al proyecto Android
 cd android && ./gradlew assembleDebug   # requiere Android SDK
 ```
 La carpeta `app-www/` se genera sola (`scripts/build-app.mjs`) copiando `app/index.html`, `js/`, `css/`, `assets/` y `vendor/`. Los íconos y la pantalla de carga se regeneran con `npx @capacitor/assets generate --android --assetPath resources`.
+
+---
+
+## APK de prueba que se actualiza encima (sin perder el progreso)
+
+El APK de prueba que arma GitHub (`matijuego-prueba-apk`) va firmado con una **llave fija** (`android/app/matijuego-test.keystore`, pública a propósito, solo para pruebas) y su número de versión sube solo con cada compilación. Por eso un APK nuevo se instala **encima** del anterior y el progreso guardado se conserva.
+
+- Si venías de un APK anterior a este cambio, **desinstálalo una sola vez** (Android no deja actualizar entre llaves distintas). Desde ahí, cada APK nuevo se instala por encima.
+- No desinstales la app entre pruebas: ahí sí se borra el progreso.
+- Esta llave **no sirve para Google Play**: el `.aab` de la tienda se firma con tu llave de subida (los cuatro secretos de arriba).

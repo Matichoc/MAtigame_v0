@@ -487,6 +487,15 @@ Autos (cambio de carril) y Porristas; **joystick** en Recolecta, Parkour y Puebl
 - **Vestuario y Tienda / Mi Casa:** dos pestañas, «🛍️ Por comprar» y «🎒 Lo que tengo», con la cantidad de cada una
   (y por categoría). Lo comprado sale de la tienda y queda solo en «Lo que tengo», así no se ve como algo por comprar otra vez.
 
+### Etapa 11l — Arreglos de la primera prueba del APK ✅
+
+Probando el APK en un celular real: la casa decía «no pudo mostrar el 3D» y, al salir de la tienda, el pueblo quedaba en blanco.
+La causa: cada pantalla 3D (menú, tienda, casa, pueblo, cada juego) abría su propio contexto WebGL y el celular solo aguanta
+unos pocos. Ahora `js/three-kit.js` mantiene como máximo 3 contextos vivos: suelta el que hace más tiempo no se usa y lo
+recupera solo al volver a esa pantalla (`createRenderer` / `glAcquire`).
+También: **joystick flotante** (`js/stick.js`) en Recolecta, Parkour y Pueblo: aparece donde pones el dedo en la mitad izquierda
+de la pantalla; el botón «🕹️ Joystick» del menú lo cambia a fijo en la esquina.
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista

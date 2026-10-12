@@ -2,7 +2,7 @@
 // con tu Matichico y su mascota adentro. Lo que hay en cada lugar viene de
 // js/house-data.js; aquí solo se dibuja. Es liviano y solo corre cuando la pantalla está visible.
 
-import { THREE, canvasTexture, roundedBox } from "./three-kit.js";
+import { THREE, canvasTexture, roundedBox, createRenderer, glAcquire } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { getOutfit } from "./wardrobe-data.js";
 import { getHouseItem, houseItemsOfSpot, isWallItem } from "./house-data.js";
@@ -476,7 +476,7 @@ export class House3D {
   init() {
     const canvas = this.canvas;
     const coarse = window.matchMedia("(pointer: coarse)").matches;
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: !coarse, alpha: true });
+    this.renderer = createRenderer({ canvas, antialias: !coarse, alpha: true });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2));
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.shadowMap.enabled = true;
@@ -757,6 +757,7 @@ export class House3D {
   setActive(on) {
     if (!this.ready) return;
     if (on && !this.active) {
+      glAcquire(this.renderer);
       this.active = true;
       this._last = null;
       requestAnimationFrame(this._loop);

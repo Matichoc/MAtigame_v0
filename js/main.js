@@ -1,7 +1,7 @@
 import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
-import { bindStick } from "./stick.js";
+import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
   loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem, equippedOutfitId,
@@ -104,6 +104,20 @@ function showScreen(target) {
   ALL_SCREENS.forEach((s) => s.classList.toggle("hidden", s !== target));
   syncLobby(target === screenHub);
 }
+
+// ---------- JOYSTICK: flotante (aparece donde pones el dedo) o fijo ----------
+
+const btnJoystick = document.getElementById("btn-joystick");
+function paintJoyButton() {
+  btnJoystick.querySelector("b").textContent = joyMode() === "float" ? "flotante" : "fijo";
+}
+btnJoystick.addEventListener("click", () => {
+  const next = joyMode() === "float" ? "fixed" : "float";
+  setJoyMode(next);
+  paintJoyButton();
+  showToast(next === "float" ? "🕹️ Joystick flotante: aparece donde pones el dedo, en la mitad izquierda de la pantalla." : "🕹️ Joystick fijo: se queda siempre en la esquina.");
+});
+paintJoyButton();
 
 // ---------- ESCENARIO 3D DEL MENÚ ----------
 
@@ -1669,7 +1683,7 @@ async function launchOrResume3d(key) {
         btn.addEventListener("click", () => actions[btn.dataset.action]?.());
       });
       const joy = q("joy");
-      if (joy) bindStick(joy, (x, y) => game.setStick?.(x, y));
+      if (joy) bindStick(joy, (x, y) => game.setStick?.(x, y), document.getElementById(`${pre}-canvas-wrap`));
       const btnMute = q("btn-mute");
       btnMute.addEventListener("click", () => {
         const next = !audio.isMuted();
