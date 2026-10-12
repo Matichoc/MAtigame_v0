@@ -36,8 +36,8 @@ const ALL_ACHIEVEMENTS = [
     name: "Campeón Matichoc",
     icon: "🏆",
     reward: 40,
-    desc: "Completa las 6 canchas de Recolecta y Corre.",
-    isDone: (p) => (p.unlockedLevel || 0) >= 6,
+    desc: "Completa las 8 canchas de Recolecta y Corre.",
+    isDone: (p) => (p.unlockedLevel || 0) >= 8,
   },
   {
     id: "ahorrista",
