@@ -21,6 +21,7 @@ function defaultProgress() {
     // Guardarropa (ver js/wardrobe-data.js): objetos comprados (compartidos por todos los
     // Matichicos) y lo que lleva puesto cada uno.
     wardrobe: { owned: [], looks: {} }, // looks: { [characterId]: { hair, hat, outfit, ... } }
+    house: { owned: [], placed: {} }, // Mi Casa (ver js/house-data.js)
     xp: 0, // experiencia total (ver js/progression.js)
     packs: 1, // sobres de figuritas sin abrir (empieza con uno de regalo)
     album: {}, // { [idFigurita]: cuántas tiene }
@@ -73,6 +74,7 @@ export function loadProgress(profileId) {
       stats: { ...defaultProgress().stats, ...parsed.stats },
       claimedAchievements: parsed.claimedAchievements || [],
       album: { ...parsed.album },
+      house: { owned: [...((parsed.house && parsed.house.owned) || [])], placed: { ...((parsed.house && parsed.house.placed) || {}) } },
       albumClaimed: parsed.albumClaimed || [],
       packs: parsed.packs ?? 1,
       creations: Array.isArray(parsed.creations) ? parsed.creations.slice(0, MAX_CREATIONS) : [],

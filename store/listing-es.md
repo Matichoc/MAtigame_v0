@@ -15,6 +15,8 @@ Elige a tu Matichico, cámbiale peinado, ropa, sombreros y mucho más en la tien
 
 🏘️ PUEBLO MATICHOC — Pasea por un pueblo 3D con fuente de chocolate, boutique, fábrica y un arcade con puertas mágicas. Saluda a los vecinos, junta alfajores dorados y mira cómo se hace de noche.
 
+🏠 MI CASA Y MASCOTAS — Decora tu propio cuarto con camas cohete, máquinas arcade y mini fuentes de chocolate, y adopta una mascota que te acompaña en todos los juegos.
+
 ⭐ MI AVENTURA — Sube de nivel, cumple 3 misiones nuevas cada día, mantén tu racha y completa tu álbum de chocolates con figuritas brillantes.
 
 🏃 RECOLECTA Y CORRE — Recorre canchas y gimnasios 3D, salta vallas y junta golosinas antes de que se acabe el tiempo.

@@ -394,6 +394,18 @@ Un lugar para pasear en vez de solo elegir juegos de una lista (`js/town-game.js
 - Colisiones con edificios, controles WASD/joystick, cámara arrastrable y botón de acción
   contextual (E / Espacio / botón en pantalla).
 
+### Etapa 11e — Mi Casa y mascotas ✅ (Fase 5 del plan)
+
+- **Mascotas** (`js/wardrobe-pets.js`): 10 criaturitas (Alfajorito, Patito de goma, Nubi,
+  Cuchu, Bombi gatito, Robo-Choco, Estrellita, Unicornio dulce, Dragón de cacao...) que
+  flotan junto al Matichico en el menú, la tienda y todos los juegos. Son una categoría
+  más del Vestuario ("Mascota"), con rarezas y precios en Matipuntos.
+- **Mi Casa** (`js/house-data.js`, `js/house3d.js`): un cuarto 3D tipo casita de muñecas con
+  10 lugares (piso, paredes, alfombra, cama, dos rincones, tres cuadros de pared y techo) y
+  ~55 objetos para decorar (cama cohete, máquina arcade, mini fuente de chocolate, bola disco...).
+  Se prueba antes de comprar; el Matichico y su mascota viven en el cuarto.
+- Se entra desde el menú ("🏠 Mi Casa") o desde el pueblo (casa verde de la plaza).
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista

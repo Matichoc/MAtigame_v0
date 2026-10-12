@@ -189,7 +189,7 @@ export class TownGame extends Game3D {
       m.receiveShadow = true;
       s.add(m);
     };
-    for (const d of [0, 50, -50, 123]) pathTo(d, 16, d === 123 ? 40 : 30);
+    for (const d of [0, 50, -50, -100, 123]) pathTo(d, 16, d === 123 ? 40 : 30);
     // cerca de postes alrededor del borde
     const post = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 1.4, 6), this.m.cream);
     const N = 90;
@@ -308,6 +308,9 @@ export class TownGame extends Game3D {
     });
     this._addBuilding({
       deg: -52, r: 36, w: 11, d: 9, h: 5.5, color: 0xffd34d, roof: 0xe8742a, name: "Figuritas", icon: "📖", signColor: "#e8742a", kind: "album", label: "📖 Mi álbum y misiones",
+    });
+    this._addBuilding({
+      deg: -100, r: 37, w: 12, d: 10, h: 5.5, color: 0x9ad8c0, roof: 0x3d9a8a, name: "Mi Casa", icon: "🏠", signColor: "#3d9a8a", kind: "house", label: "🏠 Entrar a Mi Casa",
     });
     // tablero de misiones cerca de la entrada
     const p = pol(205, 14);
@@ -438,7 +441,7 @@ export class TownGame extends Game3D {
     }
     for (const it of this.interact) if (Math.hypot(x - it.x, z - it.z) < 5) return true;
     // caminos
-    for (const d of [0, 50, -50, 123]) {
+    for (const d of [0, 50, -50, -100, 123]) {
       const p = pol(d, 28);
       const ux = p.x / 28;
       const uz = p.z / 28;

@@ -100,6 +100,8 @@ js/games-catalog.js  Catálogo de modos de juego (disponibles y "próximamente")
 js/levels.js          Camino/corredor, obstáculos, coleccionables y misiones
 js/audio.js           Efectos de sonido generados con Web Audio API
 js/parkour-game.js    Parkour Choco 3D (obby estilo Roblox: Aventura de 6 etapas)
+js/house-data.js, js/house3d.js  Mi Casa (cuarto decorable)
+js/wardrobe-pets.js   Mascotas flotantes del Vestuario
 js/town-game.js       Pueblo Matichoc (mundo abierto con vecinos, tiendas y arcade)
 js/progression.js     XP, niveles, misiones diarias y álbum de figuritas
 js/parkour-infinite.js Parkour: Mundo infinito (generador procedural, poderes, vidas, récord)

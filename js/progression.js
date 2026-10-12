@@ -42,8 +42,8 @@ export function levelInfo(xp) {
 
 /** Regalos de nivel: objetos del guardarropa que se desbloquean gratis. */
 export const LEVEL_GIFTS = {
-  3: "hair_colitas", 5: "hat_gorro", 8: "gl_estrella", 10: "back_capa_rosa", 13: "neck_bufanda",
-  15: "sh_neon", 18: "face_estrellas", 20: "back_alas", 25: "hat_galera", 30: "hc_oro", 40: "trail_arcoiris", 50: "hat_corona",
+  3: "hair_colitas", 5: "hat_gorro", 8: "gl_estrella", 10: "back_capa_rosa", 12: "pet_alfajorito", 13: "neck_bufanda",
+  15: "sh_neon", 18: "face_estrellas", 20: "back_alas", 25: "hat_galera", 30: "hc_oro", 35: "pet_nubi", 40: "trail_arcoiris", 50: "hat_corona",
 };
 
 // quien quiera enterarse de lo que pasa (subir de nivel, misión cumplida...) se suscribe aquí

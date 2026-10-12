@@ -11,6 +11,7 @@ import {
   getLastActiveProfileId, setLastActiveProfileId, MAX_PROFILES,
 } from "./profiles.js";
 import { ACHIEVEMENTS } from "./achievements.js";
+import { HOUSE_SPOTS, houseItemsOfSpot, getHouseItem, ownsHouseItem, buyHouseItem, placeHouseItem, placedWithDefaults } from "./house-data.js";
 import {
   levelInfo, xpForLevel, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
   canClaimChest, claimChest, hasPending, STICKERS, albumCount, ALBUM_MILESTONES, openPack, onProgressEvent,
@@ -26,6 +27,7 @@ const screenShop = document.getElementById("screen-shop");
 const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenAchievements = document.getElementById("screen-achievements");
 const screenProgress = document.getElementById("screen-progress");
+const screenHouse = document.getElementById("screen-house");
 const screenFps = document.getElementById("screen-fps");
 const screen3d = {
   town: document.getElementById("screen-town"),
@@ -40,7 +42,7 @@ const screen3d = {
   creador: document.getElementById("screen-creador"),
 };
 const ALL_SCREENS = [
-  screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements, screenProgress,
+  screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements, screenProgress, screenHouse,
     screenFps,
   ...Object.values(screen3d),
 ].filter(Boolean); // (en la app infantil no existe la pantalla de Choco Blaster)
@@ -276,6 +278,119 @@ btnDailyReward.addEventListener("click", () => {
   updateDailyRewardButton();
   showToast(`¡+${result.reward} Matipuntos! Racha de ${result.streak} día${result.streak === 1 ? "" : "s"} 🔥`);
 });
+
+// ---------- MI CASA ----------
+
+const houseTabsEl = document.getElementById("house-tabs");
+const houseGridEl = document.getElementById("house-grid");
+const houseBarEl = document.getElementById("house-bar");
+let houseSpot = HOUSE_SPOTS[0].id;
+let houseTrial = {}; // objetos que se están probando y todavía no son tuyos: { [lugar]: idObjeto }
+let house3d = null;
+
+document.getElementById("btn-open-house").addEventListener("click", () => {
+  houseTrial = {};
+  showScreen(screenHouse);
+  renderHouse();
+  openHousePreview();
+});
+document.getElementById("btn-house-back").addEventListener("click", () => {
+  houseTrial = {};
+  if (house3d) house3d.setActive(false);
+  refreshHubStats();
+  if (fromTown) goToHub();
+  else showScreen(screenHub);
+});
+
+function housePlaced() {
+  return { ...placedWithDefaults(progress), ...houseTrial };
+}
+
+async function openHousePreview() {
+  try {
+    if (!house3d) {
+      const { House3D } = await import("./house3d.js");
+      house3d = new House3D(document.getElementById("house-canvas"));
+      house3d.init();
+    }
+    const look = getLook(progress, selectedCharacter.id);
+    const key = `${selectedCharacter.id}|${JSON.stringify(look)}`;
+    if (house3d.key !== key) house3d.setHero(selectedCharacter, look, key);
+    house3d.setPlaced(housePlaced());
+    house3d.setActive(true);
+  } catch (err) {
+    console.error(err);
+    showToast("Tu dispositivo no pudo mostrar la casa en 3D.");
+  }
+}
+
+function renderHouse() {
+  document.getElementById("house-coins").textContent = String(progress.coins);
+  houseTabsEl.innerHTML = "";
+  HOUSE_SPOTS.forEach((s) => {
+    const btn = document.createElement("button");
+    btn.className = "sh-tab" + (s.id === houseSpot ? " active" : "");
+    btn.innerHTML = `<span>${s.icon}</span><b>${s.name}</b>`;
+    btn.addEventListener("click", () => { houseSpot = s.id; renderHouse(); });
+    houseTabsEl.appendChild(btn);
+  });
+  const placed = placedWithDefaults(progress);
+  houseGridEl.innerHTML = "";
+  const addCard = (item) => {
+    const id = item ? item.id : "";
+    const owned = !item || ownsHouseItem(progress, id);
+    const equipped = (placed[houseSpot] || "") === id && !houseTrial[houseSpot];
+    const trying = houseTrial[houseSpot] === id && id !== "";
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "sh-card" + (equipped ? " equipped" : "") + (trying ? " trying" : "") + (!owned ? " locked" : "");
+    if (item) card.style.setProperty("--rar", RARITIES[item.rarity].color);
+    card.innerHTML = `<span class="sh-ico">${item ? item.icon : "🚫"}</span><span class="sh-name">${item ? item.name : "Nada"}</span>` +
+      `<span class="sh-price">${equipped ? "✓ Puesto" : owned ? (item && item.price ? "Tuyo" : "Gratis") : `🍫✨ ${item.price}`}</span>`;
+    card.addEventListener("click", () => {
+      if (owned) {
+        placeHouseItem(progress, houseSpot, id);
+        delete houseTrial[houseSpot];
+        audio.playJump();
+      } else houseTrial[houseSpot] = id;
+      renderHouse();
+      house3d && house3d.setPlaced(housePlaced());
+    });
+    houseGridEl.appendChild(card);
+  };
+  if (houseSpot !== "floor" && houseSpot !== "wall") addCard(null);
+  houseItemsOfSpot(houseSpot).forEach(addCard);
+
+  houseBarEl.innerHTML = "";
+  const tid = houseTrial[houseSpot];
+  const titem = tid ? getHouseItem(tid) : null;
+  if (titem) {
+    const need = titem.price - progress.coins;
+    const txt = document.createElement("div");
+    txt.className = "sh-bar-txt";
+    txt.innerHTML = `<b>${titem.icon} ${titem.name}</b> <i style="color:${RARITIES[titem.rarity].color}">${RARITIES[titem.rarity].name}</i>`;
+    const buy = document.createElement("button");
+    buy.className = "btn-primary";
+    buy.textContent = need > 0 ? `Te faltan ${need} Matipuntos` : `Comprar · 🍫✨ ${titem.price}`;
+    buy.disabled = need > 0;
+    buy.addEventListener("click", () => {
+      if (!buyHouseItem(progress, titem.id)) return;
+      delete houseTrial[houseSpot];
+      audio.playPurchase();
+      showToast(`¡Compraste ${titem.name}! 🎉`);
+      renderHouse();
+      house3d && house3d.setPlaced(housePlaced());
+      refreshHubStats();
+    });
+    const cancel = document.createElement("button");
+    cancel.className = "btn-secondary";
+    cancel.textContent = "Quitar";
+    cancel.addEventListener("click", () => { delete houseTrial[houseSpot]; renderHouse(); house3d && house3d.setPlaced(housePlaced()); });
+    houseBarEl.append(txt, buy, cancel);
+  } else {
+    houseBarEl.innerHTML = `<div class="sh-bar-txt">Elige un lugar del cuarto y toca un objeto para verlo puesto. Si es tuyo se queda; si no, lo compras con Matipuntos.</div>`;
+  }
+}
 
 // ---------- MI AVENTURA: nivel, misiones, racha y álbum ----------
 
@@ -673,6 +788,7 @@ window.addEventListener("town-action", (e) => {
   else if (kind === "creador") playGame("creador");
   else if (kind === "shop") btnOpenShop.click();
   else if (kind === "album") document.getElementById("btn-open-progress").click();
+  else if (kind === "house") document.getElementById("btn-open-house").click();
 });
 
 function goToHub() {

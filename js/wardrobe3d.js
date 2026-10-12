@@ -4,6 +4,7 @@
 
 import { THREE, roundedBox, canvasTexture } from "./three-kit.js";
 import { getItem, getOutfit, EMPTY_LOOK } from "./wardrobe-data.js";
+import { buildPet } from "./wardrobe-pets.js";
 
 export const HEAD_W = 0.78;
 export const HEAD_H = 0.72;
@@ -712,6 +713,8 @@ export function applyLook(hero, look = {}) {
   if (neck) add(hero.bodyGroup, buildNeck(hero, neck.params, ticks));
   const back = getItem(L.back);
   if (back) add(hero.bodyGroup, buildBack(hero, back.params, ticks));
+  const pet = getItem(L.pet);
+  if (pet) add(hero.group, buildPet(pet.params, ticks));
 
   hero.tick = ticks.length ? (t, mode, speed) => ticks.forEach((f) => f(t, mode, speed)) : null;
   hero.look = L;

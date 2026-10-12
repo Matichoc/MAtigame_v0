@@ -75,6 +75,7 @@
           <div id="character-grid" class="character-grid lb-chars"></div>
           <div class="lb-stage-actions">
             <button id="btn-open-shop" class="btn-primary lb-shop">👕 Vestuario y Tienda</button>
+            <button id="btn-open-house" class="btn-secondary lb-shop">🏠 Mi Casa</button>
           </div>
           <label class="field-label" for="input-name">Tu apodo en los puntajes</label>
           <input id="input-name" class="text-input lb-name" type="text" maxlength="16" placeholder="Jugador">
@@ -90,6 +91,28 @@
             <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
           </nav><!--/WEB--><!--APP--><p class="app-credit">🍫 Un juego promovido por <b>Matichoc</b> · pasión por el cacao</p><!--/APP-->
         </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- MI CASA: un cuarto para decorar -->
+  <section id="screen-house" class="screen hidden">
+    <div class="shop2">
+      <header class="sh-top">
+        <button id="btn-house-back" class="btn-secondary">← Volver</button>
+        <h1 class="logo sh-title">Mi Casa</h1>
+        <div class="stat-chip lb-coins" title="Matipuntos">🍫✨ <span id="house-coins">0</span> <small>Matipuntos</small></div>
+      </header>
+      <div class="sh-body">
+        <aside class="sh-preview">
+          <div class="sh-stage"><canvas id="house-canvas"></canvas></div>
+          <div class="shop-character-name">Tu cuarto</div>
+        </aside>
+        <section class="sh-panel">
+          <div id="house-tabs" class="sh-tabs"></div>
+          <div id="house-grid" class="sh-grid"></div>
+          <div id="house-bar" class="sh-bar"></div>
+        </section>
       </div>
     </div>
   </section>

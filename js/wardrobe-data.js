@@ -26,6 +26,7 @@ export const SLOTS = [
   { id: "shoes", name: "Zapatos", icon: "👟" },
   { id: "skin", name: "Chocolate", icon: "🍫" },
   { id: "trail", name: "Estela", icon: "✨" },
+  { id: "pet", name: "Mascota", icon: "🐾" },
 ];
 
 const P = { comun: 30, raro: 110, epico: 260, legendario: 520 };
@@ -147,6 +148,18 @@ export const ITEMS = [
   it("trail", "tr_neon", "Estela neón", "🔆", "raro", { colors: ["#35f0ff", "#ff3fa4"] }),
   it("trail", "tr_arcoiris", "Estela arcoíris", "🌈", "epico", { colors: ["#ff3b3b", "#ffc800", "#4fd09a", "#3b8cff", "#9a5cff"] }),
   it("trail", "tr_oro", "Lluvia de oro", "🌟", "legendario", { colors: ["#ffc800", "#fff1a8", "#ffffff"] }),
+
+  // ---- Mascotas (flotan al lado del Matichico y lo acompañan a todos lados) ----
+  it("pet", "pet_alfajorito", "Alfajorito", "🍪", "comun", { kind: "alfajor" }),
+  it("pet", "pet_patito", "Patito de goma", "🐥", "comun", { kind: "patito" }),
+  it("pet", "pet_gotita", "Gotita de cacao", "💧", "comun", { kind: "gota" }),
+  it("pet", "pet_nubi", "Nubi", "☁️", "raro", { kind: "nube" }),
+  it("pet", "pet_cuchu", "Cuchu", "🥢", "raro", { kind: "cuchu" }),
+  it("pet", "pet_bombi", "Bombi gatito", "🐱", "raro", { kind: "gato" }),
+  it("pet", "pet_robot", "Robo-Choco", "🤖", "epico", { kind: "robot" }),
+  it("pet", "pet_estrellita", "Estrellita", "⭐", "epico", { kind: "estrella" }),
+  it("pet", "pet_unicornio", "Unicornio dulce", "🦄", "legendario", { kind: "unicornio" }),
+  it("pet", "pet_dragon", "Dragón de cacao", "🐲", "legendario", { kind: "dragon" }),
 ];
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));
@@ -169,4 +182,4 @@ export function trailColors(look) {
   return item ? item.params.colors.map((c) => Number.parseInt(c.slice(1), 16)) : [0xffc800, 0xfff6e6];
 }
 
-export const EMPTY_LOOK = { hair: "", hairColor: "", face: "", hat: "", glasses: "", neck: "", back: "", outfit: "liga", shoes: "", skin: "", trail: "" };
+export const EMPTY_LOOK = { hair: "", hairColor: "", face: "", hat: "", glasses: "", neck: "", back: "", outfit: "liga", shoes: "", skin: "", trail: "", pet: "" };
