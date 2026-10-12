@@ -1434,3 +1434,7 @@ html[data-app] .game-screen:not(.cr-screen) {
 .mode-row { display: flex; gap: 6px; justify-content: center; margin: 6px 0; }
 .mode-btn { flex: 1; max-width: 190px; padding: 7px 10px; border-radius: 999px; border: 2px solid var(--dorado); background: rgba(255,255,255,0.08); color: #fff; font: inherit; font-weight: 800; font-size: 0.85rem; cursor: pointer; touch-action: manipulation; }
 .mode-btn.sel { background: linear-gradient(180deg, #ff4f9a, #d4216c); border-color: #fff; }
+
+/* Pantallas largas (Mi aventura, Logros, Puntajes, Mi Casa): se pueden deslizar con el dedo */
+#screen-progress, #screen-achievements, #screen-leaderboard { overflow-y: auto; align-items: flex-start; -webkit-overflow-scrolling: touch; }
+@media (max-width: 760px) { #screen-house { overflow-y: auto; align-items: flex-start; -webkit-overflow-scrolling: touch; } }

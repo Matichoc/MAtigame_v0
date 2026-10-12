@@ -520,6 +520,7 @@
       <div id="parkour-banner" class="fps-banner" aria-live="polite"></div>
       <div id="parkour-popups" class="fps-popups" aria-hidden="true"></div>
       <div class="pk-status">
+        <div class="hud-chip hidden" id="parkour-hud-goal">🎯 <span></span></div>
         <div class="hud-chip hidden"><span id="parkour-hud-lives"></span></div>
         <div class="hud-chip hidden"><span id="parkour-hud-power"></span></div>
       </div>
@@ -536,9 +537,21 @@
           <p class="fps-hint">Mover: WASD o flechas · Saltar (¡dos veces en el aire!): Espacio · Cámara: arrastra el mouse o Q / E.</p>
           <div class="pk-modes">
             <button class="btn-primary" id="parkour-btn-infinite">♾️ Mundo infinito<small>Nunca termina: 10 mundos que se repiten cada vez más difíciles. Tienes 5 vidas, poderes 🧲🛡️⚡🦘 y un récord que batir.</small></button>
+            <button class="btn-primary" id="parkour-btn-missions">🎯 Misiones<small>20 misiones en el Mundo infinito: elige una abajo y cúmplela para desbloquear la siguiente.</small></button>
             <button class="btn-secondary" id="parkour-btn-campaign">🏁 Aventura<small>6 etapas con capa, gafas y corona de premio.</small></button>
           </div>
+          <div id="parkour-lvlpick" class="lvl-pick"></div>
           <p class="fps-hint" id="parkour-record"></p>
+        </div>
+      </div>
+
+      <div id="parkour-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="parkour-win-title">¡Misión cumplida!</h2>
+          <div id="parkour-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="parkour-win-text"></p>
+          <button class="btn-primary" id="parkour-btn-next">Siguiente misión</button>
+          <button class="btn-secondary overlay-secondary-btn" id="parkour-btn-win-menu">Volver al menú</button>
         </div>
       </div>
 
@@ -689,6 +702,7 @@
         </div>
       </div>
       <div class="hud-right">
+        <div class="hud-chip hidden" id="salto-hud-goal">🎯 <span></span></div>
         <div class="hud-chip">⭐ <span id="salto-hud-score">0</span></div>
         <div class="hud-chip">⛰️ <span id="salto-hud-height">0 m</span></div>
         <div class="hud-chip">❤ <span id="salto-hud-hearts">❤❤❤</span></div>
@@ -710,14 +724,25 @@
         <div class="overlay-card">
           <h2>Salto Choco 3D</h2>
           <p class="fps-tag">Nuevo · en 3D</p>
-          <p>Tu Matichico rebota solo: ¡tú lo mueves! Usa ← → (o A / D), o arrastra el dedo o el mouse. Sube por las plataformas de chocolate, junta alfajores y busca el jetpack Matidubai, el imán 🧲 y la burbuja 🫧. ¡Pisa a los malvaviscos enojados desde arriba para ganar puntos! Los pinchos y los golpes de costado te quitan un corazón, y las plataformas blancas se rompen. Aterriza justo en el centro para un ¡Perfecto!</p>
+          <p>Tu Matichico rebota solo: ¡tú lo mueves! Usa ← → (o A / D), o arrastra el dedo o el mouse. Sube por las plataformas de chocolate, junta alfajores y busca el jetpack Matidubai, el imán 🧲 y la burbuja 🫧. ¡Pisa a los malvaviscos enojados desde arriba para ganar puntos! Los pinchos y los golpes de costado te quitan un corazón, y las plataformas blancas se rompen. Aterriza justo en el centro para un ¡Perfecto! Elige entre el modo infinito o las 20 misiones.</p>
+          <div id="salto-lvlpick" class="lvl-pick"></div>
           <button class="btn-primary" id="salto-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="salto-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="salto-win-title">¡Misión cumplida!</h2>
+          <div id="salto-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="salto-win-text"></p>
+          <button class="btn-primary" id="salto-btn-next">Siguiente misión</button>
+          <button class="btn-secondary overlay-secondary-btn" id="salto-btn-win-menu">Volver al menú</button>
         </div>
       </div>
 
       <div id="salto-overlay-gameover" class="overlay hidden">
         <div class="overlay-card">
-          <h2>¡Se cayó el Matichico!</h2>
+          <h2 id="salto-gameover-title">¡Se cayó el Matichico!</h2>
           <p id="salto-gameover-text"></p>
           <button class="btn-primary" id="salto-btn-retry">Jugar de nuevo</button>
           <button class="btn-secondary overlay-secondary-btn" id="salto-btn-gameover-menu">Volver al menú</button>
@@ -738,6 +763,7 @@
         </div>
       </div>
       <div class="hud-right">
+        <div class="hud-chip hidden" id="autos-hud-goal">🎯 <span></span></div>
         <div class="hud-chip">⭐ <span id="autos-hud-score">0</span></div>
         <div class="hud-chip">🏁 <span id="autos-hud-speed">0</span></div>
         <div class="hud-chip">❤ <span id="autos-hud-hearts">❤❤❤</span></div>
@@ -760,14 +786,25 @@
         <div class="overlay-card">
           <h2>Autos de Chocolate 3D</h2>
           <p class="fps-tag">Nuevo · en 3D</p>
-          <p>Maneja tu auto de chocolate por la ruta de Matichoc. Cambia de carril con ← → (o A / D), toca/desliza a los lados en el celular. Esquiva conos, barriles y charcos, adelanta autos rivales (¡los roces dan puntos y combo!), vuela con las rampas para juntar alfajores en el aire y toma el nitro 🔥, el imán 🧲 y el escudo 🛡️. ¡Tienes 3 vidas!</p>
+          <p>Maneja tu auto de chocolate por la ruta de Matichoc. Cambia de carril con ← → (o A / D), toca/desliza a los lados en el celular. Esquiva conos, barriles y charcos, adelanta autos rivales (¡los roces dan puntos y combo!), vuela con las rampas para juntar alfajores en el aire y toma el nitro 🔥, el imán 🧲 y el escudo 🛡️. ¡Tienes 3 vidas! Elige entre la carrera infinita o las 20 misiones.</p>
+          <div id="autos-lvlpick" class="lvl-pick"></div>
           <button class="btn-primary" id="autos-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="autos-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="autos-win-title">¡Misión cumplida!</h2>
+          <div id="autos-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="autos-win-text"></p>
+          <button class="btn-primary" id="autos-btn-next">Siguiente misión</button>
+          <button class="btn-secondary overlay-secondary-btn" id="autos-btn-win-menu">Volver al menú</button>
         </div>
       </div>
 
       <div id="autos-overlay-gameover" class="overlay hidden">
         <div class="overlay-card">
-          <h2>¡Fin de la carrera!</h2>
+          <h2 id="autos-gameover-title">¡Fin de la carrera!</h2>
           <p id="autos-gameover-text"></p>
           <button class="btn-primary" id="autos-btn-retry">Jugar de nuevo</button>
           <button class="btn-secondary overlay-secondary-btn" id="autos-btn-gameover-menu">Volver al menú</button>

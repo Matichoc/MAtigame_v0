@@ -11,6 +11,7 @@ import { THREE, Game3D, clamp, lerp, rand, loadTexture, makeStars, roundedBox } 
 import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
+import { renderModePicker } from "./campaign.js";
 
 const HALF = 4.6;
 const GRAV = -30;
@@ -239,7 +240,9 @@ export class SaltoGame extends Game3D {
     this.magnet = 0;
     this.bubble = false;
     this.stomps = 0;
+    this.bestCombo = 0;
     this.perfects = 0;
+    this.setupMission();
     this.zone = 0;
     this.nextDeco = 14;
     for (const e of this.enemies) this.scene.remove(e.mesh);
@@ -658,9 +661,21 @@ export class SaltoGame extends Game3D {
     return 1 + Math.min(4, Math.floor(this.combo / 6));
   }
 
+  // modo misiones (js/missions.js)
+  getMetric(m) {
+    return { height: this.maxY, items: this.items, stomps: this.stomps, combo: this.bestCombo, score: this.score }[m];
+  }
+
+  onIntro() {
+    renderModePicker(this.els.q("lvlpick"), { id: "salto", progress: this.progress, kind: "missions", onChange: () => this.reset() });
+  }
+
+  nextLevel() { this.nextMission(); }
+
   _addCombo(n = 1) {
     const before = this._mult();
     this.combo += n;
+    this.bestCombo = Math.max(this.bestCombo, this.combo);
     this.comboT = 3.2;
     if (this._mult() > before) {
       this._banner(`¡Combo x${this._mult()}!`);

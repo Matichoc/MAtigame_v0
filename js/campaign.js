@@ -54,29 +54,31 @@ export function renderLevelPicker(el, { id, progress, selected, onSelect, total 
  * Selector completo para juegos con dos modos: "♾️ Infinito" (como siempre) y "🏆 20 niveles".
  * Guarda el modo elegido y el nivel; `onChange()` avisa al juego para que reinicie con lo elegido.
  */
-export function renderModePicker(el, { id, progress, onChange }) {
+export function renderModePicker(el, { id, progress, onChange, kind = "levels" }) {
   if (!el) return;
   const c = campaign(progress, id);
-  c.mode = c.mode || "levels";
+  c.mode = c.mode || kind;
+  if (kind === "missions" && c.mode === "levels") c.mode = "missions";
+  if (kind === "levels" && c.mode === "missions") c.mode = "levels";
   c.selected = Math.min(c.selected || c.unlocked, c.unlocked);
   el.innerHTML = "";
   const row = document.createElement("div");
   row.className = "mode-row";
-  for (const [mode, label] of [["levels", "🏆 20 niveles"], ["inf", "♾️ Infinito"]]) {
+  for (const [mode, label] of [[kind, kind === "missions" ? "🎯 20 misiones" : "🏆 20 niveles"], ["inf", "♾️ Infinito"]]) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = `mode-btn${c.mode === mode ? " sel" : ""}`;
     b.textContent = label;
-    b.addEventListener("click", () => { c.mode = mode; saveProgress(progress); renderModePicker(el, { id, progress, onChange }); onChange(); });
+    b.addEventListener("click", () => { c.mode = mode; saveProgress(progress); renderModePicker(el, { id, progress, onChange, kind }); onChange(); });
     row.appendChild(b);
   }
   el.appendChild(row);
-  if (c.mode === "levels") {
+  if (c.mode === kind) {
     const box = document.createElement("div");
     el.appendChild(box);
     renderLevelPicker(box, { id, progress, selected: c.selected, onSelect: (n) => { c.selected = n; saveProgress(progress); onChange(); } });
   }
 }
 
-export const campaignMode = (progress, id) => campaign(progress, id).mode || "levels";
+export const campaignMode = (progress, id, def = "levels") => campaign(progress, id).mode || def;
 export const campaignLevel = (progress, id) => { const c = campaign(progress, id); return Math.min(c.selected || c.unlocked, c.unlocked); };
