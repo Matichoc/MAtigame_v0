@@ -11,6 +11,7 @@ import {
   getLastActiveProfileId, setLastActiveProfileId, MAX_PROFILES,
 } from "./profiles.js";
 import { ACHIEVEMENTS } from "./achievements.js";
+import { activeEvent, eventById, eventEnd, nextEvent, eventTokens, eventItemAvailable, buyEventItem } from "./events.js";
 import { HOUSE_SPOTS, houseItemsOfSpot, getHouseItem, ownsHouseItem, buyHouseItem, placeHouseItem, placedWithDefaults } from "./house-data.js";
 import {
   levelInfo, xpForLevel, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
@@ -130,7 +131,30 @@ inputName.addEventListener("input", () => {
   updateProfileChip();
 });
 
+/** Cartel del evento de temporada en el menú (o aviso del próximo). */
+function renderEventBanner() {
+  const el = document.getElementById("event-banner");
+  if (!el) return;
+  const e = activeEvent();
+  if (e) {
+    const end = eventEnd(e);
+    el.innerHTML = `<span class="eb-ico">${e.icon}</span><span class="eb-body"><b>${e.name}</b><small>${e.blurb} Hasta el ${String(end.getDate()).padStart(2, "0")}/${String(end.getMonth() + 1).padStart(2, "0")}.</small></span><span class="eb-tokens">${e.token} ${eventTokens(progress, e.id)}</span><button class="btn-primary eb-go" type="button">Ir al pueblo</button>`;
+    el.querySelector(".eb-go").onclick = () => playGame("town");
+    el.classList.remove("hidden", "soon");
+    el.style.setProperty("--ev", "#" + e.colors[0].toString(16).padStart(6, "0"));
+  } else {
+    const n = nextEvent();
+    if (!n) { el.classList.add("hidden"); return; }
+    el.innerHTML = `<span class="eb-ico">${n.event.icon}</span><span class="eb-body"><b>Próximo evento: ${n.event.name}</b><small>Empieza en ${n.days} día${n.days === 1 ? "" : "s"}. ¡Prepara tus Matipuntos!</small></span>`;
+    el.onclick = null;
+    el.classList.remove("hidden");
+    el.classList.add("soon");
+    el.style.setProperty("--ev", "#" + n.event.colors[0].toString(16).padStart(6, "0"));
+  }
+}
+
 function refreshHubStats() {
+  renderEventBanner();
   hubTotalCoinsEl.textContent = String(progress.coins);
   const lv = levelInfo(progress.xp);
   document.getElementById("hub-level").textContent = String(lv.level);
@@ -868,6 +892,13 @@ function refreshShopPreview(force = false) {
   shopLobby.setView(shopSlot === "back" ? Math.PI : 0);
 }
 
+/** Lo que se muestra como precio de un objeto (Matipuntos, o fichas si es de un evento). */
+function priceLabel(item) {
+  if (!item.event) return `🍫✨ ${item.price}`;
+  const e = eventById(item.event);
+  return eventItemAvailable(item) ? `${e.token} ${item.tokens}` : `🔒 ${e.icon} ${e.name}`;
+}
+
 function renderShop() {
   const ch = shopChar();
   shopCoinsEl.textContent = String(progress.coins);
@@ -918,7 +949,7 @@ function renderShop() {
     card.className = "sh-card" + (equipped ? " equipped" : "") + (trying ? " trying" : "") + (!owned ? " locked" : "");
     if (item) card.style.setProperty("--rar", RARITIES[item.rarity].color);
     card.innerHTML = `<span class="sh-ico">${item ? item.icon : "🚫"}</span><span class="sh-name">${item ? item.name : "Normal"}</span>` +
-      `<span class="sh-price">${equipped ? "✓ Puesto" : owned ? (item && item.price ? "Tuyo" : "Gratis") : `🍫✨ ${item.price}`}</span>`;
+      `<span class="sh-price">${equipped ? "✓ Puesto" : owned ? (item && item.price ? "Tuyo" : "Gratis") : priceLabel(item)}</span>`;
     card.addEventListener("click", () => {
       if (owned) {
         equipItem(progress, ch.id, shopSlot, id);
@@ -940,16 +971,20 @@ function renderShop() {
   const tid = shopTrial[shopSlot];
   const titem = tid ? getItem(tid) : null;
   if (titem) {
-    const need = titem.price - progress.coins;
+    const evt = titem.event ? eventById(titem.event) : null;
+    const avail = !evt || eventItemAvailable(titem);
+    const need = evt ? titem.tokens - eventTokens(progress, evt.id) : titem.price - progress.coins;
     const txt = document.createElement("div");
     txt.className = "sh-bar-txt";
-    txt.innerHTML = `<b>${titem.icon} ${titem.name}</b> <i style="color:${RARITIES[titem.rarity].color}">${RARITIES[titem.rarity].name}</i>`;
+    txt.innerHTML = `<b>${titem.icon} ${titem.name}</b> <i style="color:${RARITIES[titem.rarity].color}">${RARITIES[titem.rarity].name}</i>` + (evt ? ` · <small>Exclusivo de ${evt.name}</small>` : "");
     const buy = document.createElement("button");
     buy.className = "btn-primary";
-    buy.textContent = need > 0 ? `Te faltan ${need} Matipuntos` : `Comprar · 🍫✨ ${titem.price}`;
-    buy.disabled = need > 0;
+    if (!avail) buy.textContent = `Vuelve en ${evt.name} ${evt.icon}`;
+    else if (evt) buy.textContent = need > 0 ? `Te faltan ${need} fichas ${evt.token}` : `Comprar · ${evt.token} ${titem.tokens}`;
+    else buy.textContent = need > 0 ? `Te faltan ${need} Matipuntos` : `Comprar · 🍫✨ ${titem.price}`;
+    buy.disabled = !avail || need > 0;
     buy.addEventListener("click", () => {
-      if (!buyItem(progress, titem.id)) return;
+      if (!(evt ? buyEventItem(progress, titem.id) : buyItem(progress, titem.id))) return;
       equipItem(progress, ch.id, shopSlot, titem.id);
       delete shopTrial[shopSlot];
       audio.playPurchase();

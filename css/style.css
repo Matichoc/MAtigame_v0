@@ -1359,3 +1359,14 @@ html[data-app] .game-screen:not(.cr-screen) {
 @media (pointer: coarse) { .town-action { bottom: auto; top: 14px; font-size: 0.9rem; padding: 10px 16px; } .town-dialog { bottom: auto; top: 70px; } }
 @media (max-width: 760px) { .town-action { left: auto; right: 12px; transform: none; top: auto; bottom: 28px; max-width: 58%; animation: none; } .town-dialog { top: 14px; } }
 .canvas-wrap:has(.overlay:not(.hidden)) :is(.town-action) { display: none !important; }
+
+/* ---------- Eventos de temporada ---------- */
+.event-banner { --ev: #ff8a2a; display: flex; align-items: center; gap: 12px; padding: 10px 14px; margin-bottom: 10px; border-radius: 16px; border: 3px solid var(--ev); background: linear-gradient(90deg, color-mix(in srgb, var(--ev) 35%, #2e1a18), #2e1a18); box-shadow: 0 0 16px color-mix(in srgb, var(--ev) 55%, transparent); }
+.event-banner.soon { opacity: 0.85; box-shadow: none; }
+.eb-ico { font-size: 2rem; }
+.eb-body { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.eb-body b { font-family: var(--font-display); color: var(--dorado); font-size: 1.1rem; }
+.eb-body small { font-size: 0.78rem; line-height: 1.25; }
+.eb-tokens { font-weight: 800; font-size: 1.05rem; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 12px; }
+.eb-go { padding: 8px 14px; font-size: 0.85rem; flex: none; }
+@media (max-width: 760px) { .event-banner { flex-wrap: wrap; } .eb-go { width: 100%; } }

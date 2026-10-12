@@ -183,6 +183,64 @@ export function buildPet(p, ticks) {
       });
       break;
     }
+    case "fantasma": {
+      const m = std(0xffffff, 0.8, { transparent: true, opacity: 0.92 });
+      g.add(mesh(new THREE.SphereGeometry(0.3, 16, 12), m, 0, 0.05, 0));
+      const skirt = mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.3, 16, 1, true), std(0xffffff, 0.8, { side: THREE.DoubleSide, transparent: true, opacity: 0.92 }), 0, -0.1, 0);
+      g.add(skirt);
+      for (let i = 0; i < 5; i++) { const a = (i / 5) * Math.PI * 2; g.add(mesh(new THREE.SphereGeometry(0.09, 8, 6), m, Math.cos(a) * 0.22, -0.26, Math.sin(a) * 0.22)); }
+      face(g, 0.08, 0.27, 0.1);
+      ticks.push((t) => { g.scale.y = 1 + Math.sin(t * 3) * 0.05; });
+      break;
+    }
+    case "nieve": {
+      const w = std(0xffffff, 0.9);
+      g.add(mesh(new THREE.SphereGeometry(0.28, 14, 10), w, 0, -0.2, 0), mesh(new THREE.SphereGeometry(0.2, 14, 10), w, 0, 0.18, 0));
+      face(g, 0.22, 0.17, 0.07, 0.03);
+      const nose = mesh(new THREE.ConeGeometry(0.03, 0.14, 6), std(0xff8a2a, 0.6), 0, 0.17, 0.22);
+      nose.rotation.x = Math.PI / 2;
+      g.add(nose, mesh(new THREE.TorusGeometry(0.17, 0.035, 6, 14), std(0xe83a3a, 0.8), 0, 0.02, 0).rotateX(Math.PI / 2));
+      g.add(mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.16, 12), std(0x2a1810, 0.7), 0, 0.46, 0));
+      break;
+    }
+    case "corazon": {
+      const sh = new THREE.Shape(); const k = 0.3;
+      sh.moveTo(0, -k); sh.bezierCurveTo(-k * 1.6, -k * 0.2, -k * 1.1, k * 1.1, 0, k * 0.45); sh.bezierCurveTo(k * 1.1, k * 1.1, k * 1.6, -k * 0.2, 0, -k);
+      const geo = new THREE.ExtrudeGeometry(sh, { depth: 0.14, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.03, bevelSegments: 2 });
+      geo.translate(0, 0, -0.07);
+      const heart = mesh(geo, std(0xe83a6a, 0.35, { emissive: 0x7a0a2a, emissiveIntensity: 0.4 }), 0, 0, 0);
+      g.add(heart);
+      face(g, 0.02, 0.13, 0.09, 0.035);
+      ticks.push((t) => heart.scale.setScalar(1 + Math.abs(Math.sin(t * 3)) * 0.1));
+      break;
+    }
+    case "huevo": {
+      const egg = mesh(new THREE.SphereGeometry(0.28, 16, 12), std(0xff9ab8, 0.4), 0, 0, 0);
+      egg.scale.y = 1.3;
+      g.add(egg);
+      for (const [y, c] of [[-0.12, 0xffe14a], [0.12, 0x9fe8ff]]) { const band = mesh(new THREE.TorusGeometry(Math.sqrt(0.28 * 0.28 - (y / 1.3) * (y / 1.3)) + 0.003, 0.02, 6, 20), std(c, 0.4), 0, y, 0); band.rotation.x = Math.PI / 2; g.add(band); }
+      face(g, 0.0, 0.27, 0.09, 0.035);
+      break;
+    }
+    case "volantin": {
+      const sh = new THREE.Shape(); sh.moveTo(0, 0.4); sh.lineTo(0.28, 0); sh.lineTo(0, -0.4); sh.lineTo(-0.28, 0); sh.closePath();
+      g.add(mesh(new THREE.ShapeGeometry(sh), std(0xd52b1e, 0.6, { side: THREE.DoubleSide }), 0, 0, 0));
+      const bar = new THREE.Shape(); bar.moveTo(-0.28, 0); bar.lineTo(0, 0.4); bar.lineTo(0, 0); bar.lineTo(-0.28, 0);
+      g.add(mesh(new THREE.ShapeGeometry(bar), std(0x0039a6, 0.6, { side: THREE.DoubleSide }), 0, 0, 0.005));
+      g.add(mesh(new THREE.BoxGeometry(0.02, 0.8, 0.02), std(0xffffff, 0.8), 0, 0, 0.01), mesh(new THREE.BoxGeometry(0.56, 0.02, 0.02), std(0xffffff, 0.8), 0, 0, 0.01));
+      face(g, 0.05, 0.02, 0.07, 0.03);
+      const tail = [];
+      for (let i = 0; i < 4; i++) { const t1 = mesh(new THREE.BoxGeometry(0.1, 0.05, 0.01), std([0xd52b1e, 0xffffff, 0x0039a6][i % 3], 0.6), 0, -0.5 - i * 0.12, 0); g.add(t1); tail.push(t1); }
+      ticks.push((t) => tail.forEach((s, i) => { s.position.x = Math.sin(t * 4 + i) * 0.06; s.rotation.z = Math.sin(t * 4 + i) * 0.3; }));
+      break;
+    }
+    case "globito": {
+      const b = mesh(new THREE.SphereGeometry(0.3, 16, 12), std(0xff3b6b, 0.25, { emissive: 0x4a0a1a, emissiveIntensity: 0.3 }), 0, 0.1, 0);
+      b.scale.y = 1.15;
+      g.add(b, mesh(new THREE.ConeGeometry(0.05, 0.08, 6), std(0xff3b6b, 0.3), 0, -0.27, 0).rotateX(Math.PI), mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.4, 4), std(0xffffff, 0.8), 0, -0.5, 0));
+      face(g, 0.12, 0.28, 0.1, 0.04);
+      break;
+    }
     default:
       break;
   }

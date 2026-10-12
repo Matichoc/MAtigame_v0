@@ -8,6 +8,7 @@
 
 import { earnCoins, saveProgress, todayKey, getBestScore } from "./storage.js";
 import { getItem } from "./wardrobe-data.js";
+import { activeEvent, addEventTokens } from "./events.js";
 
 // ---------- partidas ----------
 
@@ -276,11 +277,15 @@ export function recordRun(progress, gameId, score, info = {}) {
   let pack = false;
   if (progress.stats.totalRuns % 5 === 0) { progress.packs = (progress.packs || 0) + 1; pack = true; }
   const ups = addXp(progress, xp);
+  // durante un evento de temporada cada partida también da fichas del evento
+  const ev = activeEvent();
+  let tokens = 0;
+  if (ev) { tokens = 2; addEventTokens(progress, ev.id, tokens); }
 
   const done = d.missions.filter((m) => !m.claimed && !m.notified && missionDone(progress, m));
   for (const m of done) m.notified = true;
   if (done.length) emit({ type: "mission", missions: done });
   if (pack) emit({ type: "pack" });
   saveProgress(progress);
-  return { xp, first, ups, pack, missionsDone: done.length };
+  return { xp, first, ups, pack, missionsDone: done.length, tokens, eventToken: ev ? ev.token : "" };
 }

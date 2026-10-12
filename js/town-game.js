@@ -12,6 +12,7 @@ import { CHARACTERS, getOutfit } from "./characters.js";
 import { ITEMS, OUTFITS } from "./wardrobe-data.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import { earnCoins, saveProgress, todayKey } from "./storage.js";
+import { activeEvent, addEventTokens, eventTokens } from "./events.js";
 import { levelInfo } from "./progression.js";
 import * as audio from "./audio.js";
 
@@ -21,6 +22,7 @@ const HERO_R = 0.45;
 const WORLD_R = 52; // hasta dónde se puede caminar
 const DAY_SECS = 300;
 const COLLECT_CAP = 25; // alfajores dorados que dan Matipuntos por día
+const EVENT_CAP = 40; // fichas del evento que se pueden juntar por día en el pueblo
 const NPC_GIFT = 3; // Matipuntos por saludar a cada vecino la primera vez del día
 
 const SPRITES = ["alf-frambuesa", "alf-menta", "alf-naranja", "alf-trufa", "alf-pie-limon", "alf-maracuya", "alf-almendra", "alf-capuchino"];
@@ -78,7 +80,7 @@ export class TownGame extends Game3D {
 
   _daily() {
     const t = todayKey();
-    if (!this.progress.town || this.progress.town.date !== t) this.progress.town = { date: t, collected: 0, talked: [] };
+    if (!this.progress.town || this.progress.town.date !== t) this.progress.town = { date: t, collected: 0, talked: [], evCollected: 0 };
     return this.progress.town;
   }
 
@@ -125,6 +127,7 @@ export class TownGame extends Game3D {
     this._buildDecor();
     this._buildCollectibles();
     this._buildNeighbors();
+    this._buildEvent();
     this._ensureHero();
   }
 
@@ -519,6 +522,124 @@ export class TownGame extends Game3D {
     });
   }
 
+  // ---------- evento de temporada ----------
+
+  /** Un coleccionable del evento (calabaza, regalo, corazón, huevo, volantín o globo). */
+  _eventPickup(kind, color) {
+    const g = new THREE.Group();
+    const std = (c, r = 0.5, x = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: r, ...x });
+    const add = (geo, mat, x = 0, y = 0, z = 0) => {
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set(x, y, z);
+      m.castShadow = true;
+      g.add(m);
+      return m;
+    };
+    if (kind === "pumpkin") {
+      const p = add(new THREE.SphereGeometry(0.5, 14, 10), std(0xff8a2a, 0.55), 0, 0, 0);
+      p.scale.y = 0.8;
+      add(new THREE.CylinderGeometry(0.06, 0.09, 0.22, 6), std(0x3fa24a), 0, 0.42, 0);
+      for (const sx of [-1, 1]) add(new THREE.ConeGeometry(0.09, 0.14, 3), std(0xffe14a, 0.3, { emissive: 0xffa800, emissiveIntensity: 0.9 }), sx * 0.17, 0.05, 0.43).rotation.x = Math.PI / 2;
+    } else if (kind === "gift") {
+      const c = [0xe83a3a, 0x2f9a4a, 0x4fd0ff][Math.floor(Math.random() * 3)];
+      add(new THREE.BoxGeometry(0.8, 0.7, 0.8), std(c, 0.5), 0, 0, 0);
+      add(new THREE.BoxGeometry(0.84, 0.74, 0.14), std(0xffe14a, 0.4), 0, 0, 0);
+      add(new THREE.BoxGeometry(0.14, 0.74, 0.84), std(0xffe14a, 0.4), 0, 0, 0);
+      add(new THREE.TorusGeometry(0.16, 0.05, 6, 12), std(0xffe14a, 0.4), 0, 0.42, 0);
+    } else if (kind === "heart") {
+      const s = new THREE.Shape();
+      const k = 0.4;
+      s.moveTo(0, -k);
+      s.bezierCurveTo(-k * 1.6, -k * 0.2, -k * 1.1, k * 1.1, 0, k * 0.45);
+      s.bezierCurveTo(k * 1.1, k * 1.1, k * 1.6, -k * 0.2, 0, -k);
+      const geo = new THREE.ExtrudeGeometry(s, { depth: 0.16, bevelEnabled: true, bevelSize: 0.04, bevelThickness: 0.04, bevelSegments: 2 });
+      geo.translate(0, 0, -0.08);
+      add(geo, std(0xe83a6a, 0.3, { emissive: 0x7a0a2a, emissiveIntensity: 0.5 }), 0, 0, 0);
+    } else if (kind === "egg") {
+      const c = [0xff9ab8, 0xffe14a, 0x9fe8ff, 0xb9f0a8][Math.floor(Math.random() * 4)];
+      const e = add(new THREE.SphereGeometry(0.4, 14, 10), std(c, 0.35), 0, 0, 0);
+      e.scale.y = 1.3;
+      add(new THREE.TorusGeometry(0.4, 0.04, 6, 18), std(0xffffff, 0.4), 0, 0.05, 0).rotation.x = Math.PI / 2;
+    } else if (kind === "kite") {
+      const s = new THREE.Shape();
+      s.moveTo(0, 0.55); s.lineTo(0.38, 0); s.lineTo(0, -0.55); s.lineTo(-0.38, 0); s.closePath();
+      add(new THREE.ShapeGeometry(s), std(0xd52b1e, 0.6, { side: THREE.DoubleSide }), 0, 0, 0);
+      const h = new THREE.Shape();
+      h.moveTo(-0.38, 0); h.lineTo(0, 0.55); h.lineTo(0, 0); h.closePath();
+      add(new THREE.ShapeGeometry(h), std(0x0039a6, 0.6, { side: THREE.DoubleSide }), 0, 0, 0.01);
+      add(new THREE.BoxGeometry(0.03, 1.1, 0.03), std(0xffffff), 0, 0, 0.02);
+    } else {
+      const b = add(new THREE.SphereGeometry(0.42, 14, 10), std(color || 0xff3b6b, 0.25), 0, 0.15, 0);
+      b.scale.y = 1.15;
+      add(new THREE.CylinderGeometry(0.01, 0.01, 0.7, 4), std(0xffffff), 0, -0.5, 0);
+    }
+    g.scale.setScalar(1.25);
+    return g;
+  }
+
+  _buildEvent() {
+    const e = (this.event = activeEvent());
+    this.eventPickups = [];
+    if (!e) return;
+    const s = this.scene;
+    // banderines entre los faroles de la plaza
+    const N = 60;
+    const flags = new THREE.InstancedMesh(new THREE.ConeGeometry(0.28, 0.6, 3), new THREE.MeshStandardMaterial({ roughness: 0.7, side: THREE.DoubleSide }), N);
+    const mat = new THREE.Matrix4();
+    const rot = new THREE.Matrix4();
+    const col = new THREE.Color();
+    for (let i = 0; i < N; i++) {
+      const a = (i / N) * Math.PI * 2;
+      const seg = (i % 5) / 5;
+      mat.makeTranslation(Math.sin(a) * 21.5, 3.9 - Math.sin(seg * Math.PI) * 0.7, -Math.cos(a) * 21.5);
+      rot.makeRotationZ(Math.PI);
+      mat.multiply(rot);
+      flags.setMatrixAt(i, mat);
+      flags.setColorAt(i, col.setHex(e.colors[i % e.colors.length]));
+    }
+    s.add(flags);
+    // clima: nieve, corazones, brasas o confeti
+    const n = 260;
+    const pos = new Float32Array(n * 3);
+    const cols = new Float32Array(n * 3);
+    this.weather = { n, pos, kind: e.weather, seed: [] };
+    for (let i = 0; i < n; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 44;
+      pos[i * 3 + 1] = Math.random() * 22;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 44;
+      const c = e.weather === "snow" ? 0xffffff : e.weather === "hearts" ? (i % 2 ? 0xff3b6b : 0xff9ab8) : e.weather === "embers" ? (i % 3 ? 0xff8a2a : 0xffd34d) : e.colors[i % e.colors.length];
+      col.setHex(c);
+      cols[i * 3] = col.r;
+      cols[i * 3 + 1] = col.g;
+      cols[i * 3 + 2] = col.b;
+      this.weather.seed.push(0.6 + Math.random() * 0.8);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute("color", new THREE.BufferAttribute(cols, 3));
+    this.weather.points = new THREE.Points(geo, new THREE.PointsMaterial({ size: e.weather === "hearts" ? 0.34 : 0.24, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false }));
+    this.weather.points.frustumCulled = false;
+    s.add(this.weather.points);
+    // coleccionables del evento repartidos por el pueblo
+    let seed = 4242;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    for (let i = 0; i < 16; i++) {
+      let x = 0;
+      let z = 0;
+      for (let k = 0; k < 40; k++) {
+        const a = rnd() * Math.PI * 2;
+        const r = 6 + rnd() * 42;
+        x = Math.sin(a) * r;
+        z = Math.cos(a) * r;
+        if (!this._nearStructure(x, z, 2.5) || (Math.hypot(x, z) < 19 && Math.hypot(x, z) > 7)) break;
+      }
+      const mesh = this._eventPickup(e.collect, e.colors[i % e.colors.length]);
+      mesh.position.set(x, 1.3, z);
+      s.add(mesh);
+      this.eventPickups.push({ mesh, x, z, taken: false, respawn: 0, phase: rnd() * 6.28 });
+    }
+  }
+
   // ---------- héroe ----------
 
   _ensureHero() {
@@ -586,6 +707,7 @@ export class TownGame extends Game3D {
       this._move(dt);
       this._updateNeighbors(dt);
       this._collectItems(dt);
+      this._collectEvent(dt);
       this._pickTarget();
     } else {
       this._updateNeighbors(dt);
@@ -697,6 +819,32 @@ export class TownGame extends Game3D {
       g.position.set(n.x, 0, n.z);
       g.rotation.y = n.yaw;
       n.hero.animate(this.time + n.def.name.length, mode, mode === "run" ? 0.45 : 1);
+    }
+  }
+
+  _collectEvent(dt) {
+    const e = this.event;
+    if (!e) return;
+    const daily = this._daily();
+    for (const it of this.eventPickups) {
+      if (it.taken) {
+        it.respawn -= dt;
+        if (it.respawn <= 0) { it.taken = false; it.mesh.visible = true; }
+        continue;
+      }
+      if (Math.abs(it.x - this.pos.x) > 1.8 || Math.abs(it.z - this.pos.z) > 1.8) continue;
+      if (Math.hypot(it.x - this.pos.x, it.z - this.pos.z) > 1.6) continue;
+      it.taken = true;
+      it.respawn = 40;
+      it.mesh.visible = false;
+      const at = new THREE.Vector3(it.x, 1.8, it.z);
+      audio.playBonusCollect();
+      if ((daily.evCollected || 0) < EVENT_CAP) {
+        daily.evCollected = (daily.evCollected || 0) + 1;
+        addEventTokens(this.progress, e.id, 1);
+        this.popups.add(at, `+1 ${e.token}`, "combo");
+      } else this.popups.add(at, "¡Qué lindo!", "kill");
+      this.particles.burst(at, e.colors, 14, 3.5, 0.7, 4);
     }
   }
 
@@ -828,6 +976,24 @@ export class TownGame extends Game3D {
         s.material.opacity = 0.6 * (1 - f);
       }
     }
+    for (const it of this.eventPickups) {
+      if (it.taken) continue;
+      it.mesh.position.y = 1.4 + Math.sin(t * 2.2 + it.phase) * 0.2;
+      it.mesh.rotation.y = t * 1.4 + it.phase;
+    }
+    if (this.weather) {
+      const w = this.weather;
+      const rise = w.kind === "hearts" || w.kind === "embers";
+      for (let i = 0; i < w.n; i++) {
+        const k = w.seed[i];
+        w.pos[i * 3 + 1] += (rise ? 1.1 : -2.2) * k * dt;
+        w.pos[i * 3] += Math.sin(t * 0.8 + i) * 0.4 * dt;
+        if (w.pos[i * 3 + 1] > 22) w.pos[i * 3 + 1] = 0;
+        if (w.pos[i * 3 + 1] < 0) w.pos[i * 3 + 1] = 22;
+      }
+      w.points.geometry.attributes.position.needsUpdate = true;
+      w.points.position.set(Math.round(this.pos.x / 44) * 44, 0, Math.round(this.pos.z / 44) * 44);
+    }
     for (const c of this.clouds) { c.position.x += dt * 0.6; if (c.position.x > 120) c.position.x = -120; }
   }
 
@@ -839,6 +1005,7 @@ export class TownGame extends Game3D {
     const b = SKY[i + 1];
     const u = clamp((f - a[0]) / (b[0] - a[0]), 0, 1);
     this.tmpColor.setHex(a[1]).lerp(this.tmpColor2.setHex(b[1]), u);
+    if (this.event) this.tmpColor.lerp(this.tmpColor2.setHex(this.event.tint), 0.22);
     this.scene.background.copy(this.tmpColor);
     this.scene.fog.color.copy(this.tmpColor);
     this.hemi.intensity = lerp(a[2], b[2], u);
@@ -884,7 +1051,8 @@ export class TownGame extends Game3D {
     const daily = this._daily();
     const lv = levelInfo(this.progress.xp);
     const hour = Math.floor(((this.dayT / DAY_SECS) * 24 + 6) % 24);
-    const key = `${this.progress.coins}|${lv.level}|${daily.collected}|${hour}`;
+    const evTok = this.event ? eventTokens(this.progress, this.event.id) : 0;
+    const key = `${this.progress.coins}|${lv.level}|${daily.collected}|${hour}|${evTok}`;
     if (!force && key === this.hudCache) return;
     this.hudCache = key;
     const q = this.q;
@@ -892,6 +1060,11 @@ export class TownGame extends Game3D {
     q("hud-level").textContent = `Nv ${lv.level}`;
     q("hud-items").textContent = `${daily.collected}/${COLLECT_CAP}`;
     q("hud-time").textContent = `${String(hour).padStart(2, "0")}:00`;
+    const evEl = q("hud-event");
+    if (evEl) {
+      evEl.parentElement.classList.toggle("hidden", !this.event);
+      if (this.event) evEl.textContent = `${this.event.token} ${evTok}`;
+    }
   }
 
   // ---------- entrada ----------

@@ -406,6 +406,22 @@ Un lugar para pasear en vez de solo elegir juegos de una lista (`js/town-game.js
   Se prueba antes de comprar; el Matichico y su mascota viven en el cuarto.
 - Se entra desde el menú ("🏠 Mi Casa") o desde el pueblo (casa verde de la plaza).
 
+### Etapa 11f — Eventos de temporada ✅ (Fase 6 del plan)
+
+`js/events.js` decide por fecha qué evento está activo (Amor de Chocolate, Huevos de
+Chocolate —según la Pascua de cada año—, Fiestas Patrias, Día de las Niñas y Niños,
+Noche de Cacao/Halloween y Navidad Chocolatera). Para probar uno fuera de fecha se agrega
+`?event=halloween` (o `navidad`, `sanvalentin`, `pascua`, `patrias`, `dianino`) a la dirección.
+
+- El **pueblo cambia**: banderines en la plaza, clima (nieve, corazones, brasas o confeti)
+  y un leve tinte del cielo.
+- **Fichas del evento** (🎃, 🎁, 💖...): 16 coleccionables en el pueblo (hasta 40 al día)
+  y +2 fichas por cada partida terminada. Son solo del evento: no se compran ni valen dinero.
+- **Objetos exclusivos** (sombrero, cuello o espalda y una mascota por evento, 18 en total)
+  que solo se compran con fichas mientras el evento está activo; después quedan
+  bloqueados con un candado y "Vuelve en <evento>", y los que compraste son tuyos para siempre.
+- Cartel en el menú con el evento actual (o cuántos días faltan para el próximo).
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista

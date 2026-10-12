@@ -22,6 +22,7 @@ function defaultProgress() {
     // Matichicos) y lo que lleva puesto cada uno.
     wardrobe: { owned: [], looks: {} }, // looks: { [characterId]: { hair, hat, outfit, ... } }
     house: { owned: [], placed: {} }, // Mi Casa (ver js/house-data.js)
+    eventTokens: {}, // fichas de eventos de temporada: { [idEvento]: n }
     xp: 0, // experiencia total (ver js/progression.js)
     packs: 1, // sobres de figuritas sin abrir (empieza con uno de regalo)
     album: {}, // { [idFigurita]: cuántas tiene }
@@ -74,6 +75,7 @@ export function loadProgress(profileId) {
       stats: { ...defaultProgress().stats, ...parsed.stats },
       claimedAchievements: parsed.claimedAchievements || [],
       album: { ...parsed.album },
+      eventTokens: { ...parsed.eventTokens },
       house: { owned: [...((parsed.house && parsed.house.owned) || [])], placed: { ...((parsed.house && parsed.house.placed) || {}) } },
       albumClaimed: parsed.albumClaimed || [],
       packs: parsed.packs ?? 1,
@@ -129,7 +131,7 @@ export function spendCoins(progress, amount) {
 
 export function buyItem(progress, itemId) {
   const item = getItem(itemId);
-  if (!item || ownsItem(progress, itemId)) return false;
+  if (!item || item.event || ownsItem(progress, itemId)) return false; // los de evento se compran con fichas
   if (!spendCoins(progress, item.price)) return false;
   progress.wardrobe.owned.push(itemId);
   saveProgress(progress);

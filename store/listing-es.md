@@ -17,6 +17,8 @@ Elige a tu Matichico, cámbiale peinado, ropa, sombreros y mucho más en la tien
 
 🏠 MI CASA Y MASCOTAS — Decora tu propio cuarto con camas cohete, máquinas arcade y mini fuentes de chocolate, y adopta una mascota que te acompaña en todos los juegos.
 
+🎃🎄 EVENTOS DE TEMPORADA — Halloween, Navidad, Fiestas Patrias y más: el pueblo se transforma y puedes ganar objetos exclusivos jugando.
+
 ⭐ MI AVENTURA — Sube de nivel, cumple 3 misiones nuevas cada día, mantén tu racha y completa tu álbum de chocolates con figuritas brillantes.
 
 🏃 RECOLECTA Y CORRE — Recorre canchas y gimnasios 3D, salta vallas y junta golosinas antes de que se acabe el tiempo.

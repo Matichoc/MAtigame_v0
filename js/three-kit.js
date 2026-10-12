@@ -391,6 +391,7 @@ export class Game3D {
     const run = recordRun(this.progress, this.gameId, this.score, this.runInfo || {});
     this.runInfo = null;
     text += ` +${run.xp} XP ⭐`;
+    if (run.tokens) text += ` +${run.tokens} ${run.eventToken}`;
     if (this.els.gameoverText) this.els.gameoverText.textContent = text;
     this.showOverlay("gameover");
   }

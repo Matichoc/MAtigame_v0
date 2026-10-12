@@ -31,6 +31,8 @@ export const SLOTS = [
 
 const P = { comun: 30, raro: 110, epico: 260, legendario: 520 };
 const it = (slot, id, name, icon, rarity, params = {}, price) => ({ id, slot, name, icon, rarity, price: price ?? P[rarity], params });
+// Objetos exclusivos de un evento de temporada (ver js/events.js): se compran con fichas del evento.
+const ev = (event, tokens, slot, id, name, icon, rarity, params = {}) => ({ ...it(slot, id, name, icon, rarity, params, 99999), event, tokens });
 
 // Atuendos (colores de camiseta): los 4 primeros ya existían en la tienda original.
 export const OUTFITS = [
@@ -160,6 +162,26 @@ export const ITEMS = [
   it("pet", "pet_estrellita", "Estrellita", "⭐", "epico", { kind: "estrella" }),
   it("pet", "pet_unicornio", "Unicornio dulce", "🦄", "legendario", { kind: "unicornio" }),
   it("pet", "pet_dragon", "Dragón de cacao", "🐲", "legendario", { kind: "dragon" }),
+
+  // ---- Exclusivos de eventos de temporada ----
+  ev("halloween", 40, "hat", "ev_bruja", "Sombrero de bruja", "🧙‍♀️", "epico", { kind: "bruja" }),
+  ev("halloween", 50, "back", "ev_murcielago", "Alas de murciélago", "🦇", "epico", { kind: "murcielago" }),
+  ev("halloween", 80, "pet", "ev_fantasma", "Fantasmita", "👻", "legendario", { kind: "fantasma" }),
+  ev("navidad", 30, "hat", "ev_santa", "Gorro de Papá Noel", "🎅", "raro", { kind: "santa" }),
+  ev("navidad", 30, "neck", "ev_bufanda_nav", "Bufanda navideña", "🧣", "raro", { kind: "bufanda", color: "#e83a3a" }),
+  ev("navidad", 80, "pet", "ev_nieve", "Muñeco de nieve", "⛄", "legendario", { kind: "nieve" }),
+  ev("sanvalentin", 30, "hat", "ev_rosas", "Corona de rosas", "🌹", "raro", { kind: "rosas" }),
+  ev("sanvalentin", 50, "back", "ev_cupido", "Alas de cupido", "💘", "epico", { kind: "alas", color: "#ffc2dc" }),
+  ev("sanvalentin", 80, "pet", "ev_corazon", "Corazoncito", "💖", "legendario", { kind: "corazon" }),
+  ev("pascua", 30, "hat", "ev_conejo_p", "Orejas de Pascua", "🐰", "raro", { kind: "conejo", color: "#ffd1e3" }),
+  ev("pascua", 50, "back", "ev_canasta", "Canasta de huevos", "🧺", "epico", { kind: "canasta" }),
+  ev("pascua", 80, "pet", "ev_huevo", "Huevito sorpresa", "🥚", "legendario", { kind: "huevo" }),
+  ev("patrias", 30, "hat", "ev_chupalla", "Chupalla", "🤠", "raro", { kind: "chupalla" }),
+  ev("patrias", 30, "neck", "ev_chal", "Chal tricolor", "🇨🇱", "raro", { kind: "bufanda", color: "#0039a6" }),
+  ev("patrias", 80, "pet", "ev_volantin", "Volantín", "🪁", "legendario", { kind: "volantin" }),
+  ev("dianino", 30, "hat", "ev_fiesta", "Gorro de cumpleaños", "🥳", "raro", { kind: "fiesta", a: "#4fd0ff", b: "#9a5cff" }),
+  ev("dianino", 50, "back", "ev_globos", "Globos", "🎈", "epico", { kind: "globos" }),
+  ev("dianino", 80, "pet", "ev_globito", "Globito feliz", "🎈", "legendario", { kind: "globito" }),
 ];
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));

@@ -284,6 +284,38 @@ function buildHat(hero, p, ticks) {
   const g = new THREE.Group();
   const col = p.color || "#d4216c";
   switch (p.kind) {
+    case "bruja": {
+      const dark = std(0x2a1840, 0.7);
+      g.add(mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.03, 24), dark, 0, TOP + 0.02, 0));
+      const cone = mesh(new THREE.ConeGeometry(0.28, 0.75, 16), dark, 0.03, TOP + 0.4, 0);
+      cone.rotation.z = -0.15;
+      g.add(cone, mesh(new THREE.TorusGeometry(0.285, 0.04, 6, 20), std(0xff8a2a, 0.5), 0, TOP + 0.1, 0).rotateX(Math.PI / 2));
+      g.add(mesh(new THREE.BoxGeometry(0.1, 0.1, 0.03), std(0xffc800, 0.3, { metalness: 0.6 }), 0, TOP + 0.1, 0.29));
+      break;
+    }
+    case "santa": {
+      const red = std(0xe83a3a, 0.8);
+      const white = std(0xffffff, 0.95);
+      const cone = mesh(new THREE.ConeGeometry(0.3, 0.6, 16), red, -0.03, TOP + 0.3, 0);
+      cone.rotation.z = 0.25;
+      g.add(cone, mesh(new THREE.TorusGeometry(0.3, 0.06, 8, 20), white, 0, TOP + 0.04, 0).rotateX(Math.PI / 2), mesh(new THREE.SphereGeometry(0.08, 10, 8), white, -0.2, TOP + 0.58, 0));
+      break;
+    }
+    case "chupalla": {
+      const straw = std(0xe8c27a, 0.9);
+      g.add(mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.04, 24), straw, 0, TOP + 0.02, 0));
+      g.add(mesh(new THREE.CylinderGeometry(0.24, 0.27, 0.22, 20), straw, 0, TOP + 0.14, 0));
+      for (const [i, c] of [0xd52b1e, 0xffffff, 0x0039a6].entries()) g.add(mesh(new THREE.TorusGeometry(0.265, 0.018, 6, 20), std(c, 0.6), 0, TOP + 0.08 + i * 0.03, 0).rotateX(Math.PI / 2));
+      break;
+    }
+    case "rosas": {
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        g.add(mesh(new THREE.SphereGeometry(0.075, 8, 6), std(i % 3 === 0 ? 0xff9ab8 : 0xe83a6a, 0.6), Math.cos(a) * 0.3, TOP + 0.05, Math.sin(a) * 0.27));
+        if (i % 2) g.add(mesh(new THREE.ConeGeometry(0.04, 0.1, 4), std(0x3fa24a, 0.7), Math.cos(a + 0.2) * 0.31, TOP + 0.04, Math.sin(a + 0.2) * 0.28));
+      }
+      break;
+    }
     case "gorra": {
       const dome = mesh(new THREE.SphereGeometry(0.43, 20, 12, 0, Math.PI * 2, 0, Math.PI / 2), std(col, 0.5), 0, TOP - 0.06, -0.01);
       dome.scale.set(1, 0.8, 0.95);
@@ -300,7 +332,7 @@ function buildHat(hero, p, ticks) {
       break;
     }
     case "fiesta": {
-      const cone = mesh(new THREE.ConeGeometry(0.22, 0.55, 16), std(0xffffff, 0.5, { map: stripeTexture("#d4216c", "#ffc800") }), 0.0, TOP + 0.27, 0);
+      const cone = mesh(new THREE.ConeGeometry(0.22, 0.55, 16), std(0xffffff, 0.5, { map: stripeTexture(p.a || "#d4216c", p.b || "#ffc800") }), 0.0, TOP + 0.27, 0);
       cone.rotation.z = 0.12;
       g.add(cone, mesh(new THREE.SphereGeometry(0.07, 8, 6), std(0xcfd767, 0.6), 0.07, TOP + 0.55, 0));
       break;
@@ -329,7 +361,7 @@ function buildHat(hero, p, ticks) {
     }
     case "conejo": {
       for (const s of [-1, 1]) {
-        const ear = mesh(new THREE.CapsuleGeometry(0.075, 0.42, 4, 8), std(0xfff6e6, 0.8), s * 0.15, TOP + 0.36, 0);
+        const ear = mesh(new THREE.CapsuleGeometry(0.075, 0.42, 4, 8), std(p.color || 0xfff6e6, 0.8), s * 0.15, TOP + 0.36, 0);
         ear.rotation.z = -s * 0.18;
         g.add(ear);
         const inner = mesh(new THREE.CapsuleGeometry(0.035, 0.3, 4, 8), std(0xff9fc0, 0.8), s * 0.15, TOP + 0.36, 0.05);
@@ -543,6 +575,48 @@ function buildBack(hero, p, ticks) {
   const g = new THREE.Group();
   const col = p.color || "#d4216c";
   switch (p.kind) {
+    case "murcielago": {
+      const wings = [];
+      for (const s of [-1, 1]) {
+        const sh = new THREE.Shape();
+        sh.moveTo(0, 0); sh.lineTo(0.55, 0.42); sh.lineTo(0.5, 0.12); sh.lineTo(0.7, 0.02); sh.lineTo(0.46, -0.1); sh.lineTo(0.52, -0.32); sh.lineTo(0.22, -0.16); sh.closePath();
+        const w1 = wing(sh, 0x2a1840);
+        w1.scale.x = s;
+        const holder = new THREE.Group();
+        holder.add(w1);
+        holder.position.set(s * 0.08, 0.7, -0.22);
+        g.add(holder);
+        wings.push([holder, s]);
+      }
+      ticks.push((t, mode) => wings.forEach(([h, s]) => (h.rotation.y = s * (0.35 + Math.sin(t * (mode === "run" || mode === "jump" ? 12 : 4)) * 0.4))));
+      break;
+    }
+    case "globos": {
+      const cols = [0xff3b6b, 0xffe14a, 0x4fd0ff];
+      const balloons = cols.map((c, i) => {
+        const b = mesh(new THREE.SphereGeometry(0.2, 12, 10), std(c, 0.3), (i - 1) * 0.28, 1.75 + (i % 2) * 0.15, -0.3);
+        b.scale.y = 1.2;
+        g.add(b);
+        const string = mesh(new THREE.CylinderGeometry(0.005, 0.005, 1.0 + (i % 2) * 0.15, 4), std(0xffffff, 0.8), (i - 1) * 0.14, 1.2 + (i % 2) * 0.07, -0.27);
+        string.rotation.z = -(i - 1) * 0.15;
+        g.add(string);
+        return b;
+      });
+      ticks.push((t) => balloons.forEach((b, i) => { b.position.y = 1.75 + (i % 2) * 0.15 + Math.sin(t * 2 + i) * 0.04; }));
+      break;
+    }
+    case "canasta": {
+      const basket = mesh(new THREE.CylinderGeometry(0.2, 0.15, 0.2, 14), std(0xc98a4b, 0.9), 0.46, 0.4, 0.02);
+      g.add(basket);
+      const handle = mesh(new THREE.TorusGeometry(0.17, 0.015, 6, 14, Math.PI), std(0xa86a3a, 0.9), 0.46, 0.5, 0.02);
+      g.add(handle);
+      [0xff9ab8, 0xffe14a, 0x9fe8ff, 0xb9f0a8].forEach((c, i) => {
+        const egg = mesh(new THREE.SphereGeometry(0.07, 10, 8), std(c, 0.4), 0.4 + (i % 2) * 0.1, 0.52 + (i > 1 ? 0.04 : 0), -0.05 + (i % 3) * 0.05);
+        egg.scale.y = 1.25;
+        g.add(egg);
+      });
+      break;
+    }
     case "capa": {
       const geo = new THREE.PlaneGeometry(0.62, 0.78, 4, 6);
       geo.translate(0, -0.39, 0);
