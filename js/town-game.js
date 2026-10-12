@@ -56,6 +56,7 @@ const pol = (deg, r) => {
 export class TownGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 56 });
+    this.musicTheme = "chill";
     this.q = els.q;
     this.keys = {};
     this.joy = { x: 0, y: 0 };
@@ -690,6 +691,7 @@ export class TownGame extends Game3D {
 
   /** El pueblo no tiene puntaje: al salir solo se pausa. */
   pauseForMenu() {
+    audio.stopMusic();
     this.keys = {};
     this.joy = { x: 0, y: 0 };
     this.running = false;
