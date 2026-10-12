@@ -1370,3 +1370,10 @@ html[data-app] .game-screen:not(.cr-screen) {
 .eb-tokens { font-weight: 800; font-size: 1.05rem; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 12px; }
 .eb-go { padding: 8px 14px; font-size: 0.85rem; flex: none; }
 @media (max-width: 760px) { .event-banner { flex-wrap: wrap; } .eb-go { width: 100%; } }
+
+/* Pueblo: botón para correr / patines / monopatín */
+.town-speed { position: absolute; right: 14px; bottom: 120px; z-index: 6; width: 58px; height: 58px; border-radius: 50%; border: 3px solid #fff; background: linear-gradient(180deg, #4fd0ff, #2a8fd6); font-size: 1.7rem; line-height: 1; box-shadow: 0 4px 0 #1b5f9a; cursor: pointer; touch-action: manipulation; }
+.town-speed:active { transform: translateY(2px); box-shadow: 0 2px 0 #1b5f9a; }
+.town-speed-hint { position: absolute; right: 12px; bottom: 90px; z-index: 6; font-size: 0.72rem; font-weight: 800; color: #fff6e6; background: rgba(0,0,0,0.45); padding: 3px 8px; border-radius: 999px; pointer-events: none; }
+.town-speed-hint:empty { display: none; }
+.canvas-wrap:has(.overlay:not(.hidden)) :is(.town-speed, .town-speed-hint) { display: none !important; }
