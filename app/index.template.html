@@ -404,6 +404,10 @@
       <canvas id="parkour-canvas"></canvas>
       <div id="parkour-banner" class="fps-banner" aria-live="polite"></div>
       <div id="parkour-popups" class="fps-popups" aria-hidden="true"></div>
+      <div class="pk-status">
+        <div class="hud-chip hidden"><span id="parkour-hud-lives"></span></div>
+        <div class="hud-chip hidden"><span id="parkour-hud-power"></span></div>
+      </div>
       <div class="pk-touch" id="parkour-touch">
         <div class="pk-joy" id="parkour-joy"><div class="pk-knob" id="parkour-knob"></div></div>
         <button class="g3d-tbtn pk-jump" id="parkour-btn-jump" aria-label="Saltar">⤴</button>
@@ -413,17 +417,22 @@
         <div class="overlay-card">
           <h2>Parkour Choco 3D</h2>
           <p class="fps-tag">Nuevo · en 3D</p>
-          <p>Corre y salta por 6 etapas de plataformas: unas se mueven, otras se rompen o parpadean, hay trampolines y molinos giratorios. Junta alfajores y barras Matidubai, activa los checkpoints y desbloquea capa, gafas brillantes y corona.</p>
+          <p>Corre y salta por plataformas que se mueven, se rompen o parpadean, con trampolines y molinos giratorios. Junta alfajores y barras Matidubai para ganar Matipuntos y activa los checkpoints.</p>
           <p class="fps-hint">Mover: WASD o flechas · Saltar (¡dos veces en el aire!): Espacio · Cámara: arrastra el mouse o Q / E.</p>
-          <button class="btn-primary" id="parkour-btn-start">¡A correr!</button>
+          <div class="pk-modes">
+            <button class="btn-primary" id="parkour-btn-infinite">♾️ Mundo infinito<small>Nunca termina: 10 mundos que se repiten cada vez más difíciles. Tienes 5 vidas, poderes 🧲🛡️⚡🦘 y un récord que batir.</small></button>
+            <button class="btn-secondary" id="parkour-btn-campaign">🏁 Aventura<small>6 etapas con capa, gafas y corona de premio.</small></button>
+          </div>
+          <p class="fps-hint" id="parkour-record"></p>
         </div>
       </div>
 
       <div id="parkour-overlay-gameover" class="overlay hidden">
         <div class="overlay-card">
-          <h2>¡Llegaste a la cima! 🏆</h2>
+          <h2 id="parkour-gameover-title">¡Llegaste a la cima! 🏆</h2>
           <p id="parkour-gameover-text"></p>
           <button class="btn-primary" id="parkour-btn-retry">Correr de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" data-action="restart">Cambiar de modo</button>
           <button class="btn-secondary overlay-secondary-btn" id="parkour-btn-gameover-menu">Volver al menú</button>
         </div>
       </div>

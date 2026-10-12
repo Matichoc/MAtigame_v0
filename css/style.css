@@ -1271,3 +1271,9 @@ html[data-app] .game-screen:not(.cr-screen) {
   .sh-title { font-size: 1.1rem; }
   .sh-bar { position: sticky; bottom: 4px; background: rgba(40,22,10,0.96); border: 2px solid var(--dorado); }
 }
+
+/* Parkour: elección de modo */
+.pk-modes { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 4px; }
+.pk-modes button { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; }
+.pk-modes small { font-weight: 600; font-size: 0.72rem; line-height: 1.25; opacity: 0.9; font-family: var(--font-body, inherit); }
+.pk-status { position: absolute; top: 10px; left: 10px; z-index: 5; display: flex; flex-wrap: wrap; gap: 6px; pointer-events: none; }

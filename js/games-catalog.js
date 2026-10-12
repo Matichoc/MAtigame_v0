@@ -20,7 +20,7 @@ const ALL_GAMES = [
     id: "parkour",
     name: "Parkour Choco",
     icon: "🧗",
-    tagline: "Estilo Roblox: salta plataformas, esquiva molinos, junta alfajores y desbloquea capa, gafas y corona.",
+    tagline: "Estilo Roblox: ¡mundo infinito con 10 ambientes, poderes y récord de metros! O la aventura de 6 etapas.",
     status: "available",
     tag: "Nuevo 3D",
   },

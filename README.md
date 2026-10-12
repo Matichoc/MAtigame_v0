@@ -10,7 +10,7 @@ Capitán, Choco Estrella, Choco Baller o Choco Cheer) y lo personaliza con
 atuendos comprados en la tienda, para jugar cualquiera de los minijuegos
 disponibles con ese mismo personaje. **Los 10 juegos son 3D** (Three.js),
 con brillo (bloom), color vivo y un Matichico 3D que cambia con la tienda:
-**Parkour Choco** (estilo Roblox: 6 etapas de plataformas, checkpoints, accesorios que se desbloquean),
+**Parkour Choco** (estilo Roblox: **Mundo infinito** con 10 ambientes, poderes y récord de metros, o la Aventura de 6 etapas),
 **Recolecta y Corre** (6 canchas 3D con camino guiado, vallas y golosinas),
 **Tetris de Productos** (cubos de chocolate en una vitrina 3D),
 **Lanzamientos de Básquet** (tiro libre con física real, aro y red),
@@ -99,7 +99,10 @@ js/characters.js      Definición/dibujo procedural de los Matichicos y atuendos
 js/games-catalog.js  Catálogo de modos de juego (disponibles y "próximamente")
 js/levels.js          Camino/corredor, obstáculos, coleccionables y misiones
 js/audio.js           Efectos de sonido generados con Web Audio API
-js/parkour-game.js    Parkour Choco 3D (obby estilo Roblox)
+js/parkour-game.js    Parkour Choco 3D (obby estilo Roblox: Aventura de 6 etapas)
+js/parkour-infinite.js Parkour: Mundo infinito (generador procedural, poderes, vidas, récord)
+js/wardrobe-data.js   Catálogo del Vestuario (~80 objetos, rarezas y precios en Matipuntos)
+js/wardrobe3d.js      Cómo se ve cada objeto sobre el Matichico 3D
 js/recolecta-game.js  Recolecta y Corre 3D (usa los niveles de js/levels.js)
 js/tetris-pieces.js  Formas y colores de "Tetris de Productos"
 js/tetris3d-game.js  Tetris de Productos 3D

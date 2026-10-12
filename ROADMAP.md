@@ -340,6 +340,29 @@ haciendo parkour, con ropa y brillos (`js/parkour-game.js`):
 - Puntaje por alfajores, barras, etapas, rapidez y caídas; logro "Parkourista".
 - Verificado con un bot que recorre las 6 etapas hasta la meta sin caídas.
 
+### Etapa 11b — Parkour: Mundo infinito ✅ (Fase 2 del plan "más enganche")
+
+La niña terminó los 9 juegos en una hora, así que Parkour pasa a ser un mundo
+que no termina (`js/parkour-infinite.js`, mixin de `ParkourGame`):
+
+- Recorrido **procedural**: se genera por delante del Matichico y se borra lo
+  que queda atrás (siempre se conserva desde el último checkpoint), así nunca
+  se pone pesado.
+- **10 mundos** de 140 m (Pradera, Caramelo, Nubes, Bosque de Cacao, Molinos,
+  Desierto de Galleta, Mar de Menta, Noche Neón, Galaxia Dulce, Cumbre) que se
+  repiten cada vez más difíciles (la dificultad sube durante los primeros 9
+  mundos). Cada ambiente tiene cielo, plataformas, adornos flotantes y tipos de
+  plataforma favoritos propios; los tipos nuevos aparecen de a poco
+  (móviles → vigas/frágiles → trampolín → molinos → parpadeantes).
+- **5 vidas** (cada caída resta una; +1 vida cada 3 mundos), checkpoint y
+  +2 Matipuntos por mundo nuevo, barras Matidubai (+3), alfajores (+10).
+- **Poderes**: 🧲 imán de alfajores, 🛡️ escudo (te salva de una caída), ⚡ turbo,
+  🦘 súper salto.
+- **Récord de metros** por perfil (`stats.parkourInfBest`), puntaje, ranking y
+  3 logros nuevos (Explorador, Maratonista, Viajera de Mundos).
+- Al terminar cada partida, Matipuntos extra según el puntaje (`Game3D.finish`).
+- La Aventura de 6 etapas sigue como modo aparte (elige al entrar).
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista
