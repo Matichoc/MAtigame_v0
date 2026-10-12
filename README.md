@@ -5,8 +5,7 @@
 
 # MAtigame_v0 — Matichoc: La Aventura del Cacao
 
-Arcade web de Matichoc: cada persona elige su perfil, su Matichico (Choco
-Capitán, Choco Estrella, Choco Baller o Choco Cheer) y lo personaliza con
+Arcade web de Matichoc: cada persona elige su perfil, su Matichico (Matichico, Chocolatina, Matichico Baller o Chocolatina Cheer: los personajes de matichoc.cl) y lo personaliza con
 atuendos comprados en la tienda, para jugar cualquiera de los minijuegos
 disponibles con ese mismo personaje. **Los 10 juegos son 3D** (Three.js),
 con brillo (bloom), música generada en vivo, color vivo y un Matichico 3D que cambia con la tienda:

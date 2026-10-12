@@ -7,7 +7,7 @@
 import { getItem, EMPTY_LOOK } from "./wardrobe-data.js";
 
 const SAVE_PREFIX = "matichoc_save_v3_profile_";
-const DEFAULT_OUTFIT = "liga";
+const DEFAULT_OUTFIT = "polera";
 const MAX_LEADERBOARD = 10;
 
 export function storageKeyForProfile(profileId) {
@@ -119,7 +119,7 @@ export function getLook(progress, characterId) {
 }
 
 export function equippedOutfitId(progress, characterId) {
-  return getLook(progress, characterId).outfit || "liga";
+  return getLook(progress, characterId).outfit || "polera";
 }
 
 /** Se pone (o se quita, con itemId "") un objeto en la categoría `slot` del Matichico. */
