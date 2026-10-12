@@ -1,6 +1,7 @@
 import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
+import { bindStick } from "./stick.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
   loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem, equippedOutfitId,
@@ -77,6 +78,24 @@ function paintAvatar(canvas, char, lookOverride = null, prog = progress) {
     })
     .catch(() => { /* sin WebGL: se queda el dibujo 2D */ });
 }
+
+// ---------- JUEGOS QUE EXIGEN CELULAR HORIZONTAL ----------
+// Los juegos con orient "landscape" no se pueden jugar con el celular parado: aparece un aviso grande.
+let currentGameId = null;
+const rotateOverlay = document.getElementById("rotate-overlay");
+function checkOrientation() {
+  if (!rotateOverlay) return;
+  const entry = currentGameId && GAMES_CATALOG.find((g) => g.id === currentGameId);
+  const needs = !!entry && entry.orient === "landscape";
+  const touch = window.matchMedia("(pointer: coarse)").matches;
+  const portrait = window.innerHeight > window.innerWidth;
+  const show = needs && touch && portrait;
+  rotateOverlay.classList.toggle("hidden", !show);
+  if (show) rotateOverlay.querySelector(".rot-game").textContent = entry.name;
+}
+window.addEventListener("resize", checkOrientation);
+window.addEventListener("orientationchange", checkOrientation);
+try { screen.orientation?.lock?.("landscape").catch(() => {}); } catch (e) { /* solo funciona en pantalla completa / app */ }
 
 function showScreen(target) {
   ALL_SCREENS.forEach((s) => s.classList.toggle("hidden", s !== target));
@@ -718,6 +737,10 @@ function gameThumb(entry) {
     tag.textContent = entry.tag;
     wrap.appendChild(tag);
   }
+  const ori = document.createElement("span");
+  ori.className = `gorient ${entry.orient === "landscape" ? "land" : "any"}`;
+  ori.textContent = entry.orient === "landscape" ? "📱 Horizontal" : "📱 Vertical u horizontal";
+  wrap.appendChild(ori);
   const play = document.createElement("span");
   play.className = "gplay";
   play.textContent = "▶ Jugar";
@@ -794,6 +817,8 @@ function playGame(gameId) {
   // corriendo lógica de fondo mientras se muestra el otro).
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
 
+  currentGameId = gameId;
+  checkOrientation();
   if (gameId === "fps3d") {
     showScreen(screenFps);
     launchOrResumeFps();
@@ -822,6 +847,8 @@ function goToHub() {
     return;
   }
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
+  currentGameId = null;
+  checkOrientation();
   refreshHubStats();
   renderCharacterGrid();
   renderGameGrid();
@@ -1205,6 +1232,8 @@ async function launchOrResume3d(key) {
       document.getElementById(`screen-${pre}`).querySelectorAll("[data-action]").forEach((btn) => {
         btn.addEventListener("click", () => actions[btn.dataset.action]?.());
       });
+      const joy = q("joy");
+      if (joy) bindStick(joy, (x, y) => game.setStick?.(x, y));
       const btnMute = q("btn-mute");
       btnMute.addEventListener("click", () => {
         const next = !audio.isMuted();

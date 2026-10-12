@@ -376,6 +376,14 @@ export class AutosGame extends Game3D {
     }
   }
 
+  /** Joystick táctil: al empujarlo hacia un lado cambia de carril (una vez por empujón). */
+  setStick(x) {
+    const dir = x > 0.55 ? 1 : x < -0.55 ? -1 : 0;
+    if (dir && dir !== this.stickDir) this._changeLane(dir);
+    if (Math.abs(x) < 0.3) this.stickDir = 0;
+    else if (dir) this.stickDir = dir;
+  }
+
   _bindInput() {
     window.addEventListener("keydown", (e) => {
       if (!this.running) return;
