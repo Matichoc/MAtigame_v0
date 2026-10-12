@@ -479,6 +479,14 @@ herramientas ya no tapa el cuarto al arrastrar muebles), HUD compacto que no se 
 Tienda y Mi Casa deslizables con el celular acostado, y controles según el juego: **botones ◀ ▶ a cada lado** en Salto Choco,
 Autos (cambio de carril) y Porristas; **joystick** en Recolecta, Parkour y Pueblo (movimiento libre).
 
+### Etapa 11k — Autos legibles y «Lo que tengo» ✅
+
+- **Autos de Chocolate:** el camino era café sobre café y no se distinguía por dónde ir. Ahora el asfalto es gris azulado,
+  con línea amarilla en los bordes, rayas blancas gruesas entre carriles, flechas hacia adelante en cada carril y
+  una mancha roja bajo cada obstáculo o auto rival (los charcos llevan aro amarillo).
+- **Vestuario y Tienda / Mi Casa:** dos pestañas, «🛍️ Por comprar» y «🎒 Lo que tengo», con la cantidad de cada una
+  (y por categoría). Lo comprado sale de la tienda y queda solo en «Lo que tengo», así no se ve como algo por comprar otra vez.
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista
