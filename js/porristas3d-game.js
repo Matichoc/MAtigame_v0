@@ -333,6 +333,7 @@ export class Porristas3DGame extends Game3D {
       const halfW = this.paddle.w / 2;
       if (this.keys.left) this.paddle.x -= PADDLE_SPEED * dt;
       if (this.keys.right) this.paddle.x += PADDLE_SPEED * dt;
+      if (this.stickX) this.paddle.x += this.stickX * PADDLE_SPEED * 1.5 * dt;
       if (this.pointerX != null && !this.keys.left && !this.keys.right) {
         const d = this.pointerX - this.paddle.x;
         this.paddle.x += clamp(d, -PADDLE_SPEED * 1.4 * dt, PADDLE_SPEED * 1.4 * dt);
@@ -524,6 +525,8 @@ export class Porristas3DGame extends Game3D {
   }
 
   // ---------- entrada ----------
+
+  setStick(x) { this.stickX = x; }
 
   async init() {
     const first = !this.ready;

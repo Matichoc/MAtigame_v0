@@ -241,7 +241,9 @@ export function installInfinite(Cls, STAGES) {
 
   /** Quita lo que quedó muy atrás (siempre conserva desde el último checkpoint). */
   P._cullWorld = function _cullWorld() {
-    const cullZ = Math.min(this.pos.z, this.spawn.z) + BEHIND;
+    // lo que quede detrás del último checkpoint (o de la jugadora, si va más atrás) se puede borrar;
+    // OJO: z crece hacia atrás, así que lo que hay que conservar es el MAYOR de los dos
+    const cullZ = Math.max(this.pos.z, this.spawn.z) + BEHIND;
     const gone = (z) => z > cullZ;
     const drop = (arr, test, get) => {
       const keep = [];

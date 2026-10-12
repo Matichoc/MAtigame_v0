@@ -1,6 +1,7 @@
 import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
+import { bindStick } from "./stick.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
   loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem, equippedOutfitId,
@@ -59,11 +60,11 @@ const toastEl = document.getElementById("toast");
 const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
 
 let toastTimer = null;
-function showToast(message) {
+function showToast(message, ms = 2600) {
   toastEl.textContent = message;
   toastEl.classList.remove("hidden");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toastEl.classList.add("hidden"), 2600);
+  toastTimer = setTimeout(() => toastEl.classList.add("hidden"), ms);
 }
 
 /** Dibuja el retrato de un Matichico: primero el dibujo 2D (al instante) y luego el modelo 3D con todo lo que lleva puesto. */
@@ -77,6 +78,24 @@ function paintAvatar(canvas, char, lookOverride = null, prog = progress) {
     })
     .catch(() => { /* sin WebGL: se queda el dibujo 2D */ });
 }
+
+// ---------- JUEGOS QUE EXIGEN CELULAR HORIZONTAL ----------
+// Los juegos con orient "landscape" no se pueden jugar con el celular parado: aparece un aviso grande.
+let currentGameId = null;
+const rotateOverlay = document.getElementById("rotate-overlay");
+function checkOrientation() {
+  if (!rotateOverlay) return;
+  const entry = currentGameId && GAMES_CATALOG.find((g) => g.id === currentGameId);
+  const needs = !!entry && entry.orient === "landscape";
+  const touch = window.matchMedia("(pointer: coarse)").matches;
+  const portrait = window.innerHeight > window.innerWidth;
+  const show = needs && touch && portrait;
+  rotateOverlay.classList.toggle("hidden", !show);
+  if (show) rotateOverlay.querySelector(".rot-game").textContent = entry.name;
+}
+window.addEventListener("resize", checkOrientation);
+window.addEventListener("orientationchange", checkOrientation);
+try { screen.orientation?.lock?.("landscape").catch(() => {}); } catch (e) { /* solo funciona en pantalla completa / app */ }
 
 function showScreen(target) {
   ALL_SCREENS.forEach((s) => s.classList.toggle("hidden", s !== target));
@@ -718,6 +737,10 @@ function gameThumb(entry) {
     tag.textContent = entry.tag;
     wrap.appendChild(tag);
   }
+  const ori = document.createElement("span");
+  ori.className = `gorient ${entry.orient === "landscape" ? "land" : "any"}`;
+  ori.textContent = entry.orient === "landscape" ? "📱 Horizontal" : "📱 Vertical u horizontal";
+  wrap.appendChild(ori);
   const play = document.createElement("span");
   play.className = "gplay";
   play.textContent = "▶ Jugar";
@@ -794,6 +817,8 @@ function playGame(gameId) {
   // corriendo lógica de fondo mientras se muestra el otro).
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
 
+  currentGameId = gameId;
+  checkOrientation();
   if (gameId === "fps3d") {
     showScreen(screenFps);
     launchOrResumeFps();
@@ -822,6 +847,8 @@ function goToHub() {
     return;
   }
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
+  currentGameId = null;
+  checkOrientation();
   refreshHubStats();
   renderCharacterGrid();
   renderGameGrid();
@@ -1135,10 +1162,16 @@ async function launchOrResumeFps() {
     await instances.fps.startRun(selectedCharacter, progress);
   } catch (err) {
     console.error(err);
-    showToast("Tu dispositivo no pudo cargar el modo 3D.");
+    showToast(`Tu dispositivo no pudo cargar el modo 3D. [fps: ${errDetail(err)}]`, 9000);
     instances.fps = null;
     goToHub();
   }
+}
+
+/** Texto corto del error para mostrarlo en el aviso (sirve para saber qué falló en cada dispositivo). */
+function errDetail(err) {
+  const m = String((err && err.message) || err || "error").replace(/\s+/g, " ");
+  return m.length > 90 ? `${m.slice(0, 90)}…` : m;
 }
 
 // ---------- JUEGOS 3D (Salto Choco, Autos de Chocolate, Memoria Matichoc) ----------
@@ -1199,6 +1232,8 @@ async function launchOrResume3d(key) {
       document.getElementById(`screen-${pre}`).querySelectorAll("[data-action]").forEach((btn) => {
         btn.addEventListener("click", () => actions[btn.dataset.action]?.());
       });
+      const joy = q("joy");
+      if (joy) bindStick(joy, (x, y) => game.setStick?.(x, y));
       const btnMute = q("btn-mute");
       btnMute.addEventListener("click", () => {
         const next = !audio.isMuted();
@@ -1209,7 +1244,7 @@ async function launchOrResume3d(key) {
     await instances[key].startRun(selectedCharacter, progress);
   } catch (err) {
     console.error(err);
-    showToast("Tu dispositivo no pudo cargar el modo 3D.");
+    showToast(`Tu dispositivo no pudo cargar el modo 3D. [${key}: ${errDetail(err)}]`, 9000);
     instances[key] = null;
     goToHub();
   }
