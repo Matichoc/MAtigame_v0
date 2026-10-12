@@ -461,6 +461,24 @@ más variedad y "jugo" (música, vibración, avisos). Todo con música procedura
   cadenas por escalones (🥉→👑) con barra de progreso; piden días jugados, horas, rachas, los 20 niveles de cada juego,
   récords, colección y estilo, así que no se terminan en una tarde.
 
+### Etapa 11i — Personajes de la web, Básquet más variado y menos espacio ✅
+
+- **Personajes como en matichoc.cl** (`js/matichico3d.js`): Matichico y Chocolatina (más sus versiones Baller y Cheer) con
+  cabeza de barra de chocolate con surcos, ojos azules, sonrisa con dientes, polera negra de Matichoc con cuello rosado y
+  logo, jeans y zapatillas; rulo de pelo (Matichico) o moño con flores (Chocolatina). La «Polera Matichoc» es la ropa por
+  defecto; las demás siguen en la tienda.
+- **Básquet:** 8 lugares de tiro por toda la cancha (alas, esquinas, cerca del aro, triple y lejos); el Matichico corre de uno a
+  otro, la cámara lo sigue (cada tiro se ve desde un lado) y en los niveles difíciles se mueve de lado mientras apuntas.
+- **Espacio:** Logros en listas desplegables por categoría, selector de niveles plegado en una línea, «Cómo se juega» plegable
+  en cada juego y secciones plegables en Mi aventura (en el celular empiezan cerradas).
+
+### Etapa 11j — Pulido de la experiencia en celular ✅
+
+Feedback con capturas de un celular real: Tetris (paneles SIGUE y GUARDA cuadrados y legibles), Mi Casa (la barra de
+herramientas ya no tapa el cuarto al arrastrar muebles), HUD compacto que no se encima, tarjetas de inicio con scroll,
+Tienda y Mi Casa deslizables con el celular acostado, y controles según el juego: **botones ◀ ▶ a cada lado** en Salto Choco,
+Autos (cambio de carril) y Porristas; **joystick** en Recolecta, Parkour y Pueblo (movimiento libre).
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista

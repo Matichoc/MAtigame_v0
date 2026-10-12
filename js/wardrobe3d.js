@@ -759,7 +759,7 @@ export function applyLook(hero, look = {}) {
 
   // zapatos
   const shoe = getItem(L.shoes);
-  mats.shoe.color.set(shoe ? shoe.params.color : 0x2a2a2a);
+  mats.shoe.color.set(shoe ? shoe.params.color : defaults.shoe);
   mats.shoe.metalness = shoe && shoe.params.metal ? 0.7 : 0;
   mats.shoe.emissive.set(shoe && shoe.params.glow ? shoe.params.glow : 0x000000);
   mats.shoe.emissiveIntensity = shoe && shoe.params.glow ? 0.7 : 0;

@@ -526,6 +526,7 @@ function renderHouse() {
   houseTabsEl.innerHTML = "";
   houseGridEl.innerHTML = "";
   houseBarEl.innerHTML = "";
+  houseBarEl.className = "sh-bar";
   if (houseMode === "decor") renderHouseDecor();
   else if (houseMode === "style") renderHouseStyle();
   else renderHouseSize();
@@ -580,7 +581,8 @@ function renderHouseDecor() {
     cancel.addEventListener("click", () => { houseBuying = null; renderHouse(); });
     houseBarEl.append(txt, buy, cancel);
   } else {
-    houseBarEl.innerHTML = `<div class="sh-bar-txt">Toca un mueble para ponerlo, o <b>arrástralo</b> hasta el cuarto. Toca uno puesto para moverlo, girarlo o cambiarle el tamaño. ¡Agranda la casa para tener más espacio!</div>`;
+    houseBarEl.className = "sh-bar hint";
+    houseBarEl.innerHTML = `<div class="sh-bar-txt">Toca un mueble para ponerlo. Toca uno puesto para moverlo, girarlo o cambiarle el tamaño.</div>`;
   }
 }
 
@@ -854,6 +856,15 @@ pgOpenPackBtn.addEventListener("click", () => {
 });
 document.getElementById("pack-close").addEventListener("click", () => packOverlay.classList.add("hidden"));
 
+// En el celular las secciones secundarias empiezan plegadas (más espacio); en el computador, abiertas.
+function foldSecondary() {
+  const touch = window.matchMedia("(pointer: coarse)").matches;
+  document.querySelectorAll("details.how").forEach((d) => { d.open = !touch; });
+  const album = document.getElementById("pg-album-fold");
+  if (album) album.open = !touch;
+}
+foldSecondary();
+
 // ---------- LOGROS ----------
 
 const achievementListEl = document.getElementById("achievement-list");
@@ -864,6 +875,7 @@ document.getElementById("btn-open-achievements").addEventListener("click", () =>
 });
 document.getElementById("btn-achievements-back").addEventListener("click", () => showScreen(screenHub));
 
+let achOpen = null; // categorías de logros abiertas (null = decidir al abrir por primera vez)
 function renderAchievements() {
   achievementListEl.innerHTML = "";
   const isClaimed = (a) => progress.claimedAchievements.includes(a.id);
@@ -875,16 +887,33 @@ function renderAchievements() {
   sum.innerHTML = `<b>🏅 ${claimedN} / ${total}</b> logros reclamados` + (ready ? ` · <span class="ach-ready">🎁 ${ready} por reclamar</span>` : "");
   achievementListEl.appendChild(sum);
 
-  let lastCat = null;
+  // una lista desplegable por categoría (se abren las que tienen premios por reclamar)
+  const groups = new Map();
+  const groupFor = (catId) => {
+    if (groups.has(catId)) return groups.get(catId);
+    const cat = ACH_CATEGORIES.find((c) => c.id === catId);
+    const catChains = ACHIEVEMENT_CHAINS.filter((c) => c.cat === catId);
+    const catTiers = catChains.flatMap((c) => c.tiers);
+    const catReady = catTiers.filter((t) => !isClaimed(t) && t.isDone(progress)).length;
+    const catDone = catTiers.filter(isClaimed).length;
+    const det = document.createElement("details");
+    det.className = "ach-group";
+    if (achOpen === null) achOpen = new Set(ACH_CATEGORIES.filter((c) => ACHIEVEMENTS.some((t) => t.cat === c.id && !isClaimed(t) && t.isDone(progress))).map((c) => c.id));
+    det.open = achOpen.has(catId);
+    det.addEventListener("toggle", () => { if (det.open) achOpen.add(catId); else achOpen.delete(catId); });
+    const sm = document.createElement("summary");
+    sm.innerHTML = `<span>${cat.icon} ${cat.name}</span><span class="ach-count">${catDone}/${catTiers.length}</span>` + (catReady ? `<span class="ach-ready">🎁 ${catReady}</span>` : "");
+    det.appendChild(sm);
+    const body = document.createElement("div");
+    body.className = "ach-body";
+    det.appendChild(body);
+    achievementListEl.appendChild(det);
+    groups.set(catId, body);
+    return body;
+  };
+
   ACHIEVEMENT_CHAINS.forEach((chain) => {
-    if (chain.cat !== lastCat) {
-      lastCat = chain.cat;
-      const cat = ACH_CATEGORIES.find((c) => c.id === chain.cat);
-      const h = document.createElement("h3");
-      h.className = "ach-cat";
-      h.textContent = `${cat.icon} ${cat.name}`;
-      achievementListEl.appendChild(h);
-    }
+    const container = groupFor(chain.cat);
     // el escalón que toca: el primero sin reclamar (si ya están todos, el último)
     const idx = chain.tiers.findIndex((t) => !isClaimed(t));
     const complete = idx === -1;
@@ -939,7 +968,7 @@ function renderAchievements() {
       button.disabled = true;
     }
     card.append(icon, body, button);
-    achievementListEl.appendChild(card);
+    container.appendChild(card);
   });
 }
 
