@@ -25,5 +25,10 @@ const SIN_BLASTER = (src) => !/^(fps-.*\.js|fps3d\.jpg)$/.test(basename(src));
 for (const dir of ["js", "css", "assets", "vendor"]) {
   cpSync(dir, `${OUT}/${dir}`, { recursive: true, filter: variant === "app" ? SIN_BLASTER : undefined });
 }
+// En matichoc.cl el fondo usa el patrón "continuo" de la marca (el de la app es el sutil).
+if (variant === "web") {
+  const css = readFileSync(`${OUT}/css/style.css`, "utf8");
+  writeFileSync(`${OUT}/css/style.css`, css.replace("pattern-cacao-subtle.png", "pattern-cacao-continuo.png"));
+}
 writeFileSync(`${OUT}/.nojekyll`, "");
 console.log(`${OUT} lista`);

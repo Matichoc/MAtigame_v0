@@ -45,6 +45,7 @@ const SPRITES = ["alf-frambuesa", "alf-menta", "alf-naranja", "alf-trufa", "alf-
 export class ParkourGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 56 });
+    this.musicTheme = "adventure";
     this.q = els.q;
     this.keys = {};
     this.joy = { x: 0, y: 0 };
