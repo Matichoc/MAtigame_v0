@@ -402,14 +402,25 @@
           <p class="fps-tag">Ahora en 3D</p>
           <p>ESPACIO (o toca la pantalla) para fijar la barra de puntería, y de nuevo para
             fijar la de potencia. Encesta antes de que se acabe el tiempo —
-            cada 5° tiro es un aro dorado Chocolate Dubai, ¡vale Matipuntos extra! Tiras desde distintos lugares (más lejos, más puntos), los swish y el aro dorado te regalan segundos, y con 3 aciertos seguidos ¡te pones EN LLAMAS!</p>
+            cada 5° tiro es un aro dorado Chocolate Dubai, ¡vale Matipuntos extra! Tiras desde distintos lugares (más lejos, más puntos), los swish y el aro dorado te regalan segundos, y con 3 aciertos seguidos ¡te pones EN LLAMAS! En los 20 niveles hay que juntar una meta de puntos.</p>
+          <div id="basquet-lvlpick" class="lvl-pick"></div>
           <button class="btn-primary" id="basquet-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="basquet-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="basquet-win-title">¡Nivel completado!</h2>
+          <div id="basquet-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="basquet-win-text"></p>
+          <button class="btn-primary" id="basquet-btn-next">Siguiente nivel</button>
+          <button class="btn-secondary overlay-secondary-btn" id="basquet-btn-win-menu">Volver al menú</button>
         </div>
       </div>
 
       <div id="basquet-overlay-gameover" class="overlay hidden">
         <div class="overlay-card">
-          <h2>¡Se acabó el tiempo!</h2>
+          <h2 id="basquet-gameover-title">¡Se acabó el tiempo!</h2>
           <p id="basquet-gameover-text"></p>
           <button class="btn-primary" id="basquet-btn-retry">Reintentar</button>
           <button class="btn-secondary overlay-secondary-btn" id="basquet-btn-gameover-menu">Volver al menú</button>
@@ -453,14 +464,25 @@
           <p>Mueve la rebotadora con ← → (o arrastra el dedo / mouse) para que
             quede justo debajo de tu Matichica cada vez que cae. Rebotar
             centrado suma combo; recoge los pompones para puntos extra.
-            ¡Si cae fuera de la rebotadora, se acaba la partida!</p>
+            ¡Si cae fuera de la rebotadora, se acaba la partida! En los 20 niveles hay que dar cierta cantidad de rebotes.</p>
+          <div id="porristas-lvlpick" class="lvl-pick"></div>
           <button class="btn-primary" id="porristas-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="porristas-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="porristas-win-title">¡Nivel completado!</h2>
+          <div id="porristas-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="porristas-win-text"></p>
+          <button class="btn-primary" id="porristas-btn-next">Siguiente nivel</button>
+          <button class="btn-secondary overlay-secondary-btn" id="porristas-btn-win-menu">Volver al menú</button>
         </div>
       </div>
 
       <div id="porristas-overlay-gameover" class="overlay hidden">
         <div class="overlay-card">
-          <h2>¡Se cayó!</h2>
+          <h2 id="porristas-gameover-title">¡Se cayó!</h2>
           <p id="porristas-gameover-text"></p>
           <button class="btn-primary" id="porristas-btn-retry">Reintentar</button>
           <button class="btn-secondary overlay-secondary-btn" id="porristas-btn-gameover-menu">Volver al menú</button>
