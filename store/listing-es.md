@@ -9,7 +9,7 @@ Parkour, básquet, memoria y más: juegos 3D de Matichoc para niñas y niños
 ## Descripción completa (máx. 4000 caracteres)
 ¡Bienvenido al Matijuego, el arcade de Matichoc! 🍫
 
-Elige a tu Matichico, vístelo con atuendos que ganas con monedas del juego y juega 9 aventuras en 3D hechas con mucho cacao:
+Elige a tu Matichico, cámbiale peinado, ropa, sombreros y mucho más en la tienda con los Matipuntos que ganas jugando y juega 9 aventuras en 3D hechas con mucho cacao:
 
 🧗 PARKOUR CHOCO — Corre y salta por 6 etapas de plataformas que se mueven, se rompen o parpadean. Desbloquea una capa, gafas brillantes y una corona dorada mientras avanzas.
 
@@ -23,10 +23,10 @@ Elige a tu Matichico, vístelo con atuendos que ganas con monedas del juego y ju
 
 🦘 SALTO CHOCO · 🏎️ AUTOS DE CHOCOLATE · 🧠 MEMORIA MATICHOC — Más aventuras: sube sin parar, esquiva en la ruta y encuentra las parejas de golosinas.
 
-🍫 CREA TU CHOCOLATE — Elige el producto, el sabor, los toppings, el envoltorio y diseña tu propia etiqueta. ¡Cada día hay un reto con monedas!
+🍫 CREA TU CHOCOLATE — Elige el producto, el sabor, los toppings, el envoltorio y diseña tu propia etiqueta. ¡Cada día hay un reto con Matipuntos!
 
 Además:
-• Perfiles para cada niña o niño de la casa: cada uno guarda sus puntajes, monedas y logros.
+• Perfiles para cada niña o niño de la casa: cada uno guarda sus puntajes, Matipuntos y logros.
 • Tabla de mejores puntajes por juego y recompensa diaria.
 • Gratis, sin publicidad y sin compras dentro del juego.
 • Sin chat ni enlaces externos. No pide cuentas ni datos personales: todo se guarda en el celular.

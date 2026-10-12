@@ -910,7 +910,7 @@ export class FpsGame {
     addToLeaderboard(this.progress, GAME_ID, this.progress.playerName, this.score);
     this.els.gameoverText.textContent =
       `Llegaste a la oleada ${this.wave}, bañaste ${this.kills} malvaviscos (${this.heads} cabezazos) y sumaste ${this.score} puntos` +
-      (this.coinsEarned > 0 ? `, ganando ${this.coinsEarned} monedas Dubai.` : ".");
+      (this.coinsEarned > 0 ? `, ganando ${this.coinsEarned} Matipuntos.` : ".");
     this._showOverlay("gameover");
   }
 

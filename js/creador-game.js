@@ -128,11 +128,11 @@ export class CreadorGame extends Game3D {
 
   _ensureMascot() {
     if (this.mascot && this.mascotId === this.character.id) {
-      this.mascot.setOutfit(this.outfit);
+      this.mascot.setLook(this.look);
       return;
     }
     if (this.mascot) this.mascotRoot.remove(this.mascot.group);
-    this.mascot = createMatichico(this.character, this.outfit);
+    this.mascot = createMatichico(this.character, this.outfit, this.look);
     this.mascotId = this.character.id;
     this.mascot.group.scale.setScalar(1.1);
     this.mascot.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });

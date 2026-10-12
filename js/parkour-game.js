@@ -7,6 +7,7 @@
 import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeStars } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
+import { trailColors } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
 
 const GAME_ID = "parkour";
@@ -500,11 +501,11 @@ export class ParkourGame extends Game3D {
 
   _ensureHero() {
     if (this.hero && this.heroId === this.character.id) {
-      this.hero.setOutfit(this.outfit);
+      this.hero.setLook(this.look);
       return;
     }
     if (this.hero) this.scene.remove(this.hero.group);
-    this.hero = createMatichico(this.character, this.outfit);
+    this.hero = createMatichico(this.character, this.outfit, this.look);
     this.heroId = this.character.id;
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     this.hero.group.scale.setScalar(1.08);
@@ -554,12 +555,19 @@ export class ParkourGame extends Game3D {
     this._applyAccessories();
   }
 
+  /** Colores de la estela: la que compraste, o la del mundo en que vas. */
+  _trail() {
+    return this.look && this.look.trail ? trailColors(this.look) : STAGES[this.stageReached].trail;
+  }
+
   _applyAccessories() {
     const st = this.stageReached || 0;
     if (!this.cape) return;
-    this.cape.visible = st >= 1;
-    this.shades.visible = st >= 2;
-    this.crown.visible = st >= 4;
+    // los premios de etapa solo aparecen si el vestuario elegido no ocupa ese lugar
+    const L = this.look || {};
+    this.cape.visible = st >= 1 && !L.back;
+    this.shades.visible = st >= 2 && !L.glasses;
+    this.crown.visible = st >= 4 && !L.hat;
   }
 
   // ---------- partida ----------
@@ -698,7 +706,7 @@ export class ParkourGame extends Game3D {
       } else if (this.doubleAvail) {
         V.y = DOUBLE_V; this.doubleAvail = false; this.buffer = 0;
         audio.playJump();
-        this.particles.burst(new THREE.Vector3(P.x, P.y + 0.2, P.z), STAGES[this.stageReached].trail, 14, 3.4, 0.5, 2, 1);
+        this.particles.burst(new THREE.Vector3(P.x, P.y + 0.2, P.z), this._trail(), 14, 3.4, 0.5, 2, 1);
       }
     }
 
@@ -878,7 +886,7 @@ export class ParkourGame extends Game3D {
       this.heroModeT = 99;
       const mm = Math.floor(this.runTime / 60);
       const ss = String(Math.floor(this.runTime % 60)).padStart(2, "0");
-      this.finishText = `Llegaste a la cima en ${mm}:${ss}, con ${this.itemsGot} alfajores, ${this.goldGot} barras Matidubai y ${this.falls} caídas. ¡${this.score} puntos y ${this.coinsEarned} monedas Dubai!`;
+      this.finishText = `Llegaste a la cima en ${mm}:${ss}, con ${this.itemsGot} alfajores, ${this.goldGot} barras Matidubai y ${this.falls} caídas. ¡${this.score} puntos y ${this.coinsEarned} Matipuntos!`;
       this.finishTimer = 1.6;
     }
   }
@@ -1029,7 +1037,7 @@ export class ParkourGame extends Game3D {
       this.trailT -= dt;
       if (this.trailT <= 0 && sp > 2) {
         this.trailT = this.stageReached >= 4 ? 0.04 : 0.08;
-        this.particles.burst(new THREE.Vector3(this.pos.x, this.pos.y + 0.12, this.pos.z), STAGES[this.stageReached].trail, this.stageReached >= 4 ? 2 : 1, 0.8, 0.5, 1, 0.8);
+        this.particles.burst(new THREE.Vector3(this.pos.x, this.pos.y + 0.12, this.pos.z), this._trail(), this.stageReached >= 4 ? 2 : 1, 0.8, 0.5, 1, 0.8);
       }
     }
   }

@@ -1221,3 +1221,53 @@ html[data-app] .game-screen:not(.cr-screen) {
   padding-bottom: max(8px, env(safe-area-inset-bottom));
   padding-left: max(8px, env(safe-area-inset-left));
 }
+
+/* =====================================================================
+   VESTUARIO Y TIENDA: avatar grande, categorías, probar antes de comprar
+   ===================================================================== */
+#screen-shop { padding: 10px; align-items: stretch; }
+.shop2 { width: 100%; max-width: 1180px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.sh-top { display: flex; align-items: center; gap: 12px; background: linear-gradient(180deg, #4a2c24, #35201f); border: 3px solid var(--dorado); border-radius: 18px; padding: 8px 14px; }
+.sh-title { font-size: 1.6rem; flex: 1; text-align: center; }
+.sh-top .stat-chip small { font-weight: 600; opacity: 0.85; }
+.sh-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(280px, 400px) 1fr; gap: 12px; }
+.sh-preview, .sh-panel { min-width: 0; }
+.sh-preview { display: flex; flex-direction: column; gap: 8px; min-height: 0; background: linear-gradient(180deg, #4d2e26, #2e1a18); border: 3px solid var(--dorado); border-radius: 22px; padding: 12px; }
+.sh-stage { position: relative; flex: 1; min-height: 240px; border-radius: 16px; overflow: hidden; border: 2px solid rgba(255,200,0,0.45); background: radial-gradient(ellipse at 50% 38%, rgba(255,200,0,0.38), rgba(212,33,108,0.18) 45%, rgba(0,0,0,0) 70%), linear-gradient(180deg, #6b3a2c, #2b1812); }
+.sh-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
+.shop-character-name { text-align: center; font-family: var(--font-display); color: var(--dorado); font-size: 1.1rem; }
+.shop-character-switcher { display: flex; gap: 8px; justify-content: center; }
+.shop-switch-btn { background: rgba(255,255,255,0.08); border: 2px solid transparent; border-radius: 12px; padding: 2px; cursor: pointer; }
+.shop-switch-btn.active { border-color: var(--dorado); background: rgba(255,200,0,0.18); }
+.shop-switch-btn canvas { width: 54px; height: 54px; display: block; }
+.sh-panel { min-height: 0; display: flex; flex-direction: column; gap: 8px; background: linear-gradient(180deg, #4d2e26, #2e1a18); border: 3px solid var(--dorado); border-radius: 22px; padding: 10px; }
+.sh-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.sh-tab { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 70px; padding: 6px 8px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.07); color: var(--crema); font-family: inherit; cursor: pointer; }
+.sh-tab span { font-size: 1.35rem; line-height: 1.1; }
+.sh-tab b { font-size: 0.62rem; font-weight: 700; white-space: nowrap; }
+.sh-tab.active { background: var(--rosa); border-color: #ff8ab8; }
+.sh-grid { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; align-content: start; padding: 2px; }
+.sh-card { --rar: rgba(255,255,255,0.25); position: relative; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 6px 8px; border-radius: 14px; border: 2px solid var(--rar); background: rgba(255,255,255,0.07); color: var(--crema); font-family: inherit; cursor: pointer; transition: transform 0.1s ease; }
+.sh-card:hover { transform: translateY(-2px); background: rgba(255,255,255,0.12); }
+.sh-card .sh-ico { font-size: 2rem; line-height: 1; }
+.sh-card .sh-name { font-size: 0.72rem; font-weight: 700; text-align: center; line-height: 1.15; min-height: 2.3em; display: flex; align-items: center; }
+.sh-card .sh-price { font-size: 0.7rem; font-weight: 800; color: var(--dorado); }
+.sh-card.locked { opacity: 0.92; }
+.sh-card.equipped { background: rgba(207,215,103,0.22); border-color: var(--verde); }
+.sh-card.equipped .sh-price { color: var(--verde); }
+.sh-card.trying { background: rgba(255,200,0,0.2); border-color: var(--dorado); box-shadow: 0 0 14px rgba(255,200,0,0.45); }
+.sh-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; padding: 8px; border-radius: 14px; background: rgba(0,0,0,0.25); min-height: 52px; }
+.sh-bar-txt { font-size: 0.82rem; flex: 1 1 200px; text-align: left; }
+.sh-bar .btn-primary { padding: 8px 20px; font-size: 0.95rem; }
+.sh-bar .btn-secondary { padding: 6px 14px; font-size: 0.8rem; }
+@media (max-width: 760px) {
+  #screen-shop { overflow-y: auto; align-items: flex-start; }
+  .shop2 { height: auto; min-height: 100%; }
+  .sh-body { grid-template-columns: minmax(0, 1fr); flex: none; }
+  .sh-preview { position: sticky; top: 0; z-index: 5; padding: 8px; gap: 4px; }
+  .sh-stage { min-height: 0; flex: none; height: 210px; }
+  .shop-character-name { font-size: 0.95rem; }
+  .sh-grid { overflow: visible; max-height: none; }
+  .sh-title { font-size: 1.1rem; }
+  .sh-bar { position: sticky; bottom: 4px; background: rgba(40,22,10,0.96); border: 2px solid var(--dorado); }
+}

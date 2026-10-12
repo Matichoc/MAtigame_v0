@@ -173,11 +173,11 @@ export class RecolectaGame extends Game3D {
 
   _ensureHero() {
     if (this.hero && this.heroId === this.character.id) {
-      this.hero.setOutfit(this.outfit);
+      this.hero.setLook(this.look);
       return;
     }
     if (this.hero) this.scene.remove(this.hero.group);
-    this.hero = createMatichico(this.character, this.outfit);
+    this.hero = createMatichico(this.character, this.outfit, this.look);
     this.heroId = this.character.id;
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     this.hero.group.scale.setScalar(1.25);
@@ -784,7 +784,7 @@ export class RecolectaGame extends Game3D {
     const p = this.p;
     this.particles.burst(new THREE.Vector3(wx(p.x), 1.5, wz(p.y)), [0xd4216c, 0xffc800, 0xcfd767, 0xfff6e6], 50, 7, 1.4, 6);
     if (isLast) {
-      this.q("victory-text").textContent = `Completaste las ${LEVELS.length} canchas con ${this.score} puntos y ${this.progress.coins} monedas Dubai. ¡Toda La Liga te aplaude!`;
+      this.q("victory-text").textContent = `Completaste las ${LEVELS.length} canchas con ${this.score} puntos y ${this.progress.coins} Matipuntos. ¡Toda La Liga te aplaude!`;
       audio.playVictory();
       addToLeaderboard(this.progress, GAME_ID, this.progress.playerName, this.score);
       this.showOverlay("victory");

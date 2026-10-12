@@ -1,8 +1,9 @@
-import { CHARACTERS, OUTFITS, getOutfit, renderCharacterThumb } from "./characters.js";
+import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
+import { SLOTS, RARITIES, getItem, itemsOfSlot } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
-  loadProgress, saveProgress, ownsOutfit, equippedOutfitId, buyOutfit, equipOutfit,
+  loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem, equippedOutfitId,
   getBestScore, getLeaderboard, canClaimDailyReward, claimDailyReward, claimAchievement,
 } from "./storage.js";
 import {
@@ -56,6 +57,18 @@ function showToast(message) {
   toastTimer = setTimeout(() => toastEl.classList.add("hidden"), 2600);
 }
 
+/** Dibuja el retrato de un Matichico: primero el dibujo 2D (al instante) y luego el modelo 3D con todo lo que lleva puesto. */
+function paintAvatar(canvas, char, lookOverride = null, prog = progress) {
+  const look = lookOverride || getLook(prog, char.id);
+  renderCharacterThumb(canvas, char, getOutfit(look.outfit));
+  import("./thumb3d.js")
+    .then((m) => {
+      m.renderHeroThumb(canvas, char, look);
+      canvas.dispatchEvent(new Event("repainted"));
+    })
+    .catch(() => { /* sin WebGL: se queda el dibujo 2D */ });
+}
+
 function showScreen(target) {
   ALL_SCREENS.forEach((s) => s.classList.toggle("hidden", s !== target));
   syncLobby(target === screenHub);
@@ -73,8 +86,9 @@ async function syncLobby(visible) {
   }
   if (!selectedCharacter && !CHARACTERS.length) return;
   const char = selectedCharacter || CHARACTERS[0];
-  const outfit = getOutfit(equippedOutfitId(progress, char.id));
-  const key = `${char.id}|${outfit.id}`;
+  const look = getLook(progress, char.id);
+  const outfit = getOutfit(look.outfit);
+  const key = `${char.id}|${Object.values(look).join(",")}`;
   const nameEl = document.getElementById("lb-char-name");
   if (nameEl) nameEl.textContent = selectedCharacter ? char.name : "Elige tu Matichico";
   const fb = document.getElementById("lobby-fallback");
@@ -83,7 +97,7 @@ async function syncLobby(visible) {
     lobbyFailed = true;
     cv.classList.add("hidden");
     fb.classList.remove("hidden");
-    renderCharacterThumb(fb, char, outfit);
+    paintAvatar(fb, char, look);
   };
   try {
     if (lobbyFailed) { useFallback(); return; }
@@ -92,7 +106,7 @@ async function syncLobby(visible) {
       lobby = new Lobby3D(cv);
       lobby.init();
     }
-    if (lobby.key !== key) lobby.setHero(char, outfit, key);
+    if (lobby.key !== key) lobby.setHero(char, look, key);
     if (!screenHub.classList.contains("hidden")) lobby.setActive(true);
   } catch (err) {
     console.warn("Escenario 3D del menú no disponible:", err);
@@ -132,7 +146,7 @@ function renderProfileScreen() {
       const canvas = document.createElement("canvas");
       canvas.width = 128;
       canvas.height = 128;
-      renderCharacterThumb(canvas, char, getOutfit("liga"));
+      paintAvatar(canvas, char, null, loadProgress(p.id));
       card.appendChild(canvas);
     } else {
       const placeholder = document.createElement("div");
@@ -217,7 +231,8 @@ function updateProfileChip() {
     const c = document.createElement("canvas");
     c.width = 80;
     c.height = 80;
-    renderCharacterThumb(c, selectedCharacter, getOutfit(equippedOutfitId(progress, selectedCharacter.id)));
+    c.addEventListener("repainted", () => (avatarImg.src = c.toDataURL()));
+    paintAvatar(c, selectedCharacter);
     avatarImg.src = c.toDataURL();
   }
 }
@@ -249,7 +264,7 @@ btnDailyReward.addEventListener("click", () => {
   audio.playPurchase();
   refreshHubStats();
   updateDailyRewardButton();
-  showToast(`¡+${result.reward} monedas! Racha de ${result.streak} día${result.streak === 1 ? "" : "s"} 🔥`);
+  showToast(`¡+${result.reward} Matipuntos! Racha de ${result.streak} día${result.streak === 1 ? "" : "s"} 🔥`);
 });
 
 // ---------- LOGROS ----------
@@ -297,7 +312,7 @@ function renderAchievements() {
           audio.playPurchase();
           refreshHubStats();
           renderAchievements();
-          showToast(`¡Logro cumplido! +${a.reward} monedas 🎉`);
+          showToast(`¡Logro cumplido! +${a.reward} Matipuntos 🎉`);
         }
       });
     } else {
@@ -322,7 +337,7 @@ function characterCard(char) {
   const canvas = document.createElement("canvas");
   canvas.width = 192;
   canvas.height = 192;
-  renderCharacterThumb(canvas, char, getOutfit(equippedOutfitId(progress, char.id)));
+  paintAvatar(canvas, char);
 
   const label = document.createElement("span");
   label.className = "cname";
@@ -469,108 +484,170 @@ function goToHub() {
   showScreen(screenHub);
 }
 
-// ---------- TIENDA ----------
+// ---------- TIENDA / VESTUARIO ----------
+// Se elige un objeto para probárselo en el avatar grande; si ya es tuyo se pone de una,
+// si no, se puede comprar con Matipuntos. Todo se paga con los puntos que se ganan jugando.
 
 const btnOpenShop = document.getElementById("btn-open-shop");
 const btnShopBack = document.getElementById("btn-shop-back");
 const shopCoinsEl = document.getElementById("shop-coins");
 const shopCharacterSwitcher = document.getElementById("shop-character-switcher");
 const shopCharacterNameEl = document.getElementById("shop-character-name");
-const outfitGrid = document.getElementById("outfit-grid");
+const shopTabsEl = document.getElementById("shop-tabs");
+const shopGridEl = document.getElementById("shop-grid");
+const shopBarEl = document.getElementById("shop-bar");
+
+let shopSlot = SLOTS[0].id;
+let shopTrial = {}; // objetos que se están probando y todavía no son tuyos: { [slot]: itemId }
+let shopLobby = null;
 
 btnOpenShop.addEventListener("click", () => {
+  shopTrial = {};
   showScreen(screenShop);
-  renderShopSwitcher();
   renderShop();
+  openShopPreview();
 });
 
-btnShopBack.addEventListener("click", () => showScreen(screenHub));
+btnShopBack.addEventListener("click", () => {
+  shopTrial = {};
+  if (shopLobby) shopLobby.setActive(false);
+  refreshHubStats();
+  renderCharacterGrid();
+  showScreen(screenHub);
+});
 
-function renderShopSwitcher() {
-  shopCharacterSwitcher.innerHTML = "";
-  CHARACTERS.forEach((char) => {
-    const btn = document.createElement("button");
-    btn.className = "shop-switch-btn" + (char.id === shopCharacterId ? " active" : "");
-    const canvas = document.createElement("canvas");
-    canvas.width = 96;
-    canvas.height = 96;
-    renderCharacterThumb(canvas, char, getOutfit(equippedOutfitId(progress, char.id)));
-    btn.appendChild(canvas);
-    btn.addEventListener("click", () => {
-      shopCharacterId = char.id;
-      renderShopSwitcher();
-      renderShop();
-    });
-    shopCharacterSwitcher.appendChild(btn);
-  });
+function shopChar() {
+  return CHARACTERS.find((c) => c.id === shopCharacterId) || CHARACTERS[0];
+}
+
+function shopLook() {
+  return { ...getLook(progress, shopChar().id), ...shopTrial };
+}
+
+async function openShopPreview() {
+  try {
+    if (!shopLobby) {
+      const { Lobby3D } = await import("./lobby3d.js");
+      shopLobby = new Lobby3D(document.getElementById("shop-canvas"));
+      shopLobby.init();
+    }
+    refreshShopPreview(true);
+    shopLobby.setActive(true);
+  } catch (err) {
+    console.warn("Vista previa 3D no disponible:", err);
+  }
+}
+
+function refreshShopPreview(force = false) {
+  if (!shopLobby || !shopLobby.ready) return;
+  const look = shopLook();
+  const key = `${shopChar().id}|${Object.values(look).join(",")}`;
+  if (force || shopLobby.key !== key) shopLobby.setHero(shopChar(), look, key);
+  shopLobby.setView(shopSlot === "back" ? Math.PI : 0);
 }
 
 function renderShop() {
-  const shopCharacter = CHARACTERS.find((c) => c.id === shopCharacterId);
+  const ch = shopChar();
   shopCoinsEl.textContent = String(progress.coins);
-  shopCharacterNameEl.textContent = `Atuendos de ${shopCharacter.name}`;
-  outfitGrid.innerHTML = "";
+  shopCharacterNameEl.textContent = ch.name;
 
-  OUTFITS.forEach((outfit) => {
-    const owned = ownsOutfit(progress, shopCharacter.id, outfit.id);
-    const equipped = equippedOutfitId(progress, shopCharacter.id) === outfit.id;
-    const affordable = progress.coins >= outfit.price;
-
-    const card = document.createElement("div");
-    card.className = "outfit-card" + (equipped ? " equipped" : "") + (!owned && !affordable ? " locked" : "");
-
-    if (equipped) {
-      const ribbon = document.createElement("span");
-      ribbon.className = "oribbon";
-      ribbon.textContent = "EQUIPADO";
-      card.appendChild(ribbon);
-    }
-
+  shopCharacterSwitcher.innerHTML = "";
+  CHARACTERS.forEach((c) => {
+    const btn = document.createElement("button");
+    btn.className = "shop-switch-btn" + (c.id === shopCharacterId ? " active" : "");
+    btn.title = c.name;
     const canvas = document.createElement("canvas");
-    canvas.width = 192;
-    canvas.height = 192;
-    renderCharacterThumb(canvas, shopCharacter, outfit);
-
-    const name = document.createElement("span");
-    name.className = "oname";
-    name.textContent = outfit.name;
-
-    const price = document.createElement("span");
-    price.className = "oprice" + (owned ? " owned" : "");
-    price.textContent = owned ? (equipped ? "Equipado" : "Adquirido") : `🍫✨ ${outfit.price}`;
-
-    const button = document.createElement("button");
-    if (equipped) {
-      button.textContent = "Equipado";
-      button.disabled = true;
-    } else if (owned) {
-      button.textContent = "Equipar";
-      button.classList.add("equip-btn");
-      button.addEventListener("click", () => {
-        equipOutfit(progress, shopCharacter.id, outfit.id);
-        renderShopSwitcher();
-        renderShop();
-      });
-    } else {
-      button.textContent = affordable ? "Comprar" : "🔒 Bloqueado";
-      button.disabled = !affordable;
-      button.addEventListener("click", () => {
-        if (buyOutfit(progress, shopCharacter.id, outfit)) {
-          audio.playPurchase();
-          renderShopSwitcher();
-          renderShop();
-          refreshHubStats();
-          showToast(`¡Compraste ${outfit.name}!`);
-        }
-      });
-    }
-
-    card.appendChild(canvas);
-    card.appendChild(name);
-    card.appendChild(price);
-    card.appendChild(button);
-    outfitGrid.appendChild(card);
+    canvas.width = 96;
+    canvas.height = 96;
+    paintAvatar(canvas, c);
+    btn.appendChild(canvas);
+    btn.addEventListener("click", () => {
+      shopCharacterId = c.id;
+      shopTrial = {};
+      renderShop();
+      refreshShopPreview(true);
+    });
+    shopCharacterSwitcher.appendChild(btn);
   });
+
+  shopTabsEl.innerHTML = "";
+  SLOTS.forEach((s) => {
+    const btn = document.createElement("button");
+    btn.className = "sh-tab" + (s.id === shopSlot ? " active" : "");
+    btn.innerHTML = `<span>${s.icon}</span><b>${s.name}</b>`;
+    btn.addEventListener("click", () => {
+      shopSlot = s.id;
+      renderShop();
+      refreshShopPreview();
+    });
+    shopTabsEl.appendChild(btn);
+  });
+
+  const look = getLook(progress, ch.id);
+  const items = itemsOfSlot(shopSlot);
+  shopGridEl.innerHTML = "";
+  const addCard = (item) => {
+    const id = item ? item.id : "";
+    const owned = ownsItem(progress, id);
+    const equipped = (look[shopSlot] || "") === id && !shopTrial[shopSlot];
+    const trying = shopTrial[shopSlot] === id && id !== "";
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "sh-card" + (equipped ? " equipped" : "") + (trying ? " trying" : "") + (!owned ? " locked" : "");
+    if (item) card.style.setProperty("--rar", RARITIES[item.rarity].color);
+    card.innerHTML = `<span class="sh-ico">${item ? item.icon : "🚫"}</span><span class="sh-name">${item ? item.name : "Normal"}</span>` +
+      `<span class="sh-price">${equipped ? "✓ Puesto" : owned ? (item && item.price ? "Tuyo" : "Gratis") : `🍫✨ ${item.price}`}</span>`;
+    card.addEventListener("click", () => {
+      if (owned) {
+        equipItem(progress, ch.id, shopSlot, id);
+        delete shopTrial[shopSlot];
+        audio.playJump();
+      } else {
+        shopTrial[shopSlot] = id;
+      }
+      renderShop();
+      refreshShopPreview();
+    });
+    shopGridEl.appendChild(card);
+  };
+  if (shopSlot !== "outfit") addCard(null);
+  items.forEach(addCard);
+
+  // barra inferior: comprar lo que se está probando
+  shopBarEl.innerHTML = "";
+  const tid = shopTrial[shopSlot];
+  const titem = tid ? getItem(tid) : null;
+  if (titem) {
+    const need = titem.price - progress.coins;
+    const txt = document.createElement("div");
+    txt.className = "sh-bar-txt";
+    txt.innerHTML = `<b>${titem.icon} ${titem.name}</b> <i style="color:${RARITIES[titem.rarity].color}">${RARITIES[titem.rarity].name}</i>`;
+    const buy = document.createElement("button");
+    buy.className = "btn-primary";
+    buy.textContent = need > 0 ? `Te faltan ${need} Matipuntos` : `Comprar · 🍫✨ ${titem.price}`;
+    buy.disabled = need > 0;
+    buy.addEventListener("click", () => {
+      if (!buyItem(progress, titem.id)) return;
+      equipItem(progress, ch.id, shopSlot, titem.id);
+      delete shopTrial[shopSlot];
+      audio.playPurchase();
+      showToast(`¡Compraste ${titem.name}! 🎉`);
+      renderShop();
+      refreshShopPreview();
+      refreshHubStats();
+    });
+    const cancel = document.createElement("button");
+    cancel.className = "btn-secondary";
+    cancel.textContent = "Quitar";
+    cancel.addEventListener("click", () => {
+      delete shopTrial[shopSlot];
+      renderShop();
+      refreshShopPreview();
+    });
+    shopBarEl.append(txt, buy, cancel);
+  } else {
+    shopBarEl.innerHTML = `<div class="sh-bar-txt">Toca un objeto para probártelo. Si es tuyo, te lo pones al tiro; si no, lo compras con Matipuntos. ¡Gana más jugando!</div>`;
+  }
 }
 
 // ---------- TABLA DE PUNTAJES ----------
@@ -635,7 +712,8 @@ function updateHudAvatar(imgId, character) {
   const avatarCanvas = document.createElement("canvas");
   avatarCanvas.width = 80;
   avatarCanvas.height = 80;
-  renderCharacterThumb(avatarCanvas, character, getOutfit(equippedOutfitId(progress, character.id)));
+  avatarCanvas.addEventListener("repainted", () => (hudAvatar.src = avatarCanvas.toDataURL()));
+  paintAvatar(avatarCanvas, character);
   hudAvatar.src = avatarCanvas.toDataURL();
 }
 

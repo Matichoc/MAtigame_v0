@@ -5,7 +5,15 @@
 
 import * as THREE from "../vendor/three.module.min.js";
 import { getOutfit } from "./characters.js";
-import { addToLeaderboard, equippedOutfitId, reportScore } from "./storage.js";
+import { addToLeaderboard, earnCoins, equippedOutfitId, getLook, reportScore, saveProgress } from "./storage.js";
+
+// Puntaje que equivale a 1 Matipunto al terminar una partida (cada juego puntúa distinto).
+const RUN_DIVISOR = { tetris: 40, basquet_tiros: 12, porristas: 8, salto: 25, autos: 30, memoria: 10, parkour: 40 };
+const RUN_BONUS_CAP = 60;
+function runBonus(gameId, score) {
+  if (!(score > 0)) return 0;
+  return Math.max(1, Math.min(RUN_BONUS_CAP, Math.floor(score / (RUN_DIVISOR[gameId] || 20))));
+}
 import * as audio from "./audio.js";
 
 export { THREE };
@@ -263,6 +271,11 @@ export class Game3D {
     return getOutfit(equippedOutfitId(this.progress, this.character.id));
   }
 
+  /** Todo lo que lleva puesto el Matichico (peinado, sombrero, ropa...; ver js/wardrobe-data.js). */
+  get look() {
+    return getLook(this.progress, this.character.id);
+  }
+
   async init() {
     if (this.ready) return;
     const { canvas, wrap } = this.els;
@@ -375,6 +388,13 @@ export class Game3D {
     this.state = "gameover";
     reportScore(this.progress, this.gameId, this.score);
     addToLeaderboard(this.progress, this.gameId, this.progress.playerName, this.score);
+    // Matipuntos por terminar la partida, según el puntaje (cada juego puntúa distinto)
+    const bonus = runBonus(this.gameId, this.score);
+    if (bonus > 0) {
+      earnCoins(this.progress, bonus);
+      saveProgress(this.progress);
+      text += ` Por jugar ganas +${bonus} Matipuntos 🍫✨.`;
+    }
     if (this.els.gameoverText) this.els.gameoverText.textContent = text;
     this.showOverlay("gameover");
   }

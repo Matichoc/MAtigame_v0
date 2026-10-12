@@ -44,7 +44,7 @@ const ALL_ACHIEVEMENTS = [
     name: "Ahorrista de Cacao",
     icon: "💰",
     reward: 30,
-    desc: "Gana 200 monedas Chocolate Dubai en total.",
+    desc: "Gana 200 Matipuntos en total.",
     isDone: (p) => (p.stats.totalCoinsEarned || 0) >= 200,
   },
   {
