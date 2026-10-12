@@ -11,7 +11,7 @@ import { createMatichico } from "./matichico3d.js";
 import { SHAPES, PIECE_STYLE, createBag, spawnPiece, pieceCells } from "./tetris-pieces.js";
 import { saveProgress, earnCoins } from "./storage.js";
 import * as audio from "./audio.js";
-import { campaign, campaignMode, campaignLevel, renderModePicker, LEVELS_PER_GAME } from "./campaign.js";
+import { campaignWin, campaign, campaignMode, campaignLevel, renderModePicker, LEVELS_PER_GAME } from "./campaign.js";
 
 const COLS = 8;
 const ROWS = 14;
@@ -471,6 +471,7 @@ export class Tetris3DGame extends Game3D {
     const stars = this.pieces <= needed * 1.35 ? 3 : this.pieces <= needed * 1.8 ? 2 : 1;
     this._setHero("cheer", 99);
     if (this.level >= LEVELS_PER_GAME) {
+      campaignWin(this.progress, "tetris", this.level, stars);
       const t = this.els.q("gameover-title");
       if (t) t.textContent = `¡Completaste los ${LEVELS_PER_GAME} niveles! 🏆`;
       audio.playVictory();

@@ -203,6 +203,7 @@ export function claimDailyReward(progress) {
   if (!canClaimDailyReward(progress)) return null;
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
   progress.dailyStreak = progress.lastDailyRewardDate === yesterday ? progress.dailyStreak + 1 : 1;
+  progress.stats.bestStreak = Math.max(progress.stats.bestStreak || 0, progress.dailyStreak); // para los logros de constancia
   const reward = Math.min(10 + (progress.dailyStreak - 1) * 5, 50);
   earnCoins(progress, reward);
   progress.lastDailyRewardDate = todayKey();

@@ -390,6 +390,7 @@ export class Game3D {
       this._missionWon = true;
       const n = this.mission.n;
       if (n >= LEVELS_PER_GAME) {
+        campaignWin(this.progress, this.missionId || this.gameId, n, 3);
         const t = this.els.q("gameover-title");
         if (t) t.textContent = `¡Completaste las ${LEVELS_PER_GAME} misiones! 🏆`;
         audio.playVictory();
@@ -498,6 +499,15 @@ export class Game3D {
     this._adaptQuality(dt);
     this.update(dt);
     this._missionTick(dt);
+    if (this.state === "playing" && this.progress) {
+      // tiempo jugado (para los logros de constancia); se guarda cada ~10 s
+      this._playAcc = (this._playAcc || 0) + dt;
+      if (this._playAcc >= 10) {
+        this.progress.stats.playSecs = (this.progress.stats.playSecs || 0) + this._playAcc;
+        this._playAcc = 0;
+        saveProgress(this.progress);
+      }
+    }
     this.particles.update(dt);
     this.popups.update(dt);
     if (this.composer) this.composer.render(dt);
