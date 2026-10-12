@@ -962,6 +962,7 @@ export class TownGame extends Game3D {
       const at = new THREE.Vector3(it.x, 1.6, it.z);
       if (daily.collected < COLLECT_CAP) {
         daily.collected++;
+        this.progress.stats.townItems = (this.progress.stats.townItems || 0) + 1;
         earnCoins(this.progress, 1);
         saveProgress(this.progress);
         audio.playCollect();
@@ -1023,6 +1024,7 @@ export class TownGame extends Game3D {
     n.speaking = 2.5;
     if (!daily.talked.includes(n.def.name)) {
       daily.talked.push(n.def.name);
+      this.progress.stats.townTalks = (this.progress.stats.townTalks || 0) + 1;
       earnCoins(this.progress, NPC_GIFT);
       saveProgress(this.progress);
       text += `  (¡Regalo por saludarme hoy: +${NPC_GIFT} 🍫✨!)`;

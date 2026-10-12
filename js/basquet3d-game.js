@@ -11,7 +11,7 @@ import { THREE, Game3D, clamp, lerp, rand, canvasTexture, roundedBox, makeBuntin
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress, earnCoins } from "./storage.js";
 import * as audio from "./audio.js";
-import { campaign, campaignMode, campaignLevel, renderModePicker, LEVELS_PER_GAME } from "./campaign.js";
+import { campaignWin, campaign, campaignMode, campaignLevel, renderModePicker, LEVELS_PER_GAME } from "./campaign.js";
 
 const GAME_ID = "basquet_tiros";
 const TIME_LIMIT = 60;
@@ -786,6 +786,7 @@ export class Basquet3DGame extends Game3D {
       if (ratio >= 1) {
         const stars = ratio >= 1.7 ? 3 : ratio >= 1.3 ? 2 : 1;
         if (this.level >= LEVELS_PER_GAME) {
+          campaignWin(this.progress, "basquet_tiros", this.level, stars);
           const t = this.els.q("gameover-title");
           if (t) t.textContent = `¡Completaste los ${LEVELS_PER_GAME} niveles! 🏆`;
           audio.playVictory();

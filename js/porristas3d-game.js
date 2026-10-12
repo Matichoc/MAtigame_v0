@@ -7,7 +7,7 @@ import { THREE, Game3D, clamp, lerp, rand, canvasTexture, roundedBox, makeBuntin
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress, earnCoins } from "./storage.js";
 import * as audio from "./audio.js";
-import { campaign, campaignMode, campaignLevel, renderModePicker, LEVELS_PER_GAME } from "./campaign.js";
+import { campaignWin, campaign, campaignMode, campaignLevel, renderModePicker, LEVELS_PER_GAME } from "./campaign.js";
 
 const GAME_ID = "porristas";
 const PX_W = 800;
@@ -476,6 +476,7 @@ export class Porristas3DGame extends Game3D {
     const stars = ratio >= 0.8 ? 3 : ratio >= 0.55 ? 2 : 1;
     this.cheer = 1;
     if (this.level >= LEVELS_PER_GAME) {
+      campaignWin(this.progress, GAME_ID, this.level, stars);
       const t = this.els.q("gameover-title");
       if (t) t.textContent = `¡Completaste los ${LEVELS_PER_GAME} niveles! 🏆`;
       audio.playVictory();

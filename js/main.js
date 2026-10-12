@@ -11,7 +11,7 @@ import {
   listProfiles, createProfile, deleteProfile, updateProfileMeta,
   getLastActiveProfileId, setLastActiveProfileId, MAX_PROFILES,
 } from "./profiles.js";
-import { ACHIEVEMENTS } from "./achievements.js";
+import { ACHIEVEMENTS, ACHIEVEMENT_CHAINS, CATEGORIES as ACH_CATEGORIES, achievementProgress } from "./achievements.js";
 import { activeEvent, eventById, eventEnd, nextEvent, eventTokens, eventItemAvailable, buyEventItem } from "./events.js";
 import {
   HOUSE_SPOTS, houseItemsOfSpot, getHouseItem, ownsHouseItem, buyHouseItem, placeHouseItem, placedWithDefaults,
@@ -866,30 +866,62 @@ document.getElementById("btn-achievements-back").addEventListener("click", () =>
 
 function renderAchievements() {
   achievementListEl.innerHTML = "";
-  ACHIEVEMENTS.forEach((a) => {
+  const isClaimed = (a) => progress.claimedAchievements.includes(a.id);
+  const total = ACHIEVEMENTS.length;
+  const claimedN = ACHIEVEMENTS.filter(isClaimed).length;
+  const ready = ACHIEVEMENTS.filter((a) => !isClaimed(a) && a.isDone(progress)).length;
+  const sum = document.createElement("div");
+  sum.className = "ach-summary";
+  sum.innerHTML = `<b>🏅 ${claimedN} / ${total}</b> logros reclamados` + (ready ? ` · <span class="ach-ready">🎁 ${ready} por reclamar</span>` : "");
+  achievementListEl.appendChild(sum);
+
+  let lastCat = null;
+  ACHIEVEMENT_CHAINS.forEach((chain) => {
+    if (chain.cat !== lastCat) {
+      lastCat = chain.cat;
+      const cat = ACH_CATEGORIES.find((c) => c.id === chain.cat);
+      const h = document.createElement("h3");
+      h.className = "ach-cat";
+      h.textContent = `${cat.icon} ${cat.name}`;
+      achievementListEl.appendChild(h);
+    }
+    // el escalón que toca: el primero sin reclamar (si ya están todos, el último)
+    const idx = chain.tiers.findIndex((t) => !isClaimed(t));
+    const complete = idx === -1;
+    const a = chain.tiers[complete ? chain.tiers.length - 1 : idx];
     const done = a.isDone(progress);
-    const claimed = progress.claimedAchievements.includes(a.id);
+    const claimed = isClaimed(a);
+    const pr = achievementProgress(a, progress);
 
     const card = document.createElement("div");
-    card.className = "achievement-card" + (done ? " done" : "");
-
+    card.className = "achievement-card" + (done ? " done" : "") + (complete ? " complete" : "");
     const icon = document.createElement("span");
     icon.className = "aicon";
     icon.textContent = a.icon;
-
     const body = document.createElement("div");
     body.className = "abody";
     const name = document.createElement("span");
     name.className = "aname";
-    name.textContent = a.name;
+    name.textContent = chain.tiers.length > 1 ? a.name : chain.name;
     const desc = document.createElement("div");
     desc.className = "adesc";
-    desc.textContent = `${a.desc} (+${a.reward} 🍫✨)`;
-    body.appendChild(name);
-    body.appendChild(desc);
+    desc.textContent = complete ? `¡Cadena completa! ${a.desc}` : `${a.desc} (+${a.reward} 🍫✨)`;
+    body.append(name, desc);
+    if (!complete) {
+      const bar = document.createElement("div");
+      bar.className = "abar";
+      bar.innerHTML = `<i style="width:${Math.round((pr.cur / pr.max) * 100)}%"></i><span>${Math.floor(pr.cur).toLocaleString("es-CL")} / ${pr.max.toLocaleString("es-CL")}</span>`;
+      body.appendChild(bar);
+    }
+    if (chain.tiers.length > 1) {
+      const dots = document.createElement("div");
+      dots.className = "adots";
+      dots.textContent = chain.tiers.map((t) => (isClaimed(t) ? "●" : "○")).join(" ");
+      body.appendChild(dots);
+    }
 
     const button = document.createElement("button");
-    if (claimed) {
+    if (complete || claimed) {
       button.textContent = "Reclamado ✓";
       button.disabled = true;
     } else if (done) {
@@ -906,10 +938,7 @@ function renderAchievements() {
       button.textContent = "Bloqueado";
       button.disabled = true;
     }
-
-    card.appendChild(icon);
-    card.appendChild(body);
-    card.appendChild(button);
+    card.append(icon, body, button);
     achievementListEl.appendChild(card);
   });
 }
