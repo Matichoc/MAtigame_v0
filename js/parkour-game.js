@@ -7,6 +7,7 @@
 import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeStars } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
+import { bindStick } from "./stick.js";
 import { trailColors } from "./wardrobe-data.js";
 import { installInfinite, MAX_LIVES, POWERS, ZONE_LEN } from "./parkour-infinite.js";
 import * as audio from "./audio.js";
@@ -1302,27 +1303,7 @@ export class ParkourGame extends Game3D {
 
     // joystick y botón de salto táctiles
     const joy = document.getElementById("parkour-joy");
-    const knob = document.getElementById("parkour-knob");
-    if (joy) {
-      let id = null;
-      const upd = (e) => {
-        const r = joy.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        let dx = (e.clientX - cx) / (r.width / 2);
-        let dy = (e.clientY - cy) / (r.height / 2);
-        const m = Math.hypot(dx, dy);
-        if (m > 1) { dx /= m; dy /= m; }
-        this.joy.x = Math.abs(dx) < 0.15 ? 0 : dx;
-        this.joy.y = Math.abs(dy) < 0.15 ? 0 : -dy;
-        knob.style.transform = `translate(${dx * 34}px, ${dy * 34}px)`;
-      };
-      joy.addEventListener("pointerdown", (e) => { e.preventDefault(); id = e.pointerId; joy.setPointerCapture(id); upd(e); });
-      joy.addEventListener("pointermove", (e) => { if (e.pointerId === id) upd(e); });
-      const release = (e) => { if (e.pointerId !== id) return; id = null; this.joy.x = 0; this.joy.y = 0; knob.style.transform = ""; };
-      joy.addEventListener("pointerup", release);
-      joy.addEventListener("pointercancel", release);
-    }
+    if (joy) bindStick(joy, (x, y) => { this.joy.x = x; this.joy.y = y; });
     document.getElementById("parkour-btn-campaign")?.addEventListener("click", () => this.startMode("campaign"));
     document.getElementById("parkour-btn-infinite")?.addEventListener("click", () => { campaign(this.progress, "parkour").mode = "inf"; this.startMode("inf"); });
     document.getElementById("parkour-btn-missions")?.addEventListener("click", () => {

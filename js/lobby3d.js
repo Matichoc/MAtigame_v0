@@ -2,7 +2,7 @@
 // girando alrededor y chispas. Se puede arrastrar para girarlo y tocar para que salude.
 // Es liviano (sin sombras pesadas ni efectos) y solo dibuja cuando el menú está visible.
 
-import { THREE, loadTexture } from "./three-kit.js";
+import { THREE, loadTexture, createRenderer, glAcquire } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { getOutfit } from "./wardrobe-data.js";
 
@@ -24,7 +24,7 @@ export class Lobby3D {
   init() {
     const canvas = this.canvas;
     const coarse = window.matchMedia("(pointer: coarse)").matches;
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: !coarse, alpha: true, powerPreference: "default" });
+    this.renderer = createRenderer({ canvas, antialias: !coarse, alpha: true, powerPreference: "default" });
     this.renderer.setClearColor(0x000000, 0);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.5 : 2));
     this.renderer.shadowMap.enabled = true;
@@ -153,6 +153,7 @@ export class Lobby3D {
   setActive(on) {
     if (!this.ready) return;
     if (on && !this.active) {
+      glAcquire(this.renderer);
       this.active = true;
       this._last = null;
       requestAnimationFrame(this._loop);
