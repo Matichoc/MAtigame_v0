@@ -330,8 +330,9 @@ const btnDailyReward = document.getElementById("btn-daily-reward");
 function updateDailyRewardButton() {
   const can = canClaimDailyReward(progress);
   btnDailyReward.disabled = !can;
+  btnDailyReward.classList.toggle("daily-ready", can); // sin cobrar: dorado, brillando y con puntito rojo
   btnDailyReward.textContent = can
-    ? "🎁 Recompensa diaria"
+    ? "🎁 ¡Cobra tu recompensa!"
     : `🎁 Reclamado (racha ${progress.dailyStreak} día${progress.dailyStreak === 1 ? "" : "s"})`;
 }
 

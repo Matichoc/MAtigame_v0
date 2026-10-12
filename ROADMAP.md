@@ -496,6 +496,11 @@ recupera solo al volver a esa pantalla (`createRenderer` / `glAcquire`).
 También: **joystick flotante** (`js/stick.js`) en Recolecta, Parkour y Pueblo: aparece donde pones el dedo en la mitad izquierda
 de la pantalla; el botón «🕹️ Joystick» del menú lo cambia a fijo en la esquina.
 
+Corrección posterior: con el joystick flotante, el botón **Saltar** se corría a la izquierda mientras se movía el joystick (el círculo salía del
+flujo de la pantalla), así que no se podía avanzar y saltar a la vez. Ahora el joystick se mueve con `transform` y los botones no se mueven;
+probado con dos dedos en Parkour y Recolecta (moverse + saltar + impulso). En teclado, el salto también va con **K** o **J** (algunos
+teclados no dejan apretar flechas + Espacio al mismo tiempo).
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista

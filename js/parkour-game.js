@@ -1275,7 +1275,7 @@ export class ParkourGame extends Game3D {
     const map = { ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right", ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down" };
     window.addEventListener("keydown", (e) => {
       if (!this.running) return;
-      if (e.code === "Space" || e.key === " ") {
+      if (e.code === "Space" || e.key === " " || e.code === "KeyK" || e.code === "KeyJ") { // K o J por si el teclado no deja apretar tantas teclas con Espacio
         if (this.state === "playing") { e.preventDefault(); if (!e.repeat) this.buffer = BUFFER; }
         return;
       }
