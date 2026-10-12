@@ -304,6 +304,7 @@
         <div class="hud-chip">⭐ <span id="tetris-hud-score">0</span></div>
         <div class="hud-chip">📏 <span id="tetris-hud-lines">0</span></div>
         <div class="hud-chip">🔥 Nvl <span id="tetris-hud-level">1</span></div>
+        <div class="hud-chip">⚡ <span id="tetris-hud-combo">x1</span></div>
         <div class="hud-chip">🍫✨ <span id="tetris-hud-coins">0</span></div>
         <button id="tetris-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
       </div>
@@ -321,7 +322,7 @@
           <p>Encaja las golosinas cayendo y completa líneas. ← → para mover,
             ↑ para rotar, ↓ para bajar rápido y ESPACIO para caída instantánea.
             En el celular: arrastra para mover, toca para girar y desliza hacia abajo para caer.
-            Las piezas doradas son Chocolate Dubai: ¡dan Matipuntos extra!</p>
+            Las piezas doradas son Chocolate Dubai: ¡dan Matipuntos extra! Guarda una pieza con C o Shift (📥 en el celular). ¡Cuidado, hay cubos de poder: 💣 la bomba limpia un cuadro de 3x3 y ⚡ el rayo limpia toda su fila! Los combos de líneas seguidas dan puntos extra.</p>
           <button class="btn-primary" id="tetris-btn-start">¡Vamos!</button>
         </div>
       </div>
@@ -341,6 +342,7 @@
       <button class="tetris-btn" data-action="rotate">⟳</button>
       <button class="tetris-btn" data-action="right">▶</button>
       <button class="tetris-btn" data-action="down">▼</button>
+      <button class="tetris-btn" data-action="hold">📥</button>
       <button class="tetris-btn wide" data-action="drop">⬇ Caída</button>
     </div>
   </section>
