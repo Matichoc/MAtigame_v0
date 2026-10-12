@@ -323,13 +323,24 @@
             ↑ para rotar, ↓ para bajar rápido y ESPACIO para caída instantánea.
             En el celular: arrastra para mover, toca para girar y desliza hacia abajo para caer.
             Las piezas doradas son Chocolate Dubai: ¡dan Matipuntos extra! Guarda una pieza con C o Shift (📥 en el celular). ¡Cuidado, hay cubos de poder: 💣 la bomba limpia un cuadro de 3x3 y ⚡ el rayo limpia toda su fila! Los combos de líneas seguidas dan puntos extra.</p>
+          <div id="tetris-lvlpick" class="lvl-pick"></div>
           <button class="btn-primary" id="tetris-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="tetris-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="tetris-win-title">¡Nivel completado!</h2>
+          <div id="tetris-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="tetris-win-text"></p>
+          <button class="btn-primary" id="tetris-btn-next">Siguiente nivel</button>
+          <button class="btn-secondary overlay-secondary-btn" id="tetris-btn-win-menu">Volver al menú</button>
         </div>
       </div>
 
       <div id="tetris-overlay-gameover" class="overlay hidden">
         <div class="overlay-card">
-          <h2>¡Se apilaron las golosinas!</h2>
+          <h2 id="tetris-gameover-title">¡Se apilaron las golosinas!</h2>
           <p id="tetris-gameover-text"></p>
           <button class="btn-primary" id="tetris-btn-retry">Reintentar</button>
           <button class="btn-secondary overlay-secondary-btn" id="tetris-btn-gameover-menu">Volver al menú</button>

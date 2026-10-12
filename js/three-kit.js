@@ -8,6 +8,7 @@ import { getOutfit } from "./characters.js";
 import { addToLeaderboard, earnCoins, equippedOutfitId, getLook, reportScore, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
 import { recordRun, runBonus } from "./progression.js";
+import { campaignWin } from "./campaign.js";
 
 export { THREE };
 
@@ -392,6 +393,29 @@ export class Game3D {
   showOverlay(name) {
     Object.entries(this.els.overlays).forEach(([key, el]) => el.classList.toggle("hidden", key !== name));
     if (!name) Object.values(this.els.overlays).forEach((el) => el.classList.add("hidden"));
+  }
+
+  /**
+   * Nivel de la campaña ganado (no es el final de la partida): desbloquea el siguiente, guarda
+   * estrellas, da puntos/XP y muestra la tarjeta "¡Nivel completado!" (overlay "win").
+   */
+  levelWin({ level, stars, text }) {
+    audio.stopMusic();
+    audio.playMissionComplete();
+    this.state = "win";
+    campaignWin(this.progress, this.gameId, level, stars);
+    reportScore(this.progress, this.gameId, this.score || 0);
+    const bonus = runBonus(this.gameId, this.score || 0) + stars;
+    earnCoins(this.progress, bonus);
+    const run = recordRun(this.progress, this.gameId, this.score || 0, this.runInfo || {});
+    this.runInfo = null;
+    saveProgress(this.progress);
+    const e = this.els;
+    if (e.stars) e.stars.innerHTML = [1, 2, 3].map((n) => `<span class="${n <= stars ? "on" : "off"}">★</span>`).join("");
+    if (e.winTitle) e.winTitle.textContent = `¡Nivel ${level} completado!`;
+    if (e.winText) e.winText.textContent = `${text} +${bonus} Matipuntos 🍫✨ +${run.xp} XP ⭐`;
+    this.haptic(60);
+    this.showOverlay("win");
   }
 
   /** Cierra la partida: guarda puntaje/ranking y muestra el resumen. */
