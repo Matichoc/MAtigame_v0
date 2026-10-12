@@ -16,5 +16,6 @@ const dest = join(target, "matijuego");
 rmSync(dest, { recursive: true, force: true });
 mkdirSync(dest, { recursive: true });
 cpSync("web-www", dest, { recursive: true });
+rmSync(join(dest, ".nojekyll"), { force: true }); // matiweb ya tiene el suyo en la raíz
 const count = (d) => readdirSync(d).reduce((n, f) => n + (statSync(join(d, f)).isDirectory() ? count(join(d, f)) : 1), 0);
 console.log(`matijuego actualizado en ${dest} (${count(dest)} archivos)`);
