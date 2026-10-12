@@ -476,6 +476,17 @@ export class SaltoGame extends Game3D {
     window.addEventListener("keyup", (e) => {
       if (map[e.code]) this.keys[map[e.code]] = false;
     });
+    // botones táctiles ◀ ▶ (uno a cada lado): se mantienen apretados para mover al Matichico
+    for (const [id, dir] of [["salto-btn-left", "left"], ["salto-btn-right", "right"]]) {
+      const btn = document.getElementById(id);
+      if (!btn) continue;
+      const press = (e) => { e.preventDefault(); this.keys[dir] = true; };
+      const release = (e) => { e.preventDefault(); this.keys[dir] = false; };
+      btn.addEventListener("pointerdown", press);
+      btn.addEventListener("pointerup", release);
+      btn.addEventListener("pointerleave", release);
+      btn.addEventListener("pointercancel", release);
+    }
     const wrap = this.els.wrap;
     const setPointer = (e) => {
       if (e.pointerType === "mouse" && e.buttons === 0) return;

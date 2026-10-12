@@ -526,6 +526,7 @@ function renderHouse() {
   houseTabsEl.innerHTML = "";
   houseGridEl.innerHTML = "";
   houseBarEl.innerHTML = "";
+  houseBarEl.className = "sh-bar";
   if (houseMode === "decor") renderHouseDecor();
   else if (houseMode === "style") renderHouseStyle();
   else renderHouseSize();
@@ -580,7 +581,8 @@ function renderHouseDecor() {
     cancel.addEventListener("click", () => { houseBuying = null; renderHouse(); });
     houseBarEl.append(txt, buy, cancel);
   } else {
-    houseBarEl.innerHTML = `<div class="sh-bar-txt">Toca un mueble para ponerlo, o <b>arrástralo</b> hasta el cuarto. Toca uno puesto para moverlo, girarlo o cambiarle el tamaño. ¡Agranda la casa para tener más espacio!</div>`;
+    houseBarEl.className = "sh-bar hint";
+    houseBarEl.innerHTML = `<div class="sh-bar-txt">Toca un mueble para ponerlo. Toca uno puesto para moverlo, girarlo o cambiarle el tamaño.</div>`;
   }
 }
 

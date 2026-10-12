@@ -472,6 +472,13 @@ más variedad y "jugo" (música, vibración, avisos). Todo con música procedura
 - **Espacio:** Logros en listas desplegables por categoría, selector de niveles plegado en una línea, «Cómo se juega» plegable
   en cada juego y secciones plegables en Mi aventura (en el celular empiezan cerradas).
 
+### Etapa 11j — Pulido de la experiencia en celular ✅
+
+Feedback con capturas de un celular real: Tetris (paneles SIGUE y GUARDA cuadrados y legibles), Mi Casa (la barra de
+herramientas ya no tapa el cuarto al arrastrar muebles), HUD compacto que no se encima, tarjetas de inicio con scroll,
+Tienda y Mi Casa deslizables con el celular acostado, y controles según el juego: **botones ◀ ▶ a cada lado** en Salto Choco,
+Autos (cambio de carril) y Porristas; **joystick** en Recolecta, Parkour y Pueblo (movimiento libre).
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista
