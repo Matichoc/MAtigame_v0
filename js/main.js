@@ -59,11 +59,11 @@ const toastEl = document.getElementById("toast");
 const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
 
 let toastTimer = null;
-function showToast(message) {
+function showToast(message, ms = 2600) {
   toastEl.textContent = message;
   toastEl.classList.remove("hidden");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toastEl.classList.add("hidden"), 2600);
+  toastTimer = setTimeout(() => toastEl.classList.add("hidden"), ms);
 }
 
 /** Dibuja el retrato de un Matichico: primero el dibujo 2D (al instante) y luego el modelo 3D con todo lo que lleva puesto. */
@@ -1135,10 +1135,16 @@ async function launchOrResumeFps() {
     await instances.fps.startRun(selectedCharacter, progress);
   } catch (err) {
     console.error(err);
-    showToast("Tu dispositivo no pudo cargar el modo 3D.");
+    showToast(`Tu dispositivo no pudo cargar el modo 3D. [fps: ${errDetail(err)}]`, 9000);
     instances.fps = null;
     goToHub();
   }
+}
+
+/** Texto corto del error para mostrarlo en el aviso (sirve para saber qué falló en cada dispositivo). */
+function errDetail(err) {
+  const m = String((err && err.message) || err || "error").replace(/\s+/g, " ");
+  return m.length > 90 ? `${m.slice(0, 90)}…` : m;
 }
 
 // ---------- JUEGOS 3D (Salto Choco, Autos de Chocolate, Memoria Matichoc) ----------
@@ -1209,7 +1215,7 @@ async function launchOrResume3d(key) {
     await instances[key].startRun(selectedCharacter, progress);
   } catch (err) {
     console.error(err);
-    showToast("Tu dispositivo no pudo cargar el modo 3D.");
+    showToast(`Tu dispositivo no pudo cargar el modo 3D. [${key}: ${errDetail(err)}]`, 9000);
     instances[key] = null;
     goToHub();
   }
