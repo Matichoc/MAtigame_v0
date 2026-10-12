@@ -7,6 +7,7 @@ import { THREE, Game3D, clamp, lerp, rand, loadTexture, canvasTexture, roundedBo
 import { createMatichico } from "./matichico3d.js";
 import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates, findFreeSpot, getObstacles, getSpawn } from "./levels.js";
 import { saveProgress, addToLeaderboard, reportScore, earnCoins } from "./storage.js";
+import { recordRun } from "./progression.js";
 import * as audio from "./audio.js";
 
 const GAME_ID = "recolecta";
@@ -781,6 +782,7 @@ export class RecolectaGame extends Game3D {
     this.progress.unlockedLevel = Math.max(this.progress.unlockedLevel, this.levelIndex + 1);
     reportScore(this.progress, GAME_ID, this.score);
     saveProgress(this.progress);
+    recordRun(this.progress, GAME_ID, this.score);
     const p = this.p;
     this.particles.burst(new THREE.Vector3(wx(p.x), 1.5, wz(p.y)), [0xd4216c, 0xffc800, 0xcfd767, 0xfff6e6], 50, 7, 1.4, 6);
     if (isLast) {
@@ -798,6 +800,7 @@ export class RecolectaGame extends Game3D {
     this.state = "lose";
     audio.playLose();
     reportScore(this.progress, GAME_ID, this.score);
+    recordRun(this.progress, GAME_ID, this.score);
     this.q("lose-text").textContent = `Recolectaste ${this.collected} de ${this.level.target} golosinas. ¡Tú puedes lograrlo!`;
     this.showOverlay("lose");
   }

@@ -363,6 +363,22 @@ que no termina (`js/parkour-infinite.js`, mixin de `ParkourGame`):
 - Al terminar cada partida, Matipuntos extra según el puntaje (`Game3D.finish`).
 - La Aventura de 6 etapas sigue como modo aparte (elige al entrar).
 
+### Etapa 11c — Mi aventura: XP, misiones, racha y álbum ✅ (Fase 3 del plan)
+
+Para que haya una razón de volver cada día (`js/progression.js`, pantalla "Mi aventura"):
+
+- **XP y niveles**: cada partida (en cualquier juego) da XP; +20 extra la primera del
+  día. Cada nivel da Matipuntos, un sobre de figuritas y, en algunos niveles, un
+  regalo del Vestuario (`LEVEL_GIFTS`).
+- **3 misiones diarias** distintas cada día y por perfil (jugar N partidas, probar
+  juegos distintos, puntaje o metros en el Mundo infinito, ganar Matipuntos...), con
+  Matipuntos + XP; las 3 completas abren el **cofre del día**.
+- **Racha** de días seguidos con la recompensa diaria de siempre.
+- **Álbum de Chocolates**: 24 figuritas (12 productos Matichoc + 12 brillantes) que
+  salen de sobres de 3 (siempre una nueva mientras falte alguna); premios por
+  completar 6/12/18/24.
+- Todo se paga y se gana solo con Matipuntos y juego: sin compras reales.
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista

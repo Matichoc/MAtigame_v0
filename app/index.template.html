@@ -48,6 +48,11 @@
         <h1 class="logo lb-logo">Matijuego<span>el arcade de Matichoc</span></h1>
         <div class="lb-actions">
           <div class="stat-chip lb-coins" title="Matipuntos">🍫✨ <span id="hub-total-coins">0</span></div>
+          <button id="btn-open-progress" class="stat-chip stat-chip-btn lb-level" title="Nivel, misiones y álbum">
+            <span class="lv-badge">⭐ <b id="hub-level">1</b></span>
+            <span class="lv-bar"><i id="hub-xp-fill"></i></span>
+            <span class="lv-dot hidden" id="hub-progress-dot"></span>
+          </button>
           <button id="btn-daily-reward" class="stat-chip stat-chip-btn">🎁 Recompensa diaria</button>
           <button id="btn-open-achievements" class="stat-chip stat-chip-btn">🏅 Logros</button>
           <button id="btn-open-leaderboard" class="stat-chip stat-chip-btn">🏆 Puntajes</button>
@@ -85,6 +90,51 @@
             <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
           </nav><!--/WEB--><!--APP--><p class="app-credit">🍫 Un juego promovido por <b>Matichoc</b> · pasión por el cacao</p><!--/APP-->
         </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- MI AVENTURA: nivel, misiones diarias, racha y álbum -->
+  <section id="screen-progress" class="screen hidden">
+    <div class="pg">
+      <header class="pg-top">
+        <button id="btn-progress-back" class="btn-secondary">← Volver</button>
+        <h1 class="logo pg-title">Mi aventura</h1>
+        <div class="stat-chip lb-coins" title="Matipuntos">🍫✨ <span id="pg-coins">0</span></div>
+      </header>
+      <div class="pg-level">
+        <div class="pg-lv-badge">⭐<b id="pg-level">1</b></div>
+        <div class="pg-lv-body">
+          <div class="pg-lv-name" id="pg-level-name">Nivel 1</div>
+          <div class="pg-xpbar"><i id="pg-xp-fill"></i><span id="pg-xp-text">0 / 100 XP</span></div>
+          <div class="pg-lv-next" id="pg-level-next"></div>
+        </div>
+      </div>
+      <div class="pg-cols">
+        <section class="pg-card">
+          <h2>🎯 Misiones de hoy</h2>
+          <div id="pg-missions" class="pg-missions"></div>
+          <button id="pg-chest" class="btn-primary pg-chest" disabled>🎁 Cofre del día</button>
+          <div class="pg-streak"><span id="pg-streak-text"></span><div id="pg-streak-days" class="pg-days"></div></div>
+          <button id="pg-daily" class="btn-secondary">🎁 Recompensa diaria</button>
+        </section>
+        <section class="pg-card">
+          <h2>📖 Álbum de Chocolates <small id="pg-album-count"></small></h2>
+          <div class="pg-packbar">
+            <button id="pg-open-pack" class="btn-primary" disabled>📦 Abrir sobre</button>
+            <span id="pg-packs-text" class="pg-hint"></span>
+          </div>
+          <div id="pg-album" class="pg-album"></div>
+          <div id="pg-milestones" class="pg-milestones"></div>
+        </section>
+      </div>
+    </div>
+    <div id="pack-overlay" class="pk-reveal hidden">
+      <div class="pk-reveal-card">
+        <h2>¡Tu sobre!</h2>
+        <div id="pack-cards" class="pk-cards"></div>
+        <p id="pack-rewards" class="pg-hint"></p>
+        <button id="pack-close" class="btn-primary">¡Genial!</button>
       </div>
     </div>
   </section>

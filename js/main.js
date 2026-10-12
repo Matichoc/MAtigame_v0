@@ -11,6 +11,10 @@ import {
   getLastActiveProfileId, setLastActiveProfileId, MAX_PROFILES,
 } from "./profiles.js";
 import { ACHIEVEMENTS } from "./achievements.js";
+import {
+  levelInfo, xpForLevel, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
+  canClaimChest, claimChest, hasPending, STICKERS, albumCount, ALBUM_MILESTONES, openPack, onProgressEvent,
+} from "./progression.js";
 
 let progress = null;
 let selectedCharacter = null;
@@ -21,6 +25,7 @@ const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
 const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenAchievements = document.getElementById("screen-achievements");
+const screenProgress = document.getElementById("screen-progress");
 const screenFps = document.getElementById("screen-fps");
 const screen3d = {
   recolecta: document.getElementById("screen-recolecta"),
@@ -34,7 +39,7 @@ const screen3d = {
   creador: document.getElementById("screen-creador"),
 };
 const ALL_SCREENS = [
-  screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements,
+  screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements, screenProgress,
     screenFps,
   ...Object.values(screen3d),
 ].filter(Boolean); // (en la app infantil no existe la pantalla de Choco Blaster)
@@ -124,6 +129,10 @@ inputName.addEventListener("input", () => {
 
 function refreshHubStats() {
   hubTotalCoinsEl.textContent = String(progress.coins);
+  const lv = levelInfo(progress.xp);
+  document.getElementById("hub-level").textContent = String(lv.level);
+  document.getElementById("hub-xp-fill").style.width = `${Math.round((lv.into / lv.need) * 100)}%`;
+  document.getElementById("hub-progress-dot").classList.toggle("hidden", !hasPending(progress));
 }
 
 // ---------- PERFILES ("¿Quién juega?") ----------
@@ -266,6 +275,184 @@ btnDailyReward.addEventListener("click", () => {
   updateDailyRewardButton();
   showToast(`¡+${result.reward} Matipuntos! Racha de ${result.streak} día${result.streak === 1 ? "" : "s"} 🔥`);
 });
+
+// ---------- MI AVENTURA: nivel, misiones, racha y álbum ----------
+
+// avisos que llegan desde cualquier juego (subir de nivel, misión cumplida...)
+const toastQueue = [];
+function queueToast(msg) {
+  toastQueue.push(msg);
+  if (toastQueue.length === 1) drainToasts();
+}
+function drainToasts() {
+  if (!toastQueue.length) return;
+  showToast(toastQueue[0]);
+  setTimeout(() => { toastQueue.shift(); drainToasts(); }, 2800);
+}
+onProgressEvent((ev) => {
+  if (ev.type === "level") queueToast(`⭐ ¡Nivel ${ev.level}! +${ev.coins} Matipuntos` + (ev.gift ? ` · Regalo: ${ev.gift.icon || "🎁"} ${ev.gift.name}` : "") + " · +1 sobre 📦");
+  else if (ev.type === "mission") queueToast(`🎯 ¡Misión cumplida! Reclámala en Mi aventura (${ev.missions.length})`);
+  else if (ev.type === "pack") queueToast("📦 ¡Ganaste un sobre de figuritas!");
+  if (progress) { refreshHubStats(); }
+});
+
+const pgMissionsEl = document.getElementById("pg-missions");
+const pgChestBtn = document.getElementById("pg-chest");
+const pgOpenPackBtn = document.getElementById("pg-open-pack");
+const packOverlay = document.getElementById("pack-overlay");
+
+document.getElementById("btn-open-progress").addEventListener("click", () => {
+  showScreen(screenProgress);
+  renderProgress();
+});
+document.getElementById("btn-progress-back").addEventListener("click", () => {
+  refreshHubStats();
+  showScreen(screenHub);
+});
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+function renderProgress() {
+  document.getElementById("pg-coins").textContent = String(progress.coins);
+  // nivel
+  const lv = levelInfo(progress.xp);
+  document.getElementById("pg-level").textContent = String(lv.level);
+  document.getElementById("pg-level-name").textContent = `Nivel ${lv.level}`;
+  document.getElementById("pg-xp-fill").style.width = `${Math.round((lv.into / lv.need) * 100)}%`;
+  document.getElementById("pg-xp-text").textContent = `${lv.into} / ${lv.need} XP`;
+  const nextGift = Object.keys(LEVEL_GIFTS).map(Number).filter((l) => l > lv.level).sort((a, b) => a - b)[0];
+  const giftItem = nextGift ? getItem(LEVEL_GIFTS[nextGift]) : null;
+  document.getElementById("pg-level-next").textContent = giftItem ? `Próximo regalo en el nivel ${nextGift}: ${giftItem.icon || "🎁"} ${giftItem.name}` : "¡Tienes todos los regalos de nivel!";
+
+  // misiones
+  const d = ensureDaily(progress);
+  pgMissionsEl.innerHTML = "";
+  d.missions.forEach((m, i) => {
+    const prog = missionProgress(progress, m);
+    const done = missionDone(progress, m);
+    const card = el("div", "pg-mission" + (m.claimed ? " claimed" : done ? " done" : ""));
+    const body = el("div", "pg-m-body");
+    body.appendChild(el("div", "pg-m-name", missionLabel(m)));
+    const bar = el("div", "pg-m-bar");
+    const fill = el("i");
+    fill.style.width = `${Math.round((prog / m.target) * 100)}%`;
+    bar.appendChild(fill);
+    bar.appendChild(el("span", null, `${prog} / ${m.target}`));
+    body.appendChild(bar);
+    body.appendChild(el("div", "pg-m-reward", `+${m.coins} 🍫✨  +${m.xp} XP`));
+    const btn = el("button", done && !m.claimed ? "btn-primary" : "btn-secondary", m.claimed ? "Reclamada ✓" : done ? "Reclamar" : "En curso");
+    btn.disabled = m.claimed || !done;
+    btn.addEventListener("click", () => {
+      const r = claimMission(progress, i);
+      if (!r) return;
+      audio.playPurchase();
+      showToast(`¡+${r.coins} Matipuntos y +${r.xp} XP! 🎉`);
+      refreshHubStats();
+      renderProgress();
+    });
+    card.appendChild(body);
+    card.appendChild(btn);
+    pgMissionsEl.appendChild(card);
+  });
+  pgChestBtn.disabled = !canClaimChest(progress);
+  pgChestBtn.textContent = d.chest ? "🎁 Cofre del día abierto ✓" : "🎁 Cofre del día (completa las 3 misiones)";
+
+  // racha y recompensa diaria
+  const streak = progress.dailyStreak || 0;
+  const claimedToday = !canClaimDailyReward(progress);
+  document.getElementById("pg-streak-text").textContent = streak > 0 ? `🔥 Racha: ${streak} día${streak === 1 ? "" : "s"} seguidos` : "🔥 ¡Empieza tu racha hoy!";
+  const days = document.getElementById("pg-streak-days");
+  days.innerHTML = "";
+  const filled = claimedToday ? ((streak - 1) % 7) + 1 : streak % 7;
+  for (let i = 0; i < 7; i++) {
+    const reward = Math.min(10 + i * 5, 50);
+    const day = el("div", "pg-day" + (i < filled ? " on" : ""), i < filled ? "🔥" : String(i + 1));
+    day.title = `Día ${i + 1}: +${reward}`;
+    days.appendChild(day);
+  }
+  const dailyBtn = document.getElementById("pg-daily");
+  dailyBtn.disabled = claimedToday;
+  dailyBtn.textContent = claimedToday ? "🎁 Recompensa de hoy reclamada ✓" : "🎁 Reclamar recompensa diaria";
+
+  // álbum
+  const have = albumCount(progress);
+  document.getElementById("pg-album-count").textContent = `${have} / ${STICKERS.length}`;
+  const packs = progress.packs || 0;
+  pgOpenPackBtn.disabled = packs <= 0;
+  pgOpenPackBtn.textContent = packs > 0 ? `📦 Abrir sobre (${packs})` : "📦 Sin sobres";
+  document.getElementById("pg-packs-text").textContent = "Ganas sobres al subir de nivel, cada 5 partidas y con el cofre del día.";
+  const albumEl = document.getElementById("pg-album");
+  albumEl.innerHTML = "";
+  STICKERS.forEach((s) => {
+    const n = (progress.album || {})[s.id] || 0;
+    const card = el("div", "pg-sticker" + (n ? " got" : "") + (s.foil ? " foil" : ""));
+    if (n) {
+      const img = document.createElement("img");
+      img.src = s.img;
+      img.alt = s.name;
+      card.appendChild(img);
+      if (n > 1) card.appendChild(el("b", "pg-s-n", `x${n}`));
+    } else card.appendChild(el("span", "pg-s-q", "?"));
+    card.appendChild(el("span", "pg-s-name", n ? s.name : "Sin descubrir"));
+    albumEl.appendChild(card);
+  });
+  const ms = document.getElementById("pg-milestones");
+  ms.innerHTML = "";
+  ALBUM_MILESTONES.forEach((m) => {
+    const ok = (progress.albumClaimed || []).includes(m.at);
+    const item = m.item ? getItem(m.item) : null;
+    ms.appendChild(el("div", "pg-ms" + (ok ? " ok" : ""), `${ok ? "✅" : "🔒"} ${m.text}: +${m.coins} 🍫✨${item ? ` y ${item.name}` : ""}`));
+  });
+}
+
+document.getElementById("pg-chest").addEventListener("click", () => {
+  const r = claimChest(progress);
+  if (!r) return;
+  audio.playVictory();
+  showToast(`🎁 ¡Cofre abierto! +${r.coins} Matipuntos, +${r.xp} XP y un sobre`);
+  refreshHubStats();
+  renderProgress();
+});
+document.getElementById("pg-daily").addEventListener("click", () => {
+  const result = claimDailyReward(progress);
+  if (!result) return;
+  audio.playPurchase();
+  refreshHubStats();
+  updateDailyRewardButton();
+  showToast(`¡+${result.reward} Matipuntos! Racha de ${result.streak} día${result.streak === 1 ? "" : "s"} 🔥`);
+  renderProgress();
+});
+
+pgOpenPackBtn.addEventListener("click", () => {
+  const r = openPack(progress);
+  if (!r) return;
+  audio.playBonusCollect();
+  const wrap = document.getElementById("pack-cards");
+  wrap.innerHTML = "";
+  r.stickers.forEach((s, i) => {
+    const card = el("div", "pk-card" + (s.foil ? " foil" : ""));
+    card.style.animationDelay = `${i * 0.35}s`;
+    const img = document.createElement("img");
+    img.src = s.img;
+    img.alt = s.name;
+    card.appendChild(img);
+    card.appendChild(el("span", "pk-c-name", s.name));
+    if (s.isNew) card.appendChild(el("b", "pk-c-new", "¡NUEVA!"));
+    wrap.appendChild(card);
+  });
+  document.getElementById("pack-rewards").textContent = r.rewards.length
+    ? r.rewards.map((m) => `🏆 ${m.text}: +${m.coins} Matipuntos${m.item ? ` y ${getItem(m.item)?.name}` : ""}`).join(" · ")
+    : "";
+  packOverlay.classList.remove("hidden");
+  refreshHubStats();
+  renderProgress();
+});
+document.getElementById("pack-close").addEventListener("click", () => packOverlay.classList.add("hidden"));
 
 // ---------- LOGROS ----------
 

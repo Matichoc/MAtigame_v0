@@ -21,6 +21,11 @@ function defaultProgress() {
     // Guardarropa (ver js/wardrobe-data.js): objetos comprados (compartidos por todos los
     // Matichicos) y lo que lleva puesto cada uno.
     wardrobe: { owned: [], looks: {} }, // looks: { [characterId]: { hair, hat, outfit, ... } }
+    xp: 0, // experiencia total (ver js/progression.js)
+    packs: 1, // sobres de figuritas sin abrir (empieza con uno de regalo)
+    album: {}, // { [idFigurita]: cuántas tiene }
+    albumClaimed: [], // hitos del álbum ya cobrados
+    daily: null, // misiones de hoy
     coins: 0, // Matipuntos: los puntos que se ganan jugando y se gastan en la tienda
     unlockedLevel: 0, // progreso dentro de "Recolecta y Corre"
     bestScores: {}, // { [gameId]: number }
@@ -67,6 +72,9 @@ export function loadProgress(profileId) {
       leaderboards: { ...parsed.leaderboards },
       stats: { ...defaultProgress().stats, ...parsed.stats },
       claimedAchievements: parsed.claimedAchievements || [],
+      album: { ...parsed.album },
+      albumClaimed: parsed.albumClaimed || [],
+      packs: parsed.packs ?? 1,
       creations: Array.isArray(parsed.creations) ? parsed.creations.slice(0, MAX_CREATIONS) : [],
     };
   } catch (e) {

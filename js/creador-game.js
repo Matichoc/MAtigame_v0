@@ -6,6 +6,7 @@
 import { THREE, Game3D, clamp, lerp, canvasTexture, makeBunting } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress, earnCoins, reportScore, addToLeaderboard, saveCreation, deleteCreation, todayKey } from "./storage.js";
+import { recordRun } from "./progression.js";
 import * as audio from "./audio.js";
 import {
   PRODUCTS, CHOCOLATES, FLAVORS, TOPPINGS, WRAPS, WRAP_COLORS, MOTIFS, STEPS,
@@ -485,6 +486,7 @@ export class CreadorGame extends Game3D {
       audio.playPurchase();
     }
     reportScore(this.progress, "creador", r.score);
+    if (isNew) recordRun(this.progress, "creador", r.score);
     addToLeaderboard(this.progress, "creador", this.progress.playerName, r.score);
     this._updateHud();
     this._renderPanel();

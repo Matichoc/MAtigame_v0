@@ -420,6 +420,7 @@ export function installInfinite(Cls, STAGES) {
     stats.parkourInfRuns = (stats.parkourInfRuns || 0) + 1;
     stats.parkourInfWorlds = Math.max(stats.parkourInfWorlds || 0, (this.inf.zoneReached || 0) + 1);
     this.score = this._calcScoreInf();
+    this.runInfo = { meters: m };
     this.els.banner.classList.remove("show");
     this.power = null;
     this.heroMode = "sad";

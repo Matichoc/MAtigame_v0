@@ -100,6 +100,7 @@ js/games-catalog.js  Catálogo de modos de juego (disponibles y "próximamente")
 js/levels.js          Camino/corredor, obstáculos, coleccionables y misiones
 js/audio.js           Efectos de sonido generados con Web Audio API
 js/parkour-game.js    Parkour Choco 3D (obby estilo Roblox: Aventura de 6 etapas)
+js/progression.js     XP, niveles, misiones diarias y álbum de figuritas
 js/parkour-infinite.js Parkour: Mundo infinito (generador procedural, poderes, vidas, récord)
 js/wardrobe-data.js   Catálogo del Vestuario (~80 objetos, rarezas y precios en Matipuntos)
 js/wardrobe3d.js      Cómo se ve cada objeto sobre el Matichico 3D
