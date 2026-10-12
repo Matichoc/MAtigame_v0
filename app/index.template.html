@@ -79,7 +79,7 @@
           <div id="character-grid" class="character-grid lb-chars"></div>
           <div class="lb-stage-actions">
             <button id="btn-open-shop" class="btn-primary lb-shop">👕 Vestuario y Tienda</button>
-            <button id="btn-open-house" class="btn-secondary lb-shop">🏠 Mi Casa</button>
+            <button id="btn-open-house" class="lb-shop lb-house">🏠 Mi Casa</button>
           </div>
           <label class="field-label" for="input-name">Tu apodo en los puntajes</label>
           <input id="input-name" class="text-input lb-name" type="text" maxlength="16" placeholder="Jugador">
@@ -87,6 +87,11 @@
 
         <main class="lb-games">
           <div id="event-banner" class="event-banner hidden"></div>
+          <button id="btn-house-banner" class="house-banner" type="button">
+            <span class="hb-art" aria-hidden="true">🏠<i>🛋️</i><i>🧸</i></span>
+            <span class="hb-text"><b>Mi Casa <em>¡Nuevo!</em></b><span id="house-banner-sub">Arrastra muebles, decora y agranda tu casa</span></span>
+            <span class="hb-go">Entrar ▶</span>
+          </button>
           <h2 class="lb-title">Elige un juego</h2>
           <div id="game-feature" class="lb-feature"></div>
           <div id="game-grid" class="game-grid lb-grid"></div>
@@ -110,10 +115,11 @@
       </header>
       <div class="sh-body">
         <aside class="sh-preview">
-          <div class="sh-stage"><canvas id="house-canvas"></canvas></div>
-          <div class="shop-character-name">Tu cuarto</div>
+          <div class="sh-stage"><canvas id="house-canvas"></canvas><div id="house-tools" class="house-tools hidden"></div></div>
+          <div class="shop-character-name">Tu casa</div>
         </aside>
         <section class="sh-panel">
+          <div id="house-modes" class="house-modes"></div>
           <div id="house-tabs" class="sh-tabs"></div>
           <div id="house-grid" class="sh-grid"></div>
           <div id="house-bar" class="sh-bar"></div>

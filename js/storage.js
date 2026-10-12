@@ -21,7 +21,7 @@ function defaultProgress() {
     // Guardarropa (ver js/wardrobe-data.js): objetos comprados (compartidos por todos los
     // Matichicos) y lo que lleva puesto cada uno.
     wardrobe: { owned: [], looks: {} }, // looks: { [characterId]: { hair, hat, outfit, ... } }
-    house: { owned: [], placed: {} }, // Mi Casa (ver js/house-data.js)
+    house: { owned: [], placed: {}, layout: null, size: 0 }, // Mi Casa (ver js/house-data.js)
     eventTokens: {}, // fichas de eventos de temporada: { [idEvento]: n }
     xp: 0, // experiencia total (ver js/progression.js)
     packs: 1, // sobres de figuritas sin abrir (empieza con uno de regalo)
@@ -76,7 +76,12 @@ export function loadProgress(profileId) {
       claimedAchievements: parsed.claimedAchievements || [],
       album: { ...parsed.album },
       eventTokens: { ...parsed.eventTokens },
-      house: { owned: [...((parsed.house && parsed.house.owned) || [])], placed: { ...((parsed.house && parsed.house.placed) || {}) } },
+      house: {
+        owned: [...((parsed.house && parsed.house.owned) || [])],
+        placed: { ...((parsed.house && parsed.house.placed) || {}) },
+        layout: parsed.house && Array.isArray(parsed.house.layout) ? parsed.house.layout.map((f) => ({ ...f })) : null,
+        size: (parsed.house && parsed.house.size) || 0,
+      },
       albumClaimed: parsed.albumClaimed || [],
       packs: parsed.packs ?? 1,
       creations: Array.isArray(parsed.creations) ? parsed.creations.slice(0, MAX_CREATIONS) : [],
