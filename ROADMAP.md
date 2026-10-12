@@ -457,6 +457,9 @@ más variedad y "jugo" (música, vibración, avisos). Todo con música procedura
   (se editan en las tablas de ese archivo).
 - **Web:** archivos con `?v=<huella>` para que el caché no mezcle versiones; si un juego falla, el aviso dice por qué.
 - **Celular:** Mi aventura, Logros, Puntajes y Mi Casa ahora se pueden deslizar.
+- **Logros de largo plazo** (`js/achievements.js`, lista completa en [`docs/LOGROS.md`](./docs/LOGROS.md)): 169 logros, la mayoría en
+  cadenas por escalones (🥉→👑) con barra de progreso; piden días jugados, horas, rachas, los 20 niveles de cada juego,
+  récords, colección y estilo, así que no se terminan en una tarde.
 
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
