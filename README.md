@@ -11,11 +11,11 @@ atuendos comprados en la tienda, para jugar cualquiera de los minijuegos
 disponibles con ese mismo personaje. **Los 10 juegos son 3D** (Three.js),
 con brillo (bloom), música generada en vivo, color vivo y un Matichico 3D que cambia con la tienda:
 **Parkour Choco** (estilo Roblox: **Mundo infinito** con 10 ambientes, poderes y récord de metros, o la Aventura de 6 etapas),
-**Recolecta y Corre** (8 canchas 3D con guardias, cintas transportadoras, impulso y estrellas),
-**Tetris de Productos** (pieza guardada, cubos de poder y combos),
-**Lanzamientos de Básquet** (5 posiciones, rachas y modo «en llamas»),
-**Saltos de Porristas** (viento, red de seguridad y rebotadora gigante), **Salto Choco** (enemigos, vidas y 4 zonas),
-**Autos de Chocolate** (rivales, rampas, charcos y poderes), **Memoria Matichoc** (pareja dorada y cartas traviesas),
+**Recolecta y Corre** (20 niveles 3D con guardias, cintas transportadoras, impulso y estrellas),
+**Tetris de Productos** (pieza guardada, cubos de poder, combos y 20 niveles),
+**Lanzamientos de Básquet** (5 posiciones, rachas, modo «en llamas» y 20 niveles),
+**Saltos de Porristas** (viento, red de seguridad, rebotadora gigante y 20 niveles), **Salto Choco** (enemigos, vidas, 4 zonas, infinito y 20 misiones),
+**Autos de Chocolate** (rivales, rampas, charcos, poderes, infinito y 20 misiones), **Memoria Matichoc** (pareja dorada, cartas traviesas y 20 niveles),
 **Choco Blaster** (primera persona, ver
 [`docs/PROPUESTA-3D.md`](./docs/PROPUESTA-3D.md)) y **Crea tu Chocolate**
 (configurador 3D: elige producto, sabor, toppings, envoltorio y diseña tu
