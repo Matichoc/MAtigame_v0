@@ -489,6 +489,48 @@
     </div>
   </section>
 
+  <!-- PANTALLA DE JUEGO: PUEBLO MATICHOC (mundo abierto) -->
+  <section id="screen-town" class="screen game-screen hidden">
+    <div id="town-hud" class="hud">
+      <div class="hud-left">
+        <button id="town-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="town-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Pueblo Matichoc</div>
+          <div class="hud-mission">Explora, saluda y entra a los juegos</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">🕒 <span id="town-hud-time">08:00</span></div>
+        <div class="hud-chip">✨ <span id="town-hud-items">0/25</span></div>
+        <div class="hud-chip">⭐ <span id="town-hud-level">Nv 1</span></div>
+        <div class="hud-chip">🍫✨ <span id="town-hud-coins">0</span></div>
+        <button id="town-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="town-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="town-canvas"></canvas>
+      <div id="town-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="town-popups" class="fps-popups" aria-hidden="true"></div>
+      <div id="town-dialog" class="town-dialog hidden"><b class="td-name"></b><span class="td-text"></span><small>toca para cerrar</small></div>
+      <button id="town-btn-action" class="town-action hidden" type="button"></button>
+      <div class="pk-touch" id="town-touch">
+        <div class="pk-joy" id="town-joy"><div class="pk-knob" id="town-knob"></div></div>
+      </div>
+
+      <div id="town-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Pueblo Matichoc 🏘️</h2>
+          <p class="fps-tag">Nuevo · mundo abierto</p>
+          <p>Pasea por el pueblo con tu Matichico: prueba la fuente de chocolate, visita la Boutique y la Fábrica, saluda a los vecinos (¡te regalan Matipuntos!), junta alfajores dorados y entra a los juegos por las puertas brillantes del Arcade.</p>
+          <p class="fps-hint">Mover: WASD o flechas · Usar / hablar: E o Espacio · Cámara: arrastra el mouse o Q. En el celular, joystick y botón de acción.</p>
+          <button class="btn-primary" id="town-btn-start">¡A explorar!</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!--WEB--><!-- PANTALLA DE JUEGO: CHOCO BLASTER 3D (primera persona, propuesta) -->
   <section id="screen-fps" class="screen game-screen hidden">
     <div id="fps-hud" class="hud fps-hud">

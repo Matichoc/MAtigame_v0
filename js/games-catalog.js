@@ -9,6 +9,15 @@ const IN_APP = typeof document !== "undefined" && document.documentElement.datas
 
 const ALL_GAMES = [
   {
+    id: "town",
+    name: "Pueblo Matichoc",
+    icon: "🏘️",
+    tagline: "Pasea por el pueblo: fuente de chocolate, boutique, fábrica, vecinos y un arcade con puertas mágicas.",
+    status: "available",
+    tag: "Mundo abierto",
+    noScore: true,
+  },
+  {
     id: "recolecta",
     name: "Recolecta y Corre",
     icon: "🏃",

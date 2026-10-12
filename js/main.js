@@ -28,6 +28,7 @@ const screenAchievements = document.getElementById("screen-achievements");
 const screenProgress = document.getElementById("screen-progress");
 const screenFps = document.getElementById("screen-fps");
 const screen3d = {
+  town: document.getElementById("screen-town"),
   recolecta: document.getElementById("screen-recolecta"),
   tetris: document.getElementById("screen-tetris"),
   parkour: document.getElementById("screen-parkour"),
@@ -52,7 +53,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
+const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
 
 let toastTimer = null;
 function showToast(message) {
@@ -307,7 +308,8 @@ document.getElementById("btn-open-progress").addEventListener("click", () => {
 });
 document.getElementById("btn-progress-back").addEventListener("click", () => {
   refreshHubStats();
-  showScreen(screenHub);
+  if (fromTown) goToHub();
+  else showScreen(screenHub);
 });
 
 function el(tag, cls, text) {
@@ -590,7 +592,7 @@ function renderGameGrid() {
   featureEl.innerHTML = "";
   const available = GAMES_CATALOG.filter((g) => g.status === "available");
   const last = available.find((g) => g.id === progress.lastGameId);
-  const featured = last || available.find((g) => g.id === "parkour") || available[0];
+  const featured = last || available.find((g) => g.id === "town") || available[0];
 
   if (featured) {
     featureEl.style.backgroundImage = `url("assets/games/${featured.id}.jpg")`;
@@ -646,7 +648,7 @@ function playGame(gameId) {
     saveProgress(progress);
   }
 
-  progress.lastGameId = gameId;
+  if (gameId !== "town") progress.lastGameId = gameId;
   saveProgress(progress);
 
   // Nunca deben quedar dos juegos "activos" a la vez (evita que uno siga
@@ -662,7 +664,23 @@ function playGame(gameId) {
   }
 }
 
+// Si saliste del pueblo para jugar o comprar algo, al terminar vuelves al pueblo y no al menú.
+let fromTown = false;
+window.addEventListener("town-action", (e) => {
+  const { kind, game } = e.detail;
+  fromTown = true;
+  if (kind === "game") playGame(game);
+  else if (kind === "creador") playGame("creador");
+  else if (kind === "shop") btnOpenShop.click();
+  else if (kind === "album") document.getElementById("btn-open-progress").click();
+});
+
 function goToHub() {
+  if (fromTown) {
+    fromTown = false;
+    playGame("town");
+    return;
+  }
   Object.values(instances).forEach((instance) => instance && instance.pauseForMenu());
   refreshHubStats();
   renderCharacterGrid();
@@ -700,7 +718,8 @@ btnShopBack.addEventListener("click", () => {
   if (shopLobby) shopLobby.setActive(false);
   refreshHubStats();
   renderCharacterGrid();
-  showScreen(screenHub);
+  if (fromTown) goToHub();
+  else showScreen(screenHub);
 });
 
 function shopChar() {
@@ -845,7 +864,7 @@ const leaderboardTabs = document.getElementById("leaderboard-tabs");
 const leaderboardList = document.getElementById("leaderboard-list");
 const leaderboardEmpty = document.getElementById("leaderboard-empty");
 
-const availableGames = GAMES_CATALOG.filter((g) => g.status === "available");
+const availableGames = GAMES_CATALOG.filter((g) => g.status === "available" && !g.noScore);
 let leaderboardGameId = availableGames[0]?.id;
 
 btnOpenLeaderboard.addEventListener("click", () => {
@@ -976,6 +995,7 @@ async function launchOrResumeFps() {
 // "<prefijo>-canvas", "-hud-<nombre>", "-overlay-<intro|win|gameover>", "-btn-*".
 
 const GAMES_3D = {
+  town: { module: "./town-game.js", cls: "TownGame", hud: [] },
   recolecta: { module: "./recolecta-game.js", cls: "RecolectaGame", hud: [] },
   basquet_tiros: { module: "./basquet3d-game.js", cls: "Basquet3DGame", hud: [], prefix: "basquet" },
   porristas: { module: "./porristas3d-game.js", cls: "Porristas3DGame", hud: ["score", "combo", "coins"] },

@@ -379,6 +379,21 @@ Para que haya una razón de volver cada día (`js/progression.js`, pantalla "Mi 
   completar 6/12/18/24.
 - Todo se paga y se gana solo con Matipuntos y juego: sin compras reales.
 
+### Etapa 11d — Pueblo Matichoc (mundo abierto) ✅ (Fase 4 del plan)
+
+Un lugar para pasear en vez de solo elegir juegos de una lista (`js/town-game.js`):
+
+- Plaza empedrada con **fuente de chocolate**, **Boutique** (abre Vestuario y Tienda),
+  **Fábrica** (Crea tu Chocolate), **Figuritas** (Mi aventura) y un **tablero de misiones**.
+- **Arcade**: una puerta mágica por cada juego; al pararse enfrente aparece "▶ Jugar".
+  Al terminar o salir de un juego (o de la tienda) se vuelve al pueblo.
+- **6 vecinos** (Matichicos con ropa al azar) que caminan, miran al jugador y conversan;
+  la primera vez del día regalan 3 Matipuntos.
+- **Alfajores dorados** flotando (+1 Matipunto, hasta 25 por día, reaparecen).
+- **Ciclo día/noche** de 5 minutos con faroles y ventanas que se encienden.
+- Colisiones con edificios, controles WASD/joystick, cámara arrastrable y botón de acción
+  contextual (E / Espacio / botón en pantalla).
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista
