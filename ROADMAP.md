@@ -422,6 +422,24 @@ Noche de Cacao/Halloween y Navidad Chocolatera). Para probar uno fuera de fecha 
   bloqueados con un candado y "Vuelve en <evento>", y los que compraste son tuyos para siempre.
 - Cartel en el menú con el evento actual (o cuántos días faltan para el próximo).
 
+### Etapa 11g — Upgrade de juegos ✅
+
+Feedback: «los juegos siguen medios fomeques». Cada juego recibió mecánicas nuevas,
+más variedad y "jugo" (música, vibración, avisos). Todo con música procedural
+(`startMusic` en `js/audio.js`, un tema por juego) y efectos nuevos (choque, combo, poder).
+
+- **Autos (Gran Premio):** autos rivales con roces cercanos, rampas con vuelo y volteretas,
+  charcos, poderes (nitro, imán, escudo), combo y hitos por kilómetro.
+- **Salto Choco (Escalada al cielo):** enemigos (aplastables y con púas), 3 vidas,
+  aterrizaje perfecto, imán y burbuja, y 4 zonas con decorado propio.
+- **Recolecta y Corre:** guardias que patrullan, cintas transportadoras, combo, impulso,
+  relojes/botas/imán, estrellas por nivel y 2 canchas nuevas (Fábrica de Chocolate y Gran Final del Cacao).
+- **Tetris:** pieza guardada (C), cubos bomba y rayo, combos/back-to-back y ambiente por nivel.
+- **Básquet:** 5 posiciones de tiro con multiplicador, rachas, modo «en llamas»
+  y tiempo extra por swish; se corrigió la física para que los tiros perfectos entren.
+- **Porristas:** viento, red de seguridad, rebotadora gigante, hitos con ovación.
+- **Memoria:** vistazo inicial, pareja dorada (+300) y cartas traviesas que cambian de lugar.
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista
