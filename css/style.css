@@ -1418,3 +1418,15 @@ html[data-app] .game-screen:not(.cr-screen) {
 .hb-text span { font-size: 0.85rem; opacity: 0.95; }
 .hb-go { font-weight: 900; background: #fff; color: #d4216c; padding: 8px 14px; border-radius: 999px; white-space: nowrap; }
 @media (max-width: 520px) { .hb-go { display: none; } .hb-text b { font-size: 1.1rem; } }
+
+/* Selector de niveles (campaña de 20 niveles) */
+.lvl-pick { margin: 6px 0 10px; }
+.lvl-head { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--crema); margin-bottom: 4px; }
+.lvl-head span { color: var(--dorado); font-weight: 800; }
+.lvl-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; }
+.lvl-btn { padding: 3px 0 2px; border-radius: 8px; border: 2px solid rgba(255,200,0,0.55); background: rgba(255,255,255,0.08); color: #fff; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: center; line-height: 1.05; touch-action: manipulation; }
+.lvl-btn b { font-size: 0.95rem; }
+.lvl-btn i { font-style: normal; font-size: 0.5rem; color: var(--dorado); letter-spacing: -1px; }
+.lvl-btn.sel { background: linear-gradient(180deg, #ff4f9a, #d4216c); border-color: #fff; }
+.lvl-btn.locked { opacity: 0.45; cursor: default; }
+@media (max-width: 520px) { .lvl-grid { grid-template-columns: repeat(5, 1fr); } .lvl-btn b { font-size: 1.05rem; } .lvl-btn i { font-size: 0.6rem; } }

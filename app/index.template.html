@@ -249,7 +249,8 @@
           <h2 id="recolecta-intro-title">Nivel</h2>
           <p class="fps-tag">Ahora en 3D</p>
           <p id="recolecta-intro-text"></p>
-          <p class="fps-hint">Mueve con ← ↑ ↓ → (o W A S D). Salta con Espacio. Impulso rápido con Shift (¡te hace inmune!). Cuidado con los guardias malvaviscos: quitan 4 segundos. Junta golosinas seguidas para hacer combo y toma ⏱ el reloj, 👟 las botas y 🧲 el imán.</p>
+          <p class="fps-hint">Mueve con el joystick (o ← ↑ ↓ → / W A S D). Salta con Espacio. Impulso rápido con Shift (¡te hace inmune!). Cuidado con los guardias malvaviscos: quitan 4 segundos. Junta golosinas seguidas para hacer combo y toma ⏱ el reloj, 👟 las botas y 🧲 el imán. ¡Son 20 niveles!</p>
+          <div id="recolecta-lvlpick" class="lvl-pick"></div>
           <button class="btn-primary" data-action="begin">¡Vamos!</button>
         </div>
       </div>
@@ -772,7 +773,8 @@
         <div class="overlay-card">
           <h2>Memoria Matichoc 3D</h2>
           <p class="fps-tag">Nuevo · en 3D</p>
-          <p>Toca las cartas para darlas vuelta y encuentra las parejas de productos Matichoc. Menos intentos y menos tiempo dan más estrellas. ¡Tu Matichico te anima desde la mesa!</p>
+          <p>Toca las cartas para darlas vuelta y encuentra las parejas de productos Matichoc. Menos intentos y menos tiempo dan más estrellas. 20 niveles: ¡al avanzar hay cartas traviesas y tiempo límite!</p>
+          <div id="memoria-lvlpick" class="lvl-pick"></div>
           <button class="btn-primary" id="memoria-btn-start">¡Vamos!</button>
         </div>
       </div>
@@ -788,9 +790,9 @@
 
       <div id="memoria-overlay-gameover" class="overlay hidden">
         <div class="overlay-card">
-          <h2>¡Terminaste todos los niveles!</h2>
+          <h2 id="memoria-gameover-title">¡Terminaste todos los niveles!</h2>
           <p id="memoria-gameover-text"></p>
-          <button class="btn-primary" id="memoria-btn-retry">Jugar de nuevo</button>
+          <button class="btn-primary" id="memoria-btn-retry">Intentar de nuevo</button>
           <button class="btn-secondary overlay-secondary-btn" id="memoria-btn-gameover-menu">Volver al menú</button>
         </div>
       </div>

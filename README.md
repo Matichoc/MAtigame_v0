@@ -69,7 +69,7 @@ planeados (el hub ya muestra los 7, marcando cuáles están disponibles).
     en 3D antes de comprar, para cualquiera de tus Matichicos. Puedes ir a la Tienda o
     volver al hub en cualquier momento con el botón 🏠 del HUD, y cambiar
     de perfil con el botón "Cambiar" junto a tu nombre.
-11. Completa las 6 canchas de Recolecta y Corre para ser Campeón Matichoc,
+11. Completa las canchas de Recolecta y Corre (8 de base y 12 de revancha: ¡20 niveles!) para ser Campeón Matichoc,
     o consigue el mejor puntaje posible en cualquier otro juego — todos
     quedan en la **Tabla de Puntajes**, con una pestaña por juego.
 

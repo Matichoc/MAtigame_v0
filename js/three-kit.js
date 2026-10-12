@@ -345,6 +345,7 @@ export class Game3D {
     this.state = "intro";
     this.reset();
     this.showOverlay("intro");
+    this.onIntro?.();
     this.running = true;
     this.lastTs = null;
     requestAnimationFrame(this._loop);

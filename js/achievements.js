@@ -40,6 +40,14 @@ const ALL_ACHIEVEMENTS = [
     isDone: (p) => (p.unlockedLevel || 0) >= 8,
   },
   {
+    id: "leyenda_liga",
+    name: "Leyenda de La Liga",
+    icon: "👑",
+    reward: 80,
+    desc: "Completa los 20 niveles de Recolecta y Corre.",
+    isDone: (p) => (p.unlockedLevel || 0) >= 20,
+  },
+  {
     id: "ahorrista",
     name: "Ahorrista de Cacao",
     icon: "💰",

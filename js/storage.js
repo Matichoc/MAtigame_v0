@@ -23,6 +23,8 @@ function defaultProgress() {
     wardrobe: { owned: [], looks: {} }, // looks: { [characterId]: { hair, hat, outfit, ... } }
     house: { owned: [], placed: {}, layout: null, size: 0 }, // Mi Casa (ver js/house-data.js)
     eventTokens: {}, // fichas de eventos de temporada: { [idEvento]: n }
+    campaign: {}, // niveles por juego: { [idJuego]: { unlocked, stars: { nivel: n } } } (js/campaign.js)
+    missionsDone: {}, // misiones de cada juego ya cumplidas: { [idJuego]: [n, ...] } (js/missions.js)
     xp: 0, // experiencia total (ver js/progression.js)
     packs: 1, // sobres de figuritas sin abrir (empieza con uno de regalo)
     album: {}, // { [idFigurita]: cuántas tiene }
@@ -76,6 +78,8 @@ export function loadProgress(profileId) {
       claimedAchievements: parsed.claimedAchievements || [],
       album: { ...parsed.album },
       eventTokens: { ...parsed.eventTokens },
+      campaign: JSON.parse(JSON.stringify(parsed.campaign || {})),
+      missionsDone: JSON.parse(JSON.stringify(parsed.missionsDone || {})),
       house: {
         owned: [...((parsed.house && parsed.house.owned) || [])],
         placed: { ...((parsed.house && parsed.house.placed) || {}) },
