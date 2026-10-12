@@ -6,6 +6,7 @@
 import { THREE, Game3D, clamp, lerp, canvasTexture, makeBunting } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress, earnCoins, reportScore, addToLeaderboard, saveCreation, deleteCreation, todayKey } from "./storage.js";
+import { recordRun } from "./progression.js";
 import * as audio from "./audio.js";
 import {
   PRODUCTS, CHOCOLATES, FLAVORS, TOPPINGS, WRAPS, WRAP_COLORS, MOTIFS, STEPS,
@@ -128,11 +129,11 @@ export class CreadorGame extends Game3D {
 
   _ensureMascot() {
     if (this.mascot && this.mascotId === this.character.id) {
-      this.mascot.setOutfit(this.outfit);
+      this.mascot.setLook(this.look);
       return;
     }
     if (this.mascot) this.mascotRoot.remove(this.mascot.group);
-    this.mascot = createMatichico(this.character, this.outfit);
+    this.mascot = createMatichico(this.character, this.outfit, this.look);
     this.mascotId = this.character.id;
     this.mascot.group.scale.setScalar(1.1);
     this.mascot.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
@@ -485,6 +486,7 @@ export class CreadorGame extends Game3D {
       audio.playPurchase();
     }
     reportScore(this.progress, "creador", r.score);
+    if (isNew) recordRun(this.progress, "creador", r.score);
     addToLeaderboard(this.progress, "creador", this.progress.playerName, r.score);
     this._updateHud();
     this._renderPanel();

@@ -72,7 +72,7 @@ Pestaña **Actions → "Compilar app Android" → Run workflow**. Pon el nombre 
 - [ ] No hay ningún enlace que saque del juego (menú, creador de chocolates).
 - [ ] Se ve el crédito "Un juego promovido por Matichoc".
 - [ ] Todos los juegos abren y se pueden jugar con los controles táctiles.
-- [ ] Al cerrar y volver a abrir, se conservan perfiles y monedas.
+- [ ] Al cerrar y volver a abrir, se conservan perfiles y Matipuntos.
 - [ ] Sonido y rendimiento aceptables en un teléfono modesto.
 
 ### 6. Crear la app en Play Console

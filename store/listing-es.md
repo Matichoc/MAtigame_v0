@@ -9,9 +9,17 @@ Parkour, básquet, memoria y más: juegos 3D de Matichoc para niñas y niños
 ## Descripción completa (máx. 4000 caracteres)
 ¡Bienvenido al Matijuego, el arcade de Matichoc! 🍫
 
-Elige a tu Matichico, vístelo con atuendos que ganas con monedas del juego y juega 9 aventuras en 3D hechas con mucho cacao:
+Elige a tu Matichico, cámbiale peinado, ropa, sombreros y mucho más en la tienda con los Matipuntos que ganas jugando y juega 9 aventuras en 3D hechas con mucho cacao:
 
-🧗 PARKOUR CHOCO — Corre y salta por 6 etapas de plataformas que se mueven, se rompen o parpadean. Desbloquea una capa, gafas brillantes y una corona dorada mientras avanzas.
+🧗 PARKOUR CHOCO — ¡Un mundo infinito! Corre y salta por plataformas que se mueven, se rompen o parpadean a través de 10 mundos (praderas, caramelo, nubes, galaxias…), junta poderes 🧲🛡️⚡🦘 y bate tu récord de metros. También hay una aventura de 6 etapas con capa, gafas y corona.
+
+🏘️ PUEBLO MATICHOC — Pasea por un pueblo 3D con fuente de chocolate, boutique, fábrica y un arcade con puertas mágicas. Saluda a los vecinos, junta alfajores dorados y mira cómo se hace de noche.
+
+🏠 MI CASA Y MASCOTAS — Decora tu propio cuarto con camas cohete, máquinas arcade y mini fuentes de chocolate, y adopta una mascota que te acompaña en todos los juegos.
+
+🎃🎄 EVENTOS DE TEMPORADA — Halloween, Navidad, Fiestas Patrias y más: el pueblo se transforma y puedes ganar objetos exclusivos jugando.
+
+⭐ MI AVENTURA — Sube de nivel, cumple 3 misiones nuevas cada día, mantén tu racha y completa tu álbum de chocolates con figuritas brillantes.
 
 🏃 RECOLECTA Y CORRE — Recorre canchas y gimnasios 3D, salta vallas y junta golosinas antes de que se acabe el tiempo.
 
@@ -23,10 +31,10 @@ Elige a tu Matichico, vístelo con atuendos que ganas con monedas del juego y ju
 
 🦘 SALTO CHOCO · 🏎️ AUTOS DE CHOCOLATE · 🧠 MEMORIA MATICHOC — Más aventuras: sube sin parar, esquiva en la ruta y encuentra las parejas de golosinas.
 
-🍫 CREA TU CHOCOLATE — Elige el producto, el sabor, los toppings, el envoltorio y diseña tu propia etiqueta. ¡Cada día hay un reto con monedas!
+🍫 CREA TU CHOCOLATE — Elige el producto, el sabor, los toppings, el envoltorio y diseña tu propia etiqueta. ¡Cada día hay un reto con Matipuntos!
 
 Además:
-• Perfiles para cada niña o niño de la casa: cada uno guarda sus puntajes, monedas y logros.
+• Perfiles para cada niña o niño de la casa: cada uno guarda sus puntajes, Matipuntos y logros.
 • Tabla de mejores puntajes por juego y recompensa diaria.
 • Gratis, sin publicidad y sin compras dentro del juego.
 • Sin chat ni enlaces externos. No pide cuentas ni datos personales: todo se guarda en el celular.

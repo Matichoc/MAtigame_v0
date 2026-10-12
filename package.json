@@ -4,7 +4,8 @@
   "private": true,
   "description": "Matijuego, el arcade de Matichoc, empaquetado como app Android con Capacitor.",
   "scripts": {
-    "build:app": "node scripts/build-app.mjs",
+    "build:app": "node scripts/build.mjs app",
+    "build:web": "node scripts/build.mjs web",
     "sync:android": "npm run build:app && npx cap sync android"
   },
   "dependencies": {

@@ -9,6 +9,15 @@ const IN_APP = typeof document !== "undefined" && document.documentElement.datas
 
 const ALL_GAMES = [
   {
+    id: "town",
+    name: "Pueblo Matichoc",
+    icon: "🏘️",
+    tagline: "Pasea por el pueblo: fuente de chocolate, boutique, fábrica, vecinos y un arcade con puertas mágicas.",
+    status: "available",
+    tag: "Mundo abierto",
+    noScore: true,
+  },
+  {
     id: "recolecta",
     name: "Recolecta y Corre",
     icon: "🏃",
@@ -20,7 +29,7 @@ const ALL_GAMES = [
     id: "parkour",
     name: "Parkour Choco",
     icon: "🧗",
-    tagline: "Estilo Roblox: salta plataformas, esquiva molinos, junta alfajores y desbloquea capa, gafas y corona.",
+    tagline: "Estilo Roblox: ¡mundo infinito con 10 ambientes, poderes y récord de metros! O la aventura de 6 etapas.",
     status: "available",
     tag: "Nuevo 3D",
   },

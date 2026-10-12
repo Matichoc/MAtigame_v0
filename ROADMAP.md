@@ -340,6 +340,88 @@ haciendo parkour, con ropa y brillos (`js/parkour-game.js`):
 - Puntaje por alfajores, barras, etapas, rapidez y caídas; logro "Parkourista".
 - Verificado con un bot que recorre las 6 etapas hasta la meta sin caídas.
 
+### Etapa 11b — Parkour: Mundo infinito ✅ (Fase 2 del plan "más enganche")
+
+La niña terminó los 9 juegos en una hora, así que Parkour pasa a ser un mundo
+que no termina (`js/parkour-infinite.js`, mixin de `ParkourGame`):
+
+- Recorrido **procedural**: se genera por delante del Matichico y se borra lo
+  que queda atrás (siempre se conserva desde el último checkpoint), así nunca
+  se pone pesado.
+- **10 mundos** de 140 m (Pradera, Caramelo, Nubes, Bosque de Cacao, Molinos,
+  Desierto de Galleta, Mar de Menta, Noche Neón, Galaxia Dulce, Cumbre) que se
+  repiten cada vez más difíciles (la dificultad sube durante los primeros 9
+  mundos). Cada ambiente tiene cielo, plataformas, adornos flotantes y tipos de
+  plataforma favoritos propios; los tipos nuevos aparecen de a poco
+  (móviles → vigas/frágiles → trampolín → molinos → parpadeantes).
+- **5 vidas** (cada caída resta una; +1 vida cada 3 mundos), checkpoint y
+  +2 Matipuntos por mundo nuevo, barras Matidubai (+3), alfajores (+10).
+- **Poderes**: 🧲 imán de alfajores, 🛡️ escudo (te salva de una caída), ⚡ turbo,
+  🦘 súper salto.
+- **Récord de metros** por perfil (`stats.parkourInfBest`), puntaje, ranking y
+  3 logros nuevos (Explorador, Maratonista, Viajera de Mundos).
+- Al terminar cada partida, Matipuntos extra según el puntaje (`Game3D.finish`).
+- La Aventura de 6 etapas sigue como modo aparte (elige al entrar).
+
+### Etapa 11c — Mi aventura: XP, misiones, racha y álbum ✅ (Fase 3 del plan)
+
+Para que haya una razón de volver cada día (`js/progression.js`, pantalla "Mi aventura"):
+
+- **XP y niveles**: cada partida (en cualquier juego) da XP; +20 extra la primera del
+  día. Cada nivel da Matipuntos, un sobre de figuritas y, en algunos niveles, un
+  regalo del Vestuario (`LEVEL_GIFTS`).
+- **3 misiones diarias** distintas cada día y por perfil (jugar N partidas, probar
+  juegos distintos, puntaje o metros en el Mundo infinito, ganar Matipuntos...), con
+  Matipuntos + XP; las 3 completas abren el **cofre del día**.
+- **Racha** de días seguidos con la recompensa diaria de siempre.
+- **Álbum de Chocolates**: 24 figuritas (12 productos Matichoc + 12 brillantes) que
+  salen de sobres de 3 (siempre una nueva mientras falte alguna); premios por
+  completar 6/12/18/24.
+- Todo se paga y se gana solo con Matipuntos y juego: sin compras reales.
+
+### Etapa 11d — Pueblo Matichoc (mundo abierto) ✅ (Fase 4 del plan)
+
+Un lugar para pasear en vez de solo elegir juegos de una lista (`js/town-game.js`):
+
+- Plaza empedrada con **fuente de chocolate**, **Boutique** (abre Vestuario y Tienda),
+  **Fábrica** (Crea tu Chocolate), **Figuritas** (Mi aventura) y un **tablero de misiones**.
+- **Arcade**: una puerta mágica por cada juego; al pararse enfrente aparece "▶ Jugar".
+  Al terminar o salir de un juego (o de la tienda) se vuelve al pueblo.
+- **6 vecinos** (Matichicos con ropa al azar) que caminan, miran al jugador y conversan;
+  la primera vez del día regalan 3 Matipuntos.
+- **Alfajores dorados** flotando (+1 Matipunto, hasta 25 por día, reaparecen).
+- **Ciclo día/noche** de 5 minutos con faroles y ventanas que se encienden.
+- Colisiones con edificios, controles WASD/joystick, cámara arrastrable y botón de acción
+  contextual (E / Espacio / botón en pantalla).
+
+### Etapa 11e — Mi Casa y mascotas ✅ (Fase 5 del plan)
+
+- **Mascotas** (`js/wardrobe-pets.js`): 10 criaturitas (Alfajorito, Patito de goma, Nubi,
+  Cuchu, Bombi gatito, Robo-Choco, Estrellita, Unicornio dulce, Dragón de cacao...) que
+  flotan junto al Matichico en el menú, la tienda y todos los juegos. Son una categoría
+  más del Vestuario ("Mascota"), con rarezas y precios en Matipuntos.
+- **Mi Casa** (`js/house-data.js`, `js/house3d.js`): un cuarto 3D tipo casita de muñecas con
+  10 lugares (piso, paredes, alfombra, cama, dos rincones, tres cuadros de pared y techo) y
+  ~55 objetos para decorar (cama cohete, máquina arcade, mini fuente de chocolate, bola disco...).
+  Se prueba antes de comprar; el Matichico y su mascota viven en el cuarto.
+- Se entra desde el menú ("🏠 Mi Casa") o desde el pueblo (casa verde de la plaza).
+
+### Etapa 11f — Eventos de temporada ✅ (Fase 6 del plan)
+
+`js/events.js` decide por fecha qué evento está activo (Amor de Chocolate, Huevos de
+Chocolate —según la Pascua de cada año—, Fiestas Patrias, Día de las Niñas y Niños,
+Noche de Cacao/Halloween y Navidad Chocolatera). Para probar uno fuera de fecha se agrega
+`?event=halloween` (o `navidad`, `sanvalentin`, `pascua`, `patrias`, `dianino`) a la dirección.
+
+- El **pueblo cambia**: banderines en la plaza, clima (nieve, corazones, brasas o confeti)
+  y un leve tinte del cielo.
+- **Fichas del evento** (🎃, 🎁, 💖...): 16 coleccionables en el pueblo (hasta 40 al día)
+  y +2 fichas por cada partida terminada. Son solo del evento: no se compran ni valen dinero.
+- **Objetos exclusivos** (sombrero, cuello o espalda y una mascota por evento, 18 en total)
+  que solo se compran con fichas mientras el evento está activo; después quedan
+  bloqueados con un candado y "Vuelve en <evento>", y los que compraste son tuyos para siempre.
+- Cartel en el menú con el evento actual (o cuántos días faltan para el próximo).
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista
