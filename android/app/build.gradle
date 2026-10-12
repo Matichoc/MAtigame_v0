@@ -21,6 +21,14 @@ android {
         }
     }
     signingConfigs {
+        // Llave FIJA para las versiones de prueba (APK): así cada APK nuevo se instala encima del anterior
+        // y se conserva el progreso. Es pública a propósito: NO sirve para Play Store (ahí va la llave de subida).
+        debug {
+            storeFile file('matijuego-test.keystore')
+            storePassword 'matijuego'
+            keyAlias 'matijuego'
+            keyPassword 'matijuego'
+        }
         release {
             if (keystorePath) {
                 storeFile file(keystorePath)

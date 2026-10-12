@@ -9,3 +9,4 @@ android/app/src/main/assets/public/
 android/capacitor-cordova-android-plugins/
 *.jks
 *.keystore
+!android/app/matijuego-test.keystore
