@@ -440,6 +440,24 @@ más variedad y "jugo" (música, vibración, avisos). Todo con música procedura
 - **Porristas:** viento, red de seguridad, rebotadora gigante, hitos con ovación.
 - **Memoria:** vistazo inicial, pareja dorada (+300) y cartas traviesas que cambian de lugar.
 
+### Etapa 11h — Feedback de la prueba con niñas/os ✅
+
+- **Parkour infinito:** al caer se perdían las 5 vidas seguidas (la limpieza del mundo borraba la plataforma
+  del checkpoint). Corregido.
+- **Mi Casa estilo Avatar World:** muebles que se arrastran por el cuarto (o desde la tarjeta), se giran,
+  cambian de tamaño y se guardan; 10 muebles nuevos; agrandar la casa en 3 tamaños (10, 14 y 18);
+  paredes con diseño (el marco se solapaba y las dejaba rosadas lisas). Banner grande «Mi Casa» en el menú.
+- **Controles:** joystick táctil compartido (`js/stick.js`) en Recolecta, Salto, Autos y Porristas.
+- **Pantalla ancha:** cada juego declara `orient` en `js/games-catalog.js`; los de `landscape` muestran
+  «¡Gira tu celular!» y la tarjeta lo anuncia.
+- **Pueblo:** correr, patines (nivel 4) y monopatín cohete (nivel 9).
+- **20 niveles por juego** (`js/campaign.js`): Memoria, Recolecta (12 canchas de revancha), Tetris, Básquet y
+  Porristas, con selector de niveles, estrellas y modo infinito.
+- **Misiones** (`js/missions.js`): Salto Choco, Autos y Parkour infinito siguen sin fin y suman 20 misiones cada uno
+  (se editan en las tablas de ese archivo).
+- **Web:** archivos con `?v=<huella>` para que el caché no mezcle versiones; si un juego falla, el aviso dice por qué.
+- **Celular:** Mi aventura, Logros, Puntajes y Mi Casa ahora se pueden deslizar.
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista
