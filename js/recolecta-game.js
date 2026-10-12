@@ -664,7 +664,7 @@ export class RecolectaGame extends Game3D {
     window.addEventListener("keydown", (e) => {
       if (!this.running) return;
       if (map[e.code]) { this.keys[map[e.code]] = true; e.preventDefault(); }
-      if (e.code === "Space") { this._tryJump(); e.preventDefault(); }
+      if (e.code === "Space" || e.code === "KeyK" || e.code === "KeyJ") { this._tryJump(); e.preventDefault(); } // K o J: alternativa a Espacio
       if (e.code === "ShiftLeft" || e.code === "ShiftRight" || e.code === "KeyE") { this._tryDash(); e.preventDefault(); }
     });
     window.addEventListener("keyup", (e) => { if (map[e.code]) this.keys[map[e.code]] = false; });
