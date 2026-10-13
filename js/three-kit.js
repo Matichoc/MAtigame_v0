@@ -114,6 +114,32 @@ export function makeLogo(size = 2, { lit = true } = {}) {
   return new THREE.Mesh(new THREE.PlaneGeometry(size, size), mat);
 }
 
+let coinTex = null;
+/** Moneda dorada con el logo de Matichoc (se dibuja a mano; el logo se agrega cuando carga). */
+export function goldCoinTexture() {
+  if (coinTex) return coinTex;
+  const cv = document.createElement("canvas");
+  cv.width = cv.height = 128;
+  coinTex = new THREE.CanvasTexture(cv);
+  coinTex.colorSpace = THREE.SRGBColorSpace;
+  const draw = (img) => {
+    const g = cv.getContext("2d");
+    g.clearRect(0, 0, 128, 128);
+    const gr = g.createRadialGradient(50, 46, 8, 64, 64, 64);
+    gr.addColorStop(0, "#fff0a0"); gr.addColorStop(0.6, "#ffc800"); gr.addColorStop(1, "#c98a00");
+    g.fillStyle = gr; g.beginPath(); g.arc(64, 64, 62, 0, 6.3); g.fill();
+    g.strokeStyle = "#fff6c8"; g.lineWidth = 5; g.beginPath(); g.arc(64, 64, 55, 0, 6.3); g.stroke();
+    g.strokeStyle = "#b07a00"; g.lineWidth = 2; g.beginPath(); g.arc(64, 64, 49, 0, 6.3); g.stroke();
+    if (img) { g.save(); g.beginPath(); g.arc(64, 64, 45, 0, 6.3); g.clip(); g.drawImage(img, 19, 19, 90, 90); g.restore(); }
+    coinTex.needsUpdate = true;
+  };
+  draw(null);
+  const img = new Image();
+  img.onload = () => draw(img);
+  img.src = "assets/brand/logo-badge.png";
+  return coinTex;
+}
+
 export function canvasTexture(w, h, draw) {
   const c = document.createElement("canvas");
   c.width = w;

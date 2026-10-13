@@ -6,7 +6,7 @@
 //
 // Controles: ← → / A D para moverte, ESPACIO / ↑ / W para saltar. En el celular: ◀ ▶ y ⤴.
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeLogo } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeLogo, goldCoinTexture } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
@@ -263,7 +263,7 @@ export class AventuraGame extends Game3D {
     this.bg = new THREE.Group();
     s.add(this.bg);
     this.qTex = questionTexture();
-    this.coinTex = loadTexture("assets/products/alf-maracuya.jpg");
+    this.coinTex = goldCoinTexture();
     this.partGroup = new THREE.Group();
     s.add(this.partGroup);
     this.hero = null;
@@ -360,8 +360,8 @@ export class AventuraGame extends Game3D {
     // alfajores (monedas)
     this.coinList = L.coins.map(([x, y]) => ({ x: x + 0.5, y: y + 0.5, got: false }));
     const coinGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 18);
-    const creamM = std(0xfff6e6, 0.5);
-    const coinMats = [creamM, new THREE.MeshStandardMaterial({ map: this.coinTex, roughness: 0.5 }), creamM];
+    const creamM = std(0xe0a800, 0.3, { metalness: 0.6, emissive: 0x5a3a00, emissiveIntensity: 0.35 });
+    const coinMats = [creamM, new THREE.MeshStandardMaterial({ map: this.coinTex, roughness: 0.35, metalness: 0.3 }), creamM];
     this.coinMesh = new THREE.InstancedMesh(coinGeo, coinMats, Math.max(1, this.coinList.length));
     this.coinMesh.frustumCulled = false;
     this.levelGroup.add(this.coinMesh);

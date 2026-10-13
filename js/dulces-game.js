@@ -153,20 +153,27 @@ export class DulcesGame extends Game3D {
     this.cream = std(0xfff6e6, 0.5);
     this.gold = std(0xffc800, 0.25, { metalness: 0.5, emissive: 0x6a4a00, emissiveIntensity: 0.4 });
     this.gumMat = std(0x3a1c0e, 0.22, { metalness: 0.15, emissive: 0x1a0a04, emissiveIntensity: 0.3 });
-    this.geos = [
-      new THREE.CylinderGeometry(0.43, 0.43, 0.24, 30), // alfajor
-      new THREE.CylinderGeometry(0.43, 0.43, 0.24, 30),
-      new THREE.CylinderGeometry(0.43, 0.43, 0.24, 30),
-      new THREE.CylinderGeometry(0.43, 0.43, 0.24, 30),
-      new THREE.SphereGeometry(0.42, 26, 18), // bomba de chocolate
-      new THREE.CylinderGeometry(0.25, 0.25, 0.86, 18), // cuchuflí
-    ];
-    this.rimGeo = new THREE.TorusGeometry(0.42, 0.045, 8, 28);
+    const std2 = (c, r = 0.35, ex = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: r, ...ex });
+    this.cookie = std2(0xd9a05a, 0.7);
+    this.cookieGeo = new THREE.CylinderGeometry(0.43, 0.43, 0.11, 30);
+    this.fillGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.2, 30);
+    this.glazeGeo = new THREE.CylinderGeometry(0.37, 0.37, 0.04, 30);
+    this.glazes = TYPES.map((t) => std2(new THREE.Color(t.color).lerp(new THREE.Color(0xffffff), 0.25), 0.15, { metalness: 0.1, emissive: t.color, emissiveIntensity: 0.15 }));
+    this.accents = [0x8a0f45, 0xffffff, 0x4a2c10, 0xfff0c8, 0xffffff, 0xffffff].map((c) => std2(c, 0.4));
+    this.dotGeo = new THREE.SphereGeometry(0.045, 8, 6);
+    this.wafer = new THREE.CylinderGeometry(0.2, 0.2, 0.84, 18);
+    this.waferMat = std2(0xe3b478, 0.55);
+    this.stripeRing = new THREE.TorusGeometry(0.206, 0.045, 6, 20);
+    this.redMat = std2(0xe0383a, 0.3);
+    this.yellowMat = std2(0xffd23a, 0.3);
+    this.capGeo = new THREE.CircleGeometry(0.2, 16);
+    this.darkMat = std2(0x3a1c0e, 0.4);
+    this.ballGeo = new THREE.SphereGeometry(0.42, 28, 20);
+    this.ballMat = std2(0x4e2813, 0.18, { metalness: 0.12, emissive: 0x1a0a04, emissiveIntensity: 0.25 });
     this.stripeGeo = new THREE.BoxGeometry(0.9, 0.03, 0.09);
     this.ringGeo = new THREE.TorusGeometry(0.5, 0.06, 8, 24);
-    this.tex = TYPES.map((t) => loadTexture(`assets/products/${t.img}.jpg`));
-    this.goldTex = loadTexture("assets/products/bomba-dorada.jpg");
-    this.dmats = TYPES.map((t, i) => (t.shape === "ball" || t.shape === "tube" ? new THREE.MeshStandardMaterial({ map: this.tex[i], roughness: 0.3, metalness: 0.05, emissive: t.color, emissiveIntensity: 0.1 }) : this.mats[i]));
+    this.shineGeo = new THREE.SphereGeometry(0.07, 8, 6);
+    this.shineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
   }
 
   _makePieceMesh(type, sp, gum) {
@@ -193,7 +200,7 @@ export class DulcesGame extends Game3D {
     }
     if (sp === "bomb") {
       // bomba dorada de Matichoc: la pieza de 5 en línea
-      const m = new THREE.Mesh(new THREE.SphereGeometry(0.46, 26, 18), new THREE.MeshStandardMaterial({ map: this.goldTex, color: 0xffe9a0, roughness: 0.25, metalness: 0.45, emissive: 0x8a5a00, emissiveIntensity: 0.55 }));
+      const m = new THREE.Mesh(new THREE.SphereGeometry(0.46, 26, 18), new THREE.MeshStandardMaterial({ color: 0xffd04a, roughness: 0.2, metalness: 0.6, emissive: 0x8a5a00, emissiveIntensity: 0.5 }));
       m.position.y = 0.36;
       m.castShadow = true;
       body.add(m);
@@ -208,33 +215,49 @@ export class DulcesGame extends Game3D {
       root.userData.spin = true;
       return root;
     }
+    // piezas hechas a mano (sin fotos): alfajor de dos galletas con relleno y glaseado, bomba de chocolate con hilos de oro y cuchuflí
     const shape = TYPES[type].shape;
-    const m = new THREE.Mesh(this.geos[type], this.dmats[type]);
-    m.castShadow = true;
-    m.position.y = 0.3;
-    body.add(m);
+    const flavor = TYPES[type].color;
+    const core = new THREE.Group();
+    body.add(core);
+    const mk = (geo, mat, x, y, z) => { const mm = new THREE.Mesh(geo, mat); mm.position.set(x, y, z); mm.castShadow = true; core.add(mm); return mm; };
     if (shape === "disc") {
-      // alfajor: dos tapas de color, relleno crema y la foto del producto arriba
-      const rim = new THREE.Mesh(this.rimGeo, this.cream);
-      rim.rotation.x = Math.PI / 2;
-      rim.position.y = 0.3;
-      body.add(rim);
-      const top = new THREE.Mesh(new THREE.CircleGeometry(0.35, 24), new THREE.MeshBasicMaterial({ map: this.tex[type] }));
-      top.rotation.x = -Math.PI / 2;
-      top.position.y = 0.425;
-      body.add(top);
+      mk(this.cookieGeo, this.cookie, 0, 0.07, 0);
+      mk(this.fillGeo, this.mats[type], 0, 0.22, 0);
+      mk(this.cookieGeo, this.cookie, 0, 0.37, 0);
+      const glaze = mk(this.glazeGeo, this.glazes[type], 0, 0.435, 0);
+      glaze.castShadow = false;
+      const lg = makeLogo(0.4);
+      lg.rotation.x = -Math.PI / 2;
+      lg.position.set(0, 0.465, 0);
+      core.add(lg);
+      for (let i = 0; i < 5; i++) {
+        const a = (i / 5) * Math.PI * 2 + 0.3;
+        mk(this.dotGeo, this.accents[type], Math.cos(a) * 0.3, 0.47, Math.sin(a) * 0.3);
+      }
     } else if (shape === "tube") {
-      m.rotation.z = Math.PI / 2; // el cuchuflí acostado
+      core.position.y = 0.27;
+      core.rotation.y = 0.5;
+      const w = mk(this.wafer, this.waferMat, 0, 0, 0);
+      w.rotation.z = Math.PI / 2;
+      for (let i = 0; i < 5; i++) {
+        const r = mk(this.stripeRing, i % 2 ? this.yellowMat : this.redMat, -0.3 + i * 0.15, 0, 0);
+        r.rotation.y = Math.PI / 2;
+      }
       for (const sx of [-1, 1]) {
-        const cap = new THREE.Mesh(new THREE.CircleGeometry(0.25, 14), std2(0x3a1c0e));
-        cap.position.set(sx * 0.432, 0.3, 0);
-        cap.rotation.y = sx * Math.PI / 2;
-        body.add(cap);
+        const c = mk(this.capGeo, this.darkMat, sx * 0.43, 0, 0);
+        c.rotation.y = sx * Math.PI / 2;
       }
     } else {
-      m.rotation.y = 0.6;
-      m.rotation.x = -0.35;
-      m.position.y = 0.36;
+      core.position.y = 0.42;
+      mk(this.ballGeo, this.ballMat, 0, 0, 0);
+      for (const k of [-1, 0, 1]) {
+        const rr = Math.sqrt(0.42 * 0.42 - (k * 0.2) ** 2);
+        const t = mk(new THREE.TorusGeometry(rr + 0.004, 0.017, 6, 28), this.gold, 0, k * 0.2 + 0.02 * k, 0);
+        t.rotation.x = Math.PI / 2;
+        t.castShadow = false;
+      }
+      mk(this.shineGeo, this.shineMat, -0.17, 0.2, 0.2).castShadow = false;
     }
     if (sp === "h" || sp === "v") {
       for (const o of [-0.16, 0.16]) {
@@ -243,8 +266,7 @@ export class DulcesGame extends Game3D {
         if (sp === "v") st.rotation.y = Math.PI / 2;
         body.add(st);
       }
-      m.position.y = 0.3;
-      m.scale.set(1, 1.2, 1);
+      core.scale.set(1, 1.2, 1);
     } else if (sp === "wrap") {
       const ring = new THREE.Mesh(this.ringGeo, this.gold);
       ring.rotation.x = Math.PI / 2;
@@ -948,6 +970,16 @@ export class DulcesGame extends Game3D {
       else m.position.set(p.x, p.y > 0.001 ? p.y : m.position.y, p.z);
       const sc = p.scale * (p.sp ? 0.7 + 0.3 * p.grow : 1) * (p.gum ? p.grow : 1);
       m.scale.setScalar(Math.max(0.001, sc));
+      // vida: respira suave, se aplasta al caer y salta contenta cuando la eligen
+      if (p.y > 0.05) p.fell = true;
+      else if (p.fell) { p.fell = false; p.sq = 0.28; }
+      let sq = 0;
+      if (p.sq > 0) { p.sq -= dt; sq = 0.2 * Math.sin((Math.max(0, p.sq) / 0.28) * Math.PI); }
+      const idle = p.pop < 0 && !p.gum ? Math.sin(this.time * 2.6 + p.r * 1.3 + p.c * 0.7) : 0;
+      const sel = this.selected && this.selected.r === p.r && this.selected.c === p.c ? Math.abs(Math.sin(this.time * 9)) * 0.18 : 0;
+      const bd = m.userData.body;
+      bd.scale.set(1 + sq - idle * 0.025, 1 - sq + idle * 0.035 + sel * 0.3, 1 + sq - idle * 0.025);
+      bd.position.y = sel * 0.6 + Math.max(0, idle) * 0.02;
       if (p.sp) m.userData.body.rotation.y += dt * (p.sp === "bomb" ? 2.2 : 1.1);
       else if (p.pop < 0) m.userData.body.rotation.y = Math.sin(this.time * 1.5 + p.r + p.c) * 0.15;
       if (p.pop >= 0) m.userData.body.rotation.y += dt * 9;

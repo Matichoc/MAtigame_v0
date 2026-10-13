@@ -9,7 +9,7 @@
 // Controles: joystick o WASD/flechas. En auto, el joystick gira (←→) y acelera/frena (↑↓). Botón de acción (E o Enter):
 // hablar, subir/bajar del auto, regar. H = bocina. Arrastra para mover la cámara cuando vas a pie.
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeLogo } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeLogo, goldCoinTexture } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { CHARACTERS, getOutfit } from "./characters.js";
 import { ITEMS, OUTFITS } from "./wardrobe-data.js";
@@ -911,23 +911,7 @@ export class CiudadGame extends Game3D {
   }
 
   _buildGolds() {
-    // moneda dorada redonda con la foto del alfajor (se dibuja cuando carga la imagen)
-    const cv = document.createElement("canvas");
-    cv.width = cv.height = 128;
-    const tex = new THREE.CanvasTexture(cv);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    const draw = (img) => {
-      const g = cv.getContext("2d");
-      g.clearRect(0, 0, 128, 128);
-      g.fillStyle = "#ffc800"; g.beginPath(); g.arc(64, 64, 62, 0, 6.3); g.fill();
-      if (img) { g.save(); g.beginPath(); g.arc(64, 64, 50, 0, 6.3); g.clip(); g.drawImage(img, 14, 14, 100, 100); g.restore(); }
-      g.strokeStyle = "#fff6e6"; g.lineWidth = 6; g.beginPath(); g.arc(64, 64, 58, 0, 6.3); g.stroke();
-      tex.needsUpdate = true;
-    };
-    draw(null);
-    const img = new Image();
-    img.onload = () => draw(img);
-    img.src = "assets/products/alf-maracuya.jpg";
+    const tex = goldCoinTexture();
     const spots = [];
     for (let i = 0; i < 26; i++) {
       // sobre las calles, veredas y parques: puntos repartidos por la ciudad
