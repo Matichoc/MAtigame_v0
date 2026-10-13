@@ -44,7 +44,7 @@ export const PAGES = [
 // brillantes: las 12 de la primera página (como antes) + 12 especiales
 const FOIL_BASE = [...PRODUCT_PAGE.map((s) => s.id), "ch-capitan", "ch-estrella", "lg-fabrica", "lg-cielo", "in-cacao", "in-vainilla", "jg-parkour", "jg-ciudad", "cs-copa", "cs-corona"];
 const SPECIAL_FOILS = [
-  { id: "logo*", name: "Logo de Matichoc brillante", emoji: "🌟", color: "#d4216c", page: "cosas", foil: true },
+  { id: "logo*", name: "Logo de Matichoc brillante", img: "assets/brand/logo-badge.png", logo: true, emoji: "🌟", color: "#d4216c", page: "cosas", foil: true },
   { id: "oro*", name: "Sello de Cacao de Oro", emoji: "🥇", color: "#e0b400", page: "cosas", foil: true },
 ];
 

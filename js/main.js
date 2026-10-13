@@ -1028,7 +1028,7 @@ function stickerArt(s) {
     const img = document.createElement("img");
     img.src = s.img;
     img.alt = s.name;
-    img.className = "stk-photo";
+    img.className = s.logo ? "stk-photo stk-logo" : "stk-photo";
     d.appendChild(img);
   } else d.textContent = s.emoji || "⭐";
   return d;
