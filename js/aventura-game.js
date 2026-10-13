@@ -6,7 +6,7 @@
 //
 // Controles: ← → / A D para moverte, ESPACIO / ↑ / W para saltar. En el celular: ◀ ▶ y ⤴.
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeLogo, goldCoinTexture } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, canvasTexture, makeLogo, goldCoinTexture } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress } from "./storage.js";
 import * as audio from "./audio.js";

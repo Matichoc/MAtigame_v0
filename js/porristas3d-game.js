@@ -3,7 +3,7 @@
 // cae; rebotar centrado suma combo (¡y hace volteretas!), los pompones dan puntos extra.
 // Si cae fuera de la rebotadora, se acaba la partida. Las reglas son las de siempre.
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, roundedBox, makeBunting, makeStars, makeLogo } from "./three-kit.js";
+import { THREE, Game3D, clamp, rand, canvasTexture, roundedBox, makeBunting, makeStars, makeLogo } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress, earnCoins } from "./storage.js";
 import * as audio from "./audio.js";
