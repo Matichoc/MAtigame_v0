@@ -48,10 +48,10 @@ function levelSpec(mode, level) {
   const t = (level - 1) / (LEVELS_PER_GAME - 1);
   if (mode === "pen") {
     return {
-      need: level <= 5 ? 2 : level < 20 ? 3 : 4, // goles que hay que meter de 5
-      read: lerp(0.08, 0.36, t), // qué tan seguido el arquero adivina a dónde vas
+      need: 2, // goles que hay que meter de 5 (la dificultad sube con el arquero, no con la meta: así no hay saltos bruscos)
+      read: lerp(0.08, 0.34, t), // qué tan seguido el arquero adivina a dónde vas
       react: lerp(0.4, 0.14, t),
-      speed: lerp(3.4, 7.6, t),
+      speed: lerp(3.4, 7.2, t),
       leap: t > 0.3,
       wobble: 0.02 + 0.1 * t, // temblor de la mira
       wall: 0,
@@ -68,7 +68,7 @@ function levelSpec(mode, level) {
     };
   }
   return {
-    need: level <= 6 ? 1 : 2,
+    need: 1,
     read: lerp(0.05, 0.3, t),
     react: lerp(0.45, 0.16, t),
     speed: lerp(3.2, 7, t),

@@ -1621,7 +1621,7 @@ export class CiudadGame extends Game3D {
     saveProgress(this.progress);
     this.active = null;
     this.target = null;
-    this.dog.g.visible = m.id === "perrito" ? this.dog.g.visible : false;
+    if (m.id === "perrito") this.dog.state = "home"; else this.dog.g.visible = false;
     for (const g of this.gateMeshes) g.visible = false;
     this._updateBangs();
     this.banner(`¡Misión cumplida! ${m.icon}`);

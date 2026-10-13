@@ -503,21 +503,42 @@ teclados no dejan apretar flechas + Espacio al mismo tiempo).
 
 ### Etapa 11m — Tres juegos nuevos que se canjean con Matipuntos ✅
 
-- **Canje:** Fútbol Choco, Dulces Matichoc y Aventura Choco aparecen en el menú con candado y su precio; al juntar los Matipuntos se
+- **Canje:** Fútbol Choco, Choco Match, Aventura Choco y Ciudad Choco aparecen en el menú con candado y su precio; al juntar los Matipuntos se
   canjean (`js/unlocks.js`). **Precio de prueba: 300** (una sola línea, `UNLOCK_PRICE`); para el lanzamiento se cambia a **20000**.
   Las misiones diarias solo piden juegos ya desbloqueados.
 - **⚽ Fútbol Choco** (`js/futbol-game.js`): dos modos en el mismo juego, **Penales** (5 tiros contra un arquero que lee mejor cada nivel)
   y **Tiros libres** (barrera de 2 a 5 defensas que a veces saltan, hay que pasarla con un tiro en arco). 20 niveles por modo.
   Se apunta moviendo el puntero/dedo, se mantiene apretado para cargar potencia y se suelta; potencia baja = tiro lento en arco.
-- **🍬 Dulces Matichoc** (`js/dulces-game.js`): 3 en línea 3D con piezas rayadas (4), bombas de color (5) y envueltas (L/T),
-  cadenas, y objetivos por nivel (puntaje, juntar un dulce o limpiar chicles). **Jefes** cada 5 niveles (le duele más su dulce débil
-  y te tira chicles). 20 niveles.
+- **🍫 Choco Match** (`js/dulces-game.js`, id `dulces`): 3 en línea 3D con **productos reales de Matichoc** (alfajores de frambuesa,
+  menta, maracuyá y naranja, bomba de chocolate y cuchuflí, con sus fotos), piezas rayadas (4), bomba dorada (5) y envueltas (L/T),
+  cadenas, y objetivos por nivel (puntaje, juntar un producto o romper coberturas de chocolate duro). **Jefes** cada 5 niveles
+  (Don Cacao, Reina Frambuesa, Rey Maracuyá, Dragón de Trufa; les duele más su producto débil y lanzan coberturas). 20 niveles con
+  la dificultad calibrada con un bot (cuánto hay que hacer por movimiento sube parejo, sin saltos entre tipos de nivel).
 - **🍄 Aventura Choco** (`js/aventura-game.js`): plataformas de avance lateral tipo Mario, 5 mundos × 4 niveles = 20. Los niveles se
   arman solos con tramos y una semilla por nivel (siempre iguales); en cada mundo, el cuarto nivel es un jefe que se pisa 3 veces.
   Alfajores, bloques ?, ladrillos, pinchos, pozos, puntos de control; botones ◀ ▶ ⤴ en el celular.
-- **Demo para la web (listo, apagado):** `js/demo.js` limita los niveles jugables (Fútbol 3, Dulces 3, Aventura 2) y muestra
+- **Demo para la web (listo, apagado):** `js/demo.js` limita los niveles jugables (Fútbol 3, Choco Match 3, Aventura 2, Ciudad 2 misiones) y muestra
   «¡Esto sigue en la app!». Se enciende compilando con `MATIJUEGO_DEMO=1 node scripts/build.mjs web`. Hoy la web queda completa.
 - 50 logros nuevos (niveles de cada juego, jefes, goles, pisotones, récords…) y una meta «Dueño de la Arcade».
+
+### Etapa 11n — Mejoras de juego, Fútbol completo y Ciudad Choco ✅
+
+- **Tetris:** las figuras de «SIGUE» y «GUARDA» ya no se acumulan (los meshes viejos no se sacaban del panel).
+- **Logo de Matichoc** en la escenografía de casi todos los juegos (`makeLogo()` en `js/three-kit.js`): cancha y tribuna, bandera y castillo,
+  pared de la chocolatería, piso del pasillo de Recolecta, aros de Básquet, cortinas de Porristas, arcos de Autos, decorados de Salto,
+  meta de Parkour y letrero de Tetris.
+- **Dificultad pareja:** Recolecta (curva continua de 20 niveles en `js/levels.js`), Memoria, Porristas y Choco Match (calibrado con un bot) suben
+  sin los saltos «fácil, fácil, difícil»; en Fútbol la meta de goles ya no cambia a mitad del juego (2 de 5 en Penales, 1 de 5 en Tiros libres)
+  y lo que sube es el arquero y la barrera.
+- **⚽ Fútbol Choco, más completo:** botones **↶ ↷ (Q / E)** para dar **efecto** (la pelota sale curva y queda en la mira; se ve la trayectoria con
+  puntitos y el arquero se confunde); **dianas doradas** en los ángulos (+150); **4 copas de 5 partidos** con arqueros con nombre
+  (Guantes de Seda, Muralla Frambuesa, Pulpo Menta, El Gigante Dorado) y una final al terminar cada copa; y un tercer modo, **🧤 Atajapenales**:
+  tú eres el arquero, el delantero rival avisa con el cuerpo a qué lado patea (¡y a veces te engaña!) y tocas dónde lanzarte. 20 niveles por modo.
+- **🏙️ Ciudad Choco** (`js/ciudad-game.js`): mundo abierto infantil. A pie o en auto (joystick: ←→ gira, ↑ acelera, ↓ frena; H bocina), mapa,
+  brújula con distancia, autos de la ciudad que paran si hay alguien adelante y peatones que se corren (nada de golpes que duelan).
+  **8 misiones tranquilas:** 🎨 pintar la reja de Don Pepe, 🍎 manzanas para Doña Rosa, 🧹 plaza limpia, 🌷 regar las flores, 🐶 el perrito perdido
+  (frío/caliente), 👵 la abuelita cruza la calle, 📦 entrega de chocolates en auto y 🏁 carrera por la ciudad (medallas por tiempo). La primera vez
+  dan Matipuntos completos; repetirlas da una propina con tope diario. Alfajores dorados por la ciudad (tope diario). Se canjea con Matipuntos.
 
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 

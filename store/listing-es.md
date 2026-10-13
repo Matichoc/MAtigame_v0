@@ -31,7 +31,7 @@ Elige a tu Matichico, cámbiale peinado, ropa, sombreros y mucho más en la tien
 
 🦘 SALTO CHOCO · 🏎️ AUTOS DE CHOCOLATE · 🧠 MEMORIA MATICHOC — Más aventuras: sube sin parar, esquiva en la ruta y encuentra las parejas de golosinas.
 
-⚽ FÚTBOL CHOCO · 🍬 DULCES MATICHOC · 🍄 AVENTURA CHOCO — ¡Tres juegos para desbloquear con tus Matipuntos! Penales y tiros libres contra el arquero, un juego de 3 en línea con jefes golosos y una aventura de plataformas por 5 mundos.
+⚽ FÚTBOL CHOCO · 🍫 CHOCO MATCH · 🍄 AVENTURA CHOCO · 🏙️ CIUDAD CHOCO — ¡Cuatro juegos para desbloquear con tus Matipuntos! Penales, tiros libres con efecto y atajapenales; un 3 en línea con los productos de Matichoc y jefes; una aventura de plataformas por 5 mundos; y una ciudad abierta para pasear en auto y ayudar a los vecinos con misiones tranquilas.
 
 🍫 CREA TU CHOCOLATE — Elige el producto, el sabor, los toppings, el envoltorio y diseña tu propia etiqueta. ¡Cada día hay un reto con Matipuntos!
 

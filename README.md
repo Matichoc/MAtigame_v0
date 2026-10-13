@@ -15,8 +15,9 @@ con brillo (bloom), música generada en vivo, color vivo y un Matichico 3D que c
 **Lanzamientos de Básquet** (5 posiciones, rachas, modo «en llamas» y 20 niveles),
 **Saltos de Porristas** (viento, red de seguridad, rebotadora gigante y 20 niveles), **Salto Choco** (enemigos, vidas, 4 zonas, infinito y 20 misiones),
 **Autos de Chocolate** (rivales, rampas, charcos, poderes, infinito y 20 misiones), **Memoria Matichoc** (pareja dorada, cartas traviesas y 20 niveles),
-**Juegos que se canjean con Matipuntos** (se desbloquean desde el menú al juntar suficientes): **Fútbol Choco** (penales y tiros libres, 20 niveles cada modo),
-**Dulces Matichoc** (3 en línea con piezas especiales y jefes golosos, 20 niveles) y **Aventura Choco** (plataformas tipo Mario por 5 mundos con jefes, 20 niveles),
+**Juegos que se canjean con Matipuntos** (se desbloquean desde el menú al juntar suficientes): **Fútbol Choco** (penales, tiros libres con efecto y atajapenales, 20 niveles cada modo, 4 copas con rivales),
+**Choco Match** (3 en línea con los productos reales de Matichoc, piezas especiales y jefes, 20 niveles), **Aventura Choco** (plataformas tipo Mario por 5 mundos con jefes, 20 niveles)
+y **Ciudad Choco** (mundo abierto para pasear a pie o en auto con 8 misiones tranquilas: pintar una reja, juntar manzanas, ayudar a una abuelita…),
 **Choco Blaster** (primera persona, ver
 [`docs/PROPUESTA-3D.md`](./docs/PROPUESTA-3D.md)) y **Crea tu Chocolate**
 (configurador 3D: elige producto, sabor, toppings, envoltorio y diseña tu
@@ -120,8 +121,9 @@ js/matichico3d.js     Matichico en 3D con atuendo de la tienda
 js/salto-game.js      Salto Choco 3D
 js/autos-game.js      Autos de Chocolate 3D
 js/memoria-game.js    Memoria Matichoc 3D
-js/futbol-game.js     Fútbol Choco 3D (penales y tiros libres)
-js/dulces-game.js     Dulces Matichoc 3D (3 en línea con jefes)
+js/futbol-game.js     Fútbol Choco 3D (penales, tiros libres con efecto y atajapenales)
+js/dulces-game.js     Choco Match 3D (3 en línea con productos Matichoc y jefes)
+js/ciudad-game.js     Ciudad Choco 3D (mundo abierto con auto, mapa y misiones)
 js/aventura-game.js   Aventura Choco 3D (plataformas por mundos; los niveles se arman con una semilla)
 js/unlocks.js         Canje de juegos con Matipuntos (precio en una sola línea)
 js/demo.js            Modo demo de la web (apagado por ahora; ver ROADMAP, etapa 11m)
