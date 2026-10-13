@@ -220,7 +220,11 @@ export function recordRun(progress, gameId, score, info = {}) {
   const st = progress.stats;
   st.runsBy = st.runsBy || {};
   st.runsBy[gameId] = (st.runsBy[gameId] || 0) + 1;
-  if (st.lastPlayDay !== d.date) { st.lastPlayDay = d.date; st.playDays = (st.playDays || 0) + 1; }
+  if (st.lastPlayDay !== d.date) {
+    st.lastPlayDay = d.date;
+    st.playDays = (st.playDays || 0) + 1;
+    st.playDayList = [...(st.playDayList || []), d.date].slice(-30); // para ver en qué días jugó (panel del creador)
+  }
   d.best[gameId] = Math.max(d.best[gameId] || 0, Math.round(score || 0));
   if (info.meters) d.meters = Math.max(d.meters, info.meters);
   progress.stats.totalRuns = (progress.stats.totalRuns || 0) + 1;

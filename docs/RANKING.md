@@ -4,8 +4,8 @@ Sirve para que **tú** veas quién juega (solo por **apodo**) y, más adelante, 
 Mientras `js/online-config.js` esté vacío, **la app no envía nada a ningún servidor**.
 
 ## Qué se envía (solo si lo enciendes)
-Apodo del perfil, un identificador al azar (no se puede rastrear a una persona), plataforma (app/web), XP, partidas, tiempo jugado,
-Matipuntos y el mejor puntaje de cada juego. **No** se envía nombre real, correo, ubicación ni nada de los dispositivos.
+Apodo del perfil, un identificador al azar (no se puede rastrear a una persona), plataforma (app/web), versión del juego, XP, partidas (y cuántas de cada juego),
+tiempo jugado, cuántas veces abrió el juego, los días en que jugó (últimos 30), Matipuntos y el mejor puntaje de cada juego. **No** se envía nombre real, correo, ubicación ni nada de los dispositivos.
 
 ## Cómo encenderlo (una sola vez, ~10 minutos)
 1. Crea una cuenta gratis en <https://supabase.com> y un proyecto nuevo (región cercana, p. ej. São Paulo).
@@ -16,8 +16,10 @@ Matipuntos y el mejor puntaje de cada juego. **No** se envía nombre real, corre
 5. Abre `admin/ranking.html` en tu computador (doble clic), pega la URL, la llave anon y **tu clave de creador**, y pulsa *Cargar jugadores*.
 
 ## Qué ves en el panel
-Jugadores (apodo, última vez que jugó, desde cuándo, app o web, XP, partidas, tiempo, Matipuntos, récords por juego y misiones de Ciudad Choco),
-cuántos están activos hoy y esta semana (🟢 = jugando ahora) y un ranking por juego.
+Jugadores (apodo, última vez que jugó, desde cuándo, app o web, sesiones, días que jugó, versión, qué juegos juega más, XP, partidas, tiempo, Matipuntos, récords y misiones de Ciudad Choco),
+cuántos están activos hoy y esta semana (🟢 = jugando ahora), un gráfico de jugadores distintos por día (últimos 14 días), los juegos más jugados y un ranking por juego.
+
+**Ojo:** solo cuenta a quien juega con una versión que ya tenga la conexión encendida. Lo que pasó antes de encenderla no queda registrado en ninguna parte.
 
 ## Mostrar el ranking a los jugadores (cuando tú quieras)
 En el panel, botón **“Abrir ranking a los jugadores”**. Desde ese momento la app muestra un botón **🌎 Ranking** con los 20 mejores
