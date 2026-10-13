@@ -95,7 +95,7 @@ const ALL_GAMES = [
     orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
     name: "Fútbol Choco",
     icon: "⚽",
-    tagline: "Penales y tiros libres: apunta, carga la potencia y pasa a los arqueros y la barrera. 20 niveles en cada modo.",
+    tagline: "Penales, tiros libres con efecto y atajapenales: gana las 4 copas. 20 niveles en cada modo.",
     status: "available",
     tag: "Nuevo",
   },
