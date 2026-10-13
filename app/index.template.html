@@ -990,6 +990,71 @@
     </div>
   </section>
 
+  <!-- PANTALLA DE JUEGO 3D: DULCES MATICHOC (3 en línea con jefes) -->
+  <section id="screen-dulces" class="screen game-screen hidden">
+    <div id="dulces-hud" class="hud">
+      <div class="hud-left">
+        <button id="dulces-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="dulces-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Dulces Matichoc 3D</div>
+          <div class="hud-mission" id="dulces-hud-level">Nivel 1</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">🎯 <span id="dulces-hud-goal">0</span></div>
+        <div class="hud-chip">👆 <span id="dulces-hud-moves">0</span></div>
+        <div class="hud-chip">⭐ <span id="dulces-hud-score">0</span></div>
+        <div class="hud-chip">🍫✨ <span id="dulces-hud-coins">0</span></div>
+        <button id="dulces-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="dulces-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="dulces-canvas"></canvas>
+      <div id="dulces-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="dulces-popups" class="fps-popups" aria-hidden="true"></div>
+      <div id="dulces-boss" class="dl-boss hidden">
+        <div class="dl-boss-top"><b id="dulces-boss-name">Jefe</b><span id="dulces-boss-weak"></span></div>
+        <div class="dl-boss-bar"><div id="dulces-boss-fill" class="dl-boss-fill"></div></div>
+      </div>
+
+      <div id="dulces-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Dulces Matichoc 3D</h2>
+          <p class="fps-tag">3 en línea con jefes</p>
+          <p id="dulces-intro-text"></p>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>Desliza un dulce hacia el de al lado (o toca uno y luego el vecino) para cambiarlos y juntar 3 o más iguales en línea.
+            <b>4 en línea</b> hace un dulce rayado que borra toda una fila o columna; <b>5 en línea</b> hace una bomba de color; una <b>L o T</b> hace un dulce envuelto que explota alrededor.
+            Cada nivel pide algo: llegar a un puntaje, juntar un dulce o limpiar los chicles. Cada 5 niveles hay un <b>JEFE</b>: derrótalo juntando piezas (le duele más su dulce débil), ¡pero te tira chicles!</p>
+          </details>
+          <div id="dulces-lvlpick" class="lvl-pick"></div>
+          <button class="btn-primary" id="dulces-btn-start">¡A jugar!</button>
+        </div>
+      </div>
+
+      <div id="dulces-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="dulces-win-title">¡Nivel superado!</h2>
+          <div id="dulces-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="dulces-win-text"></p>
+          <button class="btn-primary" id="dulces-btn-next">Siguiente nivel</button>
+          <button class="btn-secondary overlay-secondary-btn" id="dulces-btn-win-menu">Volver al menú</button>
+        </div>
+      </div>
+
+      <div id="dulces-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="dulces-gameover-title">¡Se acabaron los movimientos!</h2>
+          <p id="dulces-gameover-text"></p>
+          <button class="btn-primary" id="dulces-btn-retry">Reintentar</button>
+          <button class="btn-secondary overlay-secondary-btn" id="dulces-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- PANTALLA DE JUEGO 3D: CREA TU CHOCOLATE -->
   <section id="screen-creador" class="screen game-screen cr-screen hidden">
     <div id="creador-hud" class="hud cr-hud">
