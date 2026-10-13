@@ -75,19 +75,19 @@ export function queueSync(progress, force = false) {
     return;
   }
   last = now;
-  rpc("upsert_player", { p: payload(progress) }, force).catch(() => { /* sin internet: se reintenta en el próximo guardado */ });
+  rpc("mj_upsert_player", { p: payload(progress) }, force).catch(() => { /* sin internet: se reintenta en el próximo guardado */ });
 }
 
 /** ¿El creador ya decidió mostrar el ranking a los jugadores? */
 export async function rankingEnabled() {
   if (!onlineEnabled()) return false;
-  try { return (await rpc("ranking_enabled", {})) === true; } catch (e) { return false; }
+  try { return (await rpc("mj_ranking_enabled", {})) === true; } catch (e) { return false; }
 }
 
 /** Los mejores puntajes de un juego: [{ nick, score }] (vacío si el ranking no está abierto al público). */
 export async function fetchRanking(game, limit = 20) {
   if (!onlineEnabled()) return [];
-  try { return (await rpc("public_ranking", { g: game, lim: limit })) || []; } catch (e) { return []; }
+  try { return (await rpc("mj_public_ranking", { g: game, lim: limit })) || []; } catch (e) { return []; }
 }
 
 // al cerrar o cambiar de app, se manda lo último

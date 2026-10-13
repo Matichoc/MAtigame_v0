@@ -77,9 +77,9 @@ async function load() {
   $("msg").className = "msg"; $("msg").textContent = "Cargando…";
   try { localStorage.setItem("mj_admin_url", $("url").value.trim()); localStorage.setItem("mj_admin_anon", $("anon").value.trim()); } catch (e) {}
   try {
-    players = await rpc("admin_players", { admin_key: $("key").value });
+    players = await rpc("mj_admin_players", { admin_key: $("key").value });
     $("msg").textContent = ""; $("out").hidden = false;
-    let pub = false; try { pub = (await rpc("ranking_enabled", {})) === true; } catch (e) {}
+    let pub = false; try { pub = (await rpc("mj_ranking_enabled", {})) === true; } catch (e) {}
     $("pubState").textContent = pub ? "🟢 abierto" : "🔒 cerrado (solo tú)"; $("pubState").dataset.on = pub ? "1" : "";
     $("togglePub").textContent = pub ? "Cerrar ranking" : "Abrir ranking a los jugadores";
     render();
@@ -129,7 +129,7 @@ $("tabR").onclick = () => { $("viewP").hidden = true; $("viewR").hidden = false;
 $("togglePub").onclick = async () => {
   const on = !$("pubState").dataset.on;
   if (on && !confirm("¿Abrir el ranking? Los jugadores verán apodos y puntajes en la app.")) return;
-  try { await rpc("admin_set_show", { admin_key: $("key").value, show: on }); load(); } catch (e) { alert(e.message); }
+  try { await rpc("mj_admin_set_show", { admin_key: $("key").value, show: on }); load(); } catch (e) { alert(e.message); }
 };
 </script>
 </body>

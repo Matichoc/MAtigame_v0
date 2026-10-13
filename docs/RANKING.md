@@ -8,7 +8,7 @@ Apodo del perfil, un identificador al azar (no se puede rastrear a una persona),
 tiempo jugado, cuántas veces abrió el juego, los días en que jugó (últimos 30), Matipuntos y el mejor puntaje de cada juego. **No** se envía nombre real, correo, ubicación ni nada de los dispositivos.
 
 ## Cómo encenderlo (una sola vez, ~10 minutos)
-1. Crea una cuenta gratis en <https://supabase.com> y un proyecto nuevo (región cercana, p. ej. São Paulo).
+1. Crea una cuenta gratis en <https://supabase.com> y un proyecto nuevo (región cercana, p. ej. São Paulo). **Si ya tienes un proyecto y el plan gratis no te deja crear otro, usa el que ya tienes**: el SQL solo crea tablas y funciones con prefijo `mj_` (`mj_players`, `mj_config`, `mj_upsert_player`…), así que no toca ni mezcla nada de lo existente. Se puede ejecutar más de una vez sin problema.
 2. Abre `docs/ranking-supabase.sql`, **cambia la clave** `pon-aqui-tu-clave-de-creador` por una larga tuya y pégalo en
    *Supabase → SQL Editor → New query → Run*.
 3. En *Project Settings → API* copia la **Project URL** y la llave **anon public**.
