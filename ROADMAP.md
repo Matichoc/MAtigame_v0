@@ -547,6 +547,14 @@ teclados no dejan apretar flechas + Espacio al mismo tiempo).
 - **Ranking / monitoreo del creador** (`js/online.js`, `docs/RANKING.md`, `docs/ranking-supabase.sql`, `admin/ranking.html`): solo apodo + avance, apagado
   hasta configurar Supabase. El creador ve quién juega y decide cuándo abrir un botón 🌎 Ranking para los jugadores. La política de privacidad ya lo describe.
 
+### Etapa 11p — Álbum más grande, con venta y cambio de repetidas ✅
+
+- **96 figuritas** (`js/album.js`): 6 páginas de 12 (Alfajores y bombas, Matichicos y vecinos, Lugares, Ingredientes, Los juegos, Cosas geniales) + 24 brillantes.
+  Cada sobre trae 3 figuritas **al azar** (10 % brillantes; ya no se asegura una nueva). Con solo suerte, completarlo toma ~280 sobres.
+- **Repetidas:** se pueden **vender** (1 🍫✨ por normal, 6 por brillante) o juntar para el **taller**: 12 repetidas → la figurita normal que te falta
+  (36 para una brillante; una brillante repetida vale 3). Con el taller se completa en ~130 sobres (simulado), es decir, semanas de juego.
+- Premios por hitos (6 … 96 figuritas) y por página completa (+40). Logros nuevos: Páginas completas y Vendedor de repetidas. El avance del álbum anterior se conserva.
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista
