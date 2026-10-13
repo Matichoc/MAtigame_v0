@@ -298,7 +298,7 @@ export class Porristas3DGame extends Game3D {
     this.coinsEarned = 0;
     this.mode = campaignMode(this.progress, GAME_ID);
     this.level = this.mode === "levels" ? campaignLevel(this.progress, GAME_ID) : 0;
-    this.goal = this.level ? 8 + 3 * this.level : 0; // rebotes que hay que dar en el nivel
+    this.goal = this.level ? Math.round(14 + 3.5 * this.level) : 0; // rebotes que hay que dar en el nivel (sube parejo: 18 a 84)
     this.bounces = 0;
     this.centered = 0;
     this.paddle = { x: PX_W / 2, w: PADDLE_BASE_W };

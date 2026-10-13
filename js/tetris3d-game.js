@@ -300,7 +300,9 @@ export class Tetris3DGame extends Game3D {
   }
 
   _clearGroup(list) {
-    for (const m of list) this.cellRoot.remove(m);
+    // cada malla sale de donde esté (el tablero, el cuadro SIGUE o el cuadro GUARDA); antes solo salían del tablero y
+    // las piezas de los cuadros se acumulaban unas sobre otras al reiniciar o cambiar de nivel
+    for (const m of list) if (m.parent) m.parent.remove(m);
     list.length = 0;
   }
 
@@ -311,18 +313,18 @@ export class Tetris3DGame extends Game3D {
     const vfov = THREE.MathUtils.degToRad(this.fov / 2);
     const aspect = w / h;
     // encuadre: alto del tablero (+ marco) o ancho del tablero, el que mande
-    const needH = (this.portrait ? ROWS + 7.4 : ROWS + 5.2) / 2;
+    const needH = (this.portrait ? ROWS + 8.4 : ROWS + 5.2) / 2;
     const needW = (this.portrait ? COLS + 2.2 : COLS + 13.4) / 2;
     const dist = Math.max(needH / Math.tan(vfov), needW / (Math.tan(vfov) * aspect));
     this.camDist = dist;
-    this.camCenterY = this.portrait ? ROWS / 2 + 1.6 : ROWS / 2 + 0.9;
+    this.camCenterY = this.portrait ? ROWS / 2 + 2.1 : ROWS / 2 + 0.9;
     // lugar del preview y del héroe
     if (this.portrait) {
-      this.nextHolder.position.set(3.1, ROWS + 3.1, 0);
-      this.nextHolder.scale.setScalar(0.75);
+      this.nextHolder.position.set(3.2, ROWS + 2.7, 0);
+      this.nextHolder.scale.setScalar(0.72);
       this.nextHolder.rotation.y = 0;
-      this.holdHolder.position.set(-0.1, ROWS + 3.1, 0);
-      this.holdHolder.scale.setScalar(0.75);
+      this.holdHolder.position.set(-0.2, ROWS + 2.7, 0);
+      this.holdHolder.scale.setScalar(0.72);
       this.holdHolder.rotation.y = 0;
       this.hero.group.position.set(-3.4, ROWS + 1.3, 0.6);
       this.hero.group.scale.setScalar(1.15);
@@ -331,11 +333,11 @@ export class Tetris3DGame extends Game3D {
       this.sign.position.set(0, ROWS + 5.6, -2.9);
       this.sign.visible = false;
     } else {
-      this.nextHolder.position.set(COLS / 2 + 4.1, ROWS - 3.6, 0);
-      this.nextHolder.scale.setScalar(1.12);
+      this.nextHolder.position.set(COLS / 2 + 4.1, ROWS - 3.0, 0);
+      this.nextHolder.scale.setScalar(1.0);
       this.nextHolder.rotation.y = -0.22; // de cara a la cámara, sin torcerse en el borde
-      this.holdHolder.position.set(COLS / 2 + 4.1, ROWS - 9.0, 0);
-      this.holdHolder.scale.setScalar(1.12);
+      this.holdHolder.position.set(COLS / 2 + 4.1, ROWS - 10.4, 0);
+      this.holdHolder.scale.setScalar(1.0);
       this.holdHolder.rotation.y = -0.22;
       this.hero.group.position.set(-COLS / 2 - 3.6, 2.2, 1);
       this.hero.group.scale.setScalar(2.1);
