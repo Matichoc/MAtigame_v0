@@ -948,6 +948,13 @@
       <div id="futbol-popups" class="fps-popups" aria-hidden="true"></div>
 
       <div id="futbol-hint" class="fb-hint"></div>
+      <div id="futbol-curl" class="fb-curl hidden" aria-label="Efecto">
+        <span class="fb-power-label">EFECTO</span>
+        <div class="fb-curl-row">
+          <button type="button" id="futbol-btn-curl-l" class="fb-curl-btn" title="Curva hacia la izquierda (Q)">↶</button>
+          <button type="button" id="futbol-btn-curl-r" class="fb-curl-btn" title="Curva hacia la derecha (E)">↷</button>
+        </div>
+      </div>
       <div id="futbol-power" class="fb-power hidden" aria-label="Potencia">
         <span class="fb-power-label">POTENCIA</span>
         <div class="fb-power-track"><div id="futbol-power-fill" class="fb-power-fill"></div></div>
@@ -956,13 +963,14 @@
       <div id="futbol-overlay-intro" class="overlay hidden">
         <div class="overlay-card">
           <h2>Fútbol Choco 3D</h2>
-          <p class="fps-tag">Penales y tiros libres</p>
+          <p class="fps-tag">Penales, tiros libres y atajapenales</p>
           <div id="futbol-modepick" class="lvl-pick"></div>
           <p id="futbol-intro-text"></p>
           <details class="how"><summary>📖 Cómo se juega</summary>
           <p>Mueve el puntero (o el dedo, o las flechas) para <b>apuntar</b> al arco. <b>Mantén apretado</b> (o ESPACIO) para cargar la potencia y <b>suelta</b> para patear.
             Potencia alta: tiro rápido y plano, pero si te pasas se va afuera. Potencia baja: tiro lento y en arco, que sirve para pasar la barrera en los tiros libres (¡pero el arquero llega!).
-            Cada nivel son 5 tiros y tienes que meter los goles que te piden. ¡Los goles a los ángulos valen más!</p>
+            Cada nivel son 5 tiros y tienes que meter los goles que te piden. Los botones <b>↶ ↷</b> (o <b>Q</b> / <b>E</b>) le dan <b>efecto</b> a la pelota: sale curva y el arquero se confunde. ¡Las <b>dianas doradas</b> de los ángulos valen mucho más!</p>
+          <p>🧤 En <b>Atajapenales</b> tú eres el arquero: <b>mira al delantero</b> (su cuerpo avisa a qué lado va a patear… ¡a veces te engaña!) y <b>toca</b> en el arco dónde lanzarte (o usa ← → ↑ y Q / E).</p>
           </details>
           <div id="futbol-lvlpick" class="lvl-pick"></div>
           <button class="btn-primary" id="futbol-btn-start">¡A la cancha!</button>

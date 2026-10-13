@@ -284,6 +284,8 @@ export function recordRun(progress, gameId, score, info = {}) {
   progress.stats.totalRuns = (progress.stats.totalRuns || 0) + 1;
   // contadores de los juegos nuevos (para sus logros)
   if (info.goals) st.goalsTotal = (st.goalsTotal || 0) + info.goals;
+  if (info.dianas) st.dianasTotal = (st.dianasTotal || 0) + info.dianas;
+  if (info.mode === "ata" && info.saves) st.ataSaves = (st.ataSaves || 0) + info.saves;
   if (info.stomps) st.stompsTotal = (st.stompsTotal || 0) + info.stomps;
   if (info.coins && gameId === "aventura") st.aventuraCoins = (st.aventuraCoins || 0) + info.coins;
   if (info.specials) st.dulcesSpecials = (st.dulcesSpecials || 0) + info.specials;

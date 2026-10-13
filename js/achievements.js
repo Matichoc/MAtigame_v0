@@ -238,6 +238,10 @@ for (const g of LEVEL_GAMES) chain("campana", `niv_${g}`, LEVEL_NAMES[g][0], LEV
 // Juegos que se canjean con Matipuntos: Fútbol (dos modos), Dulces y Aventura, 20 niveles cada uno
 chain("campana", "niv_futbol_pen", "Rey de los Penales", "🥅", levelsDone("futbol_pen"), "Supera {n} niveles de Penales.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
 chain("campana", "niv_futbol_tl", "Maestro del Tiro Libre", "🎯", levelsDone("futbol_tl"), "Supera {n} niveles de Tiros libres.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
+chain("campana", "niv_futbol_ata", "Manos de Oro", "🧤", levelsDone("futbol_ata"), "Supera {n} niveles de Atajapenales.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
+const CUP_MODES = ["futbol_pen", "futbol_tl", "futbol_ata"];
+const cupsWon = (p) => CUP_MODES.reduce((a, g) => a + [5, 10, 15, 20].filter((n) => (camp(p, g).stars[n] || 0) > 0).length, 0);
+chain("campana", "copas", "Campeón de Copas", "🏆", cupsWon, "Gana {n} copas de Fútbol Choco (hay 12: 4 por modo).", [[1, 25], [4, 70], [8, 160], [12, 400]]);
 chain("campana", "niv_dulces", "Maestro del Choco Match", "🍫", levelsDone("dulces"), "Supera {n} niveles de Choco Match.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
 chain("campana", "niv_aventura", "Aventurero de Mundos", "🍄", levelsDone("aventura"), "Supera {n} niveles de Aventura Choco.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
 const BOSS_LEVELS = { dulces: [5, 10, 15, 20], aventura: [4, 8, 12, 16, 20] };
@@ -264,6 +268,8 @@ REC("rec_futbol", "Récord Fútbol", "⚽", best("futbol"), "Consigue {n} puntos
 REC("rec_dulces", "Récord Choco Match", "🍫", best("dulces"), "Consigue {n} puntos en Choco Match.", [[2500, 15], [5000, 40], [9000, 100], [15000, 250]]);
 REC("rec_aventura", "Récord Aventura", "🍄", best("aventura"), "Consigue {n} puntos en Aventura Choco.", [[800, 15], [1500, 40], [2500, 100], [4000, 250]]);
 chain("puntajes", "goleador", "Goleador", "⚽", stat("goalsTotal"), "Mete {n} goles en Fútbol Choco.", [[10, 15], [50, 50], [150, 120], [400, 300]]);
+chain("puntajes", "dianas", "Francotirador", "🎯", stat("dianasTotal"), "Mete {n} goles en las dianas doradas del arco.", [[3, 15], [15, 50], [50, 120], [150, 300]]);
+chain("puntajes", "atajadas", "Pared de Chocolate", "🧤", stat("ataSaves"), "Ataja {n} penales en Atajapenales.", [[10, 15], [40, 50], [120, 120], [350, 300]]);
 chain("puntajes", "pisotones", "Pisotones", "👟", stat("stompsTotal"), "Pisa {n} enemigos en Aventura Choco.", [[20, 15], [100, 50], [300, 120], [800, 300]]);
 chain("puntajes", "alfajores_av", "Alfajorero", "🍫", stat("aventuraCoins"), "Junta {n} alfajores en Aventura Choco.", [[100, 15], [500, 50], [1500, 120], [4000, 300]]);
 chain("puntajes", "especiales", "Piezas especiales", "✨", stat("dulcesSpecials"), "Crea {n} piezas especiales (rayadas, bombas doradas y envueltas).", [[10, 15], [40, 50], [120, 120], [300, 300]]);

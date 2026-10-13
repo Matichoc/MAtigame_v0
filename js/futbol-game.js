@@ -1,7 +1,9 @@
-// Fútbol Choco 3D: dos modos en el mismo juego.
+// Fútbol Choco 3D: tres modos en el mismo juego.
 //   🥅 Penales: tanda de 5 tiros contra un arquero que cada nivel lee mejor tus tiros.
 //   🎯 Tiros libres: la pelota está lejos, hay una barrera de defensas (que a veces saltan) y un arquero.
-// Cada modo tiene 20 niveles con estrellas; hay que meter una cantidad de goles de 5 tiros.
+//   🧤 Atajapenales: ahora tú eres el arquero: mira al delantero (¡su cuerpo avisa a qué lado va a patear!) y toca dónde lanzarte.
+// Cada modo tiene 20 niveles con estrellas, divididos en 4 copas de 5 partidos con rivales con nombre.
+// Tiros y tiros libres: efecto (curva) con los botones ↶ ↷ (o Q / E) y dianas doradas en los ángulos del arco.
 //
 // Cómo se patea (mouse, dedo o teclado): se mueve el puntero para apuntar a un lugar del arco, se MANTIENE apretado
 // para cargar la potencia y se SUELTA para patear. Con potencia alta la pelota va rápida y plana (pero se puede ir
@@ -26,7 +28,18 @@ const PEN_Z = 9; // distancia del penal
 const MODES = {
   pen: { id: "futbol_pen", name: "Penales", icon: "🥅" },
   tl: { id: "futbol_tl", name: "Tiros libres", icon: "🎯" },
+  ata: { id: "futbol_ata", name: "Atajapenales", icon: "🧤" },
 };
+// cuatro copas de cinco partidos: el último de cada copa es la final
+const CUPS = [
+  { cup: "Copa Alfajor", keeper: "Guantes de Seda", striker: "Tito Tiro", jersey: 0xff8a1f },
+  { cup: "Copa Frambuesa", keeper: "Muralla Frambuesa", striker: "Pancho Cañón", jersey: 0xd4216c },
+  { cup: "Copa Menta", keeper: "Pulpo Menta", striker: "Rayo Verde", jersey: 0x2fd08a },
+  { cup: "Copa Cacao de Oro", keeper: "El Gigante Dorado", striker: "Don Misil", jersey: 0xffc800 },
+];
+const cupOf = (level) => CUPS[Math.min(CUPS.length - 1, Math.floor((level - 1) / 5))];
+const DIANA = { x: 2.45, y: 1.72, r: 0.46 }; // dianas doradas en los ángulos del arco
+const CURL_DEV = { pen: 0.9, tl: 1.9 }; // cuánto se abre la curva a mitad de camino (m)
 
 const ping = (x) => 1 - Math.abs(((x % 2) + 2) % 2 - 1); // 0 → 1 → 0
 
@@ -42,6 +55,16 @@ function levelSpec(mode, level) {
       leap: t > 0.3,
       wobble: 0.02 + 0.1 * t, // temblor de la mira
       wall: 0,
+    };
+  }
+  if (mode === "ata") {
+    return {
+      need: 2, // atajadas que hay que lograr de 5 tiros (la dificultad sube con el tiro, no con la meta)
+      T: lerp(1.3, 0.85, t), // lo que demora la pelota en llegar al arco
+      tell: lerp(1, 0.5, t), // qué tan claro avisa el delantero con su cuerpo
+      feint: lerp(0, 0.3, t), // probabilidad de que el delantero te engañe
+      corner: lerp(0.25, 0.6, t), // tiros a los ángulos
+      reach: lerp(1.25, 1.02, t), // alcance de tus guantes
     };
   }
   return {
@@ -213,11 +236,32 @@ export class FutbolGame extends Game3D {
     this.reticle.position.set(0, 1.1, 0.05);
     s.add(this.reticle);
 
+    // dianas doradas en los ángulos: dan puntos extra
+    this.dianas = new THREE.Group();
+    for (const sx of [-1, 1]) {
+      const d = new THREE.Group();
+      for (const [r0, r1, col] of [[0.14, 0.2, 0xffc800], [0.3, 0.37, 0xffffff], [0.4, 0.46, 0xd4216c]]) {
+        d.add(new THREE.Mesh(new THREE.RingGeometry(r0, r1, 28), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.8, depthWrite: false })));
+      }
+      d.add(new THREE.Mesh(new THREE.CircleGeometry(0.1, 14), new THREE.MeshBasicMaterial({ color: 0xffc800, transparent: true, opacity: 0.9, depthWrite: false })));
+      d.position.set(sx * DIANA.x, DIANA.y, 0.04);
+      this.dianas.add(d);
+    }
+    s.add(this.dianas);
+    // puntitos que muestran la curva del efecto
+    this.pathDots = [];
+    const dotGeo = new THREE.SphereGeometry(0.075, 8, 6);
+    const dotMat = new THREE.MeshBasicMaterial({ color: 0xfff6e6, transparent: true, opacity: 0.9, depthTest: false });
+    for (let i = 0; i < 16; i++) { const d = new THREE.Mesh(dotGeo, dotMat); d.renderOrder = 9; d.visible = false; s.add(d); this.pathDots.push(d); }
+    this.curl = 0;
+
     // arquero
     this.keeper = this._makePlayer("baller", 0xff8a1f, 1.32);
     this.keeper.group.position.set(0, 0, KEEPER_Z);
     this.keeperPos = { x: 0, dive: 0, leap: 0, dir: 0 };
     this.wall = [];
+    this.shooter = this._makePlayer("estrella", 0xd4216c, 1.15); // el delantero rival del modo atajapenales
+    this.shooter.group.visible = false;
     this._ensureHero();
   }
 
@@ -290,6 +334,7 @@ export class FutbolGame extends Game3D {
     top.position.set(0, GH, -DEPTH / 2);
     goal.add(top);
     this.goalDepth = DEPTH;
+    this.netShell = [top, ...goal.children.filter((c) => c.rotation.y === Math.PI / 2)];
     s.add(goal);
   }
 
@@ -350,6 +395,17 @@ export class FutbolGame extends Game3D {
     const c = campaign(this.progress, MODES[modeId].id);
     this.level = Math.min(c.selected || c.unlocked, c.unlocked);
     this.spec = levelSpec(modeId, this.level);
+    this.cup = cupOf(this.level);
+    this.keeper.setOutfit({ jersey: this.cup.jersey, trim: 0xffffff });
+    this.shooter.setOutfit({ jersey: this.cup.jersey, trim: 0xffffff });
+    this.keeper.group.visible = modeId !== "ata";
+    this.shooter.group.visible = modeId === "ata";
+    this.dianas.visible = modeId !== "ata";
+    for (const n of this.netShell) n.visible = modeId !== "ata";
+    this.netBack.visible = modeId !== "ata";
+    this.curl = 0;
+    this.dive = null;
+    this.dianaHits = 0;
     this.kickIdx = 0;
     this.goals = 0;
     this.results = [];
@@ -372,11 +428,15 @@ export class FutbolGame extends Game3D {
 
   _modeKey() {
     const m = this.progress.futbolMode;
-    return m === "tl" ? "tl" : "pen";
+    return m === "tl" || m === "ata" ? m : "pen";
   }
 
   /** Ubica la pelota, el Matichico y la barrera para el siguiente tiro. */
   _setupKick() {
+    if (this.mode === "ata") { this._setupAta(); return; }
+    this.curl = 0;
+    this._syncCurlUi();
+    this.hero.group.rotation.set(0, 0, 0);
     const pen = this.mode === "pen";
     let bx = 0;
     let bz = PEN_Z;
@@ -414,6 +474,48 @@ export class FutbolGame extends Game3D {
     if (hint) hint.textContent = pen ? `Penal ${this.kickIdx + 1} de ${KICKS}: apunta, mantén para cargar y suelta` : `Tiro libre ${this.kickIdx + 1} de ${KICKS}: ¡pasa la barrera!`;
   }
 
+  /** Atajapenales: el Matichico es el arquero y el delantero rival se prepara para patear. */
+  _setupAta() {
+    const sp = this.spec;
+    this.ballStart = new THREE.Vector3(0, BALL_R, PEN_Z);
+    this.ball.position.copy(this.ballStart);
+    this.ballV.set(0, 0, 0);
+    this.ballLive = false;
+    this.resultT = 0;
+    this.shotDir = new THREE.Vector3(0, 0, -1);
+    this.keeperPos = { x: 0, dive: 0, leap: 0, dir: 0, target: 0, start: 0, diveT: -1, diveDur: 0.3, goalX: 0 };
+    this.keeper.group.visible = false;
+    this.shooter.group.visible = true;
+    this.shooter.group.position.set(0, 0, PEN_Z + 2.4);
+    this.shooter.group.rotation.set(0, Math.PI, 0);
+    this.shooter.animate(0, "idle", 1);
+    this.hero.group.position.set(0, 0, KEEPER_Z);
+    this.hero.group.rotation.set(0, 0, 0);
+    this.kickAnim = -1;
+    this.runT = -1;
+    this.dive = null;
+    this.curl = 0;
+    this._syncCurlUi();
+    // a dónde va a patear (y si el delantero va a tratar de engañarte)
+    let tx;
+    let ty;
+    if (Math.random() < sp.corner) {
+      tx = (Math.random() < 0.5 ? -1 : 1) * rand(1.9, 2.65);
+      ty = Math.random() < 0.55 ? rand(1.45, 2.0) : rand(0.3, 0.7);
+    } else {
+      tx = rand(-1.2, 1.2);
+      ty = rand(0.4, 1.7);
+    }
+    const fake = Math.random() < sp.feint;
+    this.ataShot = { tx, ty, fake, lean: (fake ? -Math.sign(tx || 1) * rand(0.6, 1) : tx / 2.65) * sp.tell };
+    this.ataT = 0;
+    this.camTarget = this._camFor();
+    if (!this.camInit) { this.camPos.copy(this.camTarget.pos); this.camLook.copy(this.camTarget.look); this.camInit = true; }
+    this.phase = "aim";
+    const hint = this.q("hint");
+    if (hint) hint.textContent = `Atajada ${this.kickIdx + 1} de ${KICKS}: mira al delantero y toca dónde lanzarte`;
+  }
+
   _buildWall() {
     for (const w of this.wall) this.scene.remove(w.p.group);
     this.wall = [];
@@ -445,6 +547,19 @@ export class FutbolGame extends Game3D {
   _camFor() {
     const b = this.ballStart;
     const d = this.shotDir;
+    const setFov = (f) => { if (this.camera.fov !== f) { this.camera.fov = f; this.camera.updateProjectionMatrix(); } };
+    if (this.mode === "ata") {
+      // detrás del arco, lo bastante lejos (y con más ángulo en vertical) para ver todo el ancho del arco
+      const cv = this.els.canvas;
+      const aspect = (cv.clientWidth || 1) / (cv.clientHeight || 1);
+      const W = 3.8;
+      const t24 = Math.tan((24 * Math.PI) / 180);
+      const d = clamp(W / (t24 * aspect), 6, 8.8);
+      const tanNeed = W / (d * aspect);
+      setFov(tanNeed > t24 ? clamp((2 * Math.atan(tanNeed) * 180) / Math.PI, 48, 84) : 48);
+      return { pos: new THREE.Vector3(0, 2.6 + d * 0.14, KEEPER_Z - d), look: new THREE.Vector3(0, 0.8, 7) };
+    }
+    setFov(48);
     if (this.mode === "pen") {
       return { pos: new THREE.Vector3(1.0, 2.35, b.z + 3.7), look: new THREE.Vector3(0, 1.15, 0) };
     }
@@ -494,12 +609,13 @@ export class FutbolGame extends Game3D {
       if (this.state !== "playing") return;
       id = e.pointerId;
       wrap.setPointerCapture?.(id);
+      if (this.mode === "ata") { this._ataTap(e); e.preventDefault(); return; }
       this._aimFromPointer(e);
       this._startCharge();
       e.preventDefault();
     });
     wrap.addEventListener("pointermove", (e) => {
-      if (this.state !== "playing" || this.phase !== "aim") return;
+      if (this.state !== "playing" || this.phase !== "aim" || this.mode === "ata") return;
       if (e.pointerType === "mouse" || e.pointerId === id) this._aimFromPointer(e);
     });
     const up = (e) => { if (e.pointerId !== id) return; id = null; this._release(); };
@@ -508,6 +624,14 @@ export class FutbolGame extends Game3D {
     window.addEventListener("keydown", (e) => {
       if (!this.running) return;
       const k = e.code;
+      if (this.mode === "ata") {
+        // teclado: ← → para lanzarte a un lado, ↑ para saltar, Q / E a los ángulos altos, abajo/espacio al centro
+        const dives = { ArrowLeft: [-2.3, 1.1], KeyA: [-2.3, 1.1], ArrowRight: [2.3, 1.1], KeyD: [2.3, 1.1], ArrowUp: [0, 2.0], KeyW: [0, 2.0], KeyQ: [-2.4, 1.9], KeyE: [2.4, 1.9], ArrowDown: [0, 0.5], KeyS: [0, 0.5], Space: [0, 1.0] };
+        if (dives[k] && !e.repeat) { this._ataDive(...dives[k]); e.preventDefault(); }
+        return;
+      }
+      if (k === "KeyQ" && !e.repeat) { this._setCurl(-1); return; }
+      if (k === "KeyE" && !e.repeat) { this._setCurl(1); return; }
       if (k === "Space") { if (!e.repeat) this._startCharge(); e.preventDefault(); }
       else if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "KeyA", "KeyD", "KeyW", "KeyS"].includes(k)) { this.keys[k] = true; e.preventDefault(); }
     });
@@ -516,12 +640,102 @@ export class FutbolGame extends Game3D {
       this.keys[e.code] = false;
     });
     window.addEventListener("blur", () => { this.keys = {}; });
+    for (const [id2, v] of [["btn-curl-l", -1], ["btn-curl-r", 1]]) {
+      const b = this.q(id2);
+      if (b) b.addEventListener("click", (e) => { e.preventDefault(); this._setCurl(v); });
+    }
     const shoot = this.q("btn-shoot");
     if (shoot) {
       shoot.addEventListener("pointerdown", (e) => { e.preventDefault(); this._startCharge(); });
       shoot.addEventListener("pointerup", (e) => { e.preventDefault(); this._release(); });
       shoot.addEventListener("pointercancel", () => { this.charging = false; });
     }
+  }
+
+  // ---------- efecto (curva) ----------
+
+  _setCurl(v) {
+    if (this.mode === "ata" || this.phase !== "aim") return;
+    this.curl = this.curl === v ? 0 : v;
+    audio.playPop();
+    this._syncCurlUi();
+  }
+
+  _syncCurlUi() {
+    const l = this.q("btn-curl-l");
+    const r = this.q("btn-curl-r");
+    if (l) l.classList.toggle("sel", this.curl < 0);
+    if (r) r.classList.toggle("sel", this.curl > 0);
+    const box = this.q("curl");
+    if (box) box.classList.toggle("hidden", this.mode === "ata");
+  }
+
+  /** Puntitos que muestran por dónde irá la pelota con efecto. */
+  _updatePathDots() {
+    const show = this.curl !== 0 && this.state === "playing" && this.phase === "aim" && this.mode !== "ata";
+    for (const d of this.pathDots) d.visible = show;
+    if (!show) return;
+    const b = this.ballStart;
+    const tx = this.aim.x;
+    const ty = this.aim.y;
+    const dist = Math.hypot(tx - b.x, b.z);
+    const T = dist / lerp(11, 27, 0.6);
+    const dxz = new THREE.Vector2(tx - b.x, -b.z);
+    const right = new THREE.Vector2(-dxz.y, dxz.x).normalize();
+    const dev = this.curl * CURL_DEV[this.mode];
+    const n = this.pathDots.length;
+    for (let i = 0; i < n; i++) {
+      const f = (i + 1) / (n + 1);
+      const bulge = -4 * f * (1 - f) * dev; // la curva se abre del lado contrario y vuelve a la mira
+      const y = lerp(b.y, ty, f) + 0.5 * G * T * T * f * (1 - f);
+      this.pathDots[i].position.set(lerp(b.x, tx, f) + right.x * bulge, y, lerp(b.z, 0, f) + right.y * bulge);
+    }
+  }
+
+  // ---------- atajapenales: el Matichico es el arquero ----------
+
+  _ataTap(e) {
+    if (this.state !== "playing") return;
+    const r = this.els.canvas.getBoundingClientRect();
+    this.pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -(((e.clientY - r.top) / r.height) * 2 - 1));
+    this.raycaster.setFromCamera(this.pointer, this.camera);
+    const hit = new THREE.Vector3();
+    if (!this.raycaster.ray.intersectPlane(this.goalPlane, hit)) return;
+    this._ataDive(hit.x, hit.y);
+  }
+
+  _ataDive(x, y) {
+    if (this.mode !== "ata" || this.dive || this.state !== "playing") return;
+    if (this.phase !== "aim" && this.phase !== "runup" && this.phase !== "flight") return;
+    const tx = clamp(x, -3.3, 3.3);
+    const ty = clamp(y, 0.35, 2.3);
+    this.dive = { t: 0, tx, ty, dur: 0.3 + Math.abs(tx) * 0.02 };
+    audio.playWhoosh();
+  }
+
+  _ataLaunch() {
+    const sp = this.spec;
+    const sh = this.ataShot;
+    const b = this.ballStart;
+    const T = sp.T;
+    this.ballV.set((sh.tx - b.x) / T, (sh.ty - b.y + 0.5 * G * T * T) / T, -b.z / T);
+    this.ballLive = true;
+    this.ballPrevZ = b.z;
+    this.keeperSaved = false;
+    this.flightT = 0;
+    this.ballAcc = null;
+    this.phase = "flight";
+    this.kickAnim = 0;
+    audio.playShoot();
+  }
+
+  /** Dónde están los guantes del arquero cuando la pelota cruza la línea. */
+  _handPos() {
+    const d = this.dive;
+    if (!d) return { x: 0, y: 1.0, e: 0 };
+    const f = clamp(d.t / d.dur, 0, 1);
+    const e = 1 - (1 - f) * (1 - f);
+    return { x: lerp(0, d.tx, e), y: lerp(1.0, d.ty, e), e };
   }
 
   // ---------- el tiro ----------
@@ -541,7 +755,7 @@ export class FutbolGame extends Game3D {
     const sweetLow = this.mode === "pen" ? 0.5 : 0.3;
     const over = Math.max(0, p - 0.86) / 0.14;
     const weak = Math.max(0, sweetLow - p) / sweetLow;
-    const sd = 0.04 + 0.5 * over + 0.2 * weak + sp.wobble * 0.5;
+    const sd = 0.04 + 0.5 * over + 0.2 * weak + sp.wobble * 0.5 + (this.curl ? 0.07 : 0);
     const tx = this.kickAim.x + (Math.random() - 0.5) * 2 * sd;
     const ty = clamp(this.kickAim.y + (Math.random() - 0.5) * 2 * sd * 0.8, 0.05, 4);
     const speed = lerp(11, 27, p);
@@ -549,6 +763,17 @@ export class FutbolGame extends Game3D {
     const dist = Math.hypot(tx - b.x, b.z);
     const T = dist / speed;
     this.ballV.set((tx - b.x) / T, (ty - b.y + 0.5 * G * T * T) / T, -b.z / T);
+    // efecto: una aceleración de lado que curva la pelota y la deja igual en la mira
+    this.ballAcc = null;
+    if (this.curl) {
+      const rx = b.z;
+      const rz = tx - b.x;
+      const rl = Math.hypot(rx, rz) || 1;
+      const a = (this.curl * 8 * CURL_DEV[this.mode]) / (T * T);
+      this.ballAcc = { x: (rx / rl) * a, z: (rz / rl) * a };
+      this.ballV.x -= 0.5 * this.ballAcc.x * T;
+      this.ballV.z -= 0.5 * this.ballAcc.z * T;
+    }
     this.ballLive = true;
     this.ballPrevZ = b.z;
     this.keeperSaved = false;
@@ -566,7 +791,7 @@ export class FutbolGame extends Game3D {
   _keeperDecide(tx, ty, T) {
     const sp = this.spec;
     const k = this.keeperPos;
-    const read = Math.random() < sp.read;
+    const read = Math.random() < sp.read * (this.curl ? 0.55 : 1); // con efecto, el arquero se confunde
     k.start = k.x;
     k.target = read ? clamp(tx + rand(-0.22, 0.22), -GW / 2 - 0.2, GW / 2 + 0.2) : pick3();
     k.leapTo = sp.leap && (read ? ty > 1.55 : Math.random() < 0.25);
@@ -594,7 +819,7 @@ export class FutbolGame extends Game3D {
   }
 
   _updateAim(dt) {
-    if (this.state === "playing" && this.phase === "aim") {
+    if (this.state === "playing" && this.phase === "aim" && this.mode !== "ata") {
       const sp = 2.6 * dt;
       if (this.keys.ArrowLeft || this.keys.KeyA) this.aim.x -= sp;
       if (this.keys.ArrowRight || this.keys.KeyD) this.aim.x += sp;
@@ -607,8 +832,9 @@ export class FutbolGame extends Game3D {
         this.power = ping(this.chargeT * 0.9);
       }
     }
-    const show = this.state === "playing" && this.phase === "aim";
+    const show = this.state === "playing" && this.phase === "aim" && this.mode !== "ata";
     this.reticle.visible = show;
+    this._updatePathDots();
     if (show) {
       const wob = this.spec.wobble * (this.charging ? 1.6 : 0.6);
       this.reticle.position.set(this.aim.x + Math.sin(this.time * 7.3) * wob, this.aim.y + Math.cos(this.time * 6.1) * wob, 0.05);
@@ -619,10 +845,53 @@ export class FutbolGame extends Game3D {
     const bar = this.q("power-fill");
     if (bar) bar.style.height = `${Math.round(this.power * 100)}%`;
     const pw = this.q("power");
-    if (pw) pw.classList.toggle("hidden", !(this.state === "playing" && (this.phase === "aim")));
+    if (pw) pw.classList.toggle("hidden", !(this.state === "playing" && this.phase === "aim" && this.mode !== "ata"));
+  }
+
+  _updateAta(dt) {
+    const hero = this.hero;
+    const sh = this.shooter;
+    const sp = this.spec;
+    const shot = this.ataShot;
+    if (!shot) return;
+    // el delantero avisa con el cuerpo a qué lado va a patear (y a veces trata de engañarte)
+    const yaw = Math.PI - shot.lean * 0.55;
+    if (this.phase === "aim") {
+      this.ataT += dt;
+      if (this.state === "playing") sh.group.rotation.y = lerp(sh.group.rotation.y, yaw, 1 - Math.exp(-6 * dt));
+      sh.animate(this.time, "idle", 1);
+      if (this.ataT >= 1.25 && this.state === "playing") { this.phase = "runup"; this.runT = 0; }
+    } else if (this.phase === "runup") {
+      this.runT += dt;
+      const k = clamp(this.runT / 0.42, 0, 1);
+      sh.group.position.set(lerp(0, -shot.lean * 0.5, k), 0, lerp(PEN_Z + 2.4, PEN_Z + 0.7, k));
+      sh.group.rotation.y = yaw;
+      sh.animate(this.time, "run", 1.1);
+      if (k >= 1) this._ataLaunch();
+    } else if (this.phase === "flight" || this.phase === "result") {
+      if (this.kickAnim >= 0 && this.kickAnim < 1) {
+        this.kickAnim += dt / 0.3;
+        sh.animate(this.time, "kick", Math.min(1, this.kickAnim));
+      } else sh.animate(this.time, this.resultKind === "goal" ? "cheer" : "idle", 1);
+    }
+    // el arquero (el Matichico): se lanza hacia donde tocaste
+    const h = this._handPos();
+    if (this.dive) this.dive.t += dt;
+    const lean = this.dive ? Math.sign(this.dive.tx) * Math.min(1, Math.abs(this.dive.tx) / 1.6) : 0;
+    hero.group.position.set(h.x * 0.85, Math.max(0, (h.y - 1.0) * 0.5) * h.e, KEEPER_Z);
+    hero.group.rotation.z = -lean * 1.1 * h.e;
+    let mode = "idle";
+    if (this.dive && h.e > 0.2 && h.e < 1) mode = "jump";
+    if (this.phase === "result") mode = this.resultKind === "save" ? "cheer" : this.dive && h.e > 0.2 ? "jump" : "sad";
+    hero.animate(this.time, mode, 1);
+    if (this.phase === "result") {
+      this.resultT -= dt;
+      if (this.resultT <= 0) this._nextKick();
+    }
   }
 
   _updatePhase(dt) {
+    if (this.mode === "ata") { this._updateAta(dt); return; }
     const hero = this.hero;
     if (this.phase === "aim") {
       hero.animate(this.time, "idle", 1);
@@ -692,6 +961,7 @@ export class FutbolGame extends Game3D {
       this.flightT += dt;
       const prev = b.position.clone();
       v.y -= G * dt;
+      if (this.ballAcc && this.phase === "flight") { v.x += this.ballAcc.x * dt; v.z += this.ballAcc.z * dt; }
       b.position.addScaledVector(v, dt);
       if (b.position.y < BALL_R) {
         b.position.y = BALL_R;
@@ -715,7 +985,43 @@ export class FutbolGame extends Game3D {
     this.ballShadow.scale.setScalar(clamp(1 - b.position.y * 0.12, 0.45, 1));
   }
 
+  _checkFlightAta(prev) {
+    const b = this.ball.position;
+    const v = this.ballV;
+    if (prev.z > KEEPER_Z && b.z <= KEEPER_Z) {
+      const f = (prev.z - KEEPER_Z) / (prev.z - b.z || 1);
+      const x = lerp(prev.x, b.x, f);
+      const y = lerp(prev.y, b.y, f);
+      const h = this._handPos();
+      const R = this.spec.reach;
+      const dx = (x - h.x) / R;
+      const dy = (y - h.y) / (R * 0.95);
+      // el cuerpo quieto también tapa un poco el centro
+      const body = this.dive ? 0 : 1;
+      const bodyHit = body && Math.abs(x) < 0.5 && y < 1.7;
+      if (dx * dx + dy * dy < 1 || bodyHit) {
+        this.saves++;
+        this.keeperSaved = true;
+        v.set(rand(-4, 4), rand(2, 4.5), rand(4, 7)); // la desvía
+        this.ball.position.z = KEEPER_Z + 0.05;
+        audio.playBump();
+        this._result("save", { x, y });
+        return;
+      }
+    }
+    if (prev.z > 0 && b.z <= 0) {
+      const f = prev.z / (prev.z - b.z || 1);
+      const x = lerp(prev.x, b.x, f);
+      const y = lerp(prev.y, b.y, f);
+      this.net.t = 1; this.net.x = clamp(x, -GW / 2, GW / 2); this.net.y = clamp(y, 0.1, GH);
+      this._result("goal", { x, y });
+      return;
+    }
+    if (this.flightT > 3) this._result("out");
+  }
+
   _checkFlight(prev) {
+    if (this.mode === "ata") { this._checkFlightAta(prev); return; }
     const b = this.ball.position;
     const v = this.ballV;
     // barrera
@@ -810,18 +1116,36 @@ export class FutbolGame extends Game3D {
     this.phase = "result";
     this.resultKind = kind;
     this.resultT = kind === "goal" ? 1.9 : 1.5;
-    const scored = kind === "goal";
+    const ata = this.mode === "ata";
+    const scored = ata ? kind === "save" : kind === "goal"; // en atajapenales, "acierto" = atajada
     this.results.push(scored ? "g" : kind === "save" ? "s" : kind === "wall" ? "w" : "m");
-    if (scored) {
+    if (scored && ata) {
       this.goals++;
       this.streak++;
       this.bestStreak = Math.max(this.bestStreak, this.streak);
-      const corner = Math.abs(info.x) > GW / 2 - 0.9 && info.y > GH - 0.8;
-      const pts = 100 + (corner ? 60 : 0) + (this.streak >= 2 ? 25 * this.streak : 0) + (this.mode === "tl" ? 60 : 0);
+      const hard = Math.abs(info.x) > 1.8 || info.y > 1.5 || info.y < 0.6;
+      const pts = 100 + (hard ? 60 : 0) + (this.streak >= 2 ? 25 * this.streak : 0);
       this.score += pts;
       this.resultMood = "cheer";
       this.cheerT = 1.8;
-      this.banner(corner ? "¡GOLAZO!" : "¡GOOOL!");
+      this.banner(hard ? "¡ATAJADÓN!" : "¡Atajó el Matichico!");
+      this.popups.add(new THREE.Vector3(clamp(info.x, -2.8, 2.8), clamp(info.y, 0.4, 2.2) + 0.3, 0.2), `+${pts}`, "combo");
+      this.particles.burst(new THREE.Vector3(info.x, info.y, 0.4), [0xffc800, 0x35f0ff, 0xfff6e6], 26, 5, 0.9, 4);
+      audio.playMissionComplete();
+      audio.playCombo(this.streak);
+      this.haptic(40);
+    } else if (scored) {
+      this.goals++;
+      this.streak++;
+      this.bestStreak = Math.max(this.bestStreak, this.streak);
+      const diana = this.dianas && [-1, 1].some((sx) => Math.hypot(info.x - sx * DIANA.x, info.y - DIANA.y) < DIANA.r);
+      const corner = Math.abs(info.x) > GW / 2 - 0.9 && info.y > GH - 0.8;
+      if (diana) this.dianaHits++;
+      const pts = 100 + (diana ? 150 : corner ? 60 : 0) + (this.streak >= 2 ? 25 * this.streak : 0) + (this.mode === "tl" ? 60 : 0) + (this.ballAcc ? 40 : 0);
+      this.score += pts;
+      this.resultMood = "cheer";
+      this.cheerT = 1.8;
+      this.banner(diana ? "¡DIANA!" : this.ballAcc ? "¡GOLAZO DE EFECTO!" : corner ? "¡GOLAZO!" : "¡GOOOL!");
       this.popups.add(new THREE.Vector3(info.x, info.y + 0.3, 0.2), `+${pts}`, "combo");
       this.particles.burst(new THREE.Vector3(info.x, info.y, -0.6), [0xffc800, 0xd4216c, 0xfff6e6, 0x35f0ff], 36, 6, 1, 4);
       audio.playMissionComplete();
@@ -831,7 +1155,7 @@ export class FutbolGame extends Game3D {
     } else {
       this.streak = 0;
       this.resultMood = "sad";
-      this.banner({ save: "¡Atajó el arquero!", wall: "¡Pegó en la barrera!", post: "¡Al palo!", out: "¡Afuera!" }[kind]);
+      this.banner(ata ? "¡Gol del rival!" : { save: "¡Atajó el arquero!", wall: "¡Pegó en la barrera!", post: "¡Al palo!", out: "¡Afuera!" }[kind]);
       if (kind === "out") audio.playLose();
     }
     this._updateHud();
@@ -856,10 +1180,13 @@ export class FutbolGame extends Game3D {
     const need = this.spec.need;
     const won = this.goals >= need;
     const stars = this.goals >= Math.min(KICKS, need + 2) ? 3 : this.goals >= need + 1 ? 2 : 1;
-    const txt = `${this.goals} goles de ${KICKS} tiros (la meta era ${need}).`;
-    this.runInfo = { goals: this.goals, saves: this.saves, mode: this.mode, level: this.level, perfect: this.goals === KICKS, bestStreak: this.bestStreak };
+    const ata = this.mode === "ata";
+    const txt = ata ? `${this.goals} atajadas de ${KICKS} tiros (la meta era ${need}).` : `${this.goals} goles de ${KICKS} tiros (la meta era ${need}).`;
+    this.runInfo = { goals: ata ? 0 : this.goals, saves: ata ? this.goals : this.saves, mode: this.mode, level: this.level, perfect: this.goals === KICKS, bestStreak: this.bestStreak, dianas: this.dianaHits };
     if (won) {
-      if (this.level >= LEVELS_PER_GAME) {
+      if (this.level % 5 === 0 && this.level < LEVELS_PER_GAME) {
+        this.levelWin({ level: this.level, stars, text: `${txt} ¡Ganaste la ${this.cup.cup}! 🏆`, title: `¡${this.cup.cup} ganada! 🏆` });
+      } else if (this.level >= LEVELS_PER_GAME) {
         campaignWin(this.progress, id, this.level, stars);
         const t = this.els.q("gameover-title");
         if (t) t.textContent = `¡Completaste los ${LEVELS_PER_GAME} niveles de ${MODES[this.mode].name}! 🏆`;
@@ -913,9 +1240,16 @@ export class FutbolGame extends Game3D {
     const txt = this.q("intro-text");
     if (txt) {
       const sp = this.spec;
-      txt.textContent = this._modeKey() === "pen"
+      const mk = this._modeKey();
+      const cup = this.cup || cupOf(this.level);
+      const final = this.level % 5 === 0 ? " ¡ES LA FINAL!" : "";
+      const who = mk === "ata" ? `Delantero rival: ${cup.striker}.` : `Arquero rival: ${cup.keeper}.`;
+      const goal = mk === "pen"
         ? `Penales · nivel ${this.level}: mete ${sp.need} goles de ${KICKS} tiros.`
-        : `Tiros libres · nivel ${this.level}: mete ${sp.need} gol${sp.need > 1 ? "es" : ""} de ${KICKS} tiros pasando la barrera de ${sp.wall} defensas.`;
+        : mk === "tl"
+          ? `Tiros libres · nivel ${this.level}: mete ${sp.need} gol${sp.need > 1 ? "es" : ""} de ${KICKS} tiros pasando la barrera de ${sp.wall} defensas.`
+          : `Atajapenales · nivel ${this.level}: ataja ${sp.need} de ${KICKS} tiros.`;
+      txt.textContent = `🏆 ${cup.cup}, partido ${((this.level - 1) % 5) + 1} de 5.${final} ${who} ${goal}`;
     }
   }
 
@@ -930,7 +1264,7 @@ export class FutbolGame extends Game3D {
     const dots = [];
     for (let i = 0; i < KICKS; i++) {
       const r = this.results[i];
-      dots.push(r === "g" ? "⚽" : r ? "❌" : i === this.kickIdx ? "🟡" : "⚪");
+      dots.push(r === "g" ? (this.mode === "ata" ? "🧤" : "⚽") : r ? "❌" : i === this.kickIdx ? "🟡" : "⚪");
     }
     set("hud-kicks", dots.join(" "));
     const lvl = this.q("hud-mode");
@@ -939,7 +1273,13 @@ export class FutbolGame extends Game3D {
 
   onBegin() {
     this.phase = "aim";
+    this.ataT = 0;
+    if (this.cup) this.banner(this.mode === "ata" ? `¡Delantero: ${this.cup.striker}!` : `¡Rival: ${this.cup.keeper}!`);
     this._updateHud();
+  }
+
+  onResize() {
+    if (this.mode === "ata" && this.camTarget) this.camTarget = this._camFor();
   }
 
   pauseForMenu() {
