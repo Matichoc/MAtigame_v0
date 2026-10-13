@@ -1617,3 +1617,9 @@ details.how > :not(summary) { font-size: 0.85rem; margin: 6px 0 0; }
 
 .rc-jump.hint { animation: rc-pulse 0.5s ease-in-out infinite; box-shadow: 0 0 0 4px rgba(255,59,59,0.85), 0 0 22px rgba(255,59,59,0.9); }
 @keyframes rc-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+
+.wr-card { width: min(420px, 92vw); max-height: 88vh; overflow: auto; }
+.wr-card select { width: 100%; padding: 8px 10px; border-radius: 10px; border: 2px solid var(--dorado); background: #fff6e6; color: #3d1f10; font-size: 1rem; margin: 6px 0; }
+.wr-list { text-align: left; padding-left: 28px; margin: 8px 0 12px; }
+.wr-list li { padding: 5px 0; border-bottom: 1px dashed rgba(255,246,230,0.25); display: flex; justify-content: space-between; gap: 10px; }
+.wr-list li b { color: var(--dorado); }

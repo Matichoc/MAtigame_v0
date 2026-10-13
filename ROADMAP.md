@@ -540,6 +540,13 @@ teclados no dejan apretar flechas + Espacio al mismo tiempo).
   (frío/caliente), 👵 la abuelita cruza la calle, 📦 entrega de chocolates en auto y 🏁 carrera por la ciudad (medallas por tiempo). La primera vez
   dan Matipuntos completos; repetirlas da una propina con tope diario. Alfajores dorados por la ciudad (tope diario). Se canjea con Matipuntos.
 
+### Etapa 11o — Controles de Recolecta, pistas de guardias y ranking del creador ✅
+
+- **Corre y Recolecta:** joystick a la izquierda y los dos botones juntos a la derecha (Saltar grande abajo, Impulso arriba-izquierda).
+- **Guardias:** al acercarte aparece un aro rojo y un «!» sobre el guardia, un cartel «¡SALTA!» (la primera vez) y el botón Saltar late; el salto dura un poco más.
+- **Ranking / monitoreo del creador** (`js/online.js`, `docs/RANKING.md`, `docs/ranking-supabase.sql`, `admin/ranking.html`): solo apodo + avance, apagado
+  hasta configurar Supabase. El creador ve quién juega y decide cuándo abrir un botón 🌎 Ranking para los jugadores. La política de privacidad ya lo describe.
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista

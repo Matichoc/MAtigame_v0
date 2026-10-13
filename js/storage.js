@@ -5,6 +5,7 @@
 // varias personas puedan jugar desde el mismo navegador sin mezclar su avance.
 
 import { getItem, EMPTY_LOOK } from "./wardrobe-data.js";
+import { queueSync } from "./online.js";
 
 const SAVE_PREFIX = "matichoc_save_v3_profile_";
 const DEFAULT_OUTFIT = "polera";
@@ -100,6 +101,7 @@ export function loadProgress(profileId) {
 }
 
 export function saveProgress(progress) {
+  queueSync(progress); // ranking del creador (apagado mientras js/online-config.js esté vacío)
   try {
     localStorage.setItem(storageKeyForProfile(progress._profileId), JSON.stringify(progress));
   } catch (e) {

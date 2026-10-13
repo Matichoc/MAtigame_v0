@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Panel del creador · Matijuego</title>
+<style>
+  :root { --rosa:#d4216c; --cafe:#4b2e2e; --dorado:#ffc800; --crema:#fff8f0; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--crema); color:var(--cafe); font-family:"Segoe UI",Tahoma,sans-serif; }
+  header { background:var(--cafe); color:#fff6e6; padding:14px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+  header h1 { margin:0; font-size:1.2rem; color:var(--dorado); }
+  main { max-width:1100px; margin:0 auto; padding:16px; }
+  .card { background:#fff; border:2px solid var(--dorado); border-radius:14px; padding:14px 16px; margin-bottom:16px; }
+  label { display:block; font-size:.8rem; font-weight:700; margin:8px 0 3px; }
+  input, select { width:100%; padding:8px 10px; border:2px solid #e3d3b8; border-radius:10px; font-size:.95rem; }
+  .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px; }
+  button { background:var(--rosa); color:#fff; border:0; border-radius:999px; padding:9px 18px; font-weight:800; cursor:pointer; font-size:.9rem; }
+  button.sec { background:#fff; color:var(--rosa); border:2px solid var(--rosa); }
+  .stats { display:flex; gap:10px; flex-wrap:wrap; margin:8px 0; }
+  .stat { background:#fff3d6; border-radius:12px; padding:8px 14px; font-weight:800; }
+  .stat small { display:block; font-weight:600; opacity:.7; }
+  table { width:100%; border-collapse:collapse; font-size:.85rem; }
+  th, td { padding:6px 8px; text-align:left; border-bottom:1px solid #f0e4cf; white-space:nowrap; }
+  th { cursor:pointer; background:#fff3d6; position:sticky; top:0; }
+  .scroll { overflow:auto; max-height:60vh; }
+  .on { color:#1a8a3a; font-weight:800; } .off { color:#9a9a9a; }
+  .msg { margin:8px 0; font-weight:700; } .err { color:#c0152f; }
+  .tabs { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<header><h1>🍫 Panel del creador · Matijuego</h1><span>Quién juega y cómo va el ranking (solo apodos)</span></header>
+<main>
+  <div class="card" id="cfg">
+    <div class="row">
+      <div><label for="url">URL de Supabase</label><input id="url" placeholder="https://xxxx.supabase.co" autocomplete="off"></div>
+      <div><label for="anon">Llave "anon public"</label><input id="anon" autocomplete="off"></div>
+      <div><label for="key">Tu clave de creador</label><input id="key" type="password" autocomplete="off" placeholder="la que pusiste en el SQL"></div>
+    </div>
+    <p style="margin:10px 0 0"><button id="load">Cargar jugadores</button> <span class="msg" id="msg"></span></p>
+    <small>La URL y la llave se recuerdan en este navegador; la clave de creador no se guarda.</small>
+  </div>
+
+  <div id="out" hidden>
+    <div class="stats" id="stats"></div>
+    <div class="card">
+      <b>Ranking público para los jugadores:</b> <span id="pubState"></span>
+      <button class="sec" id="togglePub" style="margin-left:10px">…</button>
+      <div><small>Mientras esté cerrado, nadie más que tú ve la tabla. Al abrirlo, la app muestra un botón 🏆 Ranking con los mejores puntajes (solo apodos).</small></div>
+    </div>
+    <div class="tabs"><button id="tabP">👥 Jugadores</button><button class="sec" id="tabR">🏆 Ranking por juego</button></div>
+    <div class="card" id="viewP"><label for="f">Buscar apodo</label><input id="f" placeholder="…"><div class="scroll"><table id="tbl"></table></div></div>
+    <div class="card" id="viewR" hidden><label for="g">Juego</label><select id="g"></select><div class="scroll"><table id="rk"></table></div></div>
+  </div>
+</main>
+<script>
+const NAMES = { parkour:"Parkour Choco", recolecta:"Recolecta y Corre", salto:"Salto Choco", autos:"Autos de Chocolate", tetris:"Tetris de Productos", memoria:"Memoria Matichoc", basquet_tiros:"Lanzamientos de Básquet", porristas:"Saltos de Porristas", creador:"Crea tu Chocolate", fps3d:"Choco Blaster", futbol:"Fútbol Choco", dulces:"Choco Match", aventura:"Aventura Choco", ciudad:"Ciudad Choco" };
+const $ = (id) => document.getElementById(id);
+let players = [], sortKey = "last_seen", sortDir = -1;
+try { $("url").value = localStorage.getItem("mj_admin_url") || ""; $("anon").value = localStorage.getItem("mj_admin_anon") || ""; } catch (e) {}
+
+async function rpc(name, body) {
+  const url = $("url").value.trim().replace(/\/$/, ""), anon = $("anon").value.trim();
+  const r = await fetch(`${url}/rest/v1/rpc/${name}`, { method: "POST", headers: { apikey: anon, Authorization: `Bearer ${anon}`, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const t = await r.text();
+  if (!r.ok) throw new Error(t.includes("clave incorrecta") ? "Clave de creador incorrecta" : `Error ${r.status}`);
+  return t ? JSON.parse(t) : null;
+}
+const ago = (d) => { const s = (Date.now() - new Date(d)) / 1000; if (s < 90) return "ahora"; if (s < 3600) return `hace ${Math.round(s / 60)} min`; if (s < 86400) return `hace ${Math.round(s / 3600)} h`; return `hace ${Math.round(s / 86400)} d`; };
+const mins = (s) => s >= 3600 ? `${(s / 3600).toFixed(1)} h` : `${Math.round(s / 60)} min`;
+
+async function load() {
+  $("msg").className = "msg"; $("msg").textContent = "Cargando…";
+  try { localStorage.setItem("mj_admin_url", $("url").value.trim()); localStorage.setItem("mj_admin_anon", $("anon").value.trim()); } catch (e) {}
+  try {
+    players = await rpc("admin_players", { admin_key: $("key").value });
+    $("msg").textContent = ""; $("out").hidden = false;
+    let pub = false; try { pub = (await rpc("ranking_enabled", {})) === true; } catch (e) {}
+    $("pubState").textContent = pub ? "🟢 abierto" : "🔒 cerrado (solo tú)"; $("pubState").dataset.on = pub ? "1" : "";
+    $("togglePub").textContent = pub ? "Cerrar ranking" : "Abrir ranking a los jugadores";
+    render();
+  } catch (e) { $("msg").className = "msg err"; $("msg").textContent = e.message; }
+}
+function render() {
+  const now = Date.now();
+  const d1 = players.filter((p) => now - new Date(p.last_seen) < 864e5).length, d7 = players.filter((p) => now - new Date(p.last_seen) < 6048e5).length;
+  $("stats").innerHTML = [["Jugadores", players.length], ["Activos 24 h", d1], ["Activos 7 días", d7], ["Partidas", players.reduce((a, p) => a + p.plays, 0)], ["Tiempo jugado", mins(players.reduce((a, p) => a + p.play_secs, 0))]].map(([k, v]) => `<div class="stat">${v}<small>${k}</small></div>`).join("");
+  const q = $("f").value.trim().toLowerCase();
+  const rows = players.filter((p) => !q || p.nick.toLowerCase().includes(q)).sort((a, b) => (sortDir * ((a[sortKey] > b[sortKey]) - (a[sortKey] < b[sortKey]))));
+  const cols = [["nick", "Apodo"], ["last_seen", "Última vez"], ["first_seen", "Desde"], ["platform", "Dónde"], ["xp", "XP"], ["plays", "Partidas"], ["play_secs", "Tiempo"], ["coins", "Matipuntos"]];
+  $("tbl").innerHTML = `<tr>${cols.map(([k, n]) => `<th data-k="${k}">${n}${k === sortKey ? (sortDir > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}<th>Juegos con récord</th><th>Ciudad</th></tr>` + rows.map((p) => {
+    const live = now - new Date(p.last_seen) < 5 * 60e3;
+    const best = Object.entries(p.best || {}).map(([g, v]) => `${NAMES[g] || g}: ${Math.round(v)}`).join(" · ");
+    return `<tr><td>${live ? "🟢 " : ""}<b>${esc(p.nick)}</b></td><td>${ago(p.last_seen)}</td><td>${new Date(p.first_seen).toLocaleDateString("es-CL")}</td><td>${p.platform || ""}</td><td>${p.xp}</td><td>${p.plays}</td><td>${mins(p.play_secs)}</td><td>${p.coins}</td><td style="white-space:normal;min-width:260px">${best}</td><td>${(p.extra && p.extra.ciudad_missions) || 0}/8</td></tr>`;
+  }).join("");
+  $("tbl").querySelectorAll("th[data-k]").forEach((th) => th.onclick = () => { sortDir = sortKey === th.dataset.k ? -sortDir : -1; sortKey = th.dataset.k; render(); });
+  const games = [...new Set(players.flatMap((p) => Object.keys(p.best || {})))].sort();
+  const cur = $("g").value; $("g").innerHTML = games.map((g) => `<option value="${g}">${NAMES[g] || g}</option>`).join(""); if (games.includes(cur)) $("g").value = cur;
+  renderRank();
+}
+function renderRank() {
+  const g = $("g").value;
+  const rows = players.filter((p) => p.best && p.best[g] != null).sort((a, b) => b.best[g] - a.best[g]).slice(0, 50);
+  $("rk").innerHTML = "<tr><th>#</th><th>Apodo</th><th>Puntaje</th><th>Última vez</th></tr>" + rows.map((p, i) => `<tr><td>${i + 1}</td><td><b>${esc(p.nick)}</b></td><td>${Math.round(p.best[g])}</td><td>${ago(p.last_seen)}</td></tr>`).join("");
+}
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+$("load").onclick = load; $("f").oninput = render; $("g").onchange = renderRank;
+$("tabP").onclick = () => { $("viewP").hidden = false; $("viewR").hidden = true; $("tabP").className = ""; $("tabR").className = "sec"; };
+$("tabR").onclick = () => { $("viewP").hidden = true; $("viewR").hidden = false; $("tabR").className = ""; $("tabP").className = "sec"; };
+$("togglePub").onclick = async () => {
+  const on = !$("pubState").dataset.on;
+  if (on && !confirm("¿Abrir el ranking? Los jugadores verán apodos y puntajes en la app.")) return;
+  try { await rpc("admin_set_show", { admin_key: $("key").value, show: on }); load(); } catch (e) { alert(e.message); }
+};
+</script>
+</body>
+</html>

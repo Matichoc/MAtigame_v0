@@ -20,8 +20,9 @@ import {
 } from "./house-data.js";
 import {
   levelInfo, xpForLevel, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
-  canClaimChest, claimChest, hasPending, STICKERS, albumCount, ALBUM_MILESTONES, openPack, onProgressEvent,
+  canClaimChest, claimChest, hasPending, STICKERS, albumCount, ALBUM_MILESTONES, openPack, onProgressEvent, GAME_NAMES,
 } from "./progression.js";
+import { rankingEnabled, fetchRanking } from "./online.js";
 
 let progress = null;
 let selectedCharacter = null;
@@ -290,6 +291,9 @@ document.getElementById("btn-cancel-profile").addEventListener("click", () => {
 function chooseProfile(id) {
   setLastActiveProfileId(id);
   progress = loadProgress(id);
+  // el apodo del perfil es el que ve el creador (y el ranking, si se abre): se mantiene al día
+  const meta = listProfiles().find((x) => x.id === id);
+  if (meta && meta.name && progress.playerName !== meta.name) progress.playerName = meta.name;
   selectedCharacter = CHARACTERS.find((c) => c.id === progress.selectedCharacterId) || null;
   shopCharacterId = (selectedCharacter && selectedCharacter.id) || CHARACTERS[0].id;
   bootHub();
@@ -1272,6 +1276,31 @@ function openUnlockDialog(entry) {
   buy.disabled = missing > 0;
   unlockDialog.classList.remove("hidden");
 }
+
+// ---- ranking de todos los jugadores: el botón solo aparece si el creador abrió el ranking en el servidor ----
+const btnWorldRanking = document.getElementById("btn-world-ranking");
+const worldRanking = document.getElementById("world-ranking");
+async function showWorldRanking() {
+  const sel = document.getElementById("wr-game");
+  const list = document.getElementById("wr-list");
+  const load = async () => {
+    list.innerHTML = "<li>Cargando…</li>";
+    const rows = await fetchRanking(sel.value, 20);
+    list.innerHTML = rows.length ? rows.map((r) => `<li><span>${escapeHtml(r.nick)}</span><b>${Math.round(r.score)}</b></li>`).join("") : "<li>Todavía no hay puntajes aquí.</li>";
+  };
+  if (!sel.options.length) {
+    for (const [id, name] of Object.entries(GAME_NAMES)) if (id !== "fps3d" && id !== "creador" && id !== "ciudad") sel.add(new Option(name, id));
+    sel.addEventListener("change", load);
+  }
+  worldRanking.classList.remove("hidden");
+  load();
+}
+if (btnWorldRanking) {
+  btnWorldRanking.addEventListener("click", showWorldRanking);
+  document.getElementById("wr-close").addEventListener("click", () => worldRanking.classList.add("hidden"));
+  rankingEnabled().then((on) => btnWorldRanking.classList.toggle("hidden", !on));
+}
+function escapeHtml(t) { return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
 document.getElementById("um-cancel").addEventListener("click", () => { unlockDialog.classList.add("hidden"); unlockTarget = null; });
 document.getElementById("um-buy").addEventListener("click", () => {

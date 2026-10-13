@@ -124,6 +124,8 @@ js/memoria-game.js    Memoria Matichoc 3D
 js/futbol-game.js     Fútbol Choco 3D (penales, tiros libres con efecto y atajapenales)
 js/dulces-game.js     Choco Match 3D (3 en línea con productos Matichoc y jefes)
 js/ciudad-game.js     Ciudad Choco 3D (mundo abierto con auto, mapa y misiones)
+js/online.js          Ranking y monitoreo del creador (apagado hasta llenar js/online-config.js; ver docs/RANKING.md)
+admin/ranking.html    Panel del creador: quién juega y ranking (solo apodos)
 js/aventura-game.js   Aventura Choco 3D (plataformas por mundos; los niveles se arman con una semilla)
 js/unlocks.js         Canje de juegos con Matipuntos (precio en una sola línea)
 js/demo.js            Modo demo de la web (apagado por ahora; ver ROADMAP, etapa 11m)
