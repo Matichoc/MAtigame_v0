@@ -7,7 +7,7 @@
 // cintas transportadoras, combo de golosinas, poderes (reloj, botas turbo, imán), impulso
 // con Shift, estrellas por nivel y música. Ahora son 8 canchas.
 
-import { THREE, Game3D, clamp, lerp, rand, loadTexture, canvasTexture, roundedBox, makeBunting, makeLogo } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, loadTexture, canvasTexture, makeBunting, makeLogo, disposeTree } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates, findFreeSpot, getObstacles, getSpawn, pathLength, pointOnPath } from "./levels.js";
 import { saveProgress, addToLeaderboard, reportScore, earnCoins } from "./storage.js";
@@ -227,6 +227,7 @@ export class RecolectaGame extends Game3D {
 
   _clearLevel() {
     this.scene.remove(this.levelGroup);
+    disposeTree(this.levelGroup);
     this.levelGroup = new THREE.Group();
     this.scene.add(this.levelGroup);
     this.hurdles = [];

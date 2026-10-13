@@ -12,7 +12,7 @@
 import { THREE, Game3D, clamp, lerp, rand, canvasTexture, makeBunting, makeLogo } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { CHARACTERS, getOutfit } from "./characters.js";
-import { earnCoins, saveProgress } from "./storage.js";
+import { saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
 import { campaign, campaignWin, renderLevelPicker, LEVELS_PER_GAME } from "./campaign.js";
 

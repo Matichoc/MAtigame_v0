@@ -7,7 +7,7 @@
 // volar y juntar alfajores en el aire, charcos de chocolate, poderes (nitro, imán, escudo),
 // combo de alfajores, un hito cada kilómetro y música.
 
-import { THREE, Game3D, clamp, lerp, rand, loadTexture, canvasTexture, roundedBox, makeBunting, makeLogo } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, loadTexture, canvasTexture, roundedBox, makeBunting, makeLogo, disposeGeometries } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
@@ -378,8 +378,8 @@ export class AutosGame extends Game3D {
   // ---------- partida ----------
 
   reset() {
-    for (const o of this.obstacles) this.scene.remove(o.mesh);
-    for (const o of this.pickups) this.scene.remove(o.mesh);
+    for (const o of this.obstacles) { this.scene.remove(o.mesh); disposeGeometries(o.mesh); }
+    for (const o of this.pickups) { this.scene.remove(o.mesh); disposeGeometries(o.mesh); }
     this.obstacles = [];
     this.pickups = [];
     this._ensureDriver();
@@ -859,6 +859,7 @@ export class AutosGame extends Game3D {
       const a = o.d - this.dist;
       if (a < -12) {
         this.scene.remove(o.mesh);
+        disposeGeometries(o.mesh);
         this.obstacles.splice(i, 1);
         continue;
       }
@@ -884,6 +885,7 @@ export class AutosGame extends Game3D {
       const a = k.d - this.dist;
       if (a < -12 || k.taken) {
         this.scene.remove(k.mesh);
+        disposeGeometries(k.mesh);
         this.pickups.splice(i, 1);
         continue;
       }

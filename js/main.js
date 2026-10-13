@@ -5,7 +5,7 @@ import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
-  loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem, equippedOutfitId,
+  loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem,
   getBestScore, getLeaderboard, canClaimDailyReward, claimDailyReward, claimAchievement,
 } from "./storage.js";
 import {
@@ -19,9 +19,9 @@ import {
   FURN_CATEGORIES, furnitureOf, isWallItem, houseLayout, layoutAdd, layoutRemove, buyFurniture, HOUSE_SIZES, houseSize, buyHouseSize,
 } from "./house-data.js";
 import {
-  levelInfo, xpForLevel, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
+  levelInfo, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
   canClaimChest, claimChest, hasPending, STICKERS, PAGES, ALBUM_TOTAL, albumCount, pageStatus, ALBUM_MILESTONES, openPack, onProgressEvent, GAME_NAMES,
-  spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, spareOf, TRADE_NORMAL, TRADE_FOIL,
+  spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, TRADE_NORMAL, TRADE_FOIL,
 } from "./progression.js";
 import { rankingEnabled, fetchRanking } from "./online.js";
 
@@ -292,6 +292,7 @@ document.getElementById("btn-cancel-profile").addEventListener("click", () => {
 function chooseProfile(id) {
   setLastActiveProfileId(id);
   progress = loadProgress(id);
+  if (location.search.includes("debug3d")) window.__progress = () => progress; // solo para pruebas
   // el apodo del perfil es el que ve el creador (y el ranking, si se abre): se mantiene al día
   const meta = listProfiles().find((x) => x.id === id);
   if (meta && meta.name && progress.playerName !== meta.name) progress.playerName = meta.name;
@@ -1028,7 +1029,7 @@ function stickerArt(s) {
     const img = document.createElement("img");
     img.src = s.img;
     img.alt = s.name;
-    img.className = "stk-photo";
+    img.className = s.logo ? "stk-photo stk-logo" : "stk-photo";
     d.appendChild(img);
   } else d.textContent = s.emoji || "⭐";
   return d;

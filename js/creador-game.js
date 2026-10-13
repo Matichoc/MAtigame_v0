@@ -3,7 +3,7 @@
 // maridajes, guarda las creaciones en el perfil y permite pedir algo parecido
 // por WhatsApp (solo un mensaje, sin precios ni promesas).
 
-import { THREE, Game3D, clamp, lerp, canvasTexture, makeBunting } from "./three-kit.js";
+import { THREE, Game3D, canvasTexture, makeBunting } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress, earnCoins, reportScore, addToLeaderboard, saveCreation, deleteCreation, todayKey } from "./storage.js";
 import { recordRun } from "./progression.js";
