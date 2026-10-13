@@ -48,6 +48,7 @@ const screen3d = {
   futbol: document.getElementById("screen-futbol"),
   dulces: document.getElementById("screen-dulces"),
   aventura: document.getElementById("screen-aventura"),
+  ciudad: document.getElementById("screen-ciudad"),
   creador: document.getElementById("screen-creador"),
 };
 const ALL_SCREENS = [
@@ -64,7 +65,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, aventura: null, creador: null };
+const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, aventura: null, ciudad: null, creador: null };
 
 let toastTimer = null;
 function showToast(message, ms = 2600) {
@@ -1693,6 +1694,7 @@ const GAMES_3D = {
   futbol: { module: "./futbol-game.js", cls: "FutbolGame", hud: [] },
   dulces: { module: "./dulces-game.js", cls: "DulcesGame", hud: [] },
   aventura: { module: "./aventura-game.js", cls: "AventuraGame", hud: [] },
+  ciudad: { module: "./ciudad-game.js", cls: "CiudadGame", hud: [] },
   creador: { module: "./creador-game.js", cls: "CreadorGame", hud: ["score", "count", "coins"] },
 };
 

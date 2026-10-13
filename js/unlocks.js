@@ -13,6 +13,7 @@ export const UNLOCK_COST = {
   futbol: UNLOCK_PRICE,
   dulces: UNLOCK_PRICE,
   aventura: UNLOCK_PRICE,
+  ciudad: UNLOCK_PRICE,
 };
 
 export const needsUnlock = (gameId) => gameId in UNLOCK_COST;

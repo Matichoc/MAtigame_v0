@@ -109,6 +109,15 @@ const ALL_GAMES = [
     tag: "Nuevo",
   },
   {
+    id: "ciudad",
+    orient: "landscape", // se maneja mejor con el celular acostado
+    name: "Ciudad Choco",
+    icon: "🏙️",
+    tagline: "Mundo abierto: maneja tu auto, pasea y ayuda a los vecinos con misiones tranquilas.",
+    status: "available",
+    tag: "Nuevo",
+  },
+  {
     id: "aventura",
     orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
     name: "Aventura Choco",

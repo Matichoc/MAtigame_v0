@@ -176,7 +176,7 @@ const stat = (k) => (p) => (p.stats && p.stats[k]) || 0;
 const LEVEL_GAMES = ["recolecta", "tetris", "basquet_tiros", "porristas", "memoria"];
 const MISSION_GAMES = ["salto", "autos", "parkour"];
 const sum = (fns) => (p) => fns.reduce((a, f) => a + f(p), 0);
-const playedGames = (p) => ["recolecta", "tetris", "basquet_tiros", "porristas", "memoria", "salto", "autos", "parkour", "creador", "futbol", "dulces", "aventura"].filter((g) => ((p.stats.runsBy || {})[g] || 0) > 0 || getBestScore(p, g) > 0).length;
+const playedGames = (p) => ["recolecta", "tetris", "basquet_tiros", "porristas", "memoria", "salto", "autos", "parkour", "creador", "futbol", "dulces", "aventura", "ciudad"].filter((g) => ((p.stats.runsBy || {})[g] || 0) > 0 || getBestScore(p, g) > 0).length;
 const eventTokensTotal = (p) => Object.values(p.eventTokens || {}).reduce((a, b) => a + b, 0);
 const albumUnique = (p) => Object.values(p.album || {}).filter((n) => n > 0).length;
 
@@ -270,6 +270,11 @@ REC("rec_aventura", "Récord Aventura", "🍄", best("aventura"), "Consigue {n} 
 chain("puntajes", "goleador", "Goleador", "⚽", stat("goalsTotal"), "Mete {n} goles en Fútbol Choco.", [[10, 15], [50, 50], [150, 120], [400, 300]]);
 chain("puntajes", "dianas", "Francotirador", "🎯", stat("dianasTotal"), "Mete {n} goles en las dianas doradas del arco.", [[3, 15], [15, 50], [50, 120], [150, 300]]);
 chain("puntajes", "atajadas", "Pared de Chocolate", "🧤", stat("ataSaves"), "Ataja {n} penales en Atajapenales.", [[10, 15], [40, 50], [120, 120], [350, 300]]);
+const ciudadMissions = (p) => Object.keys((p.ciudad && p.ciudad.done) || {}).filter((k) => p.ciudad.done[k]).length;
+chain("campana", "ciudad_misiones", "Buen Vecino", "🏙️", ciudadMissions, "Cumple {n} misiones distintas en Ciudad Choco (hay 8).", [[1, 20], [3, 60], [6, 150], [8, 350]]);
+chain("campana", "ciudad_medalla", "Piloto Estrella", "🏁", (p) => (p.ciudad && p.ciudad.medal) || 0, "Gana una medalla en la carrera de Ciudad Choco (1 bronce, 2 plata, 3 oro).", [[1, 25], [2, 60], [3, 150]]);
+chain("puntajes", "chofer", "Chofer Choco", "🚗", (p) => Math.floor(((p.stats && p.stats.ciudadKm) || 0)), "Maneja {n} km por Ciudad Choco.", [[2, 15], [10, 50], [40, 120], [120, 300]]);
+chain("puntajes", "dorados_ciudad", "Cazador de Brillos", "✨", stat("ciudadGold"), "Junta {n} alfajores dorados en Ciudad Choco.", [[20, 15], [100, 50], [300, 120], [800, 300]]);
 chain("puntajes", "pisotones", "Pisotones", "👟", stat("stompsTotal"), "Pisa {n} enemigos en Aventura Choco.", [[20, 15], [100, 50], [300, 120], [800, 300]]);
 chain("puntajes", "alfajores_av", "Alfajorero", "🍫", stat("aventuraCoins"), "Junta {n} alfajores en Aventura Choco.", [[100, 15], [500, 50], [1500, 120], [4000, 300]]);
 chain("puntajes", "especiales", "Piezas especiales", "✨", stat("dulcesSpecials"), "Crea {n} piezas especiales (rayadas, bombas doradas y envueltas).", [[10, 15], [40, 50], [120, 120], [300, 300]]);

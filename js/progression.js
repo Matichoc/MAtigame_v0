@@ -14,7 +14,7 @@ import { isUnlocked } from "./unlocks.js";
 // ---------- partidas ----------
 
 /** Puntaje que equivale a 1 Matipunto al terminar una partida (cada juego puntúa distinto). */
-export const RUN_DIVISOR = { tetris: 40, basquet_tiros: 12, porristas: 8, salto: 25, autos: 30, memoria: 10, parkour: 40, futbol: 10, dulces: 15, aventura: 20 };
+export const RUN_DIVISOR = { tetris: 40, basquet_tiros: 12, porristas: 8, salto: 25, autos: 30, memoria: 10, parkour: 40, futbol: 10, dulces: 15, aventura: 20, ciudad: 12 };
 const RUN_BONUS_CAP = 60;
 
 export function runBonus(gameId, score) {
@@ -26,7 +26,7 @@ export const GAME_NAMES = {
   parkour: "Parkour Choco", recolecta: "Recolecta y Corre", salto: "Salto Choco", autos: "Autos de Chocolate",
   tetris: "Tetris de Productos", memoria: "Memoria Matichoc", basquet_tiros: "Lanzamientos de Básquet",
   porristas: "Saltos de Porristas", creador: "Crea tu Chocolate", fps3d: "Choco Blaster",
-  futbol: "Fútbol Choco", dulces: "Choco Match", aventura: "Aventura Choco",
+  futbol: "Fútbol Choco", dulces: "Choco Match", aventura: "Aventura Choco", ciudad: "Ciudad Choco",
 };
 
 // ---------- niveles ----------
@@ -80,8 +80,8 @@ export function addXp(progress, amount) {
 
 // ---------- misiones diarias ----------
 
-const SCORE_BASE = { tetris: 250, basquet_tiros: 60, salto: 700, autos: 700, parkour: 300, porristas: 60, memoria: 100, recolecta: 80, futbol: 400, dulces: 1500, aventura: 800 };
-const PLAY_GAMES = ["parkour", "salto", "autos", "tetris", "memoria", "basquet_tiros", "porristas", "recolecta", "futbol", "dulces", "aventura"];
+const SCORE_BASE = { tetris: 250, basquet_tiros: 60, salto: 700, autos: 700, parkour: 300, porristas: 60, memoria: 100, recolecta: 80, futbol: 400, dulces: 1500, aventura: 800, ciudad: 600 };
+const PLAY_GAMES = ["parkour", "salto", "autos", "tetris", "memoria", "basquet_tiros", "porristas", "recolecta", "futbol", "dulces", "aventura", "ciudad"];
 
 function hashStr(s) {
   let h = 2166136261;

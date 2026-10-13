@@ -11,7 +11,7 @@ export const IS_DEMO = typeof document !== "undefined" && document.documentEleme
 export const PLAY_STORE_URL = "";
 
 // Cuánto se puede jugar en la demo, por juego: cantidad de niveles.
-export const DEMO_LIMITS = { futbol: 3, dulces: 3, aventura: 2 };
+export const DEMO_LIMITS = { futbol: 3, dulces: 3, aventura: 2, ciudad: 2 };
 
 /** ¿Se puede jugar este nivel? (fuera de la demo, siempre sí) */
 export function demoAllows(gameId, level) {
