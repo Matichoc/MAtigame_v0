@@ -6,7 +6,7 @@
 //
 // Controles: ← → / A D para moverte, ESPACIO / ↑ / W para saltar. En el celular: ◀ ▶ y ⤴.
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, makeLogo, goldCoinTexture } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, canvasTexture, makeLogo, goldCoinTexture, disposeGeometries } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
@@ -282,7 +282,7 @@ export class AventuraGame extends Game3D {
 
   _clearLevel() {
     for (const g of [this.levelGroup, this.bg]) {
-      while (g.children.length) g.remove(g.children[0]);
+      while (g.children.length) { const c = g.children[0]; g.remove(c); disposeGeometries(c); }
     }
   }
 
