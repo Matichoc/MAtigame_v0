@@ -1533,3 +1533,27 @@ details.how > :not(summary) { font-size: 0.85rem; margin: 6px 0 0; }
   .sh-bar.hint { position: static; background: transparent; border: 0; }
   .house-tools { margin-top: 4px; }
 }
+
+/* Canje de juegos con Matipuntos y cartel de la demo */
+.modal { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(20,10,5,0.78); }
+.modal.hidden { display: none; }
+.modal-card { width: min(380px, 100%); max-height: 92vh; overflow-y: auto; text-align: center; padding: 22px 20px 18px; border-radius: 22px; background: linear-gradient(180deg, #4b2e2e, #2f1c18); border: 3px solid var(--dorado); box-shadow: 0 18px 50px rgba(0,0,0,0.6); color: var(--crema); display: flex; flex-direction: column; gap: 10px; }
+.modal-card h2 { margin: 0; font-size: 1.35rem; color: var(--dorado); }
+.modal-card p { margin: 0; font-size: 0.95rem; line-height: 1.35; }
+.modal-card .um-icon { font-size: 3rem; line-height: 1; }
+.modal-card a.btn-primary { display: block; text-decoration: none; text-align: center; }
+.modal-card a.btn-primary.disabled { opacity: 0.6; pointer-events: none; }
+.game-card.locked .gthumb img { filter: grayscale(0.7) brightness(0.65); }
+.game-card .glock { position: absolute; right: 8px; top: 8px; z-index: 2; padding: 3px 9px; border-radius: 999px; background: rgba(28,15,7,0.88); border: 2px solid var(--dorado); color: var(--dorado); font-size: 0.74rem; font-weight: 900; }
+.game-card .glock.ready { background: linear-gradient(180deg, #ffd34d, #ffa800); color: #4a2c24; border-color: #fff; animation: daily-pulse 1.3s ease-in-out infinite; }
+.game-card .gnew { position: absolute; left: 8px; top: 8px; }
+
+/* Fútbol Choco: ayuda y barra de potencia */
+.fb-hint { position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; font-family: var(--font-script); font-size: 1.6rem; color: var(--crema); text-shadow: 0 2px 8px rgba(0,0,0,0.75); pointer-events: none; padding: 0 12px; }
+.fb-power { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 34px; display: flex; flex-direction: column; align-items: center; gap: 4px; pointer-events: none; }
+.fb-power.hidden { display: none; }
+.fb-power-label { font-size: 0.6rem; font-weight: 900; color: var(--crema); text-shadow: 0 1px 4px #000; }
+.fb-power-track { width: 22px; height: 130px; border-radius: 999px; background: rgba(28,15,7,0.7); border: 2px solid #fff; overflow: hidden; position: relative; display: flex; align-items: flex-end; }
+.fb-power-fill { width: 100%; height: 0; background: linear-gradient(0deg, #cfd767, #ffc800 60%, #ff4a3a); }
+@media (max-width: 520px) { .fb-hint { font-size: 1.2rem; bottom: 8px; } }
+.canvas-wrap:has(.overlay:not(.hidden)) .fb-hint { display: none; }

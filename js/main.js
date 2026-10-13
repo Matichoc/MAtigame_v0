@@ -2,6 +2,7 @@ import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
 import { bindStick, joyMode, setJoyMode } from "./stick.js";
+import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
   loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem, equippedOutfitId,
@@ -44,6 +45,7 @@ const screen3d = {
   salto: document.getElementById("screen-salto"),
   autos: document.getElementById("screen-autos"),
   memoria: document.getElementById("screen-memoria"),
+  futbol: document.getElementById("screen-futbol"),
   creador: document.getElementById("screen-creador"),
 };
 const ALL_SCREENS = [
@@ -60,7 +62,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
+const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, creador: null };
 
 let toastTimer = null;
 function showToast(message, ms = 2600) {
@@ -1186,6 +1188,13 @@ function gameThumb(entry) {
   play.className = "gplay";
   play.textContent = "▶ Jugar";
   wrap.appendChild(play);
+  if (needsUnlock(entry.id) && !isUnlocked(progress, entry.id)) {
+    const lock = document.createElement("span");
+    const can = progress.coins >= UNLOCK_COST[entry.id];
+    lock.className = `glock${can ? " ready" : ""}`;
+    lock.textContent = can ? `🔓 ¡Canjéalo! ${UNLOCK_COST[entry.id]} 🍫✨` : `🔒 ${UNLOCK_COST[entry.id]} 🍫✨`;
+    wrap.appendChild(lock);
+  }
   return wrap;
 }
 
@@ -1193,7 +1202,7 @@ function renderGameGrid() {
   gameGrid.innerHTML = "";
   const featureEl = document.getElementById("game-feature");
   featureEl.innerHTML = "";
-  const available = GAMES_CATALOG.filter((g) => g.status === "available");
+  const available = GAMES_CATALOG.filter((g) => g.status === "available" && isUnlocked(progress, g.id));
   const last = available.find((g) => g.id === progress.lastGameId);
   const featured = last || available.find((g) => g.id === "town") || available[0];
 
@@ -1212,7 +1221,8 @@ function renderGameGrid() {
   GAMES_CATALOG.forEach((entry) => {
     if (featured && entry.id === featured.id) return;
     const card = document.createElement("div");
-    card.className = `game-card ${entry.status}`;
+    const locked = needsUnlock(entry.id) && !isUnlocked(progress, entry.id);
+    card.className = `game-card ${entry.status}${locked ? " locked" : ""}`;
     card.appendChild(gameThumb(entry));
 
     const body = document.createElement("div");
@@ -1240,9 +1250,48 @@ function renderGameGrid() {
   });
 }
 
+// ---------- CANJE DE JUEGOS CON MATIPUNTOS ----------
+
+const unlockDialog = document.getElementById("unlock-dialog");
+let unlockTarget = null;
+
+function openUnlockDialog(entry) {
+  unlockTarget = entry;
+  const cost = UNLOCK_COST[entry.id];
+  const missing = cost - progress.coins;
+  document.getElementById("um-icon").textContent = entry.icon;
+  document.getElementById("um-title").textContent = entry.name;
+  document.getElementById("um-text").textContent = missing > 0
+    ? `${entry.tagline} Se desbloquea con ${cost} Matipuntos 🍫✨. Tienes ${progress.coins}: te faltan ${missing}. ¡Sigue jugando para juntarlos!`
+    : `${entry.tagline} ¿Lo canjeas por ${cost} Matipuntos 🍫✨? Es tuyo para siempre.`;
+  const buy = document.getElementById("um-buy");
+  buy.textContent = missing > 0 ? `Te faltan ${missing} 🍫✨` : `🔓 Canjear por ${cost} 🍫✨`;
+  buy.disabled = missing > 0;
+  unlockDialog.classList.remove("hidden");
+}
+
+document.getElementById("um-cancel").addEventListener("click", () => { unlockDialog.classList.add("hidden"); unlockTarget = null; });
+document.getElementById("um-buy").addEventListener("click", () => {
+  if (!unlockTarget || !unlockGame(progress, unlockTarget.id)) return;
+  const entry = unlockTarget;
+  unlockTarget = null;
+  unlockDialog.classList.add("hidden");
+  audio.playPurchase();
+  showToast(`¡Desbloqueaste ${entry.name}! 🎉`);
+  refreshHubStats();
+  renderGameGrid();
+  playGame(entry.id);
+});
+document.getElementById("demo-wall-close").addEventListener("click", () => document.getElementById("demo-wall").classList.add("hidden"));
+
 function playGame(gameId) {
   if (!selectedCharacter) {
     window.alert("Elige primero a tu Matichico.");
+    return;
+  }
+  const entry = GAMES_CATALOG.find((g) => g.id === gameId);
+  if (entry && needsUnlock(gameId) && !isUnlocked(progress, gameId)) {
+    openUnlockDialog(entry);
     return;
   }
   if (!progress.playerName) {
@@ -1639,6 +1688,7 @@ const GAMES_3D = {
   salto: { module: "./salto-game.js", cls: "SaltoGame", hud: ["score", "height", "hearts", "combo", "coins"] },
   autos: { module: "./autos-game.js", cls: "AutosGame", hud: ["score", "speed", "hearts", "combo", "power", "coins"] },
   memoria: { module: "./memoria-game.js", cls: "MemoriaGame", hud: ["level", "moves", "time", "score", "coins"] },
+  futbol: { module: "./futbol-game.js", cls: "FutbolGame", hud: [] },
   creador: { module: "./creador-game.js", cls: "CreadorGame", hud: ["score", "count", "coins"] },
 };
 

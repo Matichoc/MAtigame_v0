@@ -291,6 +291,14 @@ export function createMatichico(character, outfit, look = null) {
       armR = [0, 0, 0.04];
       headTilt = 0.1;
       lean = 0.18;
+    } else if (mode === "kick") {
+      // patada: `speed` es el avance de la patada (0 a 1); la pierna derecha se balancea hacia adelante
+      const k = Math.sin(Math.min(1, Math.max(0, speed)) * Math.PI);
+      legR = -1.6 * k;
+      legL = 0.35 * k;
+      armL = [0.6 * k, 0, -0.5];
+      armR = [-0.6 * k, 0, 0.5];
+      lean = -0.12 * k;
     } else if (mode === "drive") {
       armL = [-1.25, 0, -0.35];
       armR = [-1.25, 0, 0.35];

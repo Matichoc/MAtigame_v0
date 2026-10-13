@@ -17,6 +17,28 @@
 </head>
 <body>
 <div id="toast" class="toast hidden"></div>
+
+<!-- Canje de un juego con Matipuntos -->
+<div id="unlock-dialog" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div id="um-icon" class="um-icon"></div>
+    <h2 id="um-title"></h2>
+    <p id="um-text"></p>
+    <button id="um-buy" class="btn-primary" type="button"></button>
+    <button id="um-cancel" class="btn-secondary" type="button">Ahora no</button>
+  </div>
+</div>
+
+<!-- Cartel de la demo de la web: para seguir hay que bajar la app -->
+<div id="demo-wall" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="um-icon">🎮</div>
+    <h2>¡Esto sigue en la app!</h2>
+    <p>Ya probaste lo primero de este juego. Para seguir jugando todos los niveles, descarga Matijuego en Google Play.</p>
+    <a id="demo-wall-link" class="btn-primary" target="_blank" rel="noopener">📲 Descargar en Google Play</a>
+    <button id="demo-wall-close" class="btn-secondary" type="button">Seguir mirando</button>
+  </div>
+</div>
 <div id="app">
 
   <!-- SELECCIÓN DE PERFIL: "¿Quién juega?" -->
@@ -895,6 +917,74 @@
           <p id="memoria-gameover-text"></p>
           <button class="btn-primary" id="memoria-btn-retry">Intentar de nuevo</button>
           <button class="btn-secondary overlay-secondary-btn" id="memoria-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANTALLA DE JUEGO 3D: FÚTBOL CHOCO (penales y tiros libres) -->
+  <section id="screen-futbol" class="screen game-screen hidden">
+    <div id="futbol-hud" class="hud">
+      <div class="hud-left">
+        <button id="futbol-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="futbol-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Fútbol Choco 3D</div>
+          <div class="hud-mission" id="futbol-hud-mode">Penales</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">🎯 <span id="futbol-hud-goals">0/0</span></div>
+        <div class="hud-chip"><span id="futbol-hud-kicks">⚪ ⚪ ⚪ ⚪ ⚪</span></div>
+        <div class="hud-chip">⚽ <span id="futbol-hud-score">0</span></div>
+        <div class="hud-chip">🍫✨ <span id="futbol-hud-coins">0</span></div>
+        <button id="futbol-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="futbol-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="futbol-canvas"></canvas>
+      <div id="futbol-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="futbol-popups" class="fps-popups" aria-hidden="true"></div>
+
+      <div id="futbol-hint" class="fb-hint"></div>
+      <div id="futbol-power" class="fb-power hidden" aria-label="Potencia">
+        <span class="fb-power-label">POTENCIA</span>
+        <div class="fb-power-track"><div id="futbol-power-fill" class="fb-power-fill"></div></div>
+      </div>
+
+      <div id="futbol-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Fútbol Choco 3D</h2>
+          <p class="fps-tag">Penales y tiros libres</p>
+          <div id="futbol-modepick" class="lvl-pick"></div>
+          <p id="futbol-intro-text"></p>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>Mueve el puntero (o el dedo, o las flechas) para <b>apuntar</b> al arco. <b>Mantén apretado</b> (o ESPACIO) para cargar la potencia y <b>suelta</b> para patear.
+            Potencia alta: tiro rápido y plano, pero si te pasas se va afuera. Potencia baja: tiro lento y en arco, que sirve para pasar la barrera en los tiros libres (¡pero el arquero llega!).
+            Cada nivel son 5 tiros y tienes que meter los goles que te piden. ¡Los goles a los ángulos valen más!</p>
+          </details>
+          <div id="futbol-lvlpick" class="lvl-pick"></div>
+          <button class="btn-primary" id="futbol-btn-start">¡A la cancha!</button>
+        </div>
+      </div>
+
+      <div id="futbol-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="futbol-win-title">¡Nivel superado!</h2>
+          <div id="futbol-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="futbol-win-text"></p>
+          <button class="btn-primary" id="futbol-btn-next">Siguiente nivel</button>
+          <button class="btn-secondary overlay-secondary-btn" id="futbol-btn-win-menu">Volver al menú</button>
+        </div>
+      </div>
+
+      <div id="futbol-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="futbol-gameover-title">¡Casi!</h2>
+          <p id="futbol-gameover-text"></p>
+          <button class="btn-primary" id="futbol-btn-retry">Reintentar</button>
+          <button class="btn-secondary overlay-secondary-btn" id="futbol-btn-gameover-menu">Volver al menú</button>
         </div>
       </div>
     </div>

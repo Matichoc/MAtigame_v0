@@ -91,6 +91,15 @@ const ALL_GAMES = [
     tag: "3D",
   },
   {
+    id: "futbol",
+    orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
+    name: "Fútbol Choco",
+    icon: "⚽",
+    tagline: "Penales y tiros libres: apunta, carga la potencia y pasa a los arqueros y la barrera. 20 niveles en cada modo.",
+    status: "available",
+    tag: "Nuevo",
+  },
+  {
     id: "fps3d",
     orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
     name: "Choco Blaster 3D",

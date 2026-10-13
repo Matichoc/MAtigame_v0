@@ -18,7 +18,9 @@ const other = variant === "app" ? "WEB" : "APP";
 let html = readFileSync("app/index.template.html", "utf8");
 html = html.replace(new RegExp(`<!--${other}-->[\\s\\S]*?<!--/${other}-->`, "g"), "");
 html = html.replace(/<!--\/?(WEB|APP)-->/g, "");
-html = html.replace("{{APP_ATTR}}", variant === "app" ? 'data-app="1"' : "").replace("{{TITLE}}", variant === "app" ? "Matijuego" : "Matichoc Arcade");
+// MATIJUEGO_DEMO=1 enciende el modo demo de la web (ver js/demo.js); apagado por defecto.
+const attr = variant === "app" ? 'data-app="1"' : process.env.MATIJUEGO_DEMO === "1" ? 'data-demo="1"' : "";
+html = html.replace("{{APP_ATTR}}", attr).replace("{{TITLE}}", variant === "app" ? "Matijuego" : "Matichoc Arcade");
 writeFileSync(`${OUT}/index.html`, html);
 
 // Choco Blaster (juego de "disparos") no va en la app infantil: se deja fuera de esa compilación.
