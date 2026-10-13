@@ -20,7 +20,8 @@ import {
 } from "./house-data.js";
 import {
   levelInfo, xpForLevel, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
-  canClaimChest, claimChest, hasPending, STICKERS, albumCount, ALBUM_MILESTONES, openPack, onProgressEvent, GAME_NAMES,
+  canClaimChest, claimChest, hasPending, STICKERS, PAGES, ALBUM_TOTAL, albumCount, pageStatus, ALBUM_MILESTONES, openPack, onProgressEvent, GAME_NAMES,
+  spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, spareOf, TRADE_NORMAL, TRADE_FOIL,
 } from "./progression.js";
 import { rankingEnabled, fetchRanking } from "./online.js";
 
@@ -935,26 +936,62 @@ function renderProgress() {
 
   // álbum
   const have = albumCount(progress);
-  document.getElementById("pg-album-count").textContent = `${have} / ${STICKERS.length}`;
+  document.getElementById("pg-album-count").textContent = `${have} / ${ALBUM_TOTAL}`;
   const packs = progress.packs || 0;
   pgOpenPackBtn.disabled = packs <= 0;
   pgOpenPackBtn.textContent = packs > 0 ? `📦 Abrir sobre (${packs})` : "📦 Sin sobres";
-  document.getElementById("pg-packs-text").textContent = "Ganas sobres al subir de nivel, cada 5 partidas y con el cofre del día.";
+  document.getElementById("pg-packs-text").textContent = "Ganas sobres al subir de nivel, cada 5 partidas y con el cofre del día. Cada sobre trae 3 figuritas al azar.";
   const albumEl = document.getElementById("pg-album");
   albumEl.innerHTML = "";
-  STICKERS.forEach((s) => {
-    const n = (progress.album || {})[s.id] || 0;
-    const card = el("div", "pg-sticker" + (n ? " got" : "") + (s.foil ? " foil" : ""));
-    if (n) {
-      const img = document.createElement("img");
-      img.src = s.img;
-      img.alt = s.name;
-      card.appendChild(img);
-      if (n > 1) card.appendChild(el("b", "pg-s-n", `x${n}`));
-    } else card.appendChild(el("span", "pg-s-q", "?"));
-    card.appendChild(el("span", "pg-s-name", n ? s.name : "Sin descubrir"));
-    albumEl.appendChild(card);
-  });
+  const pts = sparePoints(progress);
+  for (const pg of PAGES) {
+    const st = pageStatus(progress, pg);
+    albumEl.appendChild(el("h3", "pg-page-title" + (st.have >= st.total ? " ok" : ""), `${pg.icon} ${pg.title} · ${st.have}/${st.total}${st.have >= st.total ? " ✅" : ` (premio: +${pg.reward} 🍫✨)`}`));
+    const grid = el("div", "pg-album-grid");
+    STICKERS.filter((x) => x.page === pg.id).forEach((st2) => {
+      const n = (progress.album || {})[st2.id] || 0;
+      const canTrade = !n && pts >= tradeCost(st2);
+      const card = el("div", "pg-sticker" + (n ? " got" : "") + (st2.foil ? " foil" : "") + (canTrade ? " tradable" : ""));
+      if (n) {
+        card.appendChild(stickerArt(st2));
+        if (n > 1) card.appendChild(el("b", "pg-s-n", `x${n}`));
+      } else card.appendChild(el("span", "pg-s-q", st2.foil ? "✨?" : "?"));
+      card.appendChild(el("span", "pg-s-name", n ? st2.name : st2.foil ? "Brillante" : "Sin descubrir"));
+      if (canTrade) {
+        card.title = `Cambiar ${tradeCost(st2)} repetidas por esta figurita`;
+        card.addEventListener("click", () => {
+          if (!window.confirm(`¿Cambiar ${tradeCost(st2)} repetidas por «${st2.name}»?`)) return;
+          const r = tradeFor(progress, st2.id);
+          if (!r) return;
+          audio.playBonusCollect();
+          showToast(`🔄 ¡Conseguiste «${st2.name}»!${r.rewards.length ? " " + r.rewards.map((m) => `🏆 ${m.text}: +${m.coins} 🍫✨`).join(" · ") : ""}`);
+          refreshHubStats();
+          renderProgress();
+        });
+      }
+      grid.appendChild(card);
+    });
+    albumEl.appendChild(grid);
+  }
+  const tools = document.getElementById("pg-album-tools");
+  if (tools) {
+    const spare = spareCount(progress);
+    tools.innerHTML = "";
+    tools.appendChild(el("div", "pg-hint", spare ? `♻️ Tienes ${spare} figuritas repetidas (valen ${pts} puntos de cambio). Véndelas por Matipuntos, o toca una figurita que te falte para cambiarla: ${TRADE_NORMAL} repetidas por una normal, ${TRADE_FOIL} por una brillante (una brillante repetida vale 3).` : "♻️ Aquí aparecen tus repetidas: las puedes vender por Matipuntos o cambiarlas por las figuritas que te faltan."));
+    const sell = el("button", "btn-secondary", `💰 Vender repetidas (+${sellValue(progress)} 🍫✨)`);
+    sell.type = "button";
+    sell.disabled = spare <= 0;
+    sell.addEventListener("click", () => {
+      if (!window.confirm(`¿Vender ${spare} repetidas por ${sellValue(progress)} Matipuntos? (Te quedas con una de cada figurita)`)) return;
+      const r = sellSpares(progress);
+      if (!r) return;
+      audio.playPurchase();
+      showToast(`💰 Vendiste ${r.n} repetidas: +${r.coins} Matipuntos`);
+      refreshHubStats();
+      renderProgress();
+    });
+    tools.appendChild(sell);
+  }
   const ms = document.getElementById("pg-milestones");
   ms.innerHTML = "";
   ALBUM_MILESTONES.forEach((m) => {
@@ -982,6 +1019,21 @@ document.getElementById("pg-daily").addEventListener("click", () => {
   renderProgress();
 });
 
+/** Dibujo de una figurita: foto del producto, o un emoji sobre un fondo de color. */
+function stickerArt(s) {
+  const d = el("div", "stk-art");
+  d.style.background = `radial-gradient(circle at 30% 25%, ${s.color}cc, ${s.color})`;
+  if (s.img) {
+    // la foto va en un círculo con marco dorado, sobre un fondo de color (se ve más cuidado que la foto cruda)
+    const img = document.createElement("img");
+    img.src = s.img;
+    img.alt = s.name;
+    img.className = "stk-photo";
+    d.appendChild(img);
+  } else d.textContent = s.emoji || "⭐";
+  return d;
+}
+
 pgOpenPackBtn.addEventListener("click", () => {
   const r = openPack(progress);
   if (!r) return;
@@ -991,10 +1043,7 @@ pgOpenPackBtn.addEventListener("click", () => {
   r.stickers.forEach((s, i) => {
     const card = el("div", "pk-card" + (s.foil ? " foil" : ""));
     card.style.animationDelay = `${i * 0.35}s`;
-    const img = document.createElement("img");
-    img.src = s.img;
-    img.alt = s.name;
-    card.appendChild(img);
+    card.appendChild(stickerArt(s));
     card.appendChild(el("span", "pk-c-name", s.name));
     if (s.isNew) card.appendChild(el("b", "pk-c-new", "¡NUEVA!"));
     wrap.appendChild(card);
