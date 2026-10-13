@@ -5,7 +5,7 @@
 //   · Cada 5 niveles aparece un JEFE: lo derrotas juntando piezas (le duele más su color débil) y él te pega chicles.
 // 20 niveles con estrellas por movimientos que te sobran.
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeBunting } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeBunting, makeLogo } from "./three-kit.js";
 import { saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
 import { campaign, campaignWin, renderLevelPicker, LEVELS_PER_GAME } from "./campaign.js";
@@ -129,6 +129,10 @@ export class DulcesGame extends Game3D {
       }
     }
     s.add(makeBunting(new THREE.Vector3(-13, 9.6, -11), new THREE.Vector3(13, 9.6, -11), { count: 28, sag: 1.4, size: 0.5 }));
+    // el logo de Matichoc grande en la pared del fondo
+    const wallLogo = makeLogo(5);
+    wallLogo.position.set(0, 7.2, -11.8);
+    s.add(wallLogo);
 
     this._makeAssets();
     this.boss = null;

@@ -7,7 +7,7 @@
 // bolas con pinchos, aterrizajes perfectos, combo, poderes (jetpack, imán, burbuja), cuatro
 // zonas con su propia decoración (globos, aves, planetas) y música.
 
-import { THREE, Game3D, clamp, lerp, rand, loadTexture, makeStars, roundedBox } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, loadTexture, makeStars, roundedBox, makeLogo } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
@@ -411,9 +411,11 @@ export class SaltoGame extends Game3D {
       g.add(new THREE.Mesh(new THREE.SphereGeometry(rand(0.9, 1.8), 16, 12), std(c, 0.5)));
       if (Math.random() < 0.5) { const t = new THREE.Mesh(new THREE.TorusGeometry(2.2, 0.08, 6, 30), std(0xffe14a, 0.4)); t.rotation.x = 1.2; g.add(t); }
     }
+    const logoDeco = Math.random() < 0.28;
+    if (logoDeco) { g.clear(); g.add(makeLogo(2.6)); }
     g.position.set(side * rand(HALF + 2, HALF + 9), h, -rand(6, 16));
     this.scene.add(g);
-    this.decos.push({ mesh: g, y: h, spin: rand(-0.6, 0.6), phase: rand(0, 6) });
+    this.decos.push({ mesh: g, y: h, spin: logoDeco ? 0 : rand(-0.6, 0.6), phase: rand(0, 6) });
   }
 
   _spawnPickup(kind, x, y) {

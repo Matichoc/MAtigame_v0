@@ -7,7 +7,7 @@
 // volar y juntar alfajores en el aire, charcos de chocolate, poderes (nitro, imán, escudo),
 // combo de alfajores, un hito cada kilómetro y música.
 
-import { THREE, Game3D, clamp, lerp, rand, loadTexture, canvasTexture, roundedBox, makeBunting } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, loadTexture, canvasTexture, roundedBox, makeBunting, makeLogo } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
@@ -254,6 +254,11 @@ export class AutosGame extends Game3D {
       const banner = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 1.62), new THREE.MeshStandardMaterial({ map: bannerTex, roughness: 0.7, side: THREE.DoubleSide }));
       banner.position.set(0, 4.6, 0.05);
       g.add(banner);
+      for (const sx of [-1, 1]) {
+        const lg = makeLogo(1.7);
+        lg.position.set(sx * 3.45, 4.6, 0.06);
+        g.add(lg);
+      }
       this.scene.add(g);
       this.arches.push({ g, d: 90 + i * 130 });
     }

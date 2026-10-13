@@ -96,6 +96,24 @@ export function loadTexture(url, { repeat = 0, anisotropy = 4 } = {}) {
   return tex;
 }
 
+let logoTex = null;
+/** Textura del logo de Matichoc (medallón redondo). Se comparte entre todos los juegos. */
+export function logoTexture() {
+  if (!logoTex) logoTex = loadTexture("assets/brand/logo-badge.png", { anisotropy: 8 });
+  return logoTex;
+}
+
+/**
+ * Logo de Matichoc como una lámina (para carteles, paredes, pisos y banderas). `size` es el diámetro.
+ * Con `lit` se ve igual de claro en la oscuridad (no recibe luces); si no, se mezcla con la escena.
+ */
+export function makeLogo(size = 2, { lit = true } = {}) {
+  const mat = lit
+    ? new THREE.MeshBasicMaterial({ map: logoTexture(), transparent: true, side: THREE.DoubleSide })
+    : new THREE.MeshStandardMaterial({ map: logoTexture(), transparent: true, side: THREE.DoubleSide, roughness: 0.6 });
+  return new THREE.Mesh(new THREE.PlaneGeometry(size, size), mat);
+}
+
 export function canvasTexture(w, h, draw) {
   const c = document.createElement("canvas");
   c.width = w;

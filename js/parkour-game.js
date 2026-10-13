@@ -4,7 +4,7 @@
 // checkpoints y llega a la cumbre. Al avanzar, tu Matichico desbloquea accesorios
 // (capa, gafas brillantes y corona) además del atuendo que compraste en la tienda.
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeStars } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeStars, makeLogo } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import { bindStick } from "./stick.js";
@@ -467,6 +467,11 @@ export class ParkourGame extends Game3D {
     );
     sign.position.set(0, 7.2, 0.5);
     g.add(bar, sign);
+    for (const sx of [-1, 1]) {
+      const lg = makeLogo(2.3);
+      lg.position.set(sx * 6.6, 6.2, 0.5);
+      g.add(lg);
+    }
     // barra de chocolate gigante al fondo
     const choco = new THREE.Mesh(roundedBox(5, 3.2, 1.2, 0.3, 0.1), new THREE.MeshStandardMaterial({ color: 0x64321b, roughness: 0.3, metalness: 0.1 }));
     choco.position.set(0, 1.9, -4.5);

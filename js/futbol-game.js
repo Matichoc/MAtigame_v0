@@ -7,7 +7,7 @@
 // para cargar la potencia y se SUELTA para patear. Con potencia alta la pelota va rápida y plana (pero se puede ir
 // afuera); con potencia baja va lenta y en arco (así se pasa por encima de la barrera, pero el arquero llega).
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, makeBunting } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, canvasTexture, makeBunting, makeLogo } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { CHARACTERS, getOutfit } from "./characters.js";
 import { earnCoins, saveProgress } from "./storage.js";
@@ -184,6 +184,14 @@ export class FutbolGame extends Game3D {
 
     this._buildGoal();
     this._buildStadium();
+    // el logo de Matichoc en el centro de la cancha (en el pasto, mirando al cielo) y grande en la tribuna del fondo
+    const lg = makeLogo(7);
+    lg.rotation.x = -Math.PI / 2;
+    lg.position.set(0, 0.03, 25);
+    s.add(lg);
+    const lg2 = makeLogo(5.5);
+    lg2.position.set(0, 3.3, -6.25);
+    s.add(lg2);
 
     // pelota y sombra
     this.ball = new THREE.Mesh(new THREE.SphereGeometry(BALL_R, 28, 20), new THREE.MeshStandardMaterial({ map: ballTexture(), roughness: 0.5 }));

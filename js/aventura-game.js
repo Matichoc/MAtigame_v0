@@ -6,7 +6,7 @@
 //
 // Controles: ← → / A D para moverte, ESPACIO / ↑ / W para saltar. En el celular: ◀ ▶ y ⤴.
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeLogo } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
@@ -393,6 +393,12 @@ export class AventuraGame extends Game3D {
       c.fillStyle = "#FFC800"; c.font = '70px "Baby Chipmunk", sans-serif'; c.textAlign = "center"; c.textBaseline = "middle";
       c.fillText("M", w / 2, h / 2 + 4);
     });
+    // el logo de Matichoc: en la bandera (arriba del poste) y sobre la puerta del castillo
+    const flagLogo = makeLogo(1.6);
+    flagLogo.position.set(fx + 0.95, 7.35, 0.05);
+    const doorLogo = makeLogo(1.5);
+    doorLogo.position.set(fx + 5, 4.35, 0.6);
+    g.add(flagLogo, doorLogo);
     this.flagCloth = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 1.05, 8, 1), new THREE.MeshBasicMaterial({ map: flagTex, side: THREE.DoubleSide }));
     this.flagCloth.position.set(fx + 0.9, 7.3, 0);
     this.flagBase = Float32Array.from(this.flagCloth.geometry.attributes.position.array);
