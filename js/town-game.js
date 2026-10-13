@@ -352,7 +352,7 @@ export class TownGame extends Game3D {
     const n = games.length;
     this.portals = [];
     games.forEach((game, i) => {
-      const deg = 78 + (i * (168 - 78)) / Math.max(1, n - 1);
+      const deg = 70 + (i * (176 - 70)) / Math.max(1, n - 1);
       const p = pol(deg, 44);
       const col = colors[i % colors.length];
       const g = new THREE.Group();

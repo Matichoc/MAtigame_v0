@@ -7,7 +7,7 @@
 
 Arcade web de Matichoc: cada persona elige su perfil, su Matichico (Matichico, Chocolatina, Matichico Baller o Chocolatina Cheer: los personajes de matichoc.cl) y lo personaliza con
 atuendos comprados en la tienda, para jugar cualquiera de los minijuegos
-disponibles con ese mismo personaje. **Los 10 juegos son 3D** (Three.js),
+disponibles con ese mismo personaje. **Los 13 juegos son 3D** (Three.js),
 con brillo (bloom), música generada en vivo, color vivo y un Matichico 3D que cambia con la tienda:
 **Parkour Choco** (estilo Roblox: **Mundo infinito** con 10 ambientes, poderes y récord de metros, o la Aventura de 6 etapas),
 **Recolecta y Corre** (20 niveles 3D con guardias, cintas transportadoras, impulso y estrellas),
@@ -15,6 +15,8 @@ con brillo (bloom), música generada en vivo, color vivo y un Matichico 3D que c
 **Lanzamientos de Básquet** (5 posiciones, rachas, modo «en llamas» y 20 niveles),
 **Saltos de Porristas** (viento, red de seguridad, rebotadora gigante y 20 niveles), **Salto Choco** (enemigos, vidas, 4 zonas, infinito y 20 misiones),
 **Autos de Chocolate** (rivales, rampas, charcos, poderes, infinito y 20 misiones), **Memoria Matichoc** (pareja dorada, cartas traviesas y 20 niveles),
+**Juegos que se canjean con Matipuntos** (se desbloquean desde el menú al juntar suficientes): **Fútbol Choco** (penales y tiros libres, 20 niveles cada modo),
+**Dulces Matichoc** (3 en línea con piezas especiales y jefes golosos, 20 niveles) y **Aventura Choco** (plataformas tipo Mario por 5 mundos con jefes, 20 niveles),
 **Choco Blaster** (primera persona, ver
 [`docs/PROPUESTA-3D.md`](./docs/PROPUESTA-3D.md)) y **Crea tu Chocolate**
 (configurador 3D: elige producto, sabor, toppings, envoltorio y diseña tu
@@ -118,6 +120,11 @@ js/matichico3d.js     Matichico en 3D con atuendo de la tienda
 js/salto-game.js      Salto Choco 3D
 js/autos-game.js      Autos de Chocolate 3D
 js/memoria-game.js    Memoria Matichoc 3D
+js/futbol-game.js     Fútbol Choco 3D (penales y tiros libres)
+js/dulces-game.js     Dulces Matichoc 3D (3 en línea con jefes)
+js/aventura-game.js   Aventura Choco 3D (plataformas por mundos; los niveles se arman con una semilla)
+js/unlocks.js         Canje de juegos con Matipuntos (precio en una sola línea)
+js/demo.js            Modo demo de la web (apagado por ahora; ver ROADMAP, etapa 11m)
 js/creador-game.js    Crea tu Chocolate: asistente, galería, puntaje
 js/creador-data.js    Opciones, maridajes, reto del día y etiqueta
 js/creador-3d.js      Modelos 3D de los productos, toppings y envoltorios

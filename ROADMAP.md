@@ -501,6 +501,24 @@ flujo de la pantalla), así que no se podía avanzar y saltar a la vez. Ahora el
 probado con dos dedos en Parkour y Recolecta (moverse + saltar + impulso). En teclado, el salto también va con **K** o **J** (algunos
 teclados no dejan apretar flechas + Espacio al mismo tiempo).
 
+### Etapa 11m — Tres juegos nuevos que se canjean con Matipuntos ✅
+
+- **Canje:** Fútbol Choco, Dulces Matichoc y Aventura Choco aparecen en el menú con candado y su precio; al juntar los Matipuntos se
+  canjean (`js/unlocks.js`). **Precio de prueba: 300** (una sola línea, `UNLOCK_PRICE`); para el lanzamiento se cambia a **20000**.
+  Las misiones diarias solo piden juegos ya desbloqueados.
+- **⚽ Fútbol Choco** (`js/futbol-game.js`): dos modos en el mismo juego, **Penales** (5 tiros contra un arquero que lee mejor cada nivel)
+  y **Tiros libres** (barrera de 2 a 5 defensas que a veces saltan, hay que pasarla con un tiro en arco). 20 niveles por modo.
+  Se apunta moviendo el puntero/dedo, se mantiene apretado para cargar potencia y se suelta; potencia baja = tiro lento en arco.
+- **🍬 Dulces Matichoc** (`js/dulces-game.js`): 3 en línea 3D con piezas rayadas (4), bombas de color (5) y envueltas (L/T),
+  cadenas, y objetivos por nivel (puntaje, juntar un dulce o limpiar chicles). **Jefes** cada 5 niveles (le duele más su dulce débil
+  y te tira chicles). 20 niveles.
+- **🍄 Aventura Choco** (`js/aventura-game.js`): plataformas de avance lateral tipo Mario, 5 mundos × 4 niveles = 20. Los niveles se
+  arman solos con tramos y una semilla por nivel (siempre iguales); en cada mundo, el cuarto nivel es un jefe que se pisa 3 veces.
+  Alfajores, bloques ?, ladrillos, pinchos, pozos, puntos de control; botones ◀ ▶ ⤴ en el celular.
+- **Demo para la web (listo, apagado):** `js/demo.js` limita los niveles jugables (Fútbol 3, Dulces 3, Aventura 2) y muestra
+  «¡Esto sigue en la app!». Se enciende compilando con `MATIJUEGO_DEMO=1 node scripts/build.mjs web`. Hoy la web queda completa.
+- 50 logros nuevos (niveles de cada juego, jefes, goles, pisotones, récords…) y una meta «Dueño de la Arcade».
+
 ### Etapa 12 — Menú principal tipo lobby de videojuego ✅
 
 El menú anterior era una columna larga de formularios (nombre, personajes, lista
