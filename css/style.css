@@ -1566,3 +1566,8 @@ details.how > :not(summary) { font-size: 0.85rem; margin: 6px 0 0; }
 .dl-boss-bar { height: 14px; border-radius: 999px; background: rgba(28,15,7,0.75); border: 2px solid #fff; overflow: hidden; }
 .dl-boss-fill { height: 100%; width: 100%; background: linear-gradient(90deg, #ff4a3a, #ffc800); transition: width .3s ease; }
 .canvas-wrap:has(.overlay:not(.hidden)) .dl-boss { display: none; }
+
+/* Aventura Choco: ◀ ▶ juntos a la izquierda y saltar a la derecha */
+.av-dir { display: flex; gap: 10px; }
+.av-jump { background: rgba(255,200,0,0.7) !important; color: #3d1f10; border-color: #fff; }
+.canvas-wrap:has(.overlay:not(.hidden)) .av-touch { display: none !important; }

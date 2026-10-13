@@ -1055,6 +1055,75 @@
     </div>
   </section>
 
+  <!-- PANTALLA DE JUEGO 3D: AVENTURA CHOCO (plataformas tipo Mario) -->
+  <section id="screen-aventura" class="screen game-screen hidden">
+    <div id="aventura-hud" class="hud">
+      <div class="hud-left">
+        <button id="aventura-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="aventura-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Aventura Choco 3D</div>
+          <div class="hud-mission" id="aventura-hud-level">Mundo 1-1</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip"><span id="aventura-hud-hearts">❤❤❤</span></div>
+        <div class="hud-chip hidden" id="aventura-hud-boss-chip"><span id="aventura-hud-boss"></span></div>
+        <div class="hud-chip">🍫 <span id="aventura-hud-coins">0</span></div>
+        <div class="hud-chip">⭐ <span id="aventura-hud-score">0</span></div>
+        <button id="aventura-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="aventura-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="aventura-canvas"></canvas>
+      <div id="aventura-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="aventura-popups" class="fps-popups" aria-hidden="true"></div>
+
+      <div class="g3d-touch av-touch" id="aventura-touch">
+        <div class="av-dir">
+          <button class="g3d-tbtn" id="aventura-btn-left" aria-label="Izquierda">◀</button>
+          <button class="g3d-tbtn" id="aventura-btn-right" aria-label="Derecha">▶</button>
+        </div>
+        <button class="g3d-tbtn av-jump" id="aventura-btn-jump" aria-label="Saltar">⤴</button>
+      </div>
+
+      <div id="aventura-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Aventura Choco 3D</h2>
+          <p class="fps-tag">Plataformas por mundos</p>
+          <p id="aventura-intro-text"></p>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>Corre con ← → (o A D) y salta con ESPACIO o ↑ (¡mantén apretado para saltar más alto!). En el celular usa ◀ ▶ y ⤴.
+            Salta <b>sobre</b> los malvaviscos para pisarlos (los de pinchos no se pisan), junta alfajores, golpea los bloques <b>?</b> desde abajo (a veces dan un corazón) y llega a la bandera.
+            Cuidado con los pozos y los pinchos. El último nivel de cada mundo tiene un <b>JEFE</b>: písalo 3 veces para abrir el camino.</p>
+          </details>
+          <div id="aventura-lvlpick" class="lvl-pick"></div>
+          <button class="btn-primary" id="aventura-btn-start">¡A la aventura!</button>
+        </div>
+      </div>
+
+      <div id="aventura-overlay-win" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="aventura-win-title">¡Nivel superado!</h2>
+          <div id="aventura-stars" class="g3d-stars" aria-label="Estrellas">★★★</div>
+          <p id="aventura-win-text"></p>
+          <button class="btn-primary" id="aventura-btn-next">Siguiente nivel</button>
+          <button class="btn-secondary overlay-secondary-btn" id="aventura-btn-win-menu">Volver al menú</button>
+        </div>
+      </div>
+
+      <div id="aventura-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="aventura-gameover-title">¡Oh no!</h2>
+          <p id="aventura-gameover-text"></p>
+          <button class="btn-primary" id="aventura-btn-retry">Reintentar</button>
+          <button class="btn-secondary overlay-secondary-btn" id="aventura-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- PANTALLA DE JUEGO 3D: CREA TU CHOCOLATE -->
   <section id="screen-creador" class="screen game-screen cr-screen hidden">
     <div id="creador-hud" class="hud cr-hud">

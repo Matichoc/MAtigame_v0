@@ -109,6 +109,15 @@ const ALL_GAMES = [
     tag: "Nuevo",
   },
   {
+    id: "aventura",
+    orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
+    name: "Aventura Choco",
+    icon: "🍄",
+    tagline: "Plataformas por 5 mundos: corre, salta, pisa malvaviscos y vence a los jefes. 20 niveles.",
+    status: "available",
+    tag: "Nuevo",
+  },
+  {
     id: "fps3d",
     orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
     name: "Choco Blaster 3D",
