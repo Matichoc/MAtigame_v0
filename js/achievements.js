@@ -238,7 +238,7 @@ for (const g of LEVEL_GAMES) chain("campana", `niv_${g}`, LEVEL_NAMES[g][0], LEV
 // Juegos que se canjean con Matipuntos: Fútbol (dos modos), Dulces y Aventura, 20 niveles cada uno
 chain("campana", "niv_futbol_pen", "Rey de los Penales", "🥅", levelsDone("futbol_pen"), "Supera {n} niveles de Penales.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
 chain("campana", "niv_futbol_tl", "Maestro del Tiro Libre", "🎯", levelsDone("futbol_tl"), "Supera {n} niveles de Tiros libres.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
-chain("campana", "niv_dulces", "Dulcero Maestro", "🍬", levelsDone("dulces"), "Supera {n} niveles de Dulces Matichoc.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
+chain("campana", "niv_dulces", "Maestro del Choco Match", "🍫", levelsDone("dulces"), "Supera {n} niveles de Choco Match.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
 chain("campana", "niv_aventura", "Aventurero de Mundos", "🍄", levelsDone("aventura"), "Supera {n} niveles de Aventura Choco.", [[5, 25], [10, 60], [15, 120], [20, 250]]);
 const BOSS_LEVELS = { dulces: [5, 10, 15, 20], aventura: [4, 8, 12, 16, 20] };
 const bossesBeaten = (p) => Object.entries(BOSS_LEVELS).reduce((a, [g, lv]) => a + lv.filter((n) => (camp(p, g).stars[n] || 0) > 0).length, 0);
@@ -261,12 +261,12 @@ REC("rec_parkour", "Récord Parkour", "🧗", stat("parkourInfBest"), "Recorre {
 REC("rec_mundos", "Viajero de mundos", "🌎", stat("parkourInfWorlds"), "Llega al Mundo {n} en el Parkour infinito.", [[8, 40], [12, 100], [20, 250]]);
 
 REC("rec_futbol", "Récord Fútbol", "⚽", best("futbol"), "Consigue {n} puntos en una partida de Fútbol Choco.", [[400, 15], [800, 40], [1200, 100], [1800, 250]]);
-REC("rec_dulces", "Récord Dulces", "🍬", best("dulces"), "Consigue {n} puntos en Dulces Matichoc.", [[2500, 15], [5000, 40], [9000, 100], [15000, 250]]);
+REC("rec_dulces", "Récord Choco Match", "🍫", best("dulces"), "Consigue {n} puntos en Choco Match.", [[2500, 15], [5000, 40], [9000, 100], [15000, 250]]);
 REC("rec_aventura", "Récord Aventura", "🍄", best("aventura"), "Consigue {n} puntos en Aventura Choco.", [[800, 15], [1500, 40], [2500, 100], [4000, 250]]);
 chain("puntajes", "goleador", "Goleador", "⚽", stat("goalsTotal"), "Mete {n} goles en Fútbol Choco.", [[10, 15], [50, 50], [150, 120], [400, 300]]);
 chain("puntajes", "pisotones", "Pisotones", "👟", stat("stompsTotal"), "Pisa {n} enemigos en Aventura Choco.", [[20, 15], [100, 50], [300, 120], [800, 300]]);
 chain("puntajes", "alfajores_av", "Alfajorero", "🍫", stat("aventuraCoins"), "Junta {n} alfajores en Aventura Choco.", [[100, 15], [500, 50], [1500, 120], [4000, 300]]);
-chain("puntajes", "especiales", "Dulces especiales", "✨", stat("dulcesSpecials"), "Crea {n} dulces especiales (rayados, bombas y envueltos).", [[10, 15], [40, 50], [120, 120], [300, 300]]);
+chain("puntajes", "especiales", "Piezas especiales", "✨", stat("dulcesSpecials"), "Crea {n} piezas especiales (rayadas, bombas doradas y envueltas).", [[10, 15], [40, 50], [120, 120], [300, 300]]);
 
 // Pueblo y creación
 chain("pueblo", "pueblo_cosas", "Buscador del pueblo", "✨", stat("townItems"), "Junta {n} brillos en el Pueblo Matichoc.", [[25, 15], [100, 40], [300, 100], [800, 250]]);
@@ -292,7 +292,7 @@ const SINGLES = [
   { cat: "maestro", id: "gran_misionero", name: "Gran Misionero", icon: "🎖️", reward: 600, desc: "Cumple las 20 misiones de Salto Choco, Autos y Parkour.", isDone: (p) => MISSION_GAMES.every((g) => levelsDone(g)(p) >= 20), progress: (p) => ({ cur: MISSION_GAMES.reduce((a, g) => a + Math.min(20, levelsDone(g)(p)), 0), max: 60 }) },
   { cat: "maestro", id: "tres_estrellas", name: "Todo tres estrellas", icon: "🌟", reward: 1000, desc: "Consigue las 3 estrellas en los 100 niveles de los juegos por niveles.", isDone: (p) => sum(LEVEL_GAMES.map(starsOf))(p) >= 300, progress: (p) => ({ cur: sum(LEVEL_GAMES.map(starsOf))(p), max: 300 }) },
   { cat: "maestro", id: "doble_leyenda", name: "Leyenda de dos mundos", icon: "🌈", reward: 400, desc: "Llega a 5000 m en el Parkour infinito y a 25000 puntos en Salto Choco el mismo perfil.", isDone: (p) => (p.stats.parkourInfBest || 0) >= 5000 && getBestScore(p, "salto") >= 25000, progress: (p) => ({ cur: Math.min(1, (p.stats.parkourInfBest || 0) / 5000) + Math.min(1, getBestScore(p, "salto") / 25000), max: 2 }) },
-  { cat: "maestro", id: "dueno_arcade", name: "Dueño de la Arcade", icon: "🕹️", reward: 400, desc: "Canjea con Matipuntos los 3 juegos nuevos: Fútbol, Dulces y Aventura.", isDone: (p) => (p.unlockedGames || []).length >= 3, progress: (p) => ({ cur: Math.min(3, (p.unlockedGames || []).length), max: 3 }) },
+  { cat: "maestro", id: "dueno_arcade", name: "Dueño de la Arcade", icon: "🕹️", reward: 400, desc: "Canjea con Matipuntos los 3 juegos nuevos: Fútbol, Choco Match y Aventura.", isDone: (p) => (p.unlockedGames || []).length >= 3, progress: (p) => ({ cur: Math.min(3, (p.unlockedGames || []).length), max: 3 }) },
   { cat: "maestro", id: "mes_completo", name: "Un mes con Matichoc", icon: "🗓️", reward: 500, desc: "Juega 30 días distintos y llega al nivel 20.", isDone: (p) => (p.stats.playDays || 0) >= 30 && levelInfo(p.xp).level >= 20, progress: (p) => ({ cur: Math.min(30, p.stats.playDays || 0) + Math.min(20, levelInfo(p.xp).level), max: 50 }) },
 ];
 for (const s of SINGLES) CHAINS.push({ id: s.id, cat: s.cat, name: s.name, icon: s.icon, tiers: [{ ...s, reward: scaleReward(s.reward), tier: 0 }] });

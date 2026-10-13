@@ -1,8 +1,9 @@
-// Dulces Matichoc 3D: juntar piezas de 3 en línea (tipo Candy Crush) con los dulces de Matichoc.
+// Choco Match 3D: juntar piezas de 3 en línea (tipo Candy Crush) con los productos reales de Matichoc
+// (alfajores de frambuesa, menta, maracuyá y naranja, bombas de chocolate y cuchuflís).
 // Desliza una pieza hacia una vecina (o toca una y luego la otra) para intercambiarlas y juntar 3 o más iguales.
 //   · 4 en línea → pieza rayada (borra toda su fila o columna); 5 en línea → bomba de color; L o T → pieza envuelta (explota 3x3).
-//   · Cada nivel pide algo distinto: llegar a un puntaje, juntar cierto dulce o limpiar los chicles pegajosos.
-//   · Cada 5 niveles aparece un JEFE: lo derrotas juntando piezas (le duele más su color débil) y él te pega chicles.
+//   · Cada nivel pide algo distinto: llegar a un puntaje, juntar cierto dulce o romper las coberturas de chocolate duro.
+//   · Cada 5 niveles aparece un JEFE: lo derrotas juntando piezas (le duele más su color débil) y él te lanza coberturas.
 // 20 niveles con estrellas por movimientos que te sobran.
 
 import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeBunting, makeLogo } from "./three-kit.js";
@@ -18,20 +19,21 @@ const NTYPES = 6;
 const SWAP_T = 0.17;
 const POP_T = 0.2;
 
+// Las seis piezas son productos de Matichoc con su foto real (assets/products/<img>.jpg).
 const TYPES = [
-  { name: "Frambuesa", color: 0xd4216c, icon: "🩷" },
-  { name: "Chocolate", color: 0x7a3f22, icon: "🟤" },
-  { name: "Menta", color: 0x2fd08a, icon: "💚" },
-  { name: "Maracuyá", color: 0xffc800, icon: "💛" },
-  { name: "Naranja", color: 0xff7a1a, icon: "🧡" },
-  { name: "Arándano", color: 0x3b8cff, icon: "💙" },
+  { name: "Alfajor de Frambuesa", short: "Frambuesa", img: "alf-frambuesa", color: 0xd4216c, icon: "🩷", shape: "disc" },
+  { name: "Alfajor de Menta", short: "Menta", img: "alf-menta", color: 0x2fd08a, icon: "💚", shape: "disc" },
+  { name: "Alfajor de Maracuyá", short: "Maracuyá", img: "alf-maracuya", color: 0xffc800, icon: "💛", shape: "disc" },
+  { name: "Alfajor de Naranja", short: "Naranja", img: "alf-naranja", color: 0xff7a1a, icon: "🧡", shape: "disc" },
+  { name: "Bomba de Chocolate", short: "Bomba", img: "bomba-choco", color: 0x5a2d16, icon: "🍫", shape: "ball" },
+  { name: "Cuchuflí", short: "Cuchuflí", img: "cuchufli", color: 0xd9a463, icon: "🥖", shape: "tube" },
 ];
 
 const BOSSES = [
-  { name: "Malvavisco Gigante", color: 0xfff6e6, hp: 70, moves: 24, atk: 4, gum: 2 },
-  { name: "Reina Merengue", color: 0xffb3d1, hp: 140, moves: 26, atk: 4, gum: 2 },
-  { name: "Rey Caramelo", color: 0xff8a1f, hp: 215, moves: 28, atk: 3, gum: 3 },
-  { name: "Dragón de Dulce de Leche", color: 0xc98a3c, hp: 280, moves: 30, atk: 3, gum: 3 },
+  { name: "Don Cacao", color: 0x7a3f22, hp: 140, moves: 24, atk: 4, gum: 2 },
+  { name: "Reina Frambuesa", color: 0xd4216c, hp: 160, moves: 25, atk: 4, gum: 2 },
+  { name: "Rey Maracuyá", color: 0xffc800, hp: 175, moves: 27, atk: 3, gum: 3 },
+  { name: "Dragón de Trufa", color: 0x4a2412, hp: 200, moves: 28, atk: 3, gum: 3 },
 ];
 
 /** Qué pide cada nivel (1 a 20). */
@@ -43,9 +45,10 @@ export function levelSpec(L) {
   const t = (L - 1) / (LEVELS_PER_GAME - 1);
   const moves = Math.round(25 - t * 6);
   const kind = ["score", "collect", "gum"][(L - 1) % 3];
-  if (kind === "score") return { kind, moves, target: 1000 + L * 170 };
-  if (kind === "collect") return { kind, moves, color: (L * 2) % NTYPES, n: 12 + Math.floor(L * 0.9) };
-  return { kind, moves, gum: 4 + Math.floor(L / 2) };
+  // calibrado con un bot: la dificultad sube pareja (cuánto hay que hacer por cada movimiento), sin saltos entre tipos de nivel
+  if (kind === "score") return { kind, moves, target: Math.round((moves * (38 + 1.3 * (L - 1))) / 10) * 10 };
+  if (kind === "collect") return { kind, moves, color: (L * 2) % NTYPES, n: Math.round(moves * (0.36 + 0.03 * (L - 1))) };
+  return { kind, moves, gum: 4 + Math.floor(L / 2.25) };
 }
 
 const key = (r, c) => r * COLS + c;
@@ -88,7 +91,7 @@ export class DulcesGame extends Game3D {
     spot.position.set(0, 6, -3);
     s.add(spot);
 
-    // mesón de la dulcería y bandeja del tablero
+    // mesón de la chocolatería y bandeja del tablero
     const std = (color, roughness = 0.6, extra = {}) => new THREE.MeshStandardMaterial({ color, roughness, ...extra });
     const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), std(0x4a2a35, 0.9));
     floor.rotation.x = -Math.PI / 2;
@@ -149,19 +152,21 @@ export class DulcesGame extends Game3D {
     this.mats = TYPES.map((t) => std(t.color, 0.3, { emissive: t.color, emissiveIntensity: 0.18 }));
     this.cream = std(0xfff6e6, 0.5);
     this.gold = std(0xffc800, 0.25, { metalness: 0.5, emissive: 0x6a4a00, emissiveIntensity: 0.4 });
-    this.gumMat = std(0x7f8f6a, 0.8);
+    this.gumMat = std(0x3a1c0e, 0.22, { metalness: 0.15, emissive: 0x1a0a04, emissiveIntensity: 0.3 });
     this.geos = [
-      new THREE.CylinderGeometry(0.42, 0.42, 0.2, 28), // alfajor
-      roundedBox(0.76, 0.3, 0.76, 0.1, 0.04), // chocolate (barra)
-      new THREE.IcosahedronGeometry(0.4, 1), // menta
-      new THREE.SphereGeometry(0.4, 22, 16), // bomba
-      new THREE.CylinderGeometry(0.2, 0.2, 0.72, 16), // cuchuflí
-      new THREE.OctahedronGeometry(0.45, 0), // arándano
+      new THREE.CylinderGeometry(0.43, 0.43, 0.24, 30), // alfajor
+      new THREE.CylinderGeometry(0.43, 0.43, 0.24, 30),
+      new THREE.CylinderGeometry(0.43, 0.43, 0.24, 30),
+      new THREE.CylinderGeometry(0.43, 0.43, 0.24, 30),
+      new THREE.SphereGeometry(0.42, 26, 18), // bomba de chocolate
+      new THREE.CylinderGeometry(0.25, 0.25, 0.86, 18), // cuchuflí
     ];
     this.rimGeo = new THREE.TorusGeometry(0.42, 0.045, 8, 28);
     this.stripeGeo = new THREE.BoxGeometry(0.9, 0.03, 0.09);
     this.ringGeo = new THREE.TorusGeometry(0.5, 0.06, 8, 24);
-    this.tex = [loadTexture("assets/products/alf-frambuesa.jpg")];
+    this.tex = TYPES.map((t) => loadTexture(`assets/products/${t.img}.jpg`));
+    this.goldTex = loadTexture("assets/products/bomba-dorada.jpg");
+    this.dmats = TYPES.map((t, i) => (t.shape === "ball" || t.shape === "tube" ? new THREE.MeshStandardMaterial({ map: this.tex[i], roughness: 0.3, metalness: 0.05, emissive: t.color, emissiveIntensity: 0.1 }) : this.mats[i]));
   }
 
   _makePieceMesh(type, sp, gum) {
@@ -169,54 +174,67 @@ export class DulcesGame extends Game3D {
     const body = new THREE.Group();
     root.add(body);
     if (gum) {
-      const m = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 12), this.gumMat);
-      m.scale.set(1.05, 0.7, 1.05);
-      m.position.y = 0.3;
+      const m = new THREE.Mesh(roundedBox(0.92, 0.62, 0.92, 0.14, 0.04), this.gumMat);
+      m.position.y = 0.33;
       m.castShadow = true;
       body.add(m);
-      for (const [x, z] of [[-0.15, 0.1], [0.18, -0.12]]) {
-        const bub = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 6), std2(0xaebf96));
-        bub.position.set(x, 0.55, z);
-        body.add(bub);
+      for (const z of [-0.2, 0.2]) {
+        const line = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.03, 0.05), std2(0xfff6e6));
+        line.position.set(0, 0.65, z);
+        body.add(line);
       }
+      const lg = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.34), new THREE.MeshBasicMaterial({ map: this.gumLogo || (this.gumLogo = loadTexture("assets/brand/logo-badge.png")), transparent: true }));
+      lg.rotation.x = -Math.PI / 2;
+      lg.position.set(0, 0.645, 0.02);
+      lg.rotation.z = 0;
+      body.add(lg);
       root.userData.body = body;
       return root;
     }
     if (sp === "bomb") {
-      const m = new THREE.Mesh(new THREE.SphereGeometry(0.44, 22, 16), new THREE.MeshStandardMaterial({ color: 0x1c0f07, roughness: 0.25, metalness: 0.4, emissive: 0x5a2a80, emissiveIntensity: 0.6 }));
-      m.position.y = 0.34;
+      // bomba dorada de Matichoc: la pieza de 5 en línea
+      const m = new THREE.Mesh(new THREE.SphereGeometry(0.46, 26, 18), new THREE.MeshStandardMaterial({ map: this.goldTex, color: 0xffe9a0, roughness: 0.25, metalness: 0.45, emissive: 0x8a5a00, emissiveIntensity: 0.55 }));
+      m.position.y = 0.36;
       m.castShadow = true;
       body.add(m);
-      const cols = [0xff4a8a, 0xffc800, 0x2fd08a, 0x3b8cff, 0xff7a1a, 0xffffff];
+      const cols = [0xff4a8a, 0xffc800, 0x2fd08a, 0xff7a1a, 0xffffff, 0x9a5cff];
       cols.forEach((c, i) => {
         const a = (i / cols.length) * Math.PI * 2;
-        const sp2 = new THREE.Mesh(new THREE.SphereGeometry(0.09, 8, 6), new THREE.MeshBasicMaterial({ color: c }));
-        sp2.position.set(Math.cos(a) * 0.4, 0.34 + Math.sin(a * 2) * 0.16, Math.sin(a) * 0.4);
+        const sp2 = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 6), new THREE.MeshBasicMaterial({ color: c }));
+        sp2.position.set(Math.cos(a) * 0.5, 0.36 + Math.sin(a * 2) * 0.18, Math.sin(a) * 0.5);
         body.add(sp2);
       });
       root.userData.body = body;
       root.userData.spin = true;
       return root;
     }
-    const geo = this.geos[type];
-    const m = new THREE.Mesh(geo, this.mats[type]);
+    const shape = TYPES[type].shape;
+    const m = new THREE.Mesh(this.geos[type], this.dmats[type]);
     m.castShadow = true;
-    m.position.y = type === 4 ? 0.3 : type === 1 ? 0.22 : 0.3;
-    if (type === 4) m.rotation.z = Math.PI / 2; // el cuchuflí acostado
+    m.position.y = 0.3;
     body.add(m);
-    if (type === 0) {
+    if (shape === "disc") {
+      // alfajor: dos tapas de color, relleno crema y la foto del producto arriba
       const rim = new THREE.Mesh(this.rimGeo, this.cream);
       rim.rotation.x = Math.PI / 2;
       rim.position.y = 0.3;
       body.add(rim);
-      const top = new THREE.Mesh(new THREE.CircleGeometry(0.34, 20), new THREE.MeshBasicMaterial({ map: this.tex[0] }));
+      const top = new THREE.Mesh(new THREE.CircleGeometry(0.35, 24), new THREE.MeshBasicMaterial({ map: this.tex[type] }));
       top.rotation.x = -Math.PI / 2;
-      top.position.y = 0.405;
+      top.position.y = 0.425;
       body.add(top);
-    } else if (type === 1) {
-      const line = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.02, 0.05), this.gold);
-      line.position.set(0, 0.38, 0);
-      body.add(line);
+    } else if (shape === "tube") {
+      m.rotation.z = Math.PI / 2; // el cuchuflí acostado
+      for (const sx of [-1, 1]) {
+        const cap = new THREE.Mesh(new THREE.CircleGeometry(0.25, 14), std2(0x3a1c0e));
+        cap.position.set(sx * 0.432, 0.3, 0);
+        cap.rotation.y = sx * Math.PI / 2;
+        body.add(cap);
+      }
+    } else {
+      m.rotation.y = 0.6;
+      m.rotation.x = -0.35;
+      m.position.y = 0.36;
     }
     if (sp === "h" || sp === "v") {
       for (const o of [-0.16, 0.16]) {
@@ -367,7 +385,7 @@ export class DulcesGame extends Game3D {
       body.add(tooth);
     }
     if (k === 1) { // glaseado rosa
-      const top = new THREE.Mesh(new THREE.TorusGeometry(0.7, 0.28, 10, 20), new THREE.MeshStandardMaterial({ color: 0xd4216c, roughness: 0.4 }));
+      const top = new THREE.Mesh(new THREE.TorusGeometry(0.7, 0.28, 10, 20), new THREE.MeshStandardMaterial({ color: 0xfff6e6, roughness: 0.4 }));
       top.rotation.x = Math.PI / 2; top.position.y = 3.7;
       body.add(top);
     } else if (k === 2) { // corona
@@ -407,7 +425,7 @@ export class DulcesGame extends Game3D {
   _bossWeak() {
     this.weak = Math.floor(Math.random() * NTYPES);
     const w = this.q("boss-weak");
-    if (w) w.textContent = `Le duele: ${TYPES[this.weak].icon} ${TYPES[this.weak].name}`;
+    if (w) w.textContent = `Le duele: ${TYPES[this.weak].icon} ${TYPES[this.weak].short}`;
   }
 
   _hurtBoss(n) {
@@ -622,7 +640,7 @@ export class DulcesGame extends Game3D {
       }
       if (p.other) p.other = null;
     }
-    // los chicles pegados a algo que se limpia también se van
+    // las coberturas pegadas a algo que se limpia también se van
     for (const p of [...clear]) {
       for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
         const q = this.g[p.r + dr] && this.g[p.r + dr][p.c + dc];
@@ -647,7 +665,7 @@ export class DulcesGame extends Game3D {
       p.pop = POP_T;
       this.particles.burst(new THREE.Vector3(worldX(p.c), 0.5, worldZ(p.r)), [p.type >= 0 ? TYPES[p.type].color : 0xffc800, 0xffffff], 6, 3, 0.5, 4);
     }
-    for (const p of clear) if (p.gum) { p.pop = POP_T; this.particles.burst(new THREE.Vector3(worldX(p.c), 0.5, worldZ(p.r)), [0x7f8f6a, 0xaebf96], 8, 3, 0.5, 4); }
+    for (const p of clear) if (p.gum) { p.pop = POP_T; this.particles.burst(new THREE.Vector3(worldX(p.c), 0.5, worldZ(p.r)), [0x3a1c0e, 0x7a3f22], 8, 3, 0.5, 4); }
     this.gumCleared += gums;
     for (const x of create) { pts += 40; this.specialsMade++; }
     pts = Math.round(pts * mult);
@@ -740,7 +758,7 @@ export class DulcesGame extends Game3D {
     if (sp.kind === "boss" && this.moveCount > 0 && this.moveCount % sp.atk === 0 && !this._bossActed) {
       this._bossActed = true;
       this.boss.atkT = 1;
-      this.banner(`¡${BOSSES[sp.boss].name} te tira chicles!`);
+      this.banner(`¡${BOSSES[sp.boss].name} te lanza coberturas de chocolate!`);
       this._bossWeak();
       const free = [];
       for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) { const p = this.g[r][c]; if (p && !p.gum && !p.sp) free.push([r, c]); }
@@ -803,7 +821,7 @@ export class DulcesGame extends Game3D {
     this.sel.visible = false;
     const sp = this.spec;
     this.runInfo = { level: this.level, kind: sp.kind, lost: 1 };
-    const goal = sp.kind === "score" ? `Llevas ${this.score} de ${sp.target} puntos.` : sp.kind === "collect" ? `Juntaste ${this.collected[sp.color]} de ${sp.n} ${TYPES[sp.color].name}.` : sp.kind === "gum" ? `Quedan ${this.gumTotal - this.gumCleared} chicles.` : `Al jefe le quedan ${this.bossHp} de vida.`;
+    const goal = sp.kind === "score" ? `Llevas ${this.score} de ${sp.target} puntos.` : sp.kind === "collect" ? `Juntaste ${this.collected[sp.color]} de ${sp.n} ${TYPES[sp.color].short}.` : sp.kind === "gum" ? `Quedan ${this.gumTotal - this.gumCleared} coberturas.` : `Al jefe le quedan ${this.bossHp} de vida.`;
     setTimeout(() => {
       if (this.state !== "playing") return;
       audio.playLose();
@@ -837,8 +855,8 @@ export class DulcesGame extends Game3D {
   _goalText() {
     const sp = this.spec;
     if (sp.kind === "score") return `llega a ${sp.target} puntos.`;
-    if (sp.kind === "collect") return `junta ${sp.n} ${TYPES[sp.color].icon} ${TYPES[sp.color].name}.`;
-    if (sp.kind === "gum") return `limpia los ${sp.gum} chicles pegajosos (se van si limpias piezas al lado).`;
+    if (sp.kind === "collect") return `junta ${sp.n} ${TYPES[sp.color].icon} ${TYPES[sp.color].short}.`;
+    if (sp.kind === "gum") return `rompe las ${sp.gum} coberturas de chocolate duro (se rompen si limpias piezas al lado).`;
     return `¡derrota a ${sp.name}! Cada pieza que juntas le baja la vida.`;
   }
 
@@ -967,7 +985,7 @@ export class DulcesGame extends Game3D {
       let goal = "";
       if (sp.kind === "score") goal = `${Math.min(this.score, sp.target)}/${sp.target}`;
       else if (sp.kind === "collect") goal = `${TYPES[sp.color].icon} ${Math.min(this.collected[sp.color], sp.n)}/${sp.n}`;
-      else if (sp.kind === "gum") goal = `🫧 ${this.gumCleared}/${this.gumTotal}`;
+      else if (sp.kind === "gum") goal = `🍫 ${this.gumCleared}/${this.gumTotal}`;
       else goal = `👹 ${this.bossHp}`;
       set("hud-goal", goal);
       set("hud-level", `Nivel ${this.level}`);

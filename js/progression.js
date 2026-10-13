@@ -26,7 +26,7 @@ export const GAME_NAMES = {
   parkour: "Parkour Choco", recolecta: "Recolecta y Corre", salto: "Salto Choco", autos: "Autos de Chocolate",
   tetris: "Tetris de Productos", memoria: "Memoria Matichoc", basquet_tiros: "Lanzamientos de Básquet",
   porristas: "Saltos de Porristas", creador: "Crea tu Chocolate", fps3d: "Choco Blaster",
-  futbol: "Fútbol Choco", dulces: "Dulces Matichoc", aventura: "Aventura Choco",
+  futbol: "Fútbol Choco", dulces: "Choco Match", aventura: "Aventura Choco",
 };
 
 // ---------- niveles ----------

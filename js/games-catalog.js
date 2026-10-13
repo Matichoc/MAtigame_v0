@@ -102,9 +102,9 @@ const ALL_GAMES = [
   {
     id: "dulces",
     orient: "any", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
-    name: "Dulces Matichoc",
-    icon: "🍬",
-    tagline: "Junta 3 dulces iguales, haz combos y derrota a los jefes golosos. 20 niveles.",
+    name: "Choco Match",
+    icon: "🍫",
+    tagline: "Junta 3 productos Matichoc iguales, haz combos y derrota a los jefes chocolateros. 20 niveles.",
     status: "available",
     tag: "Nuevo",
   },
