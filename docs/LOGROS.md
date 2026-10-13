@@ -34,7 +34,7 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | 🔥 **Racha de fuego** | Reclama la recompensa diaria 3 días seguidos → Reclama la recompensa diaria 7 días seguidos → Reclama la recompensa diaria 14 días seguidos → Reclama la recompensa diaria 30 días seguidos | 10 / 35 / 90 / 240 |
 | ⏱️ **Horas de diversión** | Juega 30 minutos en total → Juega 120 minutos en total → Juega 360 minutos en total → Juega 900 minutos en total → Juega 1.800 minutos en total | 10 / 35 / 90 / 210 / 420 |
 | 🎮 **Partidas jugadas** | Termina 10 partidas → Termina 50 partidas → Termina 150 partidas → Termina 400 partidas → Termina 1.000 partidas | 10 / 25 / 60 / 150 / 360 |
-| 🧭 **Todoterreno** | Juega 3 juegos distintos → Juega 6 juegos distintos → Juega 9 juegos distintos | 10 / 30 / 70 |
+| 🧭 **Todoterreno** | Juega 3 juegos distintos → Juega 6 juegos distintos → Juega 9 juegos distintos → Juega 12 juegos distintos | 10 / 30 / 70 / 120 |
 
 ## 🏆 Niveles y misiones
 
@@ -45,11 +45,20 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | 🏀 **Estrella de la Cancha** | Completa 5 niveles → Completa 10 niveles → Completa 15 niveles → Completa 20 niveles | 10 / 30 / 60 / 120 |
 | 🤸 **Capitana Cheer** | Completa 5 niveles → Completa 10 niveles → Completa 15 niveles → Completa 20 niveles | 10 / 30 / 60 / 120 |
 | 🧠 **Memoria de Elefante** | Completa 5 niveles → Completa 10 niveles → Completa 15 niveles → Completa 20 niveles | 10 / 30 / 60 / 120 |
+| 🥅 **Rey de los Penales** | Supera 5 niveles de Penales → Supera 10 niveles de Penales → Supera 15 niveles de Penales → Supera 20 niveles de Penales | 15 / 35 / 70 / 150 |
+| 🎯 **Maestro del Tiro Libre** | Supera 5 niveles de Tiros libres → Supera 10 niveles de Tiros libres → Supera 15 niveles de Tiros libres → Supera 20 niveles de Tiros libres | 15 / 35 / 70 / 150 |
+| 🧤 **Manos de Oro** | Supera 5 niveles de Atajapenales → Supera 10 niveles de Atajapenales → Supera 15 niveles de Atajapenales → Supera 20 niveles de Atajapenales | 15 / 35 / 70 / 150 |
+| 🏆 **Campeón de Copas** | Gana 1 copas de Fútbol Choco (hay 12: 4 por modo) → Gana 4 copas de Fútbol Choco (hay 12: 4 por modo) → Gana 8 copas de Fútbol Choco (hay 12: 4 por modo) → Gana 12 copas de Fútbol Choco (hay 12: 4 por modo) | 15 / 40 / 95 / 240 |
+| 🍫 **Maestro del Choco Match** | Supera 5 niveles de Choco Match → Supera 10 niveles de Choco Match → Supera 15 niveles de Choco Match → Supera 20 niveles de Choco Match | 15 / 35 / 70 / 150 |
+| 🍄 **Aventurero de Mundos** | Supera 5 niveles de Aventura Choco → Supera 10 niveles de Aventura Choco → Supera 15 niveles de Aventura Choco → Supera 20 niveles de Aventura Choco | 15 / 35 / 70 / 150 |
+| 👑 **Cazajefes** | Derrota a 1 jefes (en Dulces y en Aventura hay 9) → Derrota a 3 jefes (en Dulces y en Aventura hay 9) → Derrota a 6 jefes (en Dulces y en Aventura hay 9) → Derrota a 9 jefes (en Dulces y en Aventura hay 9) | 15 / 40 / 95 / 240 |
 | 🦘 **Misionero del Cielo** | Cumple 5 misiones → Cumple 10 misiones → Cumple 15 misiones → Cumple 20 misiones | 10 / 30 / 60 / 120 |
 | 🏎️ **Misionero del Asfalto** | Cumple 5 misiones → Cumple 10 misiones → Cumple 15 misiones → Cumple 20 misiones | 10 / 30 / 60 / 120 |
 | 🧗 **Misionero del Parkour** | Cumple 5 misiones → Cumple 10 misiones → Cumple 15 misiones → Cumple 20 misiones | 10 / 30 / 60 / 120 |
 | ⭐ **Perfeccionista** | Junta 25 estrellas en los niveles (hay 300) → Junta 75 estrellas en los niveles (hay 300) → Junta 150 estrellas en los niveles (hay 300) → Junta 250 estrellas en los niveles (hay 300) → Junta 300 estrellas en los niveles (hay 300) | 15 / 40 / 95 / 210 / 420 |
 | 🗺️ **Maestro de campañas** | Cumple 20 niveles y misiones en total (hay 160) → Cumple 60 niveles y misiones en total (hay 160) → Cumple 120 niveles y misiones en total (hay 160) → Cumple 160 niveles y misiones en total (hay 160) | 25 / 70 / 180 / 420 |
+| 🏙️ **Buen Vecino** | Cumple 1 misiones distintas en Ciudad Choco (hay 8) → Cumple 3 misiones distintas en Ciudad Choco (hay 8) → Cumple 6 misiones distintas en Ciudad Choco (hay 8) → Cumple 8 misiones distintas en Ciudad Choco (hay 8) | 10 / 35 / 90 / 210 |
+| 🏁 **Piloto Estrella** | Gana una medalla en la carrera de Ciudad Choco (1 bronce, 2 plata, 3 oro) → Gana una medalla en la carrera de Ciudad Choco (1 bronce, 2 plata, 3 oro) → Gana una medalla en la carrera de Ciudad Choco (1 bronce, 2 plata, 3 oro) | 15 / 35 / 90 |
 
 ## 📈 Récords
 
@@ -64,6 +73,17 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | 🏎️ **Récord Autos** | Consigue 4.000 puntos en Autos de Chocolate → Consigue 9.000 puntos en Autos de Chocolate → Consigue 18.000 puntos en Autos de Chocolate → Consigue 35.000 puntos en Autos de Chocolate | 20 / 40 / 95 / 210 |
 | 🧗 **Récord Parkour** | Recorre 2.500 metros en el Mundo infinito → Recorre 5.000 metros en el Mundo infinito → Recorre 8.000 metros en el Mundo infinito | 40 / 95 / 210 |
 | 🌎 **Viajero de mundos** | Llega al Mundo 8 en el Parkour infinito → Llega al Mundo 12 en el Parkour infinito → Llega al Mundo 20 en el Parkour infinito | 25 / 60 / 150 |
+| ⚽ **Récord Fútbol** | Consigue 400 puntos en una partida de Fútbol Choco → Consigue 800 puntos en una partida de Fútbol Choco → Consigue 1.200 puntos en una partida de Fútbol Choco → Consigue 1.800 puntos en una partida de Fútbol Choco | 10 / 25 / 60 / 150 |
+| 🍫 **Récord Choco Match** | Consigue 2.500 puntos en Choco Match → Consigue 5.000 puntos en Choco Match → Consigue 9.000 puntos en Choco Match → Consigue 15.000 puntos en Choco Match | 10 / 25 / 60 / 150 |
+| 🍄 **Récord Aventura** | Consigue 800 puntos en Aventura Choco → Consigue 1.500 puntos en Aventura Choco → Consigue 2.500 puntos en Aventura Choco → Consigue 4.000 puntos en Aventura Choco | 10 / 25 / 60 / 150 |
+| ⚽ **Goleador** | Mete 10 goles en Fútbol Choco → Mete 50 goles en Fútbol Choco → Mete 150 goles en Fútbol Choco → Mete 400 goles en Fútbol Choco | 10 / 30 / 70 / 180 |
+| 🎯 **Francotirador** | Mete 3 goles en las dianas doradas del arco → Mete 15 goles en las dianas doradas del arco → Mete 50 goles en las dianas doradas del arco → Mete 150 goles en las dianas doradas del arco | 10 / 30 / 70 / 180 |
+| 🧤 **Pared de Chocolate** | Ataja 10 penales en Atajapenales → Ataja 40 penales en Atajapenales → Ataja 120 penales en Atajapenales → Ataja 350 penales en Atajapenales | 10 / 30 / 70 / 180 |
+| 🚗 **Chofer Choco** | Maneja 2 km por Ciudad Choco → Maneja 10 km por Ciudad Choco → Maneja 40 km por Ciudad Choco → Maneja 120 km por Ciudad Choco | 10 / 30 / 70 / 180 |
+| ✨ **Cazador de Brillos** | Junta 20 alfajores dorados en Ciudad Choco → Junta 100 alfajores dorados en Ciudad Choco → Junta 300 alfajores dorados en Ciudad Choco → Junta 800 alfajores dorados en Ciudad Choco | 10 / 30 / 70 / 180 |
+| 👟 **Pisotones** | Pisa 20 enemigos en Aventura Choco → Pisa 100 enemigos en Aventura Choco → Pisa 300 enemigos en Aventura Choco → Pisa 800 enemigos en Aventura Choco | 10 / 30 / 70 / 180 |
+| 🍫 **Alfajorero** | Junta 100 alfajores en Aventura Choco → Junta 500 alfajores en Aventura Choco → Junta 1.500 alfajores en Aventura Choco → Junta 4.000 alfajores en Aventura Choco | 10 / 30 / 70 / 180 |
+| ✨ **Piezas especiales** | Crea 10 piezas especiales (rayadas, bombas doradas y envueltas) → Crea 40 piezas especiales (rayadas, bombas doradas y envueltas) → Crea 120 piezas especiales (rayadas, bombas doradas y envueltas) → Crea 300 piezas especiales (rayadas, bombas doradas y envueltas) | 10 / 30 / 70 / 180 |
 
 ## 🏘️ Pueblo y creación
 
@@ -100,7 +120,8 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | 🎖️ **Gran Misionero** | Cumple las 20 misiones de Salto Choco, Autos y Parkour. | 360 |
 | 🌟 **Todo tres estrellas** | Consigue las 3 estrellas en los 100 niveles de los juegos por niveles. | 600 |
 | 🌈 **Leyenda de dos mundos** | Llega a 5000 m en el Parkour infinito y a 25000 puntos en Salto Choco el mismo perfil. | 240 |
+| 🕹️ **Dueño de la Arcade** | Canjea con Matipuntos los 4 juegos nuevos: Fútbol, Choco Match, Aventura y Ciudad Choco. | 240 |
 | 🗓️ **Un mes con Matichoc** | Juega 30 días distintos y llega al nivel 20. | 300 |
-| 🧿 **Cazador de logros** | Cumple 10 logros → Cumple 30 logros → Cumple 60 logros → Cumple 100 logros → Cumple 164 logros | 20 / 60 / 150 / 300 / 900 |
+| 🧿 **Cazador de logros** | Cumple 10 logros → Cumple 30 logros → Cumple 60 logros → Cumple 100 logros → Cumple 245 logros | 20 / 60 / 150 / 300 / 900 |
 
-**Total: 169 logros · 16.135 Matipuntos en premios.**
+**Total: 250 logros · 22.165 Matipuntos en premios.**

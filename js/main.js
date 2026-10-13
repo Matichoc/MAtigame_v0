@@ -2,6 +2,7 @@ import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
 import { bindStick, joyMode, setJoyMode } from "./stick.js";
+import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
   loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem, equippedOutfitId,
@@ -19,8 +20,9 @@ import {
 } from "./house-data.js";
 import {
   levelInfo, xpForLevel, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
-  canClaimChest, claimChest, hasPending, STICKERS, albumCount, ALBUM_MILESTONES, openPack, onProgressEvent,
+  canClaimChest, claimChest, hasPending, STICKERS, albumCount, ALBUM_MILESTONES, openPack, onProgressEvent, GAME_NAMES,
 } from "./progression.js";
+import { rankingEnabled, fetchRanking } from "./online.js";
 
 let progress = null;
 let selectedCharacter = null;
@@ -44,6 +46,10 @@ const screen3d = {
   salto: document.getElementById("screen-salto"),
   autos: document.getElementById("screen-autos"),
   memoria: document.getElementById("screen-memoria"),
+  futbol: document.getElementById("screen-futbol"),
+  dulces: document.getElementById("screen-dulces"),
+  aventura: document.getElementById("screen-aventura"),
+  ciudad: document.getElementById("screen-ciudad"),
   creador: document.getElementById("screen-creador"),
 };
 const ALL_SCREENS = [
@@ -60,7 +66,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, creador: null };
+const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, aventura: null, ciudad: null, creador: null };
 
 let toastTimer = null;
 function showToast(message, ms = 2600) {
@@ -285,6 +291,9 @@ document.getElementById("btn-cancel-profile").addEventListener("click", () => {
 function chooseProfile(id) {
   setLastActiveProfileId(id);
   progress = loadProgress(id);
+  // el apodo del perfil es el que ve el creador (y el ranking, si se abre): se mantiene al día
+  const meta = listProfiles().find((x) => x.id === id);
+  if (meta && meta.name && progress.playerName !== meta.name) progress.playerName = meta.name;
   selectedCharacter = CHARACTERS.find((c) => c.id === progress.selectedCharacterId) || null;
   shopCharacterId = (selectedCharacter && selectedCharacter.id) || CHARACTERS[0].id;
   bootHub();
@@ -1186,6 +1195,13 @@ function gameThumb(entry) {
   play.className = "gplay";
   play.textContent = "▶ Jugar";
   wrap.appendChild(play);
+  if (needsUnlock(entry.id) && !isUnlocked(progress, entry.id)) {
+    const lock = document.createElement("span");
+    const can = progress.coins >= UNLOCK_COST[entry.id];
+    lock.className = `glock${can ? " ready" : ""}`;
+    lock.textContent = can ? `🔓 ¡Canjéalo! ${UNLOCK_COST[entry.id]} 🍫✨` : `🔒 ${UNLOCK_COST[entry.id]} 🍫✨`;
+    wrap.appendChild(lock);
+  }
   return wrap;
 }
 
@@ -1193,7 +1209,7 @@ function renderGameGrid() {
   gameGrid.innerHTML = "";
   const featureEl = document.getElementById("game-feature");
   featureEl.innerHTML = "";
-  const available = GAMES_CATALOG.filter((g) => g.status === "available");
+  const available = GAMES_CATALOG.filter((g) => g.status === "available" && isUnlocked(progress, g.id));
   const last = available.find((g) => g.id === progress.lastGameId);
   const featured = last || available.find((g) => g.id === "town") || available[0];
 
@@ -1212,7 +1228,8 @@ function renderGameGrid() {
   GAMES_CATALOG.forEach((entry) => {
     if (featured && entry.id === featured.id) return;
     const card = document.createElement("div");
-    card.className = `game-card ${entry.status}`;
+    const locked = needsUnlock(entry.id) && !isUnlocked(progress, entry.id);
+    card.className = `game-card ${entry.status}${locked ? " locked" : ""}`;
     card.appendChild(gameThumb(entry));
 
     const body = document.createElement("div");
@@ -1240,9 +1257,73 @@ function renderGameGrid() {
   });
 }
 
+// ---------- CANJE DE JUEGOS CON MATIPUNTOS ----------
+
+const unlockDialog = document.getElementById("unlock-dialog");
+let unlockTarget = null;
+
+function openUnlockDialog(entry) {
+  unlockTarget = entry;
+  const cost = UNLOCK_COST[entry.id];
+  const missing = cost - progress.coins;
+  document.getElementById("um-icon").textContent = entry.icon;
+  document.getElementById("um-title").textContent = entry.name;
+  document.getElementById("um-text").textContent = missing > 0
+    ? `${entry.tagline} Se desbloquea con ${cost} Matipuntos 🍫✨. Tienes ${progress.coins}: te faltan ${missing}. ¡Sigue jugando para juntarlos!`
+    : `${entry.tagline} ¿Lo canjeas por ${cost} Matipuntos 🍫✨? Es tuyo para siempre.`;
+  const buy = document.getElementById("um-buy");
+  buy.textContent = missing > 0 ? `Te faltan ${missing} 🍫✨` : `🔓 Canjear por ${cost} 🍫✨`;
+  buy.disabled = missing > 0;
+  unlockDialog.classList.remove("hidden");
+}
+
+// ---- ranking de todos los jugadores: el botón solo aparece si el creador abrió el ranking en el servidor ----
+const btnWorldRanking = document.getElementById("btn-world-ranking");
+const worldRanking = document.getElementById("world-ranking");
+async function showWorldRanking() {
+  const sel = document.getElementById("wr-game");
+  const list = document.getElementById("wr-list");
+  const load = async () => {
+    list.innerHTML = "<li>Cargando…</li>";
+    const rows = await fetchRanking(sel.value, 20);
+    list.innerHTML = rows.length ? rows.map((r) => `<li><span>${escapeHtml(r.nick)}</span><b>${Math.round(r.score)}</b></li>`).join("") : "<li>Todavía no hay puntajes aquí.</li>";
+  };
+  if (!sel.options.length) {
+    for (const [id, name] of Object.entries(GAME_NAMES)) if (id !== "fps3d" && id !== "creador" && id !== "ciudad") sel.add(new Option(name, id));
+    sel.addEventListener("change", load);
+  }
+  worldRanking.classList.remove("hidden");
+  load();
+}
+if (btnWorldRanking) {
+  btnWorldRanking.addEventListener("click", showWorldRanking);
+  document.getElementById("wr-close").addEventListener("click", () => worldRanking.classList.add("hidden"));
+  rankingEnabled().then((on) => btnWorldRanking.classList.toggle("hidden", !on));
+}
+function escapeHtml(t) { return String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+document.getElementById("um-cancel").addEventListener("click", () => { unlockDialog.classList.add("hidden"); unlockTarget = null; });
+document.getElementById("um-buy").addEventListener("click", () => {
+  if (!unlockTarget || !unlockGame(progress, unlockTarget.id)) return;
+  const entry = unlockTarget;
+  unlockTarget = null;
+  unlockDialog.classList.add("hidden");
+  audio.playPurchase();
+  showToast(`¡Desbloqueaste ${entry.name}! 🎉`);
+  refreshHubStats();
+  renderGameGrid();
+  playGame(entry.id);
+});
+document.getElementById("demo-wall-close").addEventListener("click", () => document.getElementById("demo-wall").classList.add("hidden"));
+
 function playGame(gameId) {
   if (!selectedCharacter) {
     window.alert("Elige primero a tu Matichico.");
+    return;
+  }
+  const entry = GAMES_CATALOG.find((g) => g.id === gameId);
+  if (entry && needsUnlock(gameId) && !isUnlocked(progress, gameId)) {
+    openUnlockDialog(entry);
     return;
   }
   if (!progress.playerName) {
@@ -1639,6 +1720,10 @@ const GAMES_3D = {
   salto: { module: "./salto-game.js", cls: "SaltoGame", hud: ["score", "height", "hearts", "combo", "coins"] },
   autos: { module: "./autos-game.js", cls: "AutosGame", hud: ["score", "speed", "hearts", "combo", "power", "coins"] },
   memoria: { module: "./memoria-game.js", cls: "MemoriaGame", hud: ["level", "moves", "time", "score", "coins"] },
+  futbol: { module: "./futbol-game.js", cls: "FutbolGame", hud: [] },
+  dulces: { module: "./dulces-game.js", cls: "DulcesGame", hud: [] },
+  aventura: { module: "./aventura-game.js", cls: "AventuraGame", hud: [] },
+  ciudad: { module: "./ciudad-game.js", cls: "CiudadGame", hud: [] },
   creador: { module: "./creador-game.js", cls: "CreadorGame", hud: ["score", "count", "coins"] },
 };
 

@@ -5,6 +5,7 @@
 // varias personas puedan jugar desde el mismo navegador sin mezclar su avance.
 
 import { getItem, EMPTY_LOOK } from "./wardrobe-data.js";
+import { queueSync } from "./online.js";
 
 const SAVE_PREFIX = "matichoc_save_v3_profile_";
 const DEFAULT_OUTFIT = "polera";
@@ -22,6 +23,7 @@ function defaultProgress() {
     // Matichicos) y lo que lleva puesto cada uno.
     wardrobe: { owned: [], looks: {} }, // looks: { [characterId]: { hair, hat, outfit, ... } }
     house: { owned: [], placed: {}, layout: null, size: 0 }, // Mi Casa (ver js/house-data.js)
+    unlockedGames: [], // juegos canjeados con Matipuntos (ver js/unlocks.js)
     eventTokens: {}, // fichas de eventos de temporada: { [idEvento]: n }
     campaign: {}, // niveles por juego: { [idJuego]: { unlocked, stars: { nivel: n } } } (js/campaign.js)
     missionsDone: {}, // misiones de cada juego ya cumplidas: { [idJuego]: [n, ...] } (js/missions.js)
@@ -86,6 +88,7 @@ export function loadProgress(profileId) {
         layout: parsed.house && Array.isArray(parsed.house.layout) ? parsed.house.layout.map((f) => ({ ...f })) : null,
         size: (parsed.house && parsed.house.size) || 0,
       },
+      unlockedGames: Array.isArray(parsed.unlockedGames) ? [...parsed.unlockedGames] : [],
       albumClaimed: parsed.albumClaimed || [],
       packs: parsed.packs ?? 1,
       creations: Array.isArray(parsed.creations) ? parsed.creations.slice(0, MAX_CREATIONS) : [],
@@ -98,6 +101,7 @@ export function loadProgress(profileId) {
 }
 
 export function saveProgress(progress) {
+  queueSync(progress); // ranking del creador (apagado mientras js/online-config.js esté vacío)
   try {
     localStorage.setItem(storageKeyForProfile(progress._profileId), JSON.stringify(progress));
   } catch (e) {
