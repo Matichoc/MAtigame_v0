@@ -45,6 +45,8 @@
 
   <div id="out" hidden>
     <div class="stats" id="stats"></div>
+    <div class="card"><b>Jugadores distintos por día (últimos 14 días)</b><div id="daily" style="display:flex;align-items:flex-end;gap:6px;height:110px;margin-top:8px"></div></div>
+    <div class="card"><b>Juegos más jugados</b> <small>(partidas de todos)</small><div id="topGames" style="margin-top:6px"></div></div>
     <div class="card">
       <b>Ranking público para los jugadores:</b> <span id="pubState"></span>
       <button class="sec" id="togglePub" style="margin-left:10px">…</button>
@@ -75,9 +77,9 @@ async function load() {
   $("msg").className = "msg"; $("msg").textContent = "Cargando…";
   try { localStorage.setItem("mj_admin_url", $("url").value.trim()); localStorage.setItem("mj_admin_anon", $("anon").value.trim()); } catch (e) {}
   try {
-    players = await rpc("admin_players", { admin_key: $("key").value });
+    players = await rpc("mj_admin_players", { admin_key: $("key").value });
     $("msg").textContent = ""; $("out").hidden = false;
-    let pub = false; try { pub = (await rpc("ranking_enabled", {})) === true; } catch (e) {}
+    let pub = false; try { pub = (await rpc("mj_ranking_enabled", {})) === true; } catch (e) {}
     $("pubState").textContent = pub ? "🟢 abierto" : "🔒 cerrado (solo tú)"; $("pubState").dataset.on = pub ? "1" : "";
     $("togglePub").textContent = pub ? "Cerrar ranking" : "Abrir ranking a los jugadores";
     render();
@@ -89,16 +91,31 @@ function render() {
   $("stats").innerHTML = [["Jugadores", players.length], ["Activos 24 h", d1], ["Activos 7 días", d7], ["Partidas", players.reduce((a, p) => a + p.plays, 0)], ["Tiempo jugado", mins(players.reduce((a, p) => a + p.play_secs, 0))]].map(([k, v]) => `<div class="stat">${v}<small>${k}</small></div>`).join("");
   const q = $("f").value.trim().toLowerCase();
   const rows = players.filter((p) => !q || p.nick.toLowerCase().includes(q)).sort((a, b) => (sortDir * ((a[sortKey] > b[sortKey]) - (a[sortKey] < b[sortKey]))));
+  renderOverview();
   const cols = [["nick", "Apodo"], ["last_seen", "Última vez"], ["first_seen", "Desde"], ["platform", "Dónde"], ["xp", "XP"], ["plays", "Partidas"], ["play_secs", "Tiempo"], ["coins", "Matipuntos"]];
-  $("tbl").innerHTML = `<tr>${cols.map(([k, n]) => `<th data-k="${k}">${n}${k === sortKey ? (sortDir > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}<th>Juegos con récord</th><th>Ciudad</th></tr>` + rows.map((p) => {
+  $("tbl").innerHTML = `<tr>${cols.map(([k, n]) => `<th data-k="${k}">${n}${k === sortKey ? (sortDir > 0 ? " ▲" : " ▼") : ""}</th>`).join("")}<th>Sesiones</th><th>Días</th><th>Versión</th><th>Juega más</th><th>Juegos con récord</th><th>Ciudad</th></tr>` + rows.map((p) => {
     const live = now - new Date(p.last_seen) < 5 * 60e3;
     const best = Object.entries(p.best || {}).map(([g, v]) => `${NAMES[g] || g}: ${Math.round(v)}`).join(" · ");
-    return `<tr><td>${live ? "🟢 " : ""}<b>${esc(p.nick)}</b></td><td>${ago(p.last_seen)}</td><td>${new Date(p.first_seen).toLocaleDateString("es-CL")}</td><td>${p.platform || ""}</td><td>${p.xp}</td><td>${p.plays}</td><td>${mins(p.play_secs)}</td><td>${p.coins}</td><td style="white-space:normal;min-width:260px">${best}</td><td>${(p.extra && p.extra.ciudad_missions) || 0}/8</td></tr>`;
+    return `<tr><td>${live ? "🟢 " : ""}<b>${esc(p.nick)}</b></td><td>${ago(p.last_seen)}</td><td>${new Date(p.first_seen).toLocaleDateString("es-CL")}</td><td>${p.platform || ""}</td><td>${p.xp}</td><td>${p.plays}</td><td>${mins(p.play_secs)}</td><td>${p.coins}</td><td>${(p.extra && p.extra.sessions) || "–"}</td><td>${(p.extra && p.extra.play_days) || 0}</td><td>${(p.extra && p.extra.ver) || ""}</td><td>${favs(p)}</td><td style="white-space:normal;min-width:260px">${best}</td><td>${(p.extra && p.extra.ciudad_missions) || 0}/8</td></tr>`;
   }).join("");
   $("tbl").querySelectorAll("th[data-k]").forEach((th) => th.onclick = () => { sortDir = sortKey === th.dataset.k ? -sortDir : -1; sortKey = th.dataset.k; render(); });
   const games = [...new Set(players.flatMap((p) => Object.keys(p.best || {})))].sort();
   const cur = $("g").value; $("g").innerHTML = games.map((g) => `<option value="${g}">${NAMES[g] || g}</option>`).join(""); if (games.includes(cur)) $("g").value = cur;
   renderRank();
+}
+const favs = (p) => Object.entries((p.extra && p.extra.runs_by) || {}).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([g, n]) => `${NAMES[g] || g} (${n})`).join(", ");
+function renderOverview() {
+  // jugadores distintos por día: sale de los días en que cada uno jugó (los guarda el propio juego, últimos 30)
+  const days = [];
+  for (let i = 13; i >= 0; i--) { const d = new Date(Date.now() - i * 864e5); days.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`); }
+  const counts = days.map((d) => players.filter((p) => ((p.extra && p.extra.days) || []).includes(d)).length);
+  const max = Math.max(1, ...counts);
+  $("daily").innerHTML = days.map((d, i) => `<div style="flex:1;text-align:center;font-size:.7rem"><div style="background:#d4216c;border-radius:4px 4px 0 0;height:${Math.round((counts[i] / max) * 80)}px;min-height:${counts[i] ? 3 : 0}px"></div><b>${counts[i]}</b><br>${d.slice(8)}/${d.slice(5, 7)}</div>`).join("");
+  const tot = {};
+  for (const p of players) for (const [g, n] of Object.entries((p.extra && p.extra.runs_by) || {})) tot[g] = (tot[g] || 0) + n;
+  const rows = Object.entries(tot).sort((a, b) => b[1] - a[1]);
+  const top = rows.length ? rows[0][1] : 1;
+  $("topGames").innerHTML = rows.length ? rows.map(([g, n]) => `<div style="display:flex;align-items:center;gap:8px;margin:3px 0"><span style="width:190px;font-size:.85rem">${NAMES[g] || g}</span><div style="background:#ffc800;height:14px;border-radius:7px;width:${Math.round((n / top) * 100)}%;max-width:60%"></div><b style="font-size:.85rem">${n}</b></div>`).join("") : "<small>Aún no hay datos (se llenan con las versiones nuevas del juego).</small>";
 }
 function renderRank() {
   const g = $("g").value;
@@ -112,7 +129,7 @@ $("tabR").onclick = () => { $("viewP").hidden = true; $("viewR").hidden = false;
 $("togglePub").onclick = async () => {
   const on = !$("pubState").dataset.on;
   if (on && !confirm("¿Abrir el ranking? Los jugadores verán apodos y puntajes en la app.")) return;
-  try { await rpc("admin_set_show", { admin_key: $("key").value, show: on }); load(); } catch (e) { alert(e.message); }
+  try { await rpc("mj_admin_set_show", { admin_key: $("key").value, show: on }); load(); } catch (e) { alert(e.message); }
 };
 </script>
 </body>

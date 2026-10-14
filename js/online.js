@@ -9,6 +9,9 @@ let last = 0;
 let timer = null;
 let lastProgress = null;
 let lastNick = "";
+let sessionCounted = false;
+let ver = "";
+try { ver = new URL(import.meta.url).searchParams.get("v") || ""; } catch (e) { /* sin versión */ }
 
 export const onlineEnabled = () => !!(url && ONLINE.anonKey);
 
@@ -50,6 +53,10 @@ function payload(p) {
       ciudad_missions: Object.keys(done).filter((k) => done[k]).length,
       ciudad_medal: (p.ciudad && p.ciudad.medal) || 0,
       play_days: st.playDays || 0,
+      days: (st.playDayList || []).slice(-30), // días en que jugó (últimos 30)
+      sessions: st.sessions || 0, // veces que abrió el juego
+      runs_by: st.runsBy || {}, // partidas por juego
+      ver, // versión de los archivos (para saber si ya tiene la última)
     },
   };
 }
@@ -59,6 +66,7 @@ export function queueSync(progress, force = false) {
   if (!onlineEnabled() || !progress || !progress._profileId) return;
   lastProgress = progress;
   if (!progress.onlineId) progress.onlineId = newId(); // queda guardado con el progreso
+  if (!sessionCounted) { sessionCounted = true; progress.stats.sessions = (progress.stats.sessions || 0) + 1; force = true; } // una sesión por cada vez que se abre el juego
   const nick = String(progress.playerName || "").trim();
   if (nick !== lastNick) { lastNick = nick; force = true; } // si cambia el apodo se actualiza de inmediato
   const now = Date.now();
@@ -67,19 +75,19 @@ export function queueSync(progress, force = false) {
     return;
   }
   last = now;
-  rpc("upsert_player", { p: payload(progress) }, force).catch(() => { /* sin internet: se reintenta en el próximo guardado */ });
+  rpc("mj_upsert_player", { p: payload(progress) }, force).catch(() => { /* sin internet: se reintenta en el próximo guardado */ });
 }
 
 /** ¿El creador ya decidió mostrar el ranking a los jugadores? */
 export async function rankingEnabled() {
   if (!onlineEnabled()) return false;
-  try { return (await rpc("ranking_enabled", {})) === true; } catch (e) { return false; }
+  try { return (await rpc("mj_ranking_enabled", {})) === true; } catch (e) { return false; }
 }
 
 /** Los mejores puntajes de un juego: [{ nick, score }] (vacío si el ranking no está abierto al público). */
 export async function fetchRanking(game, limit = 20) {
   if (!onlineEnabled()) return [];
-  try { return (await rpc("public_ranking", { g: game, lim: limit })) || []; } catch (e) { return []; }
+  try { return (await rpc("mj_public_ranking", { g: game, lim: limit })) || []; } catch (e) { return []; }
 }
 
 // al cerrar o cambiar de app, se manda lo último
