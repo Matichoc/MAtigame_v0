@@ -16,6 +16,7 @@ import { activeEvent, addEventTokens, eventTokens } from "./events.js";
 import { levelInfo } from "./progression.js";
 import { bindStick } from "./stick.js";
 import * as audio from "./audio.js";
+import { TownFun } from "./town-fun.js";
 
 const GAME_ID = "town";
 const SPEED = 6.4;
@@ -141,6 +142,8 @@ export class TownGame extends Game3D {
     this._buildNeighbors();
     this._buildEvent();
     this._ensureHero();
+    this.fun = new TownFun(this); // faros llamativos, baile, trampolines, circuito, tesoros y actividades del día
+    this.fun.build();
   }
 
   _signTexture(text, color, icon) {
@@ -722,6 +725,7 @@ export class TownGame extends Game3D {
       this._updateNeighbors(dt);
       this._collectItems(dt);
       this._collectEvent(dt);
+      if (this.fun) this.fun.update(dt);
       this._pickTarget();
     } else {
       this._updateNeighbors(dt);
@@ -1011,6 +1015,7 @@ export class TownGame extends Game3D {
     if (!t) return;
     audio.playPurchase();
     if (t.kind === "npc") this._talk(t.npc);
+    else if (t.kind === "ring") { this.fun && this.fun.startCircuit(); }
     else if (t.kind === "fountain") {
       this.popups.add(new THREE.Vector3(0, 4.6, 0), "¡Mmm, qué rico! 🍫", "combo");
       this.particles.burst(new THREE.Vector3(0, 3.6, 0), [0x64321b, 0xffc800, 0xfff6e6], 22, 4, 1, 4, 1);
@@ -1129,7 +1134,11 @@ export class TownGame extends Game3D {
     const sp = Math.hypot(this.vel.x, this.vel.z);
     const mv = this._move_();
     const riding = mv.id === "skates" || mv.id === "board";
-    this.hero.animate(this.time, sp > 0.8 ? (riding ? "jump" : "run") : "idle", riding ? 0.7 : clamp(sp / SPEED, 0.4, 1.4));
+    let mode = sp > 0.8 ? (riding ? "jump" : "run") : "idle";
+    let spd = riding ? 0.7 : clamp(sp / SPEED, 0.4, 1.4);
+    if (this.fun && this.fun.airborne) { mode = "jump"; spd = 1; }
+    else if (this.fun && this.fun.heroMode) { mode = this.fun.heroMode; spd = 1; }
+    this.hero.animate(this.time, mode, spd);
     this._syncRide(dt);
   }
 

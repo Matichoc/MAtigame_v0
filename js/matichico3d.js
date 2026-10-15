@@ -337,6 +337,16 @@ export function createMatichico(character, outfit, look = null) {
       armR = [-1.2 + Math.sin(t * 15 + 1) * 0.16, 0, 0.28];
       lean = 0.1;
       headTilt = Math.sin(t * 3) * 0.05;
+    } else if (mode === "dance") {
+      // ¡a bailar! brazos arriba alternados, pasitos y cadera
+      const b = Math.sin(t * 8);
+      bob = Math.abs(b) * 0.12;
+      armL = [Math.sin(t * 4) * 0.5, 0, -2.0 + b * 0.8];
+      armR = [Math.sin(t * 4 + 3) * 0.5, 0, 2.0 - b * 0.8];
+      legL = b * 0.55;
+      legR = -b * 0.55;
+      headTilt = Math.sin(t * 4) * 0.2;
+      lean = Math.sin(t * 4) * 0.08;
     } else if (mode === "admire") {
       // mira y señala con una mano
       armR = [-0.9 + Math.sin(t * 2.5) * 0.12, 0, 0.5];
