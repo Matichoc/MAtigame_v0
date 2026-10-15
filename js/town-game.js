@@ -7,7 +7,7 @@
 // "town-action" y abre lo que corresponda.
 
 import { THREE, Game3D, clamp, lerp, canvasTexture, loadTexture, roundedBox, makeStars } from "./three-kit.js";
-import { createMatichico } from "./matichico3d.js";
+import { createMatichico, animeHero } from "./matichico3d.js";
 import { CHARACTERS, getOutfit } from "./characters.js";
 import { ITEMS, OUTFITS } from "./wardrobe-data.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
@@ -659,6 +659,7 @@ export class TownGame extends Game3D {
     }
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(this.character, this.outfit, this.look);
+    animeHero(this.hero);
     this.heroId = this.character.id;
     this.hero.group.scale.setScalar(1.08);
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });

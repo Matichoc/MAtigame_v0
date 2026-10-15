@@ -694,3 +694,68 @@ export function disposeTree(obj) {
 export function disposeGeometries(obj) {
   obj.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
 }
+
+// ---------- estilo "anime": sombreado por tonos (cel-shading) y contorno ----------
+let toonGradTex = null;
+function toonGradient() {
+  if (!toonGradTex) {
+    const c = document.createElement("canvas");
+    c.width = 4;
+    c.height = 1;
+    const x = c.getContext("2d");
+    ["#6a6478", "#a79fb6", "#dcd6e6", "#ffffff"].forEach((col, i) => { x.fillStyle = col; x.fillRect(i, 0, 1, 1); });
+    toonGradTex = new THREE.CanvasTexture(c);
+    toonGradTex.minFilter = THREE.NearestFilter;
+    toonGradTex.magFilter = THREE.NearestFilter;
+    toonGradTex.generateMipmaps = false;
+  }
+  return toonGradTex;
+}
+
+const toonOf = new WeakMap();
+function toToon(m) {
+  if (!m || m.isMeshToonMaterial || !m.isMeshStandardMaterial) return m;
+  if (toonOf.has(m)) return toonOf.get(m);
+  const t = new THREE.MeshToonMaterial({
+    color: m.color, map: m.map, emissive: m.emissive, emissiveIntensity: m.emissiveIntensity, emissiveMap: m.emissiveMap,
+    transparent: m.transparent, opacity: m.opacity, side: m.side, alphaTest: m.alphaTest, vertexColors: m.vertexColors,
+    flatShading: false, gradientMap: toonGradient(),
+  });
+  t.color = m.color; // se comparten los colores: si el original cambia (ropa, pelo), el nuevo también
+  t.emissive = m.emissive;
+  toonOf.set(m, t);
+  return t;
+}
+
+/** Convierte los materiales estándar de una escena u objeto en materiales "anime" (sombras por tonos, colores planos). */
+export function toonify(root) {
+  root.traverse((o) => {
+    if (!o.isMesh || o.userData.noToon) return;
+    if (Array.isArray(o.material)) o.material = o.material.map(toToon);
+    else o.material = toToon(o.material);
+  });
+}
+
+const outlineMat = new THREE.MeshBasicMaterial({ color: 0x2a1410, side: THREE.BackSide });
+outlineMat.onBeforeCompile = (sh) => {
+  sh.uniforms.thick = { value: 0.018 };
+  sh.vertexShader = sh.vertexShader.replace("void main() {", "uniform float thick;\nvoid main() {").replace("#include <begin_vertex>", "vec3 transformed = position + normalize(normal) * thick;");
+};
+
+/** Contorno fino oscuro alrededor de las mallas de un objeto (casco invertido). Solo para personajes y objetos clave. */
+export function addOutline(root, thick = 0.018) {
+  const add = [];
+  root.traverse((o) => { if (o.isMesh && !o.userData.isOutline && !o.userData.noOutline && !o.isInstancedMesh && !o.isSkinnedMesh) add.push(o); });
+  for (const m of add) {
+    const mat = outlineMat.clone();
+    mat.onBeforeCompile = (sh) => {
+      sh.uniforms.thick = { value: thick };
+      sh.vertexShader = sh.vertexShader.replace("void main() {", "uniform float thick;\nvoid main() {").replace("#include <begin_vertex>", "vec3 transformed = position + normalize(normal) * thick;");
+    };
+    const ol = new THREE.Mesh(m.geometry, mat);
+    ol.userData.isOutline = true;
+    ol.castShadow = false;
+    ol.receiveShadow = false;
+    m.add(ol);
+  }
+}

@@ -5,7 +5,7 @@
 // (capa, gafas brillantes y corona) además del atuendo que compraste en la tienda.
 
 import { THREE, Game3D, clamp, lerp, rand, canvasTexture, loadTexture, roundedBox, makeStars, makeLogo } from "./three-kit.js";
-import { createMatichico } from "./matichico3d.js";
+import { createMatichico, animeHero } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import { bindStick } from "./stick.js";
 import { trailColors } from "./wardrobe-data.js";
@@ -536,6 +536,7 @@ export class ParkourGame extends Game3D {
     }
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(this.character, this.outfit, this.look);
+    animeHero(this.hero);
     this.heroId = this.character.id;
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     this.hero.group.scale.setScalar(1.08);

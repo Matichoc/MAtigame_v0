@@ -3,7 +3,7 @@
 // js/house-data.js; aquí solo se dibuja. Es liviano y solo corre cuando la pantalla está visible.
 
 import { THREE, canvasTexture, roundedBox, createRenderer, glAcquire } from "./three-kit.js";
-import { createMatichico } from "./matichico3d.js";
+import { createMatichico, animeHero } from "./matichico3d.js";
 import { getOutfit } from "./wardrobe-data.js";
 import { getHouseItem, houseItemsOfSpot, isWallItem } from "./house-data.js";
 
@@ -471,6 +471,8 @@ export class House3D {
     this.furn = new Map(); // uid -> { group, data }
     this.sel = null;
     this.size = 10;
+    this.life = { state: "idle", t: 3, target: null, last: null, hx: 1.6, hz: 1.4, yaw: 0.5, blend: 0, stuck: 0 }; // el Matichico vive en la casa
+    this.lifeOn = true;
   }
 
   init() {
@@ -575,12 +577,16 @@ export class House3D {
     if (!this.ready) return;
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(character, getOutfit(look.outfit), look);
+    animeHero(this.hero);
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     this.hero.group.scale.setScalar(1.7);
-    this.hero.group.position.set(1.6, 0, 1.4);
-    this.hero.group.rotation.y = 0.5;
+    this.hero.group.position.set(this.life.hx, 0, this.life.hz);
+    this.hero.group.rotation.y = this.life.yaw;
     this.scene.add(this.hero.group);
     this.key = key;
+    this.life.state = "idle";
+    this.life.target = null;
+    this.life.t = 2;
   }
 
   /** `placed` = { lugar: idObjeto } con lo que hay en cada rincón. */
@@ -754,6 +760,254 @@ export class House3D {
     this.selRing.visible = !f.data.wall;
   }
 
+
+  // ---------- el Matichico vive en la casa ----------
+  // Camina entre los muebles, esquiva lo que hay en el camino y usa lo que encuentra: se acuesta en la cama (¡y recupera
+  // energía más rápido!), se sienta en sillones y sillas, escribe en el computador, juega a la arcade, toca el piano…
+
+  /** Qué se puede hacer con un mueble (o null si es solo decoración). Las coordenadas son del mueble, sin girar. */
+  _interactionOf(f) {
+    const it = f.item;
+    if (f.data.wall) return null;
+    const k = it.params && it.params.kind;
+    if (it.spot === "bed") {
+      const top = { simple: 0.95, nube: 1.1, cohete: 1.0, alfajor: 1.3 }[k] || 1.0;
+      return { act: "sleep", enter: [1.9, 0, 0], at: [0.0, top + 0.3, 1.0], face: 0 };
+    }
+    if (k === "sofa") return { act: "sit", enter: [0, 0, 1.6], at: [0, 0.78, 0.15], face: 0 };
+    if (k === "silla") return { act: "sit", enter: [0, 0, 1.2], at: [0, 0.88, 0.05], face: 0 };
+    if (k === "escritorio") return { act: "type", enter: [-0.3, 0, 1.7], at: [-0.3, 0.64, 1.0], face: Math.PI };
+    if (k === "arcade") return { act: "arcade", enter: [0, 0, 1.4], at: [0, 0, 1.2], face: Math.PI };
+    if (k === "piano") return { act: "piano", enter: [0, 0, 2.8], at: [0, 0.78, 2.0], face: Math.PI };
+    if (k === "trampolin") return { act: "hop", enter: [0, 0, 2.3], at: [0, 0.88, 0], face: 0 };
+    if (k === "pelotero") return { act: "hop", enter: [0, 0, 2.2], at: [0, 0.35, 0], face: 0 };
+    if (["planta", "estanteria", "oso", "tipi", "pastel", "cofre", "fuente", "flores", "cacao", "lampara", "mesa", "comoda"].includes(k)) {
+      return { act: "admire", enter: [0, 0, 1.9], at: [0, 0, 1.9], face: Math.PI };
+    }
+    return null;
+  }
+
+  _spots() {
+    const out = [];
+    for (const f of this.furn.values()) {
+      const i = this._interactionOf(f);
+      if (i) out.push({ f, i });
+    }
+    return out;
+  }
+
+  /** Punto del mundo para unas coordenadas del mueble. */
+  _worldOf(f, xyz) {
+    f.group.updateMatrixWorld(true);
+    const inner = f.group.children[0];
+    return inner.localToWorld(new THREE.Vector3(xyz[0], xyz[1], xyz[2]));
+  }
+
+  _yawOf(f, face) {
+    const q = new THREE.Quaternion();
+    f.group.children[0].getWorldQuaternion(q);
+    const e = new THREE.Euler().setFromQuaternion(q, "YXZ");
+    return e.y + face;
+  }
+
+  /** Ir a usar un mueble (por su uid). `force` = aunque esté haciendo otra cosa. */
+  interact(uid, wake = true) {
+    const f = this.furn.get(uid);
+    if (!f || !this.hero) return false;
+    const i = this._interactionOf(f);
+    if (!i) return false;
+    const L = this.life;
+    if (L.state === "act" && wake) this._leaveAct(true);
+    L.target = { uid, i };
+    L.state = "walk";
+    L.stuck = 0;
+    L.walkT = 0;
+    this._clearSel?.();
+    return true;
+  }
+
+  /** Ir a un punto del piso. */
+  walkTo(x, z) {
+    const L = this.life;
+    if (!this.hero) return;
+    if (L.state === "act") this._leaveAct(true);
+    const half = W / 2 - 0.9;
+    L.target = { uid: null, i: null, pt: { x: Math.max(-half, Math.min(half, x)), z: Math.max(-half, Math.min(half, z)) } };
+    L.state = "walk";
+    L.stuck = 0;
+    L.walkT = 0;
+  }
+
+  /** Despierta o deja lo que hacía y se queda de pie. */
+  wake() {
+    if (this.life.state === "act" || this.life.state === "enter") this._leaveAct(true);
+  }
+
+  /** Para que el cuarto avise cuando el Matichico se acuesta/levanta (la energía se recarga más rápido durmiendo). */
+  onLife(fn) { this._onLife = fn; }
+
+  _leaveAct(quick = false) {
+    const L = this.life;
+    if (L.cur) this._onLife?.({ type: "end", act: L.cur.act });
+    L.cur = null;
+    L.state = "leave";
+    L.blend = 0;
+    L.t = 4 + Math.random() * 6;
+  }
+
+  _lifeTick(dt) {
+    const L = this.life;
+    const h = this.hero;
+    const half = W / 2 - 0.9;
+    const g = h.group;
+    let mode = "idle";
+    if (!this.lifeOn || (this.sel && this.freezeOnSel)) {
+      h.animate(this.time, "idle", 1);
+      return;
+    }
+    if (L.state === "idle") {
+      L.t -= dt;
+      g.position.set(L.hx, 0, L.hz);
+      g.rotation.set(0, L.yaw + Math.sin(this.time * 0.6) * 0.15, 0);
+      if (L.t <= 0) {
+        const spots = this._spots().filter((s) => s.f.data.uid !== L.last);
+        if (spots.length && Math.random() < 0.85) {
+          const s = spots[Math.floor(Math.random() * spots.length)];
+          this.interact(s.f.data.uid, false);
+        } else {
+          this.walkTo((Math.random() - 0.5) * (W - 3), (Math.random() - 0.5) * (W - 3));
+        }
+      }
+    } else if (L.state === "walk") {
+      const tg = L.target;
+      if (!tg) { L.state = "idle"; return; }
+      let goal;
+      const ff = tg.uid ? this.furn.get(tg.uid) : null;
+      if (tg.uid) {
+        if (!ff) { L.state = "idle"; L.target = null; return; }
+        const w = this._worldOf(ff, tg.i.enter);
+        goal = { x: Math.max(-half, Math.min(half, w.x)), z: Math.max(-half, Math.min(half, w.z)) };
+      } else goal = tg.pt;
+      let dx = goal.x - L.hx;
+      let dz = goal.z - L.hz;
+      const dist = Math.hypot(dx, dz);
+      L.walkT += dt;
+      if (dist < 0.18 || L.walkT > 14) {
+        if (tg.uid) { L.state = "enter"; L.blend = 0; L.enterFrom = { x: L.hx, z: L.hz, yaw: L.yaw }; this._beginAct(); }
+        else { L.state = "idle"; L.t = 3 + Math.random() * 5; }
+        return;
+      }
+      dx /= dist; dz /= dist;
+      // esquivar muebles (círculos alrededor de cada uno, menos el que quiere usar)
+      let ax = 0, az = 0;
+      for (const f of this.furn.values()) {
+        if (f.data.wall || (ff && f === ff) || f.item.spot === "rug") continue;
+        const box = new THREE.Box3().setFromObject(f.group);
+        if (box.max.y < 0.3) continue;
+        const c = box.getCenter(new THREE.Vector3());
+        const sz = box.getSize(new THREE.Vector3());
+        const r = Math.min(Math.max(sz.x, sz.z) / 2, 1.9) * 0.9 + 0.55;
+        const ox = L.hx - c.x, oz = L.hz - c.z;
+        const d = Math.hypot(ox, oz);
+        if (d < r + 0.7 && d > 0.001) {
+          const k = Math.min(1, (r + 0.7 - d) / 0.7);
+          // empuja hacia afuera y un poco de lado para rodear
+          ax += (ox / d) * k * 1.6 + (-oz / d) * k * 0.9;
+          az += (oz / d) * k * 1.6 + (ox / d) * k * 0.9;
+        }
+      }
+      let vx = dx + ax, vz = dz + az;
+      const vl = Math.hypot(vx, vz) || 1;
+      vx /= vl; vz /= vl;
+      const speed = 2.6;
+      const nx = Math.max(-half, Math.min(half, L.hx + vx * speed * dt));
+      const nz = Math.max(-half, Math.min(half, L.hz + vz * speed * dt));
+      if (Math.hypot(nx - L.hx, nz - L.hz) < speed * dt * 0.2) L.stuck += dt; else L.stuck = Math.max(0, L.stuck - dt);
+      L.hx = nx; L.hz = nz;
+      const want = Math.atan2(vx, vz);
+      let dy = want - L.yaw;
+      while (dy > Math.PI) dy -= Math.PI * 2;
+      while (dy < -Math.PI) dy += Math.PI * 2;
+      L.yaw += dy * Math.min(1, dt * 10);
+      g.position.set(L.hx, 0, L.hz);
+      g.rotation.set(0, L.yaw, 0);
+      mode = "walk";
+      if (L.stuck > 2.5 && tg.uid) { // atascado: salta directo al mueble
+        L.hx = goal.x; L.hz = goal.z; L.stuck = 0;
+      }
+    } else if (L.state === "enter" || L.state === "act") {
+      const tg = L.target;
+      const ff = tg && tg.uid ? this.furn.get(tg.uid) : null;
+      if (!ff) { L.state = "idle"; L.cur = null; L.target = null; return; }
+      const i = tg.i;
+      const wpos = this._worldOf(ff, i.at);
+      const wyaw = this._yawOf(ff, i.face);
+      const k = L.state === "enter" ? Math.min(1, L.blend + dt / 0.8) : 1;
+      L.blend = k;
+      const e = k * k * (3 - 2 * k);
+      const sitY = { sit: -0.84, type: -0.84, piano: -0.84 }[i.act];
+      let py = wpos.y + (sitY || 0);
+      let rx = 0;
+      if (i.act === "sleep") { py = wpos.y; rx = -Math.PI / 2; }
+      if (i.act === "hop") py = wpos.y + Math.abs(Math.sin(this.time * 6)) * 0.55;
+      let yaw = wyaw;
+      let dy = yaw - L.enterFrom.yaw;
+      while (dy > Math.PI) dy -= Math.PI * 2;
+      while (dy < -Math.PI) dy += Math.PI * 2;
+      const fx = L.enterFrom.x, fz = L.enterFrom.z;
+      g.position.set(fx + (wpos.x - fx) * e, py * e, fz + (wpos.z - fz) * e);
+      g.rotation.set(rx * e, L.enterFrom.yaw + dy * e, 0, "YXZ");
+      mode = { sleep: "sleep", sit: "sit", type: "type", piano: "piano", arcade: "arcade", hop: "cheer", admire: "admire" }[i.act];
+      if (L.state === "enter" && k >= 1) { L.state = "act"; L.t = (i.act === "sleep" ? 30 : 8 + Math.random() * 8); this._onLife?.({ type: "start", act: i.act }); L.cur = i; }
+      if (L.state === "act") {
+        L.t -= dt;
+        this._actTime = (this._actTime || 0) + dt;
+        if (i.act === "sleep" && this._actTime > 2) { this._actTime = 0; this._onLife?.({ type: "tick", act: "sleep" }); }
+        if (L.t <= 0 && !this.holdAct) this._leaveAct();
+      }
+    } else if (L.state === "leave") {
+      // se levanta y vuelve a un punto libre junto al mueble
+      L.blend += dt / 0.6;
+      const tg = L.target;
+      const ff = tg && tg.uid ? this.furn.get(tg.uid) : null;
+      if (ff) {
+        const w = this._worldOf(ff, tg.i.enter);
+        L.hx = Math.max(-half, Math.min(half, w.x)); L.hz = Math.max(-half, Math.min(half, w.z));
+      }
+      g.position.set(L.hx, 0, L.hz);
+      g.rotation.set(0, L.yaw, 0);
+      if (L.blend >= 1) { L.last = tg && tg.uid; L.state = "idle"; L.target = null; L.cur = null; }
+    }
+    h.animate(this.time, mode, 1);
+    this._syncZzz(mode === "sleep", g);
+  }
+
+  _beginAct() { this._actTime = 0; }
+
+  /** "Zzz" flotando sobre el Matichico mientras duerme. */
+  _syncZzz(on, g) {
+    if (!this.zzz) {
+      const c = document.createElement("canvas");
+      c.width = 128; c.height = 128;
+      const x = c.getContext("2d");
+      x.font = "900 72px system-ui, sans-serif";
+      x.textAlign = "center"; x.textBaseline = "middle";
+      x.lineWidth = 8; x.strokeStyle = "#3a2a8a"; x.fillStyle = "#fff6e6";
+      x.strokeText("Zzz", 64, 64); x.fillText("Zzz", 64, 64);
+      const tex = new THREE.CanvasTexture(c);
+      this.zzz = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+      this.zzz.renderOrder = 12;
+      this.zzz.scale.set(1.4, 1.4, 1);
+      this.scene.add(this.zzz);
+    }
+    this.zzz.visible = on;
+    if (on) {
+      const t = this.time;
+      this.zzz.position.set(g.position.x, g.position.y + 2.9 + Math.sin(t * 1.5) * 0.12, g.position.z);
+      this.zzz.material.opacity = 0.6 + 0.4 * Math.abs(Math.sin(t * 1.5));
+    }
+  }
+
   setActive(on) {
     if (!this.ready) return;
     if (on && !this.active) {
@@ -770,10 +1024,7 @@ export class House3D {
     const dt = Math.min(0.05, (ts - this._last) / 1000);
     this._last = ts;
     this.time += dt;
-    if (this.hero) {
-      this.hero.animate(this.time, "idle", 1);
-      this.hero.group.rotation.y = 0.5 + Math.sin(this.time * 0.6) * 0.3;
-    }
+    if (this.hero) this._lifeTick(dt);
     for (const f of this.ticks) f(this.time, dt);
     this._syncSelRing();
     this.renderer.render(this.scene, this.camera);

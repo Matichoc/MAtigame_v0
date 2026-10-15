@@ -50,7 +50,7 @@ export const HOUSE_ITEMS = [
   it("rug", "rg_corazon", "Corazón", "❤️", "raro", { kind: "corazon", a: "#e83a6a", b: "#ff9ab8" }),
   it("rug", "rg_alfajor", "Alfajor gigante", "🍪", "epico", { kind: "alfajor" }),
   // ---- Cama ----
-  it("bed", "bd_simple", "Cama azul", "🛏️", "comun", { kind: "simple", a: "#6ab0ff", b: "#fff6e6" }),
+  it("bed", "bd_simple", "Cama azul", "🛏️", "comun", { kind: "simple", a: "#6ab0ff", b: "#fff6e6" }, 0),
   it("bed", "bd_rosa", "Cama de corazones", "🛏️", "comun", { kind: "simple", a: "#ff7aa8", b: "#fff6e6" }),
   it("bed", "bd_nube", "Cama nube", "☁️", "raro", { kind: "nube" }),
   it("bed", "bd_cohete", "Cama cohete", "🚀", "epico", { kind: "cohete" }),
@@ -185,6 +185,12 @@ export function houseLayout(progress) {
         delete h.placed[spot];
       }
     }
+    saveProgress(progress);
+  }
+  // todas las casas empiezan con una cama (para que el Matichico pueda dormir y recuperar energía)
+  if (!h.starterBed) {
+    h.starterBed = true;
+    if (!h.layout.some((f) => (getHouseItem(f.id) || {}).spot === "bed")) h.layout.push({ uid: newUid(), id: "bd_simple", rot: 0, s: 1, ...OLD_ANCHORS.bed });
     saveProgress(progress);
   }
   return h.layout;

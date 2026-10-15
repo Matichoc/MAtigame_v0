@@ -10,7 +10,7 @@
 // hablar, subir/bajar del auto, regar. H = bocina. Arrastra para mover la cámara cuando vas a pie.
 
 import { THREE, Game3D, clamp, lerp, rand, canvasTexture, roundedBox, makeLogo, goldCoinTexture } from "./three-kit.js";
-import { createMatichico } from "./matichico3d.js";
+import { createMatichico, animeHero } from "./matichico3d.js";
 import { CHARACTERS, getOutfit } from "./characters.js";
 import { ITEMS, OUTFITS } from "./wardrobe-data.js";
 import { earnCoins, saveProgress, todayKey } from "./storage.js";
@@ -971,6 +971,7 @@ export class CiudadGame extends Game3D {
     }
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(this.character, this.outfit, this.look);
+    animeHero(this.hero);
     this.heroId = this.character.id;
     this.hero.group.scale.setScalar(1.08);
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });

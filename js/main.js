@@ -24,7 +24,7 @@ import {
   spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, TRADE_NORMAL, TRADE_FOIL,
 } from "./progression.js";
 import { rankingEnabled, fetchRanking } from "./online.js";
-import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_MISSION } from "./energy.js";
+import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_MISSION, startSleep, stopSleep } from "./energy.js";
 
 let progress = null;
 let selectedCharacter = null;
@@ -214,12 +214,15 @@ function refreshHubStats() {
 
 
 // ---------- ENERGÍA ----------
+const ENERGY_FULL = 100;
 const enDlg = document.getElementById("energy-dialog");
 let enOpen = false;
 function renderEnergy() {
   if (!progress) return;
   const i = energyInfo(progress);
   document.getElementById("hub-energy").textContent = String(i.v);
+  const he = document.getElementById("house-energy-v");
+  if (he) he.textContent = String(i.v);
   document.getElementById("hub-energy-next").textContent = i.v < i.max ? `+1 en ${fmtSecs(i.nextInSecs)}` : "";
   document.getElementById("hub-energy-dot").classList.toggle("hidden", !i.chestReady);
   document.getElementById("btn-energy").classList.toggle("low", i.v < 5);
@@ -447,7 +450,7 @@ const houseBarEl = document.getElementById("house-bar");
 const houseModesEl = document.getElementById("house-modes");
 const houseToolsEl = document.getElementById("house-tools");
 const STYLE_SPOTS = HOUSE_SPOTS.filter((s) => ["floor", "wall", "ceiling"].includes(s.id));
-let houseMode = "decor";
+let houseMode = "live";
 let houseSpot = "floor";
 let houseCat = FURN_CATEGORIES[0].id;
 let houseView = "buy"; // "buy" = lo que falta por comprar, "own" = lo que ya tengo
@@ -475,7 +478,8 @@ document.getElementById("btn-house-back").addEventListener("click", () => {
   houseBuying = null;
   clearFurniturePreview();
   clearSizePreview();
-  if (house3d) house3d.setActive(false);
+  if (house3d) { house3d.holdAct = false; house3d.wake(); house3d.setActive(false); }
+  if (progress) stopSleep(progress);
   refreshHubStats();
   if (fromTown) goToHub();
   else showScreen(screenHub);
@@ -501,7 +505,28 @@ async function openHousePreview() {
     house3d.layoutData = houseLayout(progress);
     house3d.setPlaced(housePlaced());
     house3d.setSelected(houseSel);
+    house3d.freezeOnSel = true;
+    if (!house3d._lifeBound) {
+      house3d._lifeBound = true;
+      house3d.onLife((ev) => {
+        if (!progress) return;
+        if (ev.act !== "sleep") return;
+        if (ev.type === "start" || ev.type === "tick") {
+          startSleep(progress, 90);
+          if (energyInfo(progress).v >= ENERGY_FULL) house3d.holdAct = false;
+          renderEnergy();
+        } else if (ev.type === "end") { stopSleep(progress); house3d.holdAct = false; renderEnergy(); }
+      });
+    }
     house3d.setActive(true);
+    if (houseMode === "live") renderHouse(); // ahora que están los muebles, se arma la lista de cosas para hacer
+    if (window.__sleepOnEnter) {
+      window.__sleepOnEnter = false;
+      houseMode = "live";
+      const bed = [...house3d.furn.values()].find((f) => f.item.spot === "bed");
+      if (bed) { house3d.holdAct = true; house3d.interact(bed.data.uid); }
+      else showToast("Pon una cama en Decorar para poder dormir 🛏️");
+    }
   } catch (err) {
     console.error(err);
     showToast("Tu dispositivo no pudo mostrar la casa en 3D.");
@@ -598,7 +623,16 @@ function bindHouseDrag() {
   const point = (e, d) => (d.wall ? house3d.wallPoint(e.clientX, e.clientY) : house3d.floorPoint(e.clientX, e.clientY));
   const snap = (v) => Math.round(v * 4) / 4;
   cv.addEventListener("pointerdown", (e) => {
+    if (houseMode === "live") {
+      // tocar un mueble: lo usa; tocar el piso: camina hasta ahí (y se levanta si dormía)
+      const u = house3d.pick(e.clientX, e.clientY);
+      if (u && house3d.interact(u)) return;
+      const fp = house3d.floorPoint(e.clientX, e.clientY);
+      if (fp) house3d.walkTo(fp.x, fp.z);
+      return;
+    }
     if (houseMode !== "decor") return;
+    house3d.wake();
     const uid = house3d.pick(e.clientX, e.clientY);
     if (!uid) { if (houseSel) selectPiece(null); return; }
     const d = pieceById(uid);
@@ -677,7 +711,7 @@ function renderHouse() {
   document.getElementById("house-coins").textContent = String(progress.coins);
   // modos
   houseModesEl.innerHTML = "";
-  for (const [id, icon, name] of [["decor", "🛋️", "Decorar"], ["style", "🎨", "Piso y paredes"], ["size", "🏡", "Agrandar casa"]]) {
+  for (const [id, icon, name] of [["live", "🧸", "Vivir"], ["decor", "🛋️", "Decorar"], ["style", "🎨", "Piso y paredes"], ["size", "🏡", "Agrandar casa"]]) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "sh-mode" + (id === houseMode ? " active" : "");
@@ -686,8 +720,8 @@ function renderHouse() {
     houseModesEl.appendChild(b);
   }
   renderHouseTools();
-  houseViewsEl.classList.toggle("hidden", houseMode === "size");
-  if (houseMode !== "size") {
+  houseViewsEl.classList.toggle("hidden", houseMode === "size" || houseMode === "live");
+  if (houseMode !== "size" && houseMode !== "live") {
     const mine = (x) => ownsHouseItem(progress, x.id);
     const pool = houseMode === "decor" ? FURN_CATEGORIES.flatMap((c) => furnitureOf(c.id)) : STYLE_SPOTS.flatMap((sp) => houseItemsOfSpot(sp.id));
     const own = pool.filter(mine).length;
@@ -700,9 +734,32 @@ function renderHouse() {
   houseGridEl.innerHTML = "";
   houseBarEl.innerHTML = "";
   houseBarEl.className = "sh-bar";
-  if (houseMode === "decor") renderHouseDecor();
+  if (houseMode === "live") renderHouseLive();
+  else if (houseMode === "decor") renderHouseDecor();
   else if (houseMode === "style") renderHouseStyle();
   else renderHouseSize();
+}
+
+
+const LIVE_ICONS = { sleep: "😴", sit: "🛋️", type: "💻", arcade: "🕹️", piano: "🎹", hop: "🤸", admire: "👀" };
+const LIVE_NAMES = { sleep: "Dormir", sit: "Sentarse", type: "Usar el computador", arcade: "Jugar a la arcade", piano: "Tocar el piano", hop: "Saltar", admire: "Mirar" };
+/** Modo "Vivir": el Matichico camina por la casa y usa los muebles. */
+function renderHouseLive() {
+  const i = energyInfo(progress);
+  houseBarEl.innerHTML = `<div class="sh-bar-txt">Tu Matichico vive aquí: <b>toca un mueble</b> y irá a usarlo, o <b>toca el piso</b> para que camine. ${i.v < i.max ? `Si duerme en su cama, ¡la energía vuelve 3 veces más rápido! (⚡ ${i.v}/${i.max})` : ""}</div>`;
+  const spots = house3d ? house3d._spots() : [];
+  const cats = { sleep: [], sit: [], type: [], arcade: [], piano: [], hop: [], admire: [] };
+  for (const { f, i: it } of spots) cats[it.act].push(f);
+  const mk = (act, f) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "sh-card";
+    b.innerHTML = `<span class="sh-ico">${LIVE_ICONS[act]}</span><span class="sh-name">${LIVE_NAMES[act]}</span><span class="sh-price">${f.item.name}</span>`;
+    b.addEventListener("click", () => house3d && house3d.interact(f.data.uid));
+    houseGridEl.appendChild(b);
+  };
+  for (const act of ["sleep", "sit", "type", "arcade", "piano", "hop", "admire"]) for (const f of cats[act]) mk(act, f);
+  if (!spots.length) houseGridEl.innerHTML = `<div class="sh-empty">Aún no hay muebles para usar. ¡Pon una cama, un sillón o un computador en <b>Decorar</b>!</div>`;
 }
 
 function renderHouseDecor() {

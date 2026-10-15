@@ -3,7 +3,7 @@
 // Es liviano (sin sombras pesadas ni efectos) y solo dibuja cuando el menú está visible.
 
 import { THREE, loadTexture, createRenderer, glAcquire } from "./three-kit.js";
-import { createMatichico } from "./matichico3d.js";
+import { createMatichico, animeHero } from "./matichico3d.js";
 import { getOutfit } from "./wardrobe-data.js";
 
 const SPRITES = ["alf-frambuesa", "alf-menta", "alf-naranja", "alf-trufa", "alf-maracuya"];
@@ -136,6 +136,7 @@ export class Lobby3D {
     if (!this.ready) return;
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(character, getOutfit(look.outfit), look);
+    animeHero(this.hero);
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     this.hero.group.scale.setScalar(1.9);
     this.hero.group.position.y = 0.45;

@@ -7,7 +7,7 @@
 // Controles: ← → / A D para moverte, ESPACIO / ↑ / W para saltar. En el celular: ◀ ▶ y ⤴.
 
 import { THREE, Game3D, clamp, lerp, rand, canvasTexture, makeLogo, goldCoinTexture, disposeGeometries } from "./three-kit.js";
-import { createMatichico } from "./matichico3d.js";
+import { createMatichico, animeHero } from "./matichico3d.js";
 import { saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
 import { campaign, campaignWin, renderLevelPicker, LEVELS_PER_GAME } from "./campaign.js";
@@ -274,6 +274,7 @@ export class AventuraGame extends Game3D {
     if (this.hero && this.heroId === this.character.id) { this.hero.setLook(this.look); return; }
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(this.character, this.outfit, this.look);
+    animeHero(this.hero);
     this.heroId = this.character.id;
     this.hero.group.scale.setScalar(0.74);
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
