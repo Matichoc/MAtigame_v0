@@ -10,7 +10,7 @@
 // hablar, subir/bajar del auto, regar. H = bocina. Arrastra para mover la cámara cuando vas a pie.
 
 import { THREE, Game3D, clamp, lerp, rand, canvasTexture, roundedBox, makeLogo, goldCoinTexture } from "./three-kit.js";
-import { createMatichico, animeHero } from "./matichico3d.js";
+import { createMatichico } from "./matichico3d.js";
 import { CHARACTERS, getOutfit } from "./characters.js";
 import { ITEMS, OUTFITS } from "./wardrobe-data.js";
 import { earnCoins, saveProgress, todayKey } from "./storage.js";
@@ -229,6 +229,8 @@ export class CiudadGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 55 });
     this.musicTheme = "chill";
+    this.kawaii = true;
+    this.ambientOpts = { petals: 34, hearts: 6, stars: 18, radius: 22, height: 11 };
     this.q = els.q;
     this.keys = {};
     this.joy = { x: 0, y: 0 };
@@ -263,8 +265,8 @@ export class CiudadGame extends Game3D {
 
   async build() {
     const s = this.scene;
-    s.background = new THREE.Color(0x9fdcf5);
-    s.fog = new THREE.Fog(0xcdeeff, 70, 210);
+    s.background = new THREE.Color(0xbfe3ff);
+    s.fog = new THREE.Fog(0xf3dcf7, 60, 190); // niebla lila-rosada, como un sueño
     s.add(new THREE.HemisphereLight(0xfff6e0, 0x6a9a50, 1.25));
     this.sun = new THREE.DirectionalLight(0xfff0d2, 2.5);
     this.sun.position.set(-30, 50, 25);
@@ -279,7 +281,7 @@ export class CiudadGame extends Game3D {
     this.onLowQuality = () => { this.sun.castShadow = false; };
 
     this.m = {
-      grass: new THREE.MeshStandardMaterial({ color: 0x7ecb6a, roughness: 1 }),
+      grass: new THREE.MeshStandardMaterial({ color: 0xa6e592, roughness: 1 }),
       lawn: new THREE.MeshStandardMaterial({ color: 0x8fd67a, roughness: 1 }),
       road: new THREE.MeshStandardMaterial({ color: 0x53535c, roughness: 0.95 }),
       pad: new THREE.MeshStandardMaterial({ color: 0xe9dcc4, roughness: 0.9 }),
@@ -751,7 +753,7 @@ export class CiudadGame extends Game3D {
     const crownGeo = new THREE.IcosahedronGeometry(1.35, 0);
     const trunks = new THREE.InstancedMesh(trunkGeo, this.m.trunk, n);
     const crowns = new THREE.InstancedMesh(crownGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.85, flatShading: true }), n);
-    const greens = [0x3fae4c, 0x56bd55, 0x2f9a58, 0x6cc65a, 0xe9a23b, 0xe05f8a];
+    const greens = [0x9be39a, 0xb7ecaa, 0x86d9b0, 0xffc2dc, 0xffa8cc, 0xffd9a0, 0xffb8d6]; // verdes suaves y sakura
     const mat = new THREE.Matrix4();
     const col = new THREE.Color();
     this.treeSpots.forEach(([x, z, sc], i) => {
@@ -971,7 +973,6 @@ export class CiudadGame extends Game3D {
     }
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(this.character, this.outfit, this.look);
-    animeHero(this.hero);
     this.heroId = this.character.id;
     this.hero.group.scale.setScalar(1.08);
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });

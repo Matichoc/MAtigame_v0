@@ -69,19 +69,25 @@ export const lerp = (a, b, t) => a + (b - a) * t;
 export const rand = (a, b) => a + Math.random() * (b - a);
 
 // "Look" compartido (brillo suave estilo juego moderno); cada juego puede ajustarlo.
-export const LOOK = { bloom: { strength: 0.32, radius: 0.55, threshold: 0.92 }, grade: { sat: 1.16, contrast: 1.06, vig: 0.22 } };
+export const LOOK = {
+  bloom: { strength: 0.32, radius: 0.55, threshold: 0.92 },
+  grade: { sat: 1.16, contrast: 1.06, vig: 0.22, lift: 0, tint: [1, 1, 1] },
+  // ambiente "kawaii": colores pastel, negros levantados con un velo rosado y brillo suave tipo ensueño
+  kawaii: { bloom: { strength: 0.46, radius: 0.75, threshold: 0.84 }, grade: { sat: 1.22, contrast: 0.97, vig: 0.14, lift: 0.05, tint: [1.0, 0.84, 0.92] } },
+};
 
 // Ajuste final de color (saturación, contraste y viñeta) sobre la imagen ya en sRGB.
 const GRADE_SHADER = {
-  uniforms: { tDiffuse: { value: null }, sat: { value: 1.16 }, contrast: { value: 1.06 }, vig: { value: 0.22 } },
+  uniforms: { tDiffuse: { value: null }, sat: { value: 1.16 }, contrast: { value: 1.06 }, vig: { value: 0.22 }, lift: { value: 0 }, tint: { value: new THREE.Vector3(1, 1, 1) } },
   vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
-  fragmentShader: `uniform sampler2D tDiffuse; uniform float sat; uniform float contrast; uniform float vig; varying vec2 vUv;
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float sat; uniform float contrast; uniform float vig; uniform float lift; uniform vec3 tint; varying vec2 vUv;
     void main(){
       vec4 c = texture2D(tDiffuse, vUv);
       float l = dot(c.rgb, vec3(0.2126, 0.7152, 0.0722));
       c.rgb = mix(vec3(l), c.rgb, sat);
       c.rgb = (c.rgb - 0.5) * contrast + 0.5;
       c.rgb *= 1.0 - vig * smoothstep(0.45, 0.98, distance(vUv, vec2(0.5)));
+      c.rgb = mix(c.rgb, tint, lift * (1.0 - l * 0.6));
       gl_FragColor = c;
     }`,
 };
@@ -342,6 +348,8 @@ export class Game3D {
   constructor(gameId, character, progress, els, { fov = 50, bloom = true } = {}) {
     this.gameId = gameId;
     this.bloom = bloom === true ? LOOK.bloom : bloom;
+    this.kawaii = false; // los mundos con estilo kawaii lo encienden en su constructor (ver kawaiiStyle)
+    this.ambients = [];
     this.character = character;
     this.progress = progress;
     this.els = els;
@@ -439,13 +447,17 @@ export class Game3D {
       const target = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: this.coarse ? 0 : 4 });
       this.composer = new EffectComposer(this.renderer, target);
       this.composer.addPass(new RenderPass(this.scene, this.camera));
-      this.bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), this.bloom.strength, this.bloom.radius, this.bloom.threshold);
+      const bl = this.kawaii ? LOOK.kawaii.bloom : this.bloom;
+      this.bloomPass = new UnrealBloomPass(new THREE.Vector2(w, h), bl.strength, bl.radius, bl.threshold);
       this.composer.addPass(this.bloomPass);
       this.composer.addPass(new OutputPass());
       const grade = new ShaderPass(GRADE_SHADER);
-      grade.uniforms.sat.value = LOOK.grade.sat;
-      grade.uniforms.contrast.value = LOOK.grade.contrast;
-      grade.uniforms.vig.value = LOOK.grade.vig;
+      const gr = this.kawaii ? LOOK.kawaii.grade : LOOK.grade;
+      grade.uniforms.sat.value = gr.sat;
+      grade.uniforms.contrast.value = gr.contrast;
+      grade.uniforms.vig.value = gr.vig;
+      grade.uniforms.lift.value = gr.lift || 0;
+      grade.uniforms.tint.value.set(...(gr.tint || [1, 1, 1]));
       this.composer.addPass(grade);
     } catch (e) {
       console.warn("Postprocesado no disponible:", e);
@@ -462,11 +474,18 @@ export class Game3D {
     this.popups.clear();
     this.state = "intro";
     this.reset();
+    if (this.kawaii) this._kawaiiScene();
     this.showOverlay("intro");
     this.onIntro?.();
     this.running = true;
     this.lastTs = null;
     requestAnimationFrame(this._loop);
+  }
+
+  /** Estilo kawaii del escenario: sombreado por tonos (no a los personajes) y pétalos/estrellitas flotando. */
+  _kawaiiScene() {
+    toonify(this.scene);
+    if (!this.ambient) this.ambient = makeAmbient(this.scene, this.ambientOpts || {});
   }
 
   beginPlaying() {
@@ -641,6 +660,7 @@ export class Game3D {
         saveProgress(this.progress);
       }
     }
+    if (this.ambient) this.ambient.update(this.time, dt, this.camera.position);
     this.particles.update(dt);
     this.popups.update(dt);
     if (this.composer) this.composer.render(dt);
@@ -703,7 +723,7 @@ function toonGradient() {
     c.width = 4;
     c.height = 1;
     const x = c.getContext("2d");
-    ["#6a6478", "#a79fb6", "#dcd6e6", "#ffffff"].forEach((col, i) => { x.fillStyle = col; x.fillRect(i, 0, 1, 1); });
+    ["#7d6f9a", "#b9aad0", "#ece4f6", "#ffffff"].forEach((col, i) => { x.fillStyle = col; x.fillRect(i, 0, 1, 1); });
     toonGradTex = new THREE.CanvasTexture(c);
     toonGradTex.minFilter = THREE.NearestFilter;
     toonGradTex.magFilter = THREE.NearestFilter;
@@ -730,7 +750,8 @@ function toToon(m) {
 /** Convierte los materiales estándar de una escena u objeto en materiales "anime" (sombras por tonos, colores planos). */
 export function toonify(root) {
   root.traverse((o) => {
-    if (!o.isMesh || o.userData.noToon) return;
+    if (!o.isMesh) return;
+    for (let a = o; a; a = a.parent) if (a.userData && a.userData.noToon) return; // los personajes se quedan como son
     if (Array.isArray(o.material)) o.material = o.material.map(toToon);
     else o.material = toToon(o.material);
   });
@@ -758,4 +779,80 @@ export function addOutline(root, thick = 0.018) {
     ol.receiveShadow = false;
     m.add(ol);
   }
+}
+
+// ---------- ambiente flotante: pétalos, corazoncitos y estrellitas ----------
+function sparkleTexture(kind) {
+  const c = document.createElement("canvas");
+  c.width = c.height = 64;
+  const x = c.getContext("2d");
+  x.translate(32, 32);
+  if (kind === "petal") {
+    x.fillStyle = "#ffc2dc";
+    x.beginPath();
+    x.ellipse(0, 0, 11, 19, 0.5, 0, Math.PI * 2);
+    x.fill();
+    x.fillStyle = "rgba(255,255,255,0.55)";
+    x.beginPath();
+    x.ellipse(-3, -5, 3, 8, 0.5, 0, Math.PI * 2);
+    x.fill();
+  } else if (kind === "heart") {
+    x.fillStyle = "#ff8fb8";
+    x.beginPath();
+    x.moveTo(0, 14);
+    x.bezierCurveTo(-26, -4, -12, -22, 0, -8);
+    x.bezierCurveTo(12, -22, 26, -4, 0, 14);
+    x.fill();
+  } else {
+    x.fillStyle = "#fff6c8";
+    x.beginPath();
+    for (let i = 0; i < 8; i++) { const r = i % 2 ? 6 : 22; const a = (i / 8) * Math.PI * 2 - Math.PI / 2; x.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
+    x.closePath();
+    x.fill();
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+/** Pétalos que caen despacito, corazoncitos y estrellitas que titilan alrededor de la cámara. `update(t, dt, centro)` cada cuadro. */
+export function makeAmbient(parent, { petals = 36, hearts = 10, stars = 26, radius = 16, height = 11, floor = 0 } = {}) {
+  const layers = [];
+  const mk = (kind, n, size, fall, twinkle) => {
+    if (n <= 0) return;
+    const pos = new Float32Array(n * 3);
+    const off = [];
+    for (let i = 0; i < n; i++) off.push({ x: (Math.random() * 2 - 1) * radius, y: Math.random() * height, z: (Math.random() * 2 - 1) * radius, ph: Math.random() * 6.28, v: fall * (0.6 + Math.random() * 0.8) });
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ map: sparkleTexture(kind), size, transparent: true, depthWrite: false, opacity: 0.95, sizeAttenuation: true });
+    const pts = new THREE.Points(geo, mat);
+    pts.frustumCulled = false;
+    pts.renderOrder = 8;
+    pts.userData.noToon = true;
+    parent.add(pts);
+    layers.push({ pts, geo, mat, off, fall, twinkle, base: size });
+  };
+  mk("petal", petals, 0.95, 0.5, false);
+  mk("heart", hearts, 0.85, 0.28, false);
+  mk("star", stars, 0.7, 0.0, true);
+  return {
+    update(t, dt, c) {
+      for (const L of layers) {
+        const a = L.geo.attributes.position.array;
+        L.off.forEach((o, i) => {
+          if (L.fall) {
+            o.y -= o.v * dt;
+            if (o.y < 0) { o.y = height; o.x = (Math.random() * 2 - 1) * radius; o.z = (Math.random() * 2 - 1) * radius; }
+          }
+          const sway = Math.sin(t * 0.8 + o.ph) * (L.fall ? 0.8 : 0.15);
+          a[i * 3] = c.x + o.x + sway;
+          a[i * 3 + 1] = floor + o.y * (L.fall ? 1 : 0.5) + (L.fall ? 0 : 0.6);
+          a[i * 3 + 2] = c.z + o.z + Math.cos(t * 0.6 + o.ph) * (L.fall ? 0.6 : 0.1);
+        });
+        L.geo.attributes.position.needsUpdate = true;
+        if (L.twinkle) L.mat.opacity = 0.55 + 0.45 * Math.sin(t * 2.2);
+      }
+    },
+  };
 }

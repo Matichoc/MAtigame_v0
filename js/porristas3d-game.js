@@ -4,7 +4,7 @@
 // Si cae fuera de la rebotadora, se acaba la partida. Las reglas son las de siempre.
 
 import { THREE, Game3D, clamp, rand, canvasTexture, roundedBox, makeBunting, makeStars, makeLogo } from "./three-kit.js";
-import { createMatichico, animeHero } from "./matichico3d.js";
+import { createMatichico } from "./matichico3d.js";
 import { saveProgress, earnCoins } from "./storage.js";
 import * as audio from "./audio.js";
 import { campaignWin, campaign, campaignMode, campaignLevel, renderModePicker, LEVELS_PER_GAME } from "./campaign.js";
@@ -271,7 +271,6 @@ export class Porristas3DGame extends Game3D {
     }
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(this.character, this.outfit, this.look);
-    animeHero(this.hero);
     this.heroId = this.character.id;
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     this.hero.group.scale.setScalar(1.45);

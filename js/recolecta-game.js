@@ -8,7 +8,7 @@
 // con Shift, estrellas por nivel y música. Ahora son 8 canchas.
 
 import { THREE, Game3D, clamp, lerp, rand, loadTexture, canvasTexture, makeBunting, makeLogo, disposeTree } from "./three-kit.js";
-import { createMatichico, animeHero } from "./matichico3d.js";
+import { createMatichico } from "./matichico3d.js";
 import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates, findFreeSpot, getObstacles, getSpawn, pathLength, pointOnPath } from "./levels.js";
 import { saveProgress, addToLeaderboard, reportScore, earnCoins } from "./storage.js";
 import { recordRun } from "./progression.js";
@@ -212,7 +212,6 @@ export class RecolectaGame extends Game3D {
     }
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(this.character, this.outfit, this.look);
-    animeHero(this.hero);
     this.heroId = this.character.id;
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     this.hero.group.scale.setScalar(1.25);

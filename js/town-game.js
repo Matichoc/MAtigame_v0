@@ -7,7 +7,7 @@
 // "town-action" y abre lo que corresponda.
 
 import { THREE, Game3D, clamp, lerp, canvasTexture, loadTexture, roundedBox, makeStars } from "./three-kit.js";
-import { createMatichico, animeHero } from "./matichico3d.js";
+import { createMatichico } from "./matichico3d.js";
 import { CHARACTERS, getOutfit } from "./characters.js";
 import { ITEMS, OUTFITS } from "./wardrobe-data.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
@@ -65,6 +65,8 @@ export class TownGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 56 });
     this.musicTheme = "chill";
+    this.kawaii = true; // ambiente kawaii: tonos pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 38, hearts: 8, stars: 24, radius: 20, height: 10 };
     this.q = els.q;
     this.keys = {};
     this.joy = { x: 0, y: 0 };
@@ -419,7 +421,7 @@ export class TownGame extends Game3D {
     const crowns = new THREE.InstancedMesh(crownGeo, new THREE.MeshStandardMaterial({ roughness: 0.9, flatShading: true }), good.length);
     const mat = new THREE.Matrix4();
     const col = new THREE.Color();
-    const palette = [0x4aa84a, 0x5fc25a, 0x3d9a5a, 0xe8742a, 0xff8ab8];
+    const palette = [0x9be39a, 0xb7ecaa, 0x86d9b0, 0xffc2dc, 0xffa8cc, 0xffd9a0, 0xffb8d6]; // verdes suaves y árboles de sakura rosados
     good.forEach(([x, z, sc], i) => {
       mat.makeScale(sc, sc, sc).setPosition(x, 1.2 * sc, z);
       trunks.setMatrixAt(i, mat);
@@ -659,7 +661,6 @@ export class TownGame extends Game3D {
     }
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(this.character, this.outfit, this.look);
-    animeHero(this.hero);
     this.heroId = this.character.id;
     this.hero.group.scale.setScalar(1.08);
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
@@ -1105,6 +1106,7 @@ export class TownGame extends Game3D {
     const b = SKY[i + 1];
     const u = clamp((f - a[0]) / (b[0] - a[0]), 0, 1);
     this.tmpColor.setHex(a[1]).lerp(this.tmpColor2.setHex(b[1]), u);
+    this.tmpColor.lerp(this.tmpColor2.setHex(0xffd6ee), 0.28 * (1 - (a[4] + (b[4] - a[4]) * u))); // cielo con velo rosado (de día)
     if (this.event) this.tmpColor.lerp(this.tmpColor2.setHex(this.event.tint), 0.22);
     this.scene.background.copy(this.tmpColor);
     this.scene.fog.color.copy(this.tmpColor);

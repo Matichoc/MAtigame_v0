@@ -2,8 +2,8 @@
 // con tu Matichico y su mascota adentro. Lo que hay en cada lugar viene de
 // js/house-data.js; aquí solo se dibuja. Es liviano y solo corre cuando la pantalla está visible.
 
-import { THREE, canvasTexture, roundedBox, createRenderer, glAcquire } from "./three-kit.js";
-import { createMatichico, animeHero } from "./matichico3d.js";
+import { THREE, canvasTexture, roundedBox, createRenderer, glAcquire, toonify, makeAmbient } from "./three-kit.js";
+import { createMatichico } from "./matichico3d.js";
 import { getOutfit } from "./wardrobe-data.js";
 import { getHouseItem, houseItemsOfSpot, isWallItem } from "./house-data.js";
 
@@ -498,6 +498,8 @@ export class House3D {
 
     this.shell = null;
     this._buildShell(10);
+    this.ambient = makeAmbient(this.scene, { petals: 12, hearts: 8, stars: 30, radius: 7, height: 8 });
+    this.ambientC = new THREE.Vector3(0, 0, 0);
 
     this._resize = () => {
       const w = Math.max(1, canvas.clientWidth);
@@ -573,11 +575,12 @@ export class House3D {
   }
 
   /** Dibuja el Matichico (con su mascota) dentro del cuarto. */
+  _toon() { toonify(this.scene); }
+
   setHero(character, look, key) {
     if (!this.ready) return;
     if (this.hero) this.scene.remove(this.hero.group);
     this.hero = createMatichico(character, getOutfit(look.outfit), look);
-    animeHero(this.hero);
     this.hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
     this.hero.group.scale.setScalar(1.7);
     this.hero.group.position.set(this.life.hx, 0, this.life.hz);
@@ -587,6 +590,7 @@ export class House3D {
     this.life.state = "idle";
     this.life.target = null;
     this.life.t = 2;
+    this._toon();
   }
 
   /** `placed` = { lugar: idObjeto } con lo que hay en cada rincón. */
@@ -649,6 +653,7 @@ export class House3D {
     for (const { group } of this.furn.values()) { this.scene.remove(group); group.traverse((o) => { o.geometry?.dispose?.(); }); }
     this.furn.clear();
     for (const d of layout) this._addFurn(d);
+    this._toon();
   }
 
   _addFurn(d) {
@@ -661,6 +666,7 @@ export class House3D {
     this.scene.add(holder);
     this.furn.set(d.uid, { group: holder, data: d, item });
     this.updateFurn(d);
+    this._toon();
   }
 
   /** Vuelve a ubicar una pieza según sus datos (posición, giro, tamaño). */
@@ -1026,6 +1032,8 @@ export class House3D {
     this.time += dt;
     if (this.hero) this._lifeTick(dt);
     for (const f of this.ticks) f(this.time, dt);
+    if (this.ambient) this.ambient.update(this.time, dt, this.ambientC);
+    if ((this._tt = (this._tt || 0) + dt) > 0.5) { this._tt = 0; this._toon(); } // lo nuevo (pisos, muebles, techos) también entra al estilo
     this._syncSelRing();
     this.renderer.render(this.scene, this.camera);
     requestAnimationFrame(this._loop);

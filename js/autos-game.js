@@ -8,7 +8,7 @@
 // combo de alfajores, un hito cada kilómetro y música.
 
 import { THREE, Game3D, clamp, lerp, rand, loadTexture, canvasTexture, roundedBox, makeBunting, makeLogo, disposeGeometries } from "./three-kit.js";
-import { createMatichico, animeHero } from "./matichico3d.js";
+import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
 import { renderModePicker } from "./campaign.js";
@@ -367,7 +367,6 @@ export class AutosGame extends Game3D {
     }
     if (this.driver) this.car.remove(this.driver.group);
     this.driver = createMatichico(this.character, this.outfit, this.look);
-    animeHero(this.driver);
     this.driverId = this.character.id;
     this.driver.group.scale.setScalar(0.62);
     this.driver.group.position.set(0, 0.72, 0.4);

@@ -3,7 +3,7 @@
 // la feria; tu Matichico te anima. 4 niveles (6 a 12 parejas) con estrellas.
 
 import { THREE, Game3D, clamp, lerp, canvasTexture, roundedBox, makeBunting } from "./three-kit.js";
-import { createMatichico, animeHero } from "./matichico3d.js";
+import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
 import { campaign, campaignWin, renderLevelPicker, LEVELS_PER_GAME } from "./campaign.js";
@@ -249,7 +249,6 @@ export class MemoriaGame extends Game3D {
     }
     if (this.mascot) this.mascotRoot.remove(this.mascot.group);
     this.mascot = createMatichico(this.character, this.outfit, this.look);
-    animeHero(this.mascot);
     this.mascotId = this.character.id;
     this.mascot.group.scale.setScalar(1.5);
     this.mascot.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });

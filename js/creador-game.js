@@ -4,7 +4,7 @@
 // por WhatsApp (solo un mensaje, sin precios ni promesas).
 
 import { THREE, Game3D, canvasTexture, makeBunting } from "./three-kit.js";
-import { createMatichico, animeHero } from "./matichico3d.js";
+import { createMatichico } from "./matichico3d.js";
 import { saveProgress, earnCoins, reportScore, addToLeaderboard, saveCreation, deleteCreation, todayKey } from "./storage.js";
 import { recordRun } from "./progression.js";
 import * as audio from "./audio.js";
@@ -134,7 +134,6 @@ export class CreadorGame extends Game3D {
     }
     if (this.mascot) this.mascotRoot.remove(this.mascot.group);
     this.mascot = createMatichico(this.character, this.outfit, this.look);
-    animeHero(this.mascot);
     this.mascotId = this.character.id;
     this.mascot.group.scale.setScalar(1.1);
     this.mascot.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });

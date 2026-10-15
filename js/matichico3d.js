@@ -2,7 +2,7 @@
 // con surcos), ojos azules grandes, sonrisa con dientes, polera negra de Matichoc con cuello rosado y su
 // logo, jeans y zapatillas. Matichico trae un rulo de pelo; Chocolatina, un moño con flores.
 
-import { THREE, roundedBox, loadTexture, toonify, addOutline } from "./three-kit.js";
+import { THREE, roundedBox, loadTexture } from "./three-kit.js";
 import { applyLook, HEAD_W, HEAD_H, HEAD_D } from "./wardrobe3d.js";
 
 const LIFT = 0.26; // largo extra de las piernas: da las proporciones de los personajes de la web
@@ -377,12 +377,7 @@ export function createMatichico(character, outfit, look = null) {
     setLook(next) { applyLook(hero, next || {}); },
   };
   hero.setLook(look || { outfit: outfit && outfit.id });
+  outer.userData.noToon = true; // los personajes no llevan el estilo de ambiente (sombreado por tonos)
   return hero;
 }
 
-/** Estilo anime para el personaje principal: sombreado por tonos y contorno fino (no se usa en los NPC, para cuidar el rendimiento). */
-export function animeHero(hero, outline = 0.012) {
-  toonify(hero.group);
-  if (outline > 0) addOutline(hero.group, outline);
-  return hero;
-}
