@@ -14,6 +14,7 @@ import { createMatichico } from "./matichico3d.js";
 import { CHARACTERS, getOutfit } from "./characters.js";
 import { ITEMS, OUTFITS } from "./wardrobe-data.js";
 import { earnCoins, saveProgress, todayKey } from "./storage.js";
+import { spendEnergy, ENERGY_MISSION } from "./energy.js";
 import { recordRun } from "./progression.js";
 import { IS_DEMO, DEMO_LIMITS, showDemoWall } from "./demo.js";
 import * as audio from "./audio.js";
@@ -1536,6 +1537,11 @@ export class CiudadGame extends Game3D {
 
   _startMission(id) {
     const m = MISSIONS.find((x) => x.id === id);
+    if (!spendEnergy(this.progress, ENERGY_MISSION)) {
+      this._toast("😴 Sin energía para otra misión. ¡Recarga en el cofre, duerme en tu casa o espera un ratito!");
+      try { window.dispatchEvent(new CustomEvent("no-energy", { detail: { need: ENERGY_MISSION, game: "ciudad" } })); } catch (e) { /* sin ventana */ }
+      return;
+    }
     this.active = { id, step: "do", n: 0, data: {} };
     this.wayTo = null;
     const init = {

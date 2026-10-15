@@ -10,6 +10,7 @@ import * as audio from "./audio.js";
 import { recordRun, runBonus } from "./progression.js";
 import { campaignWin, campaignMode, campaignLevel, campaign, LEVELS_PER_GAME } from "./campaign.js";
 import { missionFor } from "./missions.js";
+import { costOf, spendEnergy } from "./energy.js";
 
 export { THREE };
 
@@ -470,11 +471,21 @@ export class Game3D {
 
   beginPlaying() {
     if (this.state === "playing") return;
+    if (!this._payEnergy()) return;
     this.state = "playing";
     this.showOverlay(null);
     if (this.musicTheme) audio.startMusic(this.musicTheme);
     this.onBegin?.();
     if (this.mission) this.banner(`🎯 Misión ${this.mission.n}: ${this.mission.text}`);
+  }
+
+  /** Cada partida gasta energía (ver js/energy.js). Sin energía no empieza: se avisa y se queda en la tarjeta de inicio. */
+  _payEnergy() {
+    const cost = costOf(this.gameId);
+    if (!(cost > 0) || !this.progress) return true;
+    if (spendEnergy(this.progress, cost)) return true;
+    try { window.dispatchEvent(new CustomEvent("no-energy", { detail: { need: cost, game: this.gameId } })); } catch (e) { /* sin ventana */ }
+    return false;
   }
 
   // ---------- modo misiones (juegos sin fin) ----------

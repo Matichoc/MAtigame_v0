@@ -1646,3 +1646,19 @@ details.how > :not(summary) { font-size: 0.85rem; margin: 6px 0 0; }
 
 /* pasos del Creador: objetivo táctil más cómodo */
 @media (pointer: coarse) { .cr-step { min-height: 34px; } }
+
+/* ---------- Energía ---------- */
+.lb-energy { position: relative; gap: 4px; }
+.lb-energy b { font-size: 1.05em; }
+.lb-energy small { opacity: 0.75; font-weight: 700; }
+.lb-energy .en-next { font-size: 0.68rem; opacity: 0.85; }
+.lb-energy.low { background: rgba(220,60,60,0.28); border-color: #ff8a8a; }
+.lb-energy .lv-dot { position: absolute; top: -3px; right: -3px; }
+.en-card { max-width: min(420px, 94vw); }
+.en-card p { margin: 0; }
+.en-bar { position: relative; height: 26px; border-radius: 999px; background: rgba(255,255,255,0.14); overflow: hidden; border: 2px solid var(--dorado, #ffc800); }
+.en-bar i { position: absolute; inset: 0 auto 0 0; width: 100%; background: linear-gradient(90deg, #ffd34d, #ff9d00); transition: width 0.4s; }
+.en-bar span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #3d1f10; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
+.en-sub { font-size: 0.85rem; opacity: 0.85; }
+.en-ways { list-style: none; margin: 4px 0 0; padding: 0; text-align: left; font-size: 0.82rem; display: flex; flex-direction: column; gap: 3px; opacity: 0.92; }
+@media (max-height: 520px) { .en-card .en-ways { display: none; } .modal-card.en-card { padding: 12px 16px; gap: 6px; } }

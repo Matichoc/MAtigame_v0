@@ -7,6 +7,7 @@
 // con Matipuntos, sin compras reales.
 
 import { earnCoins, saveProgress, todayKey, getBestScore } from "./storage.js";
+import { addEnergy } from "./energy.js";
 import { getItem } from "./wardrobe-data.js";
 import { activeEvent, addEventTokens } from "./events.js";
 import { isUnlocked } from "./unlocks.js";
@@ -72,6 +73,7 @@ export function addXp(progress, amount) {
       if (!progress.wardrobe.owned.includes(giftId)) progress.wardrobe.owned.push(giftId);
       gift = getItem(giftId);
     }
+    addEnergy(progress, 10, "nivel");
     ups.push({ level: l, coins, gift });
     emit({ type: "level", level: l, coins, gift });
   }
@@ -174,6 +176,7 @@ export function claimMission(progress, index) {
   m.claimed = true;
   progress.stats.missionsClaimed = (progress.stats.missionsClaimed || 0) + 1;
   earnCoins(progress, m.coins);
+  addEnergy(progress, 5, "misión");
   const ups = addXp(progress, m.xp);
   saveProgress(progress);
   return { coins: m.coins, xp: m.xp, ups };
@@ -188,6 +191,7 @@ export function claimChest(progress) {
   if (!canClaimChest(progress)) return null;
   progress.daily.chest = true;
   earnCoins(progress, 30);
+  addEnergy(progress, 15, "cofre del día");
   progress.packs = (progress.packs || 0) + 1;
   const ups = addXp(progress, 40);
   saveProgress(progress);

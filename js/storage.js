@@ -6,6 +6,7 @@
 
 import { getItem, EMPTY_LOOK } from "./wardrobe-data.js";
 import { queueSync } from "./online.js";
+import { addEnergy } from "./energy.js";
 
 const SAVE_PREFIX = "matichoc_save_v3_profile_";
 const DEFAULT_OUTFIT = "polera";
@@ -216,6 +217,7 @@ export function claimAchievement(progress, achievement) {
   if (!achievement.isDone(progress)) return false;
   progress.claimedAchievements.push(achievement.id);
   earnCoins(progress, achievement.reward);
+  addEnergy(progress, achievement.reward >= 150 ? 10 : 5, "logro");
   saveProgress(progress);
   return true;
 }

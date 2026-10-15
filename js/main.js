@@ -24,6 +24,7 @@ import {
   spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, TRADE_NORMAL, TRADE_FOIL,
 } from "./progression.js";
 import { rankingEnabled, fetchRanking } from "./online.js";
+import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_MISSION } from "./energy.js";
 
 let progress = null;
 let selectedCharacter = null;
@@ -203,12 +204,64 @@ function refreshHubStats() {
   document.getElementById("hub-level").textContent = String(lv.level);
   document.getElementById("hub-xp-fill").style.width = `${Math.round((lv.into / lv.need) * 100)}%`;
   document.getElementById("hub-progress-dot").classList.toggle("hidden", !hasPending(progress));
+  renderEnergy();
   const hs = document.getElementById("house-banner-sub");
   if (hs && progress.house) {
     const n = (progress.house.layout || []).length;
     hs.textContent = `${houseSize(progress).name}${n ? ` · ${n} mueble${n > 1 ? "s" : ""}` : ""} — ¡arrastra muebles, decora y agranda tu casa!`;
   }
 }
+
+
+// ---------- ENERGÍA ----------
+const enDlg = document.getElementById("energy-dialog");
+let enOpen = false;
+function renderEnergy() {
+  if (!progress) return;
+  const i = energyInfo(progress);
+  document.getElementById("hub-energy").textContent = String(i.v);
+  document.getElementById("hub-energy-next").textContent = i.v < i.max ? `+1 en ${fmtSecs(i.nextInSecs)}` : "";
+  document.getElementById("hub-energy-dot").classList.toggle("hidden", !i.chestReady);
+  document.getElementById("btn-energy").classList.toggle("low", i.v < 5);
+  if (!enOpen) return;
+  document.getElementById("en-fill").style.width = `${Math.min(100, Math.round((i.v / i.max) * 100))}%`;
+  document.getElementById("en-count").textContent = i.v > i.max ? `${i.v} (¡extra!)` : `${i.v}/${i.max}`;
+  document.getElementById("en-next").textContent = i.v >= i.max ? "¡Energía llena!" : `${i.sleeping ? "😴 Durmiendo: " : ""}+1 ⚡ en ${fmtSecs(i.nextInSecs)} · llena en ${fmtSecs(i.fullInSecs)}`;
+  document.getElementById("en-chest").classList.toggle("hidden", !i.chestReady);
+  document.getElementById("en-chest-wait").textContent = i.chestReady ? "" : `🎁 Próximo cofre del tesoro en ${fmtSecs(i.chestInSecs)}`;
+  document.getElementById("en-sleep").classList.toggle("hidden", i.v >= i.max);
+}
+function openEnergy(need = 0, game = "") {
+  if (!progress) return;
+  const i = energyInfo(progress);
+  document.getElementById("en-icon").textContent = need ? "😴" : "⚡";
+  document.getElementById("en-title").textContent = need ? "¡Matichico está cansado!" : "Tu energía";
+  document.getElementById("en-text").textContent = need
+    ? `Para jugar ${game ? "esto " : ""}necesitas ${need} ⚡ y tienes ${i.v}. Puedes seguir decorando tu casa, vistiendo a tu Matichico, pasear por el Pueblo y Ciudad Choco, o recargar:`
+    : `Cada partida gasta un poco de energía (entre ${Math.min(...Object.values(ENERGY_COST).filter((c) => c > 0))} y ${Math.max(...Object.values(ENERGY_COST))}; una misión de Ciudad Choco, ${ENERGY_MISSION}). Se recarga sola y con premios:`;
+  enOpen = true;
+  enDlg.classList.remove("hidden");
+  renderEnergy();
+}
+function closeEnergy() { enOpen = false; enDlg.classList.add("hidden"); }
+document.getElementById("btn-energy").addEventListener("click", () => openEnergy());
+document.getElementById("en-close").addEventListener("click", closeEnergy);
+document.getElementById("en-chest").addEventListener("click", () => {
+  const r = claimEnergyChest(progress);
+  if (!r) return;
+  audio.playPurchase();
+  showToast(r.energy ? `🎁 ¡Cofre del tesoro! +${r.energy} ⚡ y +${r.coins} 🍫✨` : `🎁 ¡Cofre! Hoy ya tienes toda la energía extra, así que te da +${r.coins} 🍫✨`);
+  refreshHubStats();
+  renderEnergy();
+});
+document.getElementById("en-sleep").addEventListener("click", () => {
+  closeEnergy();
+  window.__sleepOnEnter = true;
+  document.getElementById("btn-open-house").click();
+});
+window.addEventListener("no-energy", (e) => openEnergy(e.detail.need, e.detail.game));
+window.addEventListener("energy-gain", (e) => { showToast(`⚡ +${e.detail.n} energía${e.detail.reason ? ` (${e.detail.reason})` : ""}`); renderEnergy(); });
+setInterval(renderEnergy, 1000);
 
 // ---------- PERFILES ("¿Quién juega?") ----------
 
