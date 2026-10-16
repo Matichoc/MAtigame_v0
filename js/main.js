@@ -16,7 +16,7 @@ import { ACHIEVEMENTS, ACHIEVEMENT_CHAINS, CATEGORIES as ACH_CATEGORIES, achieve
 import { activeEvent, eventById, eventEnd, nextEvent, eventTokens, eventItemAvailable, buyEventItem } from "./events.js";
 import {
   HOUSE_SPOTS, houseItemsOfSpot, getHouseItem, ownsHouseItem, buyHouseItem, placeHouseItem, placedWithDefaults,
-  FURN_CATEGORIES, furnitureOf, isWallItem, houseLayout, layoutAdd, layoutRemove, buyFurniture, HOUSE_SIZES, houseSize, buyHouseSize,
+  FURN_CATEGORIES, furnitureOf, isWallItem, houseLayout, layoutAdd, layoutRemove, buyFurniture, copiesOf, placedCount, HOUSE_SIZES, houseSize, buyHouseSize,
   ROOM_TYPES, MAX_ROOMS, roomType, roomsOf, nextRoomOf, roomHasBed, switchRoom, buyRoom,
 } from "./house-data.js";
 import {
@@ -978,18 +978,23 @@ function renderHouseDecor() {
   if (!shown.length) addEmptyNote(houseGridEl, houseView, "¡Ya tienes todo de esta categoría! 🎉", "Aquí aún no tienes nada. ¡Mira lo que hay por comprar!", () => { houseView = wantOwn ? "buy" : "own"; houseBuying = null; clearFurniturePreview(); renderHouse(); });
   shown.forEach((item) => {
     const owned = ownsHouseItem(progress, item.id);
-    const count = houseLayout(progress).filter((f) => f.id === item.id).length;
+    const total = copiesOf(progress, item.id);
+    const placed = placedCount(progress, item.id);
+    const free = total - placed; // unidades guardadas listas para poner
     const card = document.createElement("button");
     card.type = "button";
     card.className = "sh-card" + (!owned ? " locked" : "") + (houseBuying === item.id ? " trying" : "");
     card.style.setProperty("--rar", RARITIES[item.rarity].color);
     card.innerHTML = `<span class="sh-ico">${item.icon}</span><span class="sh-name">${item.name}</span>` +
-      `<span class="sh-price">${owned ? `＋ Poner${count ? ` (${count} puesto${count > 1 ? "s" : ""})` : ""}` : `🍫✨ ${item.price}`}</span>`;
+      `<span class="sh-price">${!owned ? `🍫✨ ${item.price}` : free > 0 ? `＋ Poner${total > 1 ? ` (${free} libre${free > 1 ? "s" : ""})` : ""}` : item.price > 0 ? `✓ Puesto · 🍫✨ ${item.price} otro` : "✓ Puesto"}</span>`;
     card.addEventListener("click", () => {
       if (card.dataset.dragged) { delete card.dataset.dragged; return; }
-      if (owned) { clearFurniturePreview(); houseBuying = null; placeFurniture(item.id); renderHouse(); } else { houseBuying = item.id; startFurniturePreview(item.id); renderHouse(); }
+      if (owned && free > 0) { clearFurniturePreview(); houseBuying = null; placeFurniture(item.id); renderHouse(); }
+      else if (owned && item.price <= 0) showToast(`${item.icon} ${item.name} ya está puesto. Tócalo en el cuarto para moverlo o quitarlo.`);
+      else if (owned) { houseBuying = item.id; startFurniturePreview(item.id); showToast(`Ya tienes puesto ${item.name}. Si quieres otro igual, puedes comprarlo 🍫✨ ${item.price}`); renderHouse(); }
+      else { houseBuying = item.id; startFurniturePreview(item.id); renderHouse(); }
     });
-    if (owned) bindCardDrag(card, item.id);
+    if (owned && free > 0) bindCardDrag(card, item.id);
     houseGridEl.appendChild(card);
   });
   const bi = houseBuying && getHouseItem(houseBuying);
@@ -1000,12 +1005,13 @@ function renderHouseDecor() {
     txt.innerHTML = `<b>${bi.icon} ${bi.name}</b> <i style="color:${RARITIES[bi.rarity].color}">${RARITIES[bi.rarity].name}</i>`;
     const buy = document.createElement("button");
     buy.className = "btn-primary";
-    buy.textContent = need > 0 ? `Te faltan ${need} 🍫✨ para comprarlo` : `Comprar · 🍫✨ ${bi.price}`;
+    const another = ownsHouseItem(progress, bi.id);
+    buy.textContent = need > 0 ? `Te faltan ${need} 🍫✨ para comprarlo` : `${another ? "Comprar otro" : "Comprar"} · 🍫✨ ${bi.price}`;
     buy.disabled = need > 0;
     buy.addEventListener("click", () => {
       if (!buyFurniture(progress, bi.id)) return;
       audio.playPurchase();
-      showToast(`¡Compraste ${bi.name}! 🎉 Ahora está en 🎒 Lo que tengo`);
+      showToast(another ? `¡Compraste otro ${bi.name}! 🎉` : `¡Compraste ${bi.name}! 🎉 Ahora está en 🎒 Lo que tengo`);
       const where = housePreview ? { ...housePreview } : null;
       houseBuying = null;
       clearFurniturePreview();
@@ -1020,7 +1026,7 @@ function renderHouseDecor() {
     houseBarEl.append(txt, buy, cancel);
   } else {
     houseBarEl.className = "sh-bar hint";
-    houseBarEl.innerHTML = `<div class="sh-bar-txt">${houseView === "own" ? "Toca un mueble tuyo para ponerlo (o arrástralo al cuarto)." : "Toca un mueble para verlo en tu cuarto antes de comprarlo."} Toca uno puesto para moverlo, girarlo o cambiarle el tamaño.</div>`;
+    houseBarEl.innerHTML = `<div class="sh-bar-txt">${houseView === "own" ? "Toca un mueble tuyo para ponerlo (o arrástralo al cuarto). Cada compra se puede poner una sola vez." : "Toca un mueble para verlo en tu cuarto antes de comprarlo."} Toca uno puesto para moverlo, girarlo, cambiarle el tamaño o quitarlo (🗑 lo guarda en Lo que tengo).</div>`;
   }
 }
 

@@ -113,6 +113,7 @@ export function loadProgress(profileId) {
         layout: parsed.house && Array.isArray(parsed.house.layout) ? parsed.house.layout.map((f) => ({ ...f })) : null,
         size: (parsed.house && parsed.house.size) || 0,
         starterBed: !!(parsed.house && parsed.house.starterBed),
+        copies: parsed.house && parsed.house.copies && typeof parsed.house.copies === "object" ? { ...parsed.house.copies } : {}, // cuántas unidades tienes de cada mueble (por defecto 1)
         // habitaciones extra (ver js/house-data.js): lista, cuál está abierta y lo guardado de las que no están abiertas
         rooms: parsed.house && Array.isArray(parsed.house.rooms) ? parsed.house.rooms.map((r) => ({ ...r })) : null,
         roomData: parsed.house && parsed.house.roomData && typeof parsed.house.roomData === "object" ? JSON.parse(JSON.stringify(parsed.house.roomData)) : {},

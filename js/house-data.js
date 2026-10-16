@@ -209,9 +209,28 @@ export function houseLayout(progress) {
   return h.layout;
 }
 
+/** Cuántas unidades de un mueble tienes (cada compra es una unidad: se puede poner una sola vez cada una). */
+export function copiesOf(progress, id) {
+  if (!ownsHouseItem(progress, id)) return 0;
+  const n = Math.floor(Number((progress.house.copies || {})[id]));
+  return n >= 1 ? n : 1;
+}
+
+/** Cuántas están puestas hoy, sumando todos los cuartos de la casa. */
+export function placedCount(progress, id) {
+  const h = progress.house;
+  let n = houseLayout(progress).filter((f) => f.id === id).length;
+  for (const [rid, d] of Object.entries(h.roomData || {})) if (rid !== h.curRoom && d && Array.isArray(d.layout)) n += d.layout.filter((f) => f.id === id).length;
+  return n;
+}
+
+/** Unidades que tienes guardadas (en "Lo que tengo") listas para poner. */
+export const freeCopies = (progress, id) => copiesOf(progress, id) - placedCount(progress, id);
+
 export function layoutAdd(progress, id, x = 0, z = 1.5) {
   const item = getHouseItem(id);
   if (!item || !ownsHouseItem(progress, id)) return null;
+  if (freeCopies(progress, id) <= 0) return null; // ya están todas puestas: para otro igual hay que comprar otro
   const piece = isWallItem(item) ? { uid: newUid(), id, wall: "back", u: 0, y: 2.8, s: 1 } : { uid: newUid(), id, x, z, rot: 0, s: 1 };
   houseLayout(progress).push(piece);
   saveProgress(progress);
@@ -225,12 +244,16 @@ export function layoutRemove(progress, uid) {
   saveProgress(progress);
 }
 
-/** Compra un mueble sin ponerlo (se agrega con un toque). */
+/** Compra un mueble (o "otro igual" si ya lo tienes: cada compra es una unidad más). Se agrega con un toque. */
 export function buyFurniture(progress, id) {
   const item = getHouseItem(id);
-  if (!item || ownsHouseItem(progress, id)) return false;
+  if (!item || item.price <= 0) return false;
+  const h = progress.house;
+  const had = ownsHouseItem(progress, id);
   if (!spendCoins(progress, item.price)) return false;
-  progress.house.owned.push(id);
+  if (!had) h.owned.push(id);
+  h.copies = h.copies || {};
+  h.copies[id] = had ? copiesOf(progress, id) + 1 : 1;
   saveProgress(progress);
   return true;
 }
@@ -324,9 +347,14 @@ export function buyRoom(progress, typeId) {
   const same = rooms.filter((r) => r.type === t.id).length;
   const rid = `r${Date.now().toString(36)}${(uidCounter++).toString(36)}`;
   const layout = [];
+  h.copies = h.copies || {};
   for (const [id, x, z, rot] of t.starter || []) {
     if (!getHouseItem(id)) continue;
-    if (!h.owned.includes(id) && getHouseItem(id).price > 0) h.owned.push(id);
+    // los muebles de regalo del cuarto son unidades nuevas (aunque ya tengas uno igual en otro cuarto)
+    if (getHouseItem(id).price > 0) {
+      if (h.owned.includes(id)) h.copies[id] = copiesOf(progress, id) + 1;
+      else { h.owned.push(id); h.copies[id] = 1; }
+    } else h.copies[id] = copiesOf(progress, id) + 1;
     layout.push({ uid: newUid(), id, x, z, rot: rot || 0, s: 1 });
   }
   for (const id of [t.floor, t.wall]) if (id && getHouseItem(id).price > 0 && !h.owned.includes(id)) h.owned.push(id);
