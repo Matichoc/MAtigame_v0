@@ -432,6 +432,7 @@ export class MemoriaGame extends Game3D {
     } else {
       this.second = card;
       this.moves++;
+      this.countEnergy("intentos", 2); // cada 2 intentos gasta 1 ⚡
       if (this.first.pi === card.pi) {
         this.busy = 0.7;
         this.resolveTimer = 0.55;

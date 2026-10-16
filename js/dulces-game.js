@@ -610,6 +610,7 @@ export class DulcesGame extends Game3D {
       return;
     }
     this.moves--;
+    this.countEnergy("mov", 1); // cada movimiento gasta 1 ⚡
     this.moveCount++;
     this.combo = 0;
     // piezas especiales intercambiadas se activan solas

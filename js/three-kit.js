@@ -10,7 +10,7 @@ import * as audio from "./audio.js";
 import { recordRun, runBonus } from "./progression.js";
 import { campaignWin, campaignMode, campaignLevel, campaign, LEVELS_PER_GAME } from "./campaign.js";
 import { missionFor } from "./missions.js";
-import { costOf, spendEnergy } from "./energy.js";
+import { costOf, spendEnergy, energyOf } from "./energy.js";
 
 export { THREE };
 
@@ -491,6 +491,10 @@ export class Game3D {
   beginPlaying() {
     if (this.state === "playing") return;
     if (!this._payEnergy()) return;
+    this._em = {}; // contadores del gasto por acción (ver meterEnergy / countEnergy)
+    this._ec = {};
+    this._eT = 0;
+    this._lowWarned = false;
     this.state = "playing";
     this.showOverlay(null);
     if (this.musicTheme) audio.startMusic(this.musicTheme);
@@ -505,6 +509,70 @@ export class Game3D {
     if (spendEnergy(this.progress, cost)) return true;
     try { window.dispatchEvent(new CustomEvent("no-energy", { detail: { need: cost, game: this.gameId } })); } catch (e) { /* sin ventana */ }
     return false;
+  }
+
+  /**
+   * Gasto de energía DURANTE la partida (además de la entrada): cada tiro, cada pieza, cada movimiento, cada tanto
+   * de camino... Devuelve false si no alcanzó (la partida termina con un aviso amable y se conserva el puntaje).
+   */
+  spendAction(n = 1) {
+    if (!(n > 0) || !this.progress || this.state !== "playing") return true;
+    if (spendEnergy(this.progress, n)) {
+      this._showSpend(n);
+      return true;
+    }
+    this._outOfEnergy();
+    return false;
+  }
+
+  /** Gasta `cost` cada vez que `value` cruza un múltiplo de `every` (distancia, altura, piezas, rebotes...). */
+  meterEnergy(key, value, every, cost = 1) {
+    if (this.state !== "playing") return true;
+    if (!this._em) this._em = {};
+    const k = Math.floor(value / every);
+    while ((this._em[key] || 0) < k && this.state === "playing") {
+      this._em[key] = (this._em[key] || 0) + 1;
+      if (!this.spendAction(cost)) return false;
+    }
+    return true;
+  }
+
+  /** Cuenta una acción (un tiro, una pieza...) y gasta `cost` cada `every` veces. */
+  countEnergy(key, every = 1, cost = 1) {
+    if (this.state !== "playing") return true;
+    if (!this._ec) this._ec = {};
+    this._ec[key] = (this._ec[key] || 0) + 1;
+    return this._ec[key] % every === 0 ? this.spendAction(cost) : true;
+  }
+
+  _outOfEnergy() {
+    try { window.dispatchEvent(new CustomEvent("no-energy", { detail: { need: 1, game: this.gameId, mid: true } })); } catch (e) { /* sin ventana */ }
+    this.haptic(60);
+    if (this.onNoEnergy) this.onNoEnergy();
+    else this.finish("😴 ¡Matichico se quedó sin energía! Descansa un ratito (o duerme en tu casa) y sigue jugando.");
+  }
+
+  /** Cartelito "-1 ⚡ 73" arriba al centro cada vez que se gasta, y aviso cuando queda poca. */
+  _showSpend(n) {
+    const left = Math.floor(energyOf(this.progress).v);
+    let el = document.getElementById("game-energy");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "game-energy";
+      el.className = "game-energy hidden";
+      document.body.appendChild(el);
+    }
+    el.innerHTML = `<b>-${n}</b> ⚡ <span>${left}</span>`;
+    el.classList.toggle("low", left <= 10);
+    el.classList.remove("hidden", "pop");
+    void el.offsetWidth;
+    el.classList.add("pop");
+    clearTimeout(this._enHide);
+    this._enHide = setTimeout(() => el.classList.add("hidden"), 2600);
+    if (left <= 10 && !this._lowWarned) {
+      this._lowWarned = true;
+      this.banner(`🔋 ¡Poca energía! Te quedan ${left} ⚡`);
+    }
   }
 
   // ---------- modo misiones (juegos sin fin) ----------
@@ -651,6 +719,11 @@ export class Game3D {
     this._adaptQuality(dt);
     this.update(dt);
     this._missionTick(dt);
+    if (this.state === "playing" && this.energyEvery) {
+      // juegos de correr/avanzar sin acciones claras: gastan 1 cada cierto tiempo
+      this._eT = (this._eT || 0) + dt;
+      if (this._eT >= this.energyEvery) { this._eT -= this.energyEvery; this.spendAction(1); }
+    }
     if (this.state === "playing" && this.progress) {
       // tiempo jugado (para los logros de constancia); se guarda cada ~10 s
       this._playAcc = (this._playAcc || 0) + dt;

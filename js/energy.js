@@ -19,12 +19,18 @@ export const EXTRA_DAILY_MAX = 50; // máximo de energía extra por día
 export const CHEST_EVERY = 40 * 60 * 1000; // un cofre del tesoro cada 40 minutos
 export const CHEST_ENERGY = 10;
 
-/** Cuánto cuesta empezar una partida de cada juego (0 = gratis). */
+/** Cuánto cuesta ENTRAR a jugar cada juego (0 = gratis). Además, durante la partida se gasta por acción (ver ENERGY_RULE). */
 export const ENERGY_COST = {
-  memoria: 4, tetris: 5, salto: 5, autos: 5, porristas: 5, basquet_tiros: 5, recolecta: 6, parkour: 6, dulces: 6,
-  futbol: 8, aventura: 8, fps3d: 5,
+  memoria: 4, tetris: 6, salto: 8, autos: 8, porristas: 6, basquet_tiros: 4, recolecta: 8, parkour: 8, dulces: 4,
+  futbol: 4, aventura: 8, fps3d: 5, merge: 0,
   ciudad: 0, // explorar es gratis; cada misión cuesta ENERGY_MISSION
   town: 0, creador: 0,
+};
+/** Lo que se gasta mientras se juega (para mostrarlo en las tarjetas). */
+export const ENERGY_RULE = {
+  basquet_tiros: "1 por tiro", futbol: "1 por tiro", tetris: "1 cada 4 piezas", dulces: "1 por movimiento",
+  memoria: "1 cada 2 intentos", autos: "1 cada 250 m", parkour: "1 cada 60 m", salto: "1 cada 15 m alto",
+  porristas: "1 cada 6 rebotes", recolecta: "1 cada 12 s", aventura: "1 cada 20 s", merge: "1 por pieza nueva",
 };
 export const ENERGY_MISSION = 2; // misión de Ciudad Choco
 export const costOf = (gameId) => (gameId in ENERGY_COST ? ENERGY_COST[gameId] : 5);

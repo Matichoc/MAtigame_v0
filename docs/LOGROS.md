@@ -83,6 +83,8 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | ✨ **Cazador de Brillos** | Junta 20 alfajores dorados en Ciudad Choco → Junta 100 alfajores dorados en Ciudad Choco → Junta 300 alfajores dorados en Ciudad Choco → Junta 800 alfajores dorados en Ciudad Choco | 10 / 30 / 70 / 180 |
 | 👟 **Pisotones** | Pisa 20 enemigos en Aventura Choco → Pisa 100 enemigos en Aventura Choco → Pisa 300 enemigos en Aventura Choco → Pisa 800 enemigos en Aventura Choco | 10 / 30 / 70 / 180 |
 | 🍫 **Alfajorero** | Junta 100 alfajores en Aventura Choco → Junta 500 alfajores en Aventura Choco → Junta 1.500 alfajores en Aventura Choco → Junta 4.000 alfajores en Aventura Choco | 10 / 30 / 70 / 180 |
+| 🍬 **Maestro del Merge** | Llega al producto nivel 4 en Mati Merge (el 13 es la Mati Dubai) → Llega al producto nivel 7 en Mati Merge (el 13 es la Mati Dubai) → Llega al producto nivel 10 en Mati Merge (el 13 es la Mati Dubai) → Llega al producto nivel 13 en Mati Merge (el 13 es la Mati Dubai) | 10 / 30 / 70 / 240 |
+| 📦 **Proveedor Estrella** | Entrega 5 pedidos de clientes en Mati Merge → Entrega 25 pedidos de clientes en Mati Merge → Entrega 80 pedidos de clientes en Mati Merge → Entrega 250 pedidos de clientes en Mati Merge | 10 / 30 / 70 / 180 |
 | ✨ **Piezas especiales** | Crea 10 piezas especiales (rayadas, bombas doradas y envueltas) → Crea 40 piezas especiales (rayadas, bombas doradas y envueltas) → Crea 120 piezas especiales (rayadas, bombas doradas y envueltas) → Crea 300 piezas especiales (rayadas, bombas doradas y envueltas) | 10 / 30 / 70 / 180 |
 
 ## 🏘️ Pueblo y creación
@@ -106,8 +108,10 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 
 | Logro | Meta | Premio (Matipuntos) |
 |---|---|---|
-| 📖 **Coleccionista** | Junta 6 figuritas distintas (hay 24) → Junta 12 figuritas distintas (hay 24) → Junta 18 figuritas distintas (hay 24) → Junta 24 figuritas distintas (hay 24) | 10 / 35 / 90 / 240 |
-| 📦 **Abridor de sobres** | Abre 5 sobres → Abre 20 sobres → Abre 50 sobres | 10 / 40 / 110 |
+| 📖 **Coleccionista** | Junta 6 figuritas distintas (hay 96) → Junta 12 figuritas distintas (hay 96) → Junta 24 figuritas distintas (hay 96) → Junta 48 figuritas distintas (hay 96) → Junta 72 figuritas distintas (hay 96) → Junta 96 figuritas distintas (hay 96) | 10 / 35 / 90 / 180 / 300 / 600 |
+| 📚 **Páginas completas** | Completa 1 páginas del álbum (hay 6) → Completa 3 páginas del álbum (hay 6) → Completa 6 páginas del álbum (hay 6) | 25 / 70 / 240 |
+| 💰 **Vendedor de repetidas** | Gana 50 Matipuntos vendiendo repetidas → Gana 250 Matipuntos vendiendo repetidas → Gana 1.000 Matipuntos vendiendo repetidas | 10 / 35 / 120 |
+| 📦 **Abridor de sobres** | Abre 5 sobres → Abre 20 sobres → Abre 50 sobres → Abre 100 sobres | 10 / 40 / 110 / 240 |
 | 🎯 **Cumplidor diario** | Cumple 5 misiones diarias → Cumple 25 misiones diarias → Cumple 100 misiones diarias | 10 / 55 / 180 |
 | ⭐ **Subiendo de nivel** | Llega al nivel 5 → Llega al nivel 10 → Llega al nivel 20 → Llega al nivel 30 → Llega al nivel 45 → Llega al nivel 60 | 10 / 30 / 70 / 150 / 300 / 600 |
 | 💰 **Ahorrista mayor** | Gana 500 Matipuntos en total → Gana 2.000 Matipuntos en total → Gana 6.000 Matipuntos en total → Gana 15.000 Matipuntos en total | 15 / 40 / 110 / 270 |
@@ -122,6 +126,6 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | 🌈 **Leyenda de dos mundos** | Llega a 5000 m en el Parkour infinito y a 25000 puntos en Salto Choco el mismo perfil. | 240 |
 | 🕹️ **Dueño de la Arcade** | Canjea con Matipuntos los 4 juegos nuevos: Fútbol, Choco Match, Aventura y Ciudad Choco. | 240 |
 | 🗓️ **Un mes con Matichoc** | Juega 30 días distintos y llega al nivel 20. | 300 |
-| 🧿 **Cazador de logros** | Cumple 10 logros → Cumple 30 logros → Cumple 60 logros → Cumple 100 logros → Cumple 245 logros | 20 / 60 / 150 / 300 / 900 |
+| 🧿 **Cazador de logros** | Cumple 10 logros → Cumple 30 logros → Cumple 60 logros → Cumple 100 logros → Cumple 262 logros | 20 / 60 / 150 / 300 / 900 |
 
-**Total: 250 logros · 22.165 Matipuntos en premios.**
+**Total: 267 logros · 24.385 Matipuntos en premios.**

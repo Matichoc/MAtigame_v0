@@ -257,6 +257,7 @@ export class AventuraGame extends Game3D {
     this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
     this.ambientOpts = { petals: 28, hearts: 5, stars: 18, radius: 14, height: 9 };
     this.musicTheme = "adventure";
+    this.energyEvery = 20; // 1 ⚡ cada 20 s de juego
     this.q = els.q;
     this.keys = { left: false, right: false, jump: false, down: false, fire: false };
     this.level = 1;

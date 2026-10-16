@@ -143,6 +143,7 @@ export class RecolectaGame extends Game3D {
     this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
     this.ambientOpts = { petals: 28, hearts: 5, stars: 18, radius: 14, height: 9 };
     this.musicTheme = "arcade";
+    this.energyEvery = 12; // 1 ⚡ cada 12 s de juego
     this.keys = {};
     this.levelIndex = 0;
     this.q = els.q;

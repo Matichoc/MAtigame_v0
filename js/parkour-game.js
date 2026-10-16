@@ -641,6 +641,7 @@ export class ParkourGame extends Game3D {
     this.power = null;
     this.aura.visible = false;
     this.stageReached = 0;
+    this._travel = 0;
     this.itemsGot = 0;
     this.goldGot = 0;
     this.falls = 0;
@@ -797,6 +798,10 @@ export class ParkourGame extends Game3D {
     const acc = (this.grounded ? 75 : 30) * dt;
     V.x += clamp(tx - V.x, -acc, acc);
     V.z += clamp(tz - V.z, -acc, acc);
+    if (this.state === "playing") { // el camino recorrido (en cualquier dirección) gasta 1 ⚡ cada 60 m
+      this._travel = (this._travel || 0) + Math.hypot(V.x, V.z) * dt;
+      this.meterEnergy("camino", this._travel, 60);
+    }
     if (inp.mag > 0.1) this.heroYaw = Math.atan2(inp.x, inp.z);
 
     // salto

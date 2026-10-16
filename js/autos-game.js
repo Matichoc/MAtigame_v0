@@ -543,6 +543,7 @@ export class AutosGame extends Game3D {
       this.speed = lerp(this.speed, 0, 1 - Math.exp(-2.5 * dt));
     }
     this.dist += this.speed * dt;
+    this.meterEnergy("dist", this.dist, 250); // 1 ⚡ cada 250 m
     this.curvNow = lerp(this.curvNow, this.curv(), 1 - Math.exp(-2 * dt));
 
     // carril

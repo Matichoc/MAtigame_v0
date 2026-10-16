@@ -506,6 +506,7 @@ export class Basquet3DGame extends Game3D {
   }
 
   _launchBall() {
+    if (!this.spendAction(1)) return; // cada lanzamiento gasta 1 ⚡
     const accErr = this.aimLocked - this.aimTarget;
     const powErr = this.powerLocked - this.powerTarget;
     const aErr = Math.abs(accErr);

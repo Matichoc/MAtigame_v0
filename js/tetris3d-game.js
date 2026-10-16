@@ -584,6 +584,7 @@ export class Tetris3DGame extends Game3D {
   }
 
   _lockPiece() {
+    this.countEnergy("piezas", 4); // cada 4 piezas gasta 1 ⚡
     const style = PIECE_STYLE[this.current.type];
     let toppedOut = false;
     const powers = [];

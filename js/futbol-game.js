@@ -743,6 +743,7 @@ export class FutbolGame extends Game3D {
   // ---------- el tiro ----------
 
   _kick(power) {
+    if (!this.spendAction(1)) return; // cada tiro gasta 1 ⚡
     this.phase = "runup";
     this.runT = 0;
     this.kickPower = power;

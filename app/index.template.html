@@ -1113,6 +1113,52 @@
     </div>
   </section>
 
+  <!-- PANTALLA DE JUEGO 3D: MATI MERGE (juntar productos) -->
+  <section id="screen-merge" class="screen game-screen hidden">
+    <div id="merge-hud" class="hud">
+      <div class="hud-left">
+        <button id="merge-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="merge-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Mati Merge</div>
+          <div class="hud-mission" id="merge-hud-name">Bombón</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">🏆 <span id="merge-hud-best">1/13</span></div>
+        <div class="hud-chip">📦 <span id="merge-hud-free">0</span></div>
+        <div class="hud-chip">🍫✨ <span id="merge-hud-coins">0</span></div>
+        <button id="merge-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="merge-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="merge-canvas"></canvas>
+      <div id="merge-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="merge-popups" class="fps-popups" aria-hidden="true"></div>
+
+      <div class="mg-bar">
+        <div id="merge-orders" class="mg-orders" aria-label="Pedidos de clientes"></div>
+        <button id="merge-btn-spawn" class="btn-primary mg-spawn" type="button">➕ Pieza nueva <small>-1 ⚡</small></button>
+      </div>
+
+      <div id="merge-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Mati Merge</h2>
+          <p class="fps-tag">Junta, transforma y entrega</p>
+          <p>Arrastra un producto sobre otro <b>igual</b> y se transforman en el siguiente. ¿Llegas hasta la <b>Mati Dubai</b> 👑?</p>
+          <div id="merge-chain" class="mg-chain"></div>
+          <p id="merge-next-goal" class="mg-next"></p>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>Toca <b>➕ Pieza nueva</b> para sacar un producto (cada uno gasta 1 ⚡ de energía). Arrastra uno sobre otro igual para juntarlos: ¡suben de nivel! A veces aparece un regalo.
+            Los <b>clientes</b> piden productos (abajo): cuando lo tienes en el tablero se ilumina, tócalo para entregarlo y ganar Matipuntos y espacio. Si el tablero se llena, junta o entrega. Tu tablero se guarda solo.</p>
+          </details>
+          <button class="btn-primary" id="merge-btn-start">¡A juntar!</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- PANTALLA DE JUEGO 3D: AVENTURA CHOCO (plataformas tipo Mario) -->
   <section id="screen-aventura" class="screen game-screen hidden">
     <div id="aventura-hud" class="hud">

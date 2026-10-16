@@ -24,7 +24,7 @@ import {
   spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, TRADE_NORMAL, TRADE_FOIL,
 } from "./progression.js";
 import { rankingEnabled, fetchRanking } from "./online.js";
-import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_MISSION, startSleep, stopSleep } from "./energy.js";
+import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_RULE, ENERGY_MISSION, startSleep, stopSleep } from "./energy.js";
 import { monthPlan, rewardInfo, calendarOf, canClaimCalendar, claimCalendar, daysInMonth } from "./calendar.js";
 
 let progress = null;
@@ -51,6 +51,7 @@ const screen3d = {
   memoria: document.getElementById("screen-memoria"),
   futbol: document.getElementById("screen-futbol"),
   dulces: document.getElementById("screen-dulces"),
+  merge: document.getElementById("screen-merge"),
   aventura: document.getElementById("screen-aventura"),
   ciudad: document.getElementById("screen-ciudad"),
   creador: document.getElementById("screen-creador"),
@@ -69,7 +70,7 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
-const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, aventura: null, ciudad: null, creador: null };
+const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, merge: null, aventura: null, ciudad: null, creador: null };
 
 let toastTimer = null;
 function showToast(message, ms = 2600) {
@@ -235,14 +236,16 @@ function renderEnergy() {
   document.getElementById("en-chest-wait").textContent = i.chestReady ? "" : `🎁 Próximo cofre del tesoro en ${fmtSecs(i.chestInSecs)}`;
   document.getElementById("en-sleep").classList.toggle("hidden", i.v >= i.max);
 }
-function openEnergy(need = 0, game = "") {
+function openEnergy(need = 0, game = "", mid = false) {
   if (!progress) return;
   const i = energyInfo(progress);
   document.getElementById("en-icon").textContent = need ? "😴" : "⚡";
   document.getElementById("en-title").textContent = need ? "¡Matichico está cansado!" : "Tu energía";
-  document.getElementById("en-text").textContent = need
+  document.getElementById("en-text").textContent = need && mid
+    ? `Se acabó la energía en plena partida (tienes ${i.v} ⚡). Tu puntaje quedó guardado. Puedes descansar, dormir en tu casa o recargar:`
+    : need
     ? `Para jugar ${game ? "esto " : ""}necesitas ${need} ⚡ y tienes ${i.v}. Puedes seguir decorando tu casa, vistiendo a tu Matichico, pasear por el Pueblo y Ciudad Choco, o recargar:`
-    : `Cada partida gasta un poco de energía (entre ${Math.min(...Object.values(ENERGY_COST).filter((c) => c > 0))} y ${Math.max(...Object.values(ENERGY_COST))}; una misión de Ciudad Choco, ${ENERGY_MISSION}). Se recarga sola y con premios:`;
+    : `Al entrar a un juego se gasta un poco de energía y después se va gastando mientras juegas (cada tiro, cada pieza, cada movimiento, cada tantos metros...). Mira en cada tarjeta cuánto gasta. Una misión de Ciudad Choco cuesta ${ENERGY_MISSION}. Se recarga sola y con premios:`;
   enOpen = true;
   enDlg.classList.remove("hidden");
   renderEnergy();
@@ -263,7 +266,7 @@ document.getElementById("en-sleep").addEventListener("click", () => {
   window.__sleepOnEnter = true;
   document.getElementById("btn-open-house").click();
 });
-window.addEventListener("no-energy", (e) => openEnergy(e.detail.need, e.detail.game));
+window.addEventListener("no-energy", (e) => openEnergy(e.detail.need, e.detail.game, !!e.detail.mid));
 window.addEventListener("energy-gain", (e) => { showToast(`⚡ +${e.detail.n} energía${e.detail.reason ? ` (${e.detail.reason})` : ""}`); renderEnergy(); });
 setInterval(renderEnergy, 1000);
 
@@ -1388,6 +1391,12 @@ function gameThumb(entry) {
   ori.className = `gorient ${entry.orient === "landscape" ? "land" : "any"}`;
   ori.textContent = entry.orient === "landscape" ? "📱 Horizontal" : "📱 Vertical u horizontal";
   wrap.appendChild(ori);
+  if (entry.id in ENERGY_COST && (ENERGY_COST[entry.id] > 0 || ENERGY_RULE[entry.id])) {
+    const en = document.createElement("span");
+    en.className = "gorient gen";
+    en.textContent = `⚡ ${ENERGY_COST[entry.id] > 0 ? ENERGY_COST[entry.id] : ""}${ENERGY_COST[entry.id] > 0 && ENERGY_RULE[entry.id] ? " + " : ""}${ENERGY_RULE[entry.id] || ""}`;
+    wrap.appendChild(en);
+  }
   const play = document.createElement("span");
   play.className = "gplay";
   play.textContent = "▶ Jugar";
@@ -1919,6 +1928,7 @@ const GAMES_3D = {
   memoria: { module: "./memoria-game.js", cls: "MemoriaGame", hud: ["level", "moves", "time", "score", "coins"] },
   futbol: { module: "./futbol-game.js", cls: "FutbolGame", hud: [] },
   dulces: { module: "./dulces-game.js", cls: "DulcesGame", hud: [] },
+  merge: { module: "./merge-game.js", cls: "MergeGame", hud: [] },
   aventura: { module: "./aventura-game.js", cls: "AventuraGame", hud: [] },
   ciudad: { module: "./ciudad-game.js", cls: "CiudadGame", hud: [] },
   creador: { module: "./creador-game.js", cls: "CreadorGame", hud: ["score", "count", "coins"] },

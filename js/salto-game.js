@@ -631,6 +631,7 @@ export class SaltoGame extends Game3D {
 
     if (this.y > this.maxY) {
       this.maxY = this.y;
+      this.meterEnergy("alt", this.maxY, 15); // 1 ⚡ cada 15 m de altura
       this.score = Math.floor(this.maxY * 10) + this.bonus;
       if (this.maxY >= this.milestone) {
         this._banner(`¡${this.milestone} m!`);

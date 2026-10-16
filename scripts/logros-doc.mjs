@@ -1,7 +1,10 @@
 // Genera docs/LOGROS.md con la lista completa de logros (para revisarla y decidir qué cambiar).
 // Uso: node scripts/logros-doc.mjs
 import { writeFileSync } from "node:fs";
-globalThis.document = { documentElement: { dataset: {} } };
+globalThis.document = { documentElement: { dataset: {} }, addEventListener() {}, visibilityState: "visible" };
+globalThis.window = globalThis;
+globalThis.addEventListener = () => {};
+globalThis.location = { search: "", hostname: "x" };
 globalThis.localStorage = { getItem: () => null, setItem: () => {} };
 const { ACHIEVEMENT_CHAINS, CATEGORIES } = await import("../js/achievements.js");
 let md = "# Logros de Matichoc Arcade\n\n";
