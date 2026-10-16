@@ -19,7 +19,7 @@ export const SLEEP_MULT = 3; // durmiendo se recarga 3 veces más rápido
 export const EXTRA_DAILY_MAX = 50; // máximo de energía extra por día
 export const CHEST_EVERY = 40 * 60 * 1000; // un cofre del tesoro cada 40 minutos
 export const CHEST_ENERGY = 10;
-/** Comprar energía con Matipuntos: sale caro a propósito y tiene tope por día. */
+/** Comprar energía con Matipuntos: solo sube hasta 100 (no pasa de ahí) y tiene tope de compras por día. */
 export const BUY_ENERGY = { amount: 20, price: 80, perDay: 10 };
 
 /** Cuánto cuesta ENTRAR a jugar cada juego (0 = gratis). Además, durante la partida se gasta por acción (ver ENERGY_RULE). */
@@ -131,15 +131,22 @@ export function addEnergy(progress, n, reason = "", { calendar = false } = {}) {
   return room;
 }
 
-/** Compra energía con Matipuntos. Devuelve cuánta sumó, o 0 si no se pudo (sin puntos, tope del día o ya está al máximo). */
+/** Lo que costaría y daría comprar ahora: la energía comprada nunca pasa de ENERGY_MAX (si faltan menos de 20, se da lo que falta y se cobra proporcional). */
+export function buyOffer(progress) {
+  const e = energyOf(progress);
+  const n = Math.min(BUY_ENERGY.amount, Math.max(0, ENERGY_MAX - Math.floor(e.v)));
+  return { n, price: n > 0 ? Math.ceil((BUY_ENERGY.price * n) / BUY_ENERGY.amount) : 0 };
+}
+
+/** Compra energía con Matipuntos, solo hasta llegar a 100. Devuelve cuánta sumó, o 0 si no se pudo (sin puntos, tope del día o ya tienes 100). */
 export function buyEnergy(progress) {
   const e = energyOf(progress);
-  if (e.bought >= BUY_ENERGY.perDay || e.v >= ENERGY_CAP || (progress.coins || 0) < BUY_ENERGY.price) return 0;
-  const n = Math.min(BUY_ENERGY.amount, ENERGY_CAP - e.v);
-  if (!spendCoins(progress, BUY_ENERGY.price)) return 0;
-  if (e.v >= ENERGY_MAX && e.v + n > ENERGY_MAX) e.t = Date.now();
+  const { n, price } = buyOffer(progress);
+  if (e.bought >= BUY_ENERGY.perDay || n <= 0 || (progress.coins || 0) < price) return 0;
+  if (!spendCoins(progress, price)) return 0;
   e.v += n;
   e.bought++;
+  if (e.v >= ENERGY_MAX) e.t = Date.now();
   saveProgress(progress);
   emitGain(n, "comprada");
   return n;

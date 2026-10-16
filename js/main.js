@@ -25,7 +25,7 @@ import {
   spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, TRADE_NORMAL, TRADE_FOIL,
 } from "./progression.js";
 import { rankingEnabled, fetchRanking } from "./online.js";
-import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_RULE, ENERGY_MISSION, startSleep, stopSleep, buyEnergy, BUY_ENERGY, REGEN_SECS, SLEEP_MULT, CHEST_EVERY, CHEST_ENERGY } from "./energy.js";
+import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_RULE, ENERGY_MISSION, startSleep, stopSleep, buyEnergy, buyOffer, BUY_ENERGY, REGEN_SECS, SLEEP_MULT, CHEST_EVERY, CHEST_ENERGY } from "./energy.js";
 import { monthPlan, rewardInfo, calendarOf, canClaimCalendar, claimCalendar, daysInMonth } from "./calendar.js";
 
 let progress = null;
@@ -277,16 +277,17 @@ function renderEnergyWays(i) {
   row("📋", `<b>Misiones diarias</b> · +5 ⚡ cada una y +15 ⚡ el cofre del día`, hub ? "Ver misiones" : "", go("btn-open-progress"));
   row("🏅", `<b>Logros</b> · +5 ⚡ (+10 ⚡ los grandes) · y <b>subir de nivel</b> +10 ⚡`, hub ? "Ver logros" : "", go("btn-open-achievements"));
   row("🏘️", `<b>Actividades del Pueblo</b> (pasear, ayudar a los vecinos) · +10 ⚡`);
-  const room = Math.max(0, i.cap - i.v);
-  row("🍫✨", `<b>Comprar</b> +${BUY_ENERGY.amount} ⚡ por 🍫✨ ${BUY_ENERGY.price} · te quedan <b>${i.buysLeft}</b> compra${i.buysLeft === 1 ? "" : "s"} hoy`,
-    i.buysLeft > 0 ? (progress.coins < BUY_ENERGY.price ? `Faltan ${BUY_ENERGY.price - progress.coins} 🍫✨` : room <= 0 ? "Ya estás al tope" : "Comprar") : "Vuelve mañana",
+  const offer = buyOffer(progress);
+  const full = offer.n <= 0;
+  row("🍫✨", `<b>Comprar energía</b> · +${BUY_ENERGY.amount} ⚡ por 🍫✨ ${BUY_ENERGY.price}, solo hasta llegar a ${i.max} ⚡ · hasta ${BUY_ENERGY.perDay} veces al día (te quedan <b>${i.buysLeft}</b>)`,
+    i.buysLeft <= 0 ? "Vuelve mañana" : full ? "Ya tienes 100" : progress.coins < offer.price ? `Faltan ${offer.price - progress.coins} 🍫✨` : `+${offer.n} ⚡ · 🍫✨ ${offer.price}`,
     () => {
       const n = buyEnergy(progress);
       if (!n) return;
       audio.playPurchase();
       refreshHubStats();
       renderEnergy();
-    }, !(i.buysLeft > 0 && progress.coins >= BUY_ENERGY.price && room > 0));
+    }, !(i.buysLeft > 0 && !full && progress.coins >= offer.price));
   // lo que gasta cada juego
   const costs = document.getElementById("en-costs");
   if (!costs.childElementCount) {
