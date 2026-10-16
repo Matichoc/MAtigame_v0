@@ -47,6 +47,8 @@ const SPRITES = ["alf-frambuesa", "alf-menta", "alf-naranja", "alf-trufa", "alf-
 export class ParkourGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 56 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 28, hearts: 5, stars: 18, radius: 16, height: 9 };
     this.musicTheme = "adventure";
     this.q = els.q;
     this.keys = {};

@@ -56,6 +56,8 @@ const SPRITES = ["alf-frambuesa", "alf-menta", "alf-naranja", "alf-trufa", "alf-
 export class SaltoGame extends Game3D {
   constructor(character, progress, els) {
     super("salto", character, progress, els, { fov: 45 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 18, hearts: 5, stars: 13, radius: 9, height: 9 };
     this.musicTheme = "adventure";
     this.keys = {};
     this.pointerX = null;

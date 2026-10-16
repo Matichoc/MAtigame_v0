@@ -73,7 +73,7 @@ export const LOOK = {
   bloom: { strength: 0.32, radius: 0.55, threshold: 0.92 },
   grade: { sat: 1.16, contrast: 1.06, vig: 0.22, lift: 0, tint: [1, 1, 1] },
   // ambiente "kawaii": colores pastel, negros levantados con un velo rosado y brillo suave tipo ensueño
-  kawaii: { bloom: { strength: 0.46, radius: 0.75, threshold: 0.84 }, grade: { sat: 1.22, contrast: 0.97, vig: 0.14, lift: 0.05, tint: [1.0, 0.84, 0.92] } },
+  kawaii: { bloom: { strength: 0.32, radius: 0.6, threshold: 0.93 }, grade: { sat: 1.2, contrast: 0.98, vig: 0.14, lift: 0.04, tint: [1.0, 0.85, 0.93] } },
 };
 
 // Ajuste final de color (saturación, contraste y viñeta) sobre la imagen ya en sRGB.

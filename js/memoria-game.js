@@ -66,6 +66,8 @@ function shuffle(arr) {
 export class MemoriaGame extends Game3D {
   constructor(character, progress, els) {
     super("memoria", character, progress, els, { fov: 42 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 18, hearts: 5, stars: 13, radius: 9, height: 9 };
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
     this.levelIndex = 0;

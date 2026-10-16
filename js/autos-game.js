@@ -41,6 +41,8 @@ const DAY = [
 export class AutosGame extends Game3D {
   constructor(character, progress, els) {
     super("autos", character, progress, els, { fov: 62 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 28, hearts: 5, stars: 18, radius: 16, height: 9 };
     this.musicTheme = "race";
     this.laneIndex = 1;
     this.tmpA = new THREE.Color();

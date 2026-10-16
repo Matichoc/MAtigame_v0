@@ -231,6 +231,8 @@ function questionTexture() {
 export class AventuraGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 40 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 28, hearts: 5, stars: 18, radius: 14, height: 9 };
     this.musicTheme = "adventure";
     this.q = els.q;
     this.keys = { left: false, right: false, jump: false };

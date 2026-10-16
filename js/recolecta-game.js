@@ -140,6 +140,8 @@ function mergeWalls(cells) {
 export class RecolectaGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 46 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 28, hearts: 5, stars: 18, radius: 14, height: 9 };
     this.musicTheme = "arcade";
     this.keys = {};
     this.levelIndex = 0;

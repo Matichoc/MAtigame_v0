@@ -99,6 +99,8 @@ function ballTexture() {
 export class Basquet3DGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 50 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 18, hearts: 5, stars: 13, radius: 10, height: 9 };
     this.musicTheme = "sport";
     this.q = els.q;
     this.cheer = 0;
