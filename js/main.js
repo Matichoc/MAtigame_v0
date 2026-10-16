@@ -1,6 +1,7 @@
 import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot, lockReason } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
+import { initSplash } from "./splash.js";
 import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
@@ -32,6 +33,7 @@ let progress = null;
 let selectedCharacter = null;
 let shopCharacterId = CHARACTERS[0].id;
 
+initSplash(); // sello de inicio: lo primero que se ve
 const screenProfiles = document.getElementById("screen-profiles");
 const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
