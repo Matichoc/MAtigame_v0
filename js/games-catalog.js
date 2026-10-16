@@ -118,6 +118,15 @@ const ALL_GAMES = [
     tag: "Nuevo",
   },
   {
+    id: "merge",
+    orient: "any",
+    name: "Mati Merge",
+    icon: "🍬",
+    tagline: "Tablero lleno: junta alfajores, cuchuflís, bombones y tabletas del más chico al más grande, ¡hasta el Mati Dubai! Entrega pedidos y completa tu colección.",
+    status: "available",
+    tag: "Nuevo",
+  },
+  {
     id: "aventura",
     orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
     name: "Aventura Choco",

@@ -151,6 +151,8 @@ function netTexture() {
 export class FutbolGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 48 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 28, hearts: 5, stars: 18, radius: 12, height: 9 };
     this.musicTheme = "sport";
     this.q = els.q;
     this.mode = "pen";
@@ -741,6 +743,7 @@ export class FutbolGame extends Game3D {
   // ---------- el tiro ----------
 
   _kick(power) {
+    if (!this.spendAction(1)) return; // cada tiro gasta 1 ⚡
     this.phase = "runup";
     this.runT = 0;
     this.kickPower = power;

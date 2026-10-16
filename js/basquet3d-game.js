@@ -99,6 +99,8 @@ function ballTexture() {
 export class Basquet3DGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 50 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 18, hearts: 5, stars: 13, radius: 10, height: 9 };
     this.musicTheme = "sport";
     this.q = els.q;
     this.cheer = 0;
@@ -504,6 +506,7 @@ export class Basquet3DGame extends Game3D {
   }
 
   _launchBall() {
+    if (!this.spendAction(1)) return; // cada lanzamiento gasta 1 ⚡
     const accErr = this.aimLocked - this.aimTarget;
     const powErr = this.powerLocked - this.powerTarget;
     const aErr = Math.abs(accErr);

@@ -28,6 +28,8 @@ const cy = (row) => ROWS - 1 - row + 0.5;
 export class Tetris3DGame extends Game3D {
   constructor(character, progress, els) {
     super("tetris", character, progress, els, { fov: 38 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 18, hearts: 5, stars: 13, radius: 9, height: 9 };
     this.musicTheme = "puzzle";
     this.grid = [];
     this.pieceMeshes = [];
@@ -582,6 +584,7 @@ export class Tetris3DGame extends Game3D {
   }
 
   _lockPiece() {
+    this.countEnergy("piezas", 4); // cada 4 piezas gasta 1 ⚡
     const style = PIECE_STYLE[this.current.type];
     let toppedOut = false;
     const powers = [];

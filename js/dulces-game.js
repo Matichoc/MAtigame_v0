@@ -58,6 +58,8 @@ const worldZ = (r) => (r - (ROWS - 1) / 2) * CELL;
 export class DulcesGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 42 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 18, hearts: 5, stars: 13, radius: 9, height: 9 };
     this.musicTheme = "chill";
     this.q = els.q;
     this.raycaster = new THREE.Raycaster();
@@ -608,6 +610,7 @@ export class DulcesGame extends Game3D {
       return;
     }
     this.moves--;
+    this.countEnergy("mov", 1); // cada movimiento gasta 1 ⚡
     this.moveCount++;
     this.combo = 0;
     // piezas especiales intercambiadas se activan solas

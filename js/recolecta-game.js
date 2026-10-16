@@ -13,7 +13,7 @@ import { LEVELS, CANVAS_W, CANVAS_H, generateChocolates, findFreeSpot, getObstac
 import { saveProgress, addToLeaderboard, reportScore, earnCoins } from "./storage.js";
 import { recordRun } from "./progression.js";
 import * as audio from "./audio.js";
-import { campaign, campaignWin, renderLevelPicker } from "./campaign.js";
+import { campaign, campaignWin, campaignComplete, campaignStartOver, renderLevelPicker } from "./campaign.js";
 
 const GAME_ID = "recolecta";
 const S = 0.04; // píxeles del nivel -> unidades 3D
@@ -140,7 +140,10 @@ function mergeWalls(cells) {
 export class RecolectaGame extends Game3D {
   constructor(character, progress, els) {
     super(GAME_ID, character, progress, els, { fov: 46 });
+    this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
+    this.ambientOpts = { petals: 28, hearts: 5, stars: 18, radius: 14, height: 9 };
     this.musicTheme = "arcade";
+    this.energyEvery = 12; // 1 ⚡ cada 12 s de juego
     this.keys = {};
     this.levelIndex = 0;
     this.q = els.q;
@@ -660,6 +663,11 @@ export class RecolectaGame extends Game3D {
   }
 
   restart() {
+    // "Jugar de nuevo" después de completar las 20 canchas: vuelta nueva con premio y todo desde la cancha 1
+    if (campaignComplete(this.progress, "recolecta")) {
+      const lap = campaignStartOver(this.progress, "recolecta");
+      if (lap) { try { window.dispatchEvent(new CustomEvent("lap-start", { detail: lap })); } catch (e) { /* sin ventana */ } }
+    }
     this.score = 0;
     this.startLevel = 1;
     this.loadLevel(0);

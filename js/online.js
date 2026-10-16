@@ -56,6 +56,7 @@ function payload(p) {
       days: (st.playDayList || []).slice(-30), // días en que jugó (últimos 30)
       sessions: st.sessions || 0, // veces que abrió el juego
       runs_by: st.runsBy || {}, // partidas por juego
+      energy: p.energy ? Math.round(p.energy.v || 0) : 100, // energía que le queda
       ver, // versión de los archivos (para saber si ya tiene la última)
     },
   };
