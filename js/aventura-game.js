@@ -236,7 +236,7 @@ export function buildLevel(L) {
       const ex = bx0 + bw - 3;
       for (let y = 2; y < 4; y++) set(ex, y, "P");
       warp = { x: wc.x, top: wc.top };
-      bonus = { x0: bx0, x1: bx0 + bw, exitX: ex, exitTop: 4, qx: bx0 + 11, qy: 5 };
+      bonus = { x0: bx0, x1: bx0 + bw, exitX: ex, exitTop: 4, qx: bx0 + 11, qy: 4 };
     }
     return { map, W: maxX + 4, start, coins, enemies, checkpoints, ...extra, world, isBoss, warp, bonus };
   }
@@ -1032,7 +1032,7 @@ export class AventuraGame extends Game3D {
         if (this._solid(front, it.y + 0.25)) it.vx = -it.vx;
         it.x += it.vx * dt;
         it.y += it.vy * dt;
-        if (it.vy <= 0 && (this._solid(it.x, it.y) || this._solid(it.x - 0.2, it.y) || this._solid(it.x + 0.2, it.y))) { it.y = Math.floor(it.y) + 1; it.vy = 0; if (it.kind === "flower") { it.vx = 0; it.drop = false; } }
+        if (it.vy <= 0 && (this._solid(it.x, it.y) || this._solid(it.x - 0.2, it.y) || this._solid(it.x + 0.2, it.y))) { it.y = Math.floor(it.y) + 1; it.vy = 0; if (it.kind === "flower" && it.y < it.baseY - 0.9) { it.vx = 0; it.drop = false; } }
         if (it.y < -3) { it.gone = true; this.levelGroup.remove(it.mesh); continue; }
       }
       it.mesh.position.set(it.x, it.y, -0.1);
