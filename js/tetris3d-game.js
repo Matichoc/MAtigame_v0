@@ -1,4 +1,4 @@
-// Tetris de Productos 3D: el mismo juego de siempre (js/tetris-pieces.js) pero las
+// Bloques de Productos 3D: el mismo juego de siempre (js/tetris-pieces.js) pero las
 // golosinas son cubos de chocolate brillantes dentro de una vitrina de cristal con
 // marco dorado. Las líneas explotan en confeti, la pieza cae con sombra "fantasma"
 // y tu Matichico celebra cada línea desde un costado.
@@ -729,7 +729,7 @@ export class Tetris3DGame extends Game3D {
     this.shake = 0.1 + fullRows.length * 0.07;
 
     const mid = new THREE.Vector3(0, cy(fullRows[0]) + 0.5, 1);
-    const label = fullRows.length >= 4 ? "¡TETRIS! 🍫" : fullRows.length > 1 ? `¡${fullRows.length} líneas!` : "¡Línea!";
+    const label = fullRows.length >= 4 ? "¡4 LÍNEAS! 🍫" : fullRows.length > 1 ? `¡${fullRows.length} líneas!` : "¡Línea!";
     this.popups.add(mid, `${label} +${pts}`, fullRows.length > 1 ? "combo" : "kill");
     this._setHero("cheer", 1.4);
 

@@ -158,7 +158,7 @@ Se revisó el repo de la web (`Matichoc/matiweb`), de donde sale el botón
   un backend o mover el juego al mismo dominio. Tampoco se prometen premios
   reales: la web ya tiene su propia "racha" con reglas del dueño.
 
-### Etapa 2 — Segundo juego: Tetris de Productos ✅
+### Etapa 2 — Segundo juego: Bloques de Productos ✅
 
 Ver la sección dedicada más abajo con el diseño completo. En resumen:
 tetris clásico (7 piezas, bolsa 7-bag, rotación con wall-kick simple)
@@ -263,7 +263,7 @@ con resultados deterministas (fijando los valores de las barras/la
 posición de la rebotadora), bonus dorado, combo, colección de pompones,
 fin de partida y reporte a mejor puntaje/ranking, botones de silencio y
 controles táctiles, además del aislamiento y rebind correcto entre
-perfiles (igual que "Recolecta y Corre" y "Tetris de Productos") y
+perfiles (igual que "Recolecta y Corre" y "Bloques de Productos") y
 regresión completa del resto de la plataforma. Se agregaron además dos
 logros nuevos ("Encestador Estrella" y "Equilibrista Matichoc") para
 que también alimenten el sistema de recompensa diaria/logros de la
@@ -301,7 +301,7 @@ seguían en 2D, **manteniendo sus reglas, ids, rankings y logros**:
   `js/levels.js` en 3D (pasto con setos, cancha de básquet con aros, gimnasio),
   cámara de seguimiento, vallas, conos móviles, bandera con haz dorado, alfajores
   reales como golosinas y bonus Matidubai.
-- **Tetris de Productos** (`js/tetris3d-game.js`): vitrina de cristal con marco
+- **Bloques de Productos** (`js/tetris3d-game.js`): vitrina de cristal con marco
   dorado, cubos de chocolate brillantes, sombra fantasma, estallido de líneas,
   siguiente pieza en pedestal y Matichico que celebra. Gestos táctiles.
 - **Lanzamientos de Básquet** (`js/basquet3d-game.js`): cámara tras tu Matichico,
@@ -614,7 +614,7 @@ arrastrando) y tu Matichico animando desde la mesa:
 - Los nombres de producto/sabor son de juego: no prometen disponibilidad. Las
   etiquetas del juego no incluyen datos legales (resolución sanitaria, etc.).
 
-## Diseño de "Tetris de Productos" (Etapa 2)
+## Diseño de "Bloques de Productos" (Etapa 2)
 
 - **Tablero**: 8 columnas × 14 filas, celdas de 32px (`js/tetris-game.js`).
 - **Piezas**: las 7 formas clásicas (`js/tetris-pieces.js`), repartidas

@@ -11,7 +11,7 @@ disponibles con ese mismo personaje. **Los 13 juegos son 3D** (Three.js),
 con brillo (bloom), música generada en vivo, color vivo y un Matichico 3D que cambia con la tienda:
 **Parkour Choco** (estilo Roblox: **Mundo infinito** con 10 ambientes, poderes y récord de metros, o la Aventura de 6 etapas),
 **Recolecta y Corre** (20 niveles 3D con guardias, cintas transportadoras, impulso y estrellas),
-**Tetris de Productos** (pieza guardada, cubos de poder, combos y 20 niveles),
+**Bloques de Productos** (pieza guardada, cubos de poder, combos y 20 niveles),
 **Lanzamientos de Básquet** (5 posiciones, rachas, modo «en llamas» y 20 niveles),
 **Saltos de Porristas** (viento, red de seguridad, rebotadora gigante y 20 niveles), **Salto Choco** (enemigos, vidas, 4 zonas, infinito y 20 misiones),
 **Autos de Chocolate** (rivales, rampas, charcos, poderes, infinito y 20 misiones), **Memoria Matichoc** (pareja dorada, cartas traviesas y 20 niveles),
@@ -52,7 +52,7 @@ planeados (el hub ya muestra los 7, marcando cuáles están disponibles).
    obstáculos que aparecen sobre el camino. Muévete con las flechas / WASD
    (o el D-pad táctil en móvil). El Nivel 6 (Gran Final Cheer) es puro
    salto: siete vallas seguidas hasta la meta.
-6. En **Tetris de Productos**: encaja las piezas con ← → ↑ (rotar) ↓
+6. En **Bloques de Productos**: encaja las piezas con ← → ↑ (rotar) ↓
    (bajar) y ESPACIO (caída instantánea) para completar líneas. Las piezas
    brillantes son Chocolate Dubai: dan Matipuntos extra al limpiar su línea.
 7. En **Lanzamientos de Básquet**: presiona ESPACIO/tap para fijar la
@@ -111,8 +111,8 @@ js/parkour-infinite.js Parkour: Mundo infinito (generador procedural, poderes, v
 js/wardrobe-data.js   Catálogo del Vestuario (~80 objetos, rarezas y precios en Matipuntos)
 js/wardrobe3d.js      Cómo se ve cada objeto sobre el Matichico 3D
 js/recolecta-game.js  Recolecta y Corre 3D (usa los niveles de js/levels.js)
-js/tetris-pieces.js  Formas y colores de "Tetris de Productos"
-js/tetris3d-game.js  Tetris de Productos 3D
+js/tetris-pieces.js  Formas y colores de "Bloques de Productos"
+js/tetris3d-game.js  Bloques de Productos 3D
 js/basquet3d-game.js  Lanzamientos de Básquet 3D (física del balón, red, hinchada)
 js/porristas3d-game.js  Saltos de Porristas 3D
 js/lobby3d.js         Escenario 3D del menú principal (tu Matichico sobre un pedestal)
