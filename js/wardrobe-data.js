@@ -35,6 +35,8 @@ const P = { comun: 30, raro: 110, epico: 260, legendario: 520 };
 const PRICE_X = { comun: 3, raro: 2, epico: 3.5, legendario: 4 };
 const cost = (rarity, price) => { const base = price ?? P[rarity]; return base > 0 ? Math.round((base * PRICE_X[rarity]) / 5) * 5 : 0; };
 const it = (slot, id, name, icon, rarity, params = {}, price) => ({ id, slot, name, icon, rarity, price: cost(rarity, price), params });
+// Objetos que se pueden ver y probar pero todavía no se pueden comprar ("Próximamente"): son los que se cobrarán después.
+const soon = (item) => ({ ...item, soon: true });
 // Objetos exclusivos de un evento de temporada (ver js/events.js): se compran con fichas del evento.
 const ev = (event, tokens, slot, id, name, icon, rarity, params = {}) => ({ id, slot, name, icon, rarity, price: 99999, params, event, tokens });
 
@@ -75,6 +77,27 @@ export const OUTFITS = [
   out("smoking", "Smoking de gala", "🤵", "raro", "#1C1C22", "#FFFFFF", { emblem: "bow" }, 130),
   out("super", "Súper Choco", "🦸", "epico", "#2F6FD6", "#E83A3A", { emblem: "bolt" }, 300, { minLevel: 10 }),
   out("astronauta", "Traje espacial", "🚀", "epico", "#F2F4FF", "#35F0FF", { emblem: "star", shine: true }, 320, { minLevel: 14 }),
+
+  // ---- Deportes, pijamas y oficios ----
+  out("equipo_rojo", "Equipo Rojo", "⚽", "raro", "#D52B1E", "#FFFFFF", { pants: "#FFFFFF", emblem: "star" }, 100),
+  out("equipo_azul", "Equipo Azul", "⚽", "raro", "#1F57C9", "#FFFFFF", { pants: "#1F57C9", emblem: "star" }, 100),
+  out("portero", "Portero Neón", "🧤", "raro", "#B6FF3A", "#1C1C22", { pants: "#1C1C22" }, 100),
+  out("basquet_naranja", "Uniforme de Básquet", "🏀", "raro", "#FF8A2A", "#1C1C22", { pants: "#FF8A2A", emblem: "star" }, 100),
+  out("basquet_estrella", "Básquet Estrella", "🌟", "epico", "#2A1A6A", "#FFC800", { pants: "#2A1A6A", emblem: "star", shine: true }, 270, { minLevel: 16 }),
+  out("pijama_estrellas", "Pijama de estrellas", "🌙", "comun", "#3A2D8A", "#FFD34D", { pants: "#3A2D8A", emblem: "star" }, 40),
+  out("pijama_nubes", "Pijama de nubes", "☁️", "comun", "#A8D8FF", "#FFFFFF", { pants: "#A8D8FF", emblem: "heart" }, 40),
+  out("jardinero", "Overol de jardín", "🌻", "comun", "#2F6FD6", "#FFD34D", { pants: "#2F6FD6" }, 40),
+  out("chef", "Chef Matichoc", "👨‍🍳", "raro", "#FFFFFF", "#D4216C", { pants: "#3D3D44", emblem: "bow" }, 110),
+  out("doctora", "Doctora Choco", "🩺", "raro", "#FFFFFF", "#35C8FF", { pants: "#35C8FF", emblem: "heart" }, 110),
+  out("falda_jeans", "Falda de jeans", "👖", "comun", "#FFFFFF", "#FF7AA8", { skirt: "cheer", skirtColor: "#2E4A7C", skirtTrim: "#FF7AA8", emblem: "heart" }, 45),
+  out("cheer_lunares", "Cheer Lunares", "🔴", "raro", "#FFFFFF", "#D4216C", { skirt: "cheer", skirtColor: "#D4216C", skirtTrim: "#FFFFFF", emblem: "heart", pompoms: "#FFFFFF" }, 105),
+  out("hada_noche", "Hada de la noche", "🧚‍♀️", "epico", "#3A2D8A", "#35F0FF", { skirt: "tutu", skirtColor: "#6A4DD8", tights: "#35F0FF", stars: true, emblem: "star" }, 280, { minLevel: 18 }),
+
+  // ---- Próximamente (se ven y se prueban, todavía no se compran) ----
+  soon(out("copa_oro", "Copa de Oro", "🏆", "legendario", "#FFC800", "#1C1C22", { pants: "#FFC800", shine: true, emblem: "star" }, 540)),
+  soon(out("unicornio", "Disfraz de unicornio", "🦄", "legendario", "#FFFFFF", "#FF7AA8", { skirt: "tutu", rainbow: true, tights: "#FFFFFF", shine: true, emblem: "star", pompoms: "#FF7AA8" }, 540)),
+  soon(out("hielo", "Princesa de Hielo", "❄️", "epico", "#BFE8FF", "#FFFFFF", { skirt: "gala", skirtColor: "#8FD0FF", skirtTrim: "#FFFFFF", shine: true, emblem: "star" }, 290)),
+  soon(out("cheer_navidad", "Cheer Navideña", "🎄", "epico", "#E83A3A", "#FFFFFF", { skirt: "cheer", skirtColor: "#E83A3A", skirtTrim: "#FFFFFF", emblem: "star", pompoms: "#4FD09A" }, 270)),
   out("dubai", "Edición Mati Dubai", "💎", "legendario", "#FFC800", "#FF3FA4", { shine: true, emblem: "star" }, 540, { needs: "dubai" }),
 ];
 
@@ -192,6 +215,80 @@ export const ITEMS = [
   it("pet", "pet_unicornio", "Unicornio dulce", "🦄", "legendario", { kind: "unicornio" }),
   it("pet", "pet_dragon", "Dragón de cacao", "🐲", "legendario", { kind: "dragon" }),
 
+  // ---- NUEVO · Peinados ----
+  it("hair", "hair_cola", "Cola de caballo alta", "🎀", "comun", { style: "cola" }),
+  it("hair", "hair_cheer", "Coletas cheer", "📣", "comun", { style: "cheer" }),
+  it("hair", "hair_bob", "Pelo bob", "💁‍♀️", "comun", { style: "bob" }),
+  it("hair", "hair_ballet", "Moño de bailarina", "🩰", "comun", { style: "ballet" }),
+  it("hair", "hair_ondas", "Melena con ondas", "🌊", "raro", { style: "ondas" }),
+  it("hair", "hair_futbolista", "Corte futbolista", "⚽", "raro", { style: "mullet" }),
+  it("hair", "hair_boxeadora", "Trenzas deportivas", "🏀", "raro", { style: "trenzas" }),
+  it("hair", "hair_corona", "Trenza corona", "👑", "epico", { style: "corona" }),
+  soon(it("hair", "hair_unicornio", "Melena de unicornio", "🦄", "legendario", { style: "unicornio" })),
+
+  // ---- NUEVO · Colores de pelo ----
+  it("hairColor", "hc_rojo", "Rojo fuego", "🔴", "comun", { color: "#e8412a" }, 25),
+  it("hairColor", "hc_celeste", "Celeste", "🩵", "comun", { color: "#6fd0ff" }, 25),
+  it("hairColor", "hc_castano", "Castaño dorado", "🟤", "comun", { color: "#b5763a" }, 15),
+  soon(it("hairColor", "hc_arcoiris", "Pelo arcoíris", "🌈", "legendario", { color: "#ffffff", rainbow: true })),
+
+  // ---- NUEVO · Sombreros ----
+  it("hat", "hat_lazo", "Gran lazo cheer", "🎀", "comun", { kind: "lazo", color: "#d4216c" }),
+  it("hat", "hat_pompones", "Pompones de cheer", "📣", "comun", { kind: "pompones", color: "#ffc800" }),
+  it("hat", "hat_visera", "Visera deportiva", "🎾", "comun", { kind: "visera", color: "#35c8ff" }),
+  it("hat", "hat_banda", "Banda de deportista", "🏅", "comun", { kind: "banda", color: "#e83a3a" }),
+  it("hat", "hat_gorra_basquet", "Gorra de básquet", "🏀", "comun", { kind: "gorra", color: "#ff8a2a" }),
+  it("hat", "hat_gorra_futbol", "Gorra Equipo Rojo", "⚽", "comun", { kind: "gorra", color: "#d52b1e" }),
+  it("hat", "hat_diadema", "Diadema de estrellas", "💫", "raro", { kind: "diadema", color: "#ffc800" }),
+  it("hat", "hat_corona_flores", "Corona de flores", "🌸", "raro", { kind: "coronaflores" }),
+  it("hat", "hat_birrete", "Birrete de campeón", "🎓", "raro", { kind: "birrete", color: "#1c1c22" }),
+  it("hat", "hat_tiara", "Tiara de princesa", "👸", "epico", { kind: "tiara" }),
+  soon(it("hat", "hat_unicornio", "Cuerno de unicornio", "🦄", "legendario", { kind: "unicornio" })),
+
+  // ---- NUEVO · Anteojos ----
+  it("glasses", "gl_azules", "Cuadrados azules", "👓", "comun", { kind: "cuadrados", color: "#2f6fd6" }),
+  it("glasses", "gl_dorados", "Redondos dorados", "🥇", "raro", { kind: "redondos", color: "#ffc800" }),
+  it("glasses", "gl_rosa", "Redondos rosados", "🩷", "comun", { kind: "redondos", color: "#ff6fb0" }),
+
+  // ---- NUEVO · Cuello ----
+  it("neck", "neck_silbato", "Silbato de entrenador", "📯", "comun", { kind: "silbato" }),
+  it("neck", "neck_panuelo", "Pañuelo cheer", "🎀", "comun", { kind: "bufanda", color: "#ffc800" }),
+  it("neck", "neck_perlas", "Collar de perlas", "🤍", "raro", { kind: "perlas" }),
+  it("neck", "neck_medalla_plata", "Medalla de plata", "🥈", "raro", { kind: "medalla", color: "#cfd3dc" }),
+
+  // ---- NUEVO · Espalda ----
+  it("back", "back_bolso", "Bolso deportivo", "👜", "comun", { kind: "mochila", color: "#ff8a2a" }),
+  it("back", "back_mochila_rosa", "Mochila rosada", "🎒", "comun", { kind: "mochila", color: "#ff6fb0" }),
+  it("back", "back_balones", "Red de balones", "⚽", "raro", { kind: "balones" }),
+  it("back", "back_alas_hada", "Alas de hada", "🧚", "epico", { kind: "alas", color: "#9fe8ff" }),
+  soon(it("back", "back_alas_arcoiris", "Alas arcoíris", "🌈", "legendario", { kind: "mariposa", rainbow: true })),
+
+  // ---- NUEVO · Zapatos ----
+  it("shoes", "sh_ballet", "Zapatillas de ballet", "🩰", "comun", { kind: "ballet", color: "#ffc2dc" }),
+  it("shoes", "sh_cheer", "Zapatillas Cheer", "📣", "raro", { kind: "cheer", color: "#ffffff" }),
+  it("shoes", "sh_bota_lluvia", "Botas de lluvia", "🌧️", "comun", { kind: "bota", color: "#ffd84d" }),
+  it("shoes", "sh_bota_nieve", "Botas de nieve", "🥾", "raro", { kind: "bota", color: "#ffffff", fur: true }),
+  it("shoes", "sh_botin", "Botines de fútbol", "⚽", "raro", { kind: "botin", color: "#e83a3a" }),
+  it("shoes", "sh_botin_neon", "Botines neón", "⚡", "epico", { kind: "botin", color: "#b6ff3a", glow: "#b6ff3a" }),
+  it("shoes", "sh_basquet", "Zapatillas de básquet", "🏀", "raro", { kind: "basquet", color: "#ff8a2a" }),
+  it("shoes", "sh_basquet_oro", "Air Mati Dorado", "👟", "legendario", { kind: "basquet", color: "#ffc800", metal: true }, 520),
+  it("shoes", "sh_patines", "Patines", "🛼", "epico", { kind: "patin", color: "#ff7aa8" }),
+  soon(it("shoes", "sh_cristal", "Zapatillas de cristal", "👠", "legendario", { kind: "ballet", color: "#bfe8ff", glow: "#9fe8ff" })),
+  soon(it("shoes", "sh_cohete", "Botas cohete", "🚀", "legendario", { kind: "bota", color: "#d4216c", glow: "#35f0ff" })),
+
+  // ---- NUEVO · Estelas ----
+  it("trail", "tr_futbol", "Estela de cancha", "⚽", "comun", { colors: ["#4fd09a", "#ffffff"] }, 40),
+  it("trail", "tr_basquet", "Estela de básquet", "🏀", "comun", { colors: ["#ff8a2a", "#1c1c22"] }, 40),
+  it("trail", "tr_cheer", "Estela cheer", "📣", "raro", { colors: ["#ff6fb0", "#ffc800", "#ffffff"] }),
+  soon(it("trail", "tr_unicornio", "Estela de unicornio", "🦄", "legendario", { colors: ["#ff6fb0", "#9fe8ff", "#fff1a8", "#b6ff3a"] })),
+
+  // ---- NUEVO · Mascotas ----
+  it("pet", "pet_balon", "Balón goleador", "⚽", "comun", { kind: "balon" }),
+  it("pet", "pet_basquet", "Basqui", "🏀", "comun", { kind: "basquet" }),
+  it("pet", "pet_pompon", "Pompi", "📣", "raro", { kind: "pompon" }),
+  it("pet", "pet_trofeo", "Copita", "🏆", "epico", { kind: "trofeo" }),
+  soon(it("pet", "pet_unicornio2", "Unicornio arcoíris", "🦄", "legendario", { kind: "unicornio", rainbow: true })),
+
   // ---- Exclusivos de eventos de temporada ----
   ev("halloween", 40, "hat", "ev_bruja", "Sombrero de bruja", "🧙‍♀️", "epico", { kind: "bruja" }),
   ev("halloween", 50, "back", "ev_murcielago", "Alas de murciélago", "🦇", "epico", { kind: "murcielago" }),
@@ -218,6 +315,7 @@ import { levelInfo } from "./xp.js";
 /** Si la prenda todavía está bloqueada devuelve por qué ("" si ya se puede comprar). Lo exclusivo pide nivel o un logro. */
 export function lockReason(progress, item) {
   if (!item) return "";
+  if (item.soon) return "Próximamente";
   if (item.minLevel && levelInfo(progress.xp).level < item.minLevel) return `Nivel ${item.minLevel}`;
   if (item.needs === "dubai" && !(progress.merge && progress.merge.dubai)) return "Haz el ¡Mati Dubai! en Mati Merge";
   return "";
@@ -230,7 +328,8 @@ export function getItem(id) {
 }
 
 export function itemsOfSlot(slot) {
-  return ITEMS.filter((i) => i.slot === slot);
+  // lo que ya se puede comprar primero; lo "próximamente" al final
+  return [...ITEMS.filter((i) => i.slot === slot && !i.soon), ...ITEMS.filter((i) => i.slot === slot && i.soon)];
 }
 
 export function getOutfit(id) {

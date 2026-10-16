@@ -54,3 +54,11 @@ Lo que ya compraste **no cambia**: el reajuste solo sube lo que aún no tienes.
 ## Pendiente
 
 - Revisar con datos reales de partidas (cuando haya ranking online) si el ritmo de ~300 al día es correcto; si la gente gana más o menos, se ajusta en un solo lugar por sistema (`PRICE_X` en `wardrobe-data.js`, `HOUSE_X` en `house-data.js`, `UNLOCK_PRICE`, `ROOM_TYPES`/`HOUSE_SIZES`, autos en `autos-garage.js`).
+
+## Catálogo (oct-2026): cómo se reparte lo que hay para gastar
+
+- **Ropa y accesorios**: 178 cosas a la venta (80 comunes, 54 raras, 29 épicas, 15 legendarias) + 12 "Próximamente".
+- **Casa**: 101 objetos a la venta (muebles, pisos, paredes, techos) + 4 "Próximamente".
+- **Fácil acceso** = comunes y raros (45–260, hasta un día de juego). **Difícil** = épicos y legendarios (910–2.160) y las exclusivas por nivel (Súper Choco 10 … Vestido de Gala 25) o logro (Edición Mati Dubai).
+- **Próximamente** (`soon(...)` en `wardrobe-data.js` y `house-data.js`): se ven y se prueban puestos, pero no se pueden comprar (la compra se rechaza en `buyItem`, `buyFurniture` y `buyHouseItem`). Son los que se cobrarán después con dinero real. Para abrir uno a la venta basta quitarle el `soon(...)`.
+- Temas nuevos: cheerleader (tutús, uniformes con pompones, lazos, coletas), fútbol (botines, equipos, arco, futbolín, copa), básquet (zapatillas, uniforme, aro, marcador, cancha), ballet, deportes, hobbies (telescopio, acuario, caballete).

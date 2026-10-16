@@ -1069,7 +1069,7 @@ function renderHouseDecor() {
     card.className = "sh-card" + (!owned ? " locked" : "") + (houseBuying === item.id ? " trying" : "");
     card.style.setProperty("--rar", RARITIES[item.rarity].color);
     card.innerHTML = `<span class="sh-ico">${item.icon}</span><span class="sh-name">${item.name}</span>` +
-      `<span class="sh-price">${!owned ? `🍫✨ ${item.price}` : free > 0 ? `＋ Poner${total > 1 ? ` (${free} libre${free > 1 ? "s" : ""})` : ""}` : item.price > 0 ? `✓ Puesto · 🍫✨ ${item.price} otro` : "✓ Puesto"}</span>`;
+      `<span class="sh-price">${!owned ? (item.soon ? "🔜 Próximamente" : `🍫✨ ${item.price}`) : free > 0 ? `＋ Poner${total > 1 ? ` (${free} libre${free > 1 ? "s" : ""})` : ""}` : item.price > 0 ? `✓ Puesto · 🍫✨ ${item.price} otro` : "✓ Puesto"}</span>`;
     card.addEventListener("click", () => {
       if (card.dataset.dragged) { delete card.dataset.dragged; return; }
       if (owned && free > 0) { clearFurniturePreview(); houseBuying = null; placeFurniture(item.id); renderHouse(); }
@@ -1085,12 +1085,12 @@ function renderHouseDecor() {
     const need = bi.price - progress.coins;
     const txt = document.createElement("div");
     txt.className = "sh-bar-txt";
-    txt.innerHTML = `<b>${bi.icon} ${bi.name}</b> <i style="color:${RARITIES[bi.rarity].color}">${RARITIES[bi.rarity].name}</i>`;
+    txt.innerHTML = `<b>${bi.icon} ${bi.name}</b> <i style="color:${RARITIES[bi.rarity].color}">${RARITIES[bi.rarity].name}</i>` + (bi.soon ? ` · <small>🔜 Próximamente: puedes verlo en tu cuarto, pero todavía no se vende</small>` : "");
     const buy = document.createElement("button");
     buy.className = "btn-primary";
     const another = ownsHouseItem(progress, bi.id);
-    buy.textContent = need > 0 ? `Te faltan ${need} 🍫✨ para comprarlo` : `${another ? "Comprar otro" : "Comprar"} · 🍫✨ ${bi.price}`;
-    buy.disabled = need > 0;
+    buy.textContent = bi.soon ? "🔜 Próximamente" : need > 0 ? `Te faltan ${need} 🍫✨ para comprarlo` : `${another ? "Comprar otro" : "Comprar"} · 🍫✨ ${bi.price}`;
+    buy.disabled = need > 0 || !!bi.soon;
     buy.addEventListener("click", () => {
       if (!buyFurniture(progress, bi.id)) return;
       audio.playPurchase();
@@ -1960,7 +1960,7 @@ function renderShop() {
     card.className = "sh-card" + (equipped ? " equipped" : "") + (trying ? " trying" : "") + (!owned ? " locked" : "") + (busy ? " busy" : "");
     if (item) card.style.setProperty("--rar", RARITIES[item.rarity].color);
     card.innerHTML = `<span class="sh-ico">${item ? item.icon : "🚫"}</span><span class="sh-name">${item ? item.name : "Normal"}</span>` +
-      `<span class="sh-price">${equipped ? (item && item.price > 0 && !item.event ? `✓ Puesto · 🍫✨ ${item.price} otro` : "✓ Puesto") : busy ? `Lo usa ${usedBy}` : owned ? (item && item.price ? "Tuyo" : "Gratis") : lock ? `🔒 ${lock}` : priceLabel(item)}</span>`;
+      `<span class="sh-price">${equipped ? (item && item.price > 0 && !item.event ? `✓ Puesto · 🍫✨ ${item.price} otro` : "✓ Puesto") : busy ? `Lo usa ${usedBy}` : owned ? (item && item.price ? "Tuyo" : "Gratis") : lock ? (item.soon ? "🔜 Próximamente" : `🔒 ${lock}`) : priceLabel(item)}</span>`;
     card.addEventListener("click", () => {
       if (busy) {
         shopTrial[shopSlot] = id; // se mira puesto y abajo salen las opciones
@@ -2037,10 +2037,10 @@ function renderShop() {
     const txt = document.createElement("div");
     txt.className = "sh-bar-txt";
     txt.innerHTML = `<b>${titem.icon} ${titem.name}</b> <i style="color:${RARITIES[titem.rarity].color}">${RARITIES[titem.rarity].name}</i>` + (evt ? ` · <small>Exclusivo de ${evt.name}</small>` : "") +
-      (had ? ` · <small>Ya lo tienes puesto. ¿Quieres otro igual para otro Matichico?</small>` : lock ? ` · <small>🔒 Exclusivo: ${lock}</small>` : "");
+      (had ? ` · <small>Ya lo tienes puesto. ¿Quieres otro igual para otro Matichico?</small>` : titem.soon ? ` · <small>🔜 Próximamente: lo puedes probar, pero todavía no se vende</small>` : lock ? ` · <small>🔒 Exclusivo: ${lock}</small>` : "");
     const buy = document.createElement("button");
     buy.className = "btn-primary";
-    if (lock) buy.textContent = `🔒 ${lock}`;
+    if (lock) buy.textContent = titem.soon ? "🔜 Próximamente" : `🔒 ${lock}`;
     else if (!avail) buy.textContent = `Vuelve en ${evt.name} ${evt.icon}`;
     else if (evt) buy.textContent = need > 0 ? `Te faltan ${need} fichas ${evt.token}` : `Comprar · ${evt.token} ${titem.tokens}`;
     else buy.textContent = need > 0 ? `Te faltan ${need} Matipuntos` : `${had ? "Comprar otro" : "Comprar"} · 🍫✨ ${titem.price}`;

@@ -175,6 +175,20 @@ const BUILD = {
       const s = new THREE.Shape();
       for (let i = 0; i < 10; i++) { const a = (i / 10) * Math.PI * 2 + Math.PI / 2; const r = i % 2 ? 1.05 : 2.4; (i ? s.lineTo : s.moveTo).call(s, Math.cos(a) * r, Math.sin(a) * r); }
       g.add(flat(new THREE.ShapeGeometry(s), std(p.a, 0.8, { metalness: 0.3 }), 0.02));
+    } else if (p.kind === "canchaB" || p.kind === "canchaF") {
+      const basket = p.kind === "canchaB";
+      const tex = canvasTexture(512, 300, (c, w, h) => {
+        c.fillStyle = basket ? "#d98a3c" : "#4fb04a"; c.fillRect(0, 0, w, h);
+        if (!basket) for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"; c.fillRect((i * w) / 8, 0, w / 8, h); }
+        c.strokeStyle = "#ffffff"; c.lineWidth = 6;
+        c.strokeRect(10, 10, w - 20, h - 20);
+        c.beginPath(); c.moveTo(w / 2, 10); c.lineTo(w / 2, h - 10); c.stroke();
+        c.beginPath(); c.arc(w / 2, h / 2, h * 0.2, 0, 6.3); c.stroke();
+        if (basket) { c.strokeRect(10, h * 0.3, w * 0.18, h * 0.4); c.strokeRect(w - 10 - w * 0.18, h * 0.3, w * 0.18, h * 0.4); }
+        else { c.strokeRect(10, h * 0.25, w * 0.16, h * 0.5); c.strokeRect(w - 10 - w * 0.16, h * 0.25, w * 0.16, h * 0.5); }
+      });
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(4.6, 2.7), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 }));
+      m.rotation.x = -Math.PI / 2; m.position.y = 0.03; m.receiveShadow = true; g.add(m);
     } else if (p.kind === "corazon") {
       const s = new THREE.Shape(); const k = 1.5;
       s.moveTo(0, -k); s.bezierCurveTo(-k * 1.7, -k * 0.2, -k * 1.2, k * 1.2, 0, k * 0.5); s.bezierCurveTo(k * 1.2, k * 1.2, k * 1.7, -k * 0.2, 0, -k);
@@ -195,6 +209,13 @@ const BUILD = {
       g.add(rbox(1.9, 0.3, 1.9, 0.12, std(p.a, 0.85), 0, 0.9, 0.5));
       g.add(rbox(1.2, 0.28, 0.7, 0.12, std(0xffffff, 0.9), 0, 0.95, -1.05));
       g.add(rbox(2.1, 1.3, 0.2, 0.08, frame, 0, 0.9, -1.65));
+    } else if (p.kind === "princesa") { // cama con dosel
+      g.add(rbox(2.6, 0.5, 3.6, 0.2, std(0xffd1e3, 0.7), 0, 0.45, 0), rbox(2.3, 0.3, 2.4, 0.15, std(0xffffff, 0.9), 0, 0.8, 0.35), rbox(2.3, 0.12, 0.7, 0.1, std(0xfff1a8, 0.8), 0, 0.98, -1.2));
+      for (const [x, z] of [[-1.25, -1.7], [1.25, -1.7], [-1.25, 1.7], [1.25, 1.7]]) g.add(cyl(0.07, 0.07, 3.3, std(0xffc800, 0.3, { metalness: 0.6 }), x, 1.65, z, 8));
+      const canopy = new THREE.Mesh(new THREE.ConeGeometry(2.1, 1.0, 4, 1, true), std(0xff9ec6, 0.8, { side: THREE.DoubleSide, transparent: true, opacity: 0.85 }));
+      canopy.position.y = 3.65; canopy.rotation.y = Math.PI / 4; g.add(canopy);
+      for (const sx of [-1, 1]) g.add(rbox(0.12, 2.6, 0.9, 0.05, std(0xffc2dc, 0.8, { transparent: true, opacity: 0.8 }), sx * 1.3, 1.9, 1.3));
+      g.add(ball(0.18, std(0xffc800, 0.3, { metalness: 0.6 }), 0, 4.2, 0));
     } else if (p.kind === "nube") {
       const m = std(0xffffff, 0.95);
       g.add(rbox(2.2, 0.4, 3.2, 0.2, std(0xbfe3ff, 0.9), 0, 0.25, 0));
@@ -351,6 +372,57 @@ const BUILD = {
     } else if (p.kind === "repisa") {
       g.add(box(2.6, 0.12, 0.5, frame, 0, 0, 0.25));
       for (let i = 0; i < 3; i++) { g.add(cyl(0.2, 0.15, 0.3, std(0xd4216c, 0.5), -0.8 + i * 0.8, 0.2, 0.25)); for (let k = 0; k < 4; k++) { const l = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.5, 5), std(0x3fa24a)); l.position.set(-0.8 + i * 0.8 + Math.sin(k * 1.6) * 0.1, 0.6, 0.25 + Math.cos(k * 1.6) * 0.1); l.rotation.z = Math.sin(k * 1.6) * 0.4; g.add(l); } }
+    } else if (p.kind === "banner") {
+      g.add(cyl(0.05, 0.05, 3.4, std(0x8a5a36, 0.5), 0, 0.62, 0.1, 8).rotateZ(Math.PI / 2));
+      const tex = canvasTexture(512, 200, (c, w, h) => {
+        c.fillStyle = p.a; c.beginPath(); c.moveTo(0, 0); c.lineTo(w, 0); c.lineTo(w, h * 0.85); c.lineTo(w / 2, h); c.lineTo(0, h * 0.85); c.closePath(); c.fill();
+        c.fillStyle = p.b; c.font = '110px "Baby Chipmunk", sans-serif'; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(p.text || "VAMOS!", w / 2, h * 0.45);
+        c.strokeStyle = p.b; c.lineWidth = 6; c.strokeRect(12, 12, w - 24, h * 0.7);
+      });
+      const f = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 1.25), new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide }));
+      f.position.set(0, -0.05, 0.12); g.add(f);
+      ticks.push((t) => { f.rotation.x = Math.sin(t * 1.5) * 0.02; });
+    } else if (p.kind === "aropared") {
+      g.add(rbox(2.2, 1.5, 0.12, 0.05, std(0xffffff, 0.4), 0, 0.2, 0.06));
+      g.add(box(0.8, 0.5, 0.02, std(0xe83a3a, 0.5), 0, 0.0, 0.13));
+      const hoop = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.04, 8, 22), std(0xff6a1a, 0.4));
+      hoop.rotation.x = Math.PI / 2; hoop.position.set(0, -0.2, 0.42); g.add(hoop);
+      const net = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.18, 0.4, 10, 1, true), basic(0xffffff, { wireframe: true }));
+      net.position.set(0, -0.42, 0.42); g.add(net);
+    } else if (p.kind === "camiseta") {
+      g.add(box(1.9, 2.3, 0.1, std(0xffc800, 0.3, { metalness: 0.6 }), 0, 0, 0));
+      const tex = canvasTexture(256, 300, (c, w, h) => {
+        c.fillStyle = "#fff6e6"; c.fillRect(0, 0, w, h);
+        c.fillStyle = p.a; c.beginPath(); c.moveTo(70, 30); c.lineTo(110, 20); c.quadraticCurveTo(128, 50, 146, 20); c.lineTo(186, 30); c.lineTo(236, 80); c.lineTo(200, 110); c.lineTo(190, 95); c.lineTo(190, 270); c.lineTo(66, 270); c.lineTo(66, 95); c.lineTo(56, 110); c.lineTo(20, 80); c.closePath(); c.fill();
+        c.fillStyle = "#ffffff"; c.font = '110px "Baby Chipmunk", sans-serif'; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText("10", w / 2, 160);
+      });
+      const pic = new THREE.Mesh(new THREE.PlaneGeometry(1.65, 2.05), new THREE.MeshBasicMaterial({ map: tex }));
+      pic.position.z = 0.06; g.add(pic);
+    } else if (p.kind === "marcador") {
+      g.add(rbox(3.2, 1.4, 0.2, 0.08, std(0x15151d, 0.3), 0, 0, 0));
+      const tex = canvasTexture(512, 220, (c, w, h) => {
+        c.fillStyle = "#0a0a12"; c.fillRect(0, 0, w, h);
+        c.fillStyle = "#35f0ff"; c.font = '36px "Baby Chipmunk", sans-serif'; c.textAlign = "center"; c.fillText("LOCAL", w * 0.22, 46); c.fillText("VISITA", w * 0.78, 46);
+        c.fillStyle = "#ffc800"; c.font = '120px "Baby Chipmunk", sans-serif'; c.fillText("12", w * 0.22, 160); c.fillText("10", w * 0.78, 160);
+        c.fillStyle = "#ffffff"; c.font = '60px sans-serif'; c.fillText(":", w / 2, 140);
+      });
+      const scr = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 1.2), new THREE.MeshBasicMaterial({ map: tex }));
+      scr.position.z = 0.11; g.add(scr);
+      const dots = [-1, 1].map((sx) => { const d = ball(0.07, basic(0xff3b3b), sx * 1.4, 0.55, 0.12); g.add(d); return d; });
+      ticks.push((t) => dots.forEach((d, i) => d.material.color.setHex(Math.sin(t * 4 + i * 3) > 0 ? 0xff3b3b : 0x551111)));
+    } else if (p.kind === "medallas") {
+      g.add(box(3.0, 0.1, 0.2, std(0x8a5a36, 0.5), 0, 0.5, 0.1));
+      [0xffc800, 0xcfd3dc, 0xc98a4b, 0xffc800, 0xff6fb0].forEach((c, i) => {
+        const x = -1.2 + i * 0.6;
+        g.add(box(0.1, 0.8, 0.02, std([0xd4216c, 0x2f6fd6, 0x4fd09a][i % 3], 0.6), x, 0.1, 0.18));
+        const d = cyl(0.2, 0.2, 0.05, std(c, 0.25, { metalness: 0.7 }), x, -0.45, 0.2, 18).rotateX(Math.PI / 2); g.add(d);
+      });
+    } else if (p.kind === "pomponespared") {
+      g.add(rbox(2.4, 0.3, 0.16, 0.06, std(0x8a5a36, 0.5), 0, -0.6, 0.08));
+      for (const sx of [-1, 1]) {
+        const m = std(sx > 0 ? 0xff6fb0 : 0xffc800, 0.9);
+        for (let i = 0; i < 20; i++) { const a = i * 2.4; const y = Math.cos(i * 0.9); const r = Math.sqrt(Math.max(0, 1 - y * y)); g.add(ball(0.2, m, sx * 0.7 + Math.cos(a) * r * 0.4, 0.1 + y * 0.4, 0.25 + Math.sin(a) * r * 0.3)); }
+      }
     } else if (p.kind === "luces") {
       const pts = [];
       for (let i = 0; i <= 12; i++) { const x = -1.9 + i * (3.8 / 12); const y = Math.sin((i / 12) * Math.PI) * -0.5; pts.push([x, y]); }
@@ -488,6 +560,103 @@ const BUILD = {
       scr.position.set(0, 1.9, 0.09); g.add(scr);
       g.add(cyl(0.1, 0.2, 0.4, std(0x15151d, 0.4), 0, 1.1, 0, 10));
       ticks.push((t) => { scr.material.color.setHSL((t * 0.12) % 1, 0.7, 0.55); });
+    } else if (p.kind === "pompones") { // pompones gigantes sobre un soporte
+      g.add(cyl(0.5, 0.6, 0.15, std(0xffffff, 0.5), 0, 0.08, 0, 20));
+      for (const [sx, c] of [[-0.5, 0xff6fb0], [0.5, 0xffc800]]) {
+        g.add(cyl(0.06, 0.07, 1.1, std(0xffffff, 0.5), sx, 0.7, 0, 8));
+        const m = std(c, 0.9);
+        for (let i = 0; i < 34; i++) { const a = i * 2.4; const y = Math.cos(i * 0.8); const r = Math.sqrt(Math.max(0, 1 - y * y)); g.add(ball(0.2, m, sx + Math.cos(a) * r * 0.5, 1.6 + y * 0.45, Math.sin(a) * r * 0.5)); }
+      }
+    } else if (p.kind === "colchoneta") {
+      g.add(rbox(3.4, 0.28, 2.0, 0.1, std(0x2f6fd6, 0.8), 0, 0.14, 0));
+      g.add(rbox(3.4, 0.05, 0.3, 0.02, std(0xffffff, 0.8), 0, 0.3, 0.6), rbox(3.4, 0.05, 0.3, 0.02, std(0xffffff, 0.8), 0, 0.3, -0.6));
+      for (const sx of [-1.7, 1.7]) g.add(rbox(0.08, 0.2, 0.6, 0.03, std(0xff6fb0, 0.6), sx, 0.2, 0.8));
+    } else if (p.kind === "barra") { // espejo con barra de ballet
+      g.add(rbox(3.0, 3.0, 0.12, 0.06, std(0xd7ecff, 0.06, { metalness: 0.9 }), 0, 1.9, -0.1));
+      g.add(rbox(3.2, 3.2, 0.08, 0.1, std(0xffc2dc, 0.5), 0, 1.9, -0.16));
+      for (const sx of [-1.3, 1.3]) g.add(cyl(0.05, 0.06, 1.7, std(0xcfd3dc, 0.3, { metalness: 0.8 }), sx, 0.85, 0.5, 8));
+      g.add(cyl(0.06, 0.06, 2.8, std(0xc98a4b, 0.5), 0, 1.7, 0.5, 10).rotateZ(Math.PI / 2));
+    } else if (p.kind === "copa") {
+      const k = p.big ? 1.5 : 1;
+      const gold = std(p.silver ? 0xcfd3dc : 0xffc800, 0.2, { metalness: 0.85, emissive: p.silver ? 0x222222 : 0x6a4a00, emissiveIntensity: 0.5 });
+      g.add(rbox(1.0 * k, 0.3 * k, 1.0 * k, 0.05, std(0x64321b, 0.5), 0, 0.15 * k, 0));
+      g.add(cyl(0.12 * k, 0.2 * k, 0.9 * k, gold, 0, 0.75 * k, 0, 12));
+      if (p.world) { g.add(ball(0.45 * k, gold, 0, 1.55 * k, 0)); for (const sx of [-1, 1]) g.add(cyl(0.1 * k, 0.16 * k, 0.8 * k, gold, sx * 0.3 * k, 1.0 * k, 0, 8)); }
+      else {
+        g.add(cyl(0.5 * k, 0.2 * k, 0.8 * k, gold, 0, 1.55 * k, 0, 18));
+        for (const sx of [-1, 1]) { const h = new THREE.Mesh(new THREE.TorusGeometry(0.26 * k, 0.05 * k, 6, 14), gold); h.position.set(sx * 0.58 * k, 1.6 * k, 0); g.add(h); }
+        const st = new THREE.Mesh(new THREE.OctahedronGeometry(0.16 * k), basic(0xffffff)); st.position.set(0, 1.55 * k, 0.45 * k); g.add(st);
+        ticks.push((t) => { st.rotation.y = t * 2; });
+      }
+    } else if (p.kind === "aro") { // aro de básquet con soporte
+      const metal = std(0x9aa3b2, 0.3, { metalness: 0.7 });
+      g.add(cyl(0.7, 0.8, 0.2, std(0x2a2a34, 0.7), 0, 0.1, 0, 14), cyl(0.07, 0.07, 3.6, metal, 0, 1.9, -0.1, 8));
+      g.add(rbox(2.0, 1.4, 0.12, 0.05, std(0xffffff, 0.4), 0, 3.4, 0.1), box(0.8, 0.5, 0.02, std(0xe83a3a, 0.5), 0, 3.2, 0.18));
+      g.add(box(0.12, 0.12, 0.8, metal, 0, 2.95, 0.4));
+      const hoop = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.045, 8, 22), std(0xff6a1a, 0.4)); hoop.rotation.x = Math.PI / 2; hoop.position.set(0, 2.95, 0.75); g.add(hoop);
+      const net = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.2, 0.5, 10, 1, true), basic(0xffffff, { wireframe: true })); net.position.set(0, 2.68, 0.75); g.add(net);
+    } else if (p.kind === "cestoBalones") {
+      g.add(cyl(0.7, 0.55, 0.9, std(0x9aa3b2, 0.3, { metalness: 0.6, transparent: true, opacity: 0.55 }), 0, 0.45, 0, 16));
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.7, 0.04, 6, 20), std(0x9aa3b2, 0.3, { metalness: 0.7 }));
+      rim.rotation.x = Math.PI / 2; rim.position.y = 0.9; g.add(rim);
+      [[-0.25, 0.85, 0.1, 0xff8a2a], [0.25, 0.9, -0.1, 0xffffff], [0, 1.1, 0.15, 0xff8a2a], [0.1, 0.85, 0.3, 0x4fd09a], [-0.15, 1.0, -0.25, 0xffffff]].forEach(([x, y, z, c]) => g.add(ball(0.28, std(c, 0.6), x, y, z)));
+    } else if (p.kind === "banca") {
+      g.add(rbox(3.0, 0.2, 0.9, 0.06, std(p.a || 0xc98a4b, 0.6), 0, 0.85, 0), rbox(3.0, 0.9, 0.12, 0.05, std(p.b || 0xe83a3a, 0.6), 0, 1.4, -0.4));
+      for (const sx of [-1.3, 1.3]) g.add(box(0.14, 0.85, 0.8, std(0x5a3a22, 0.6), sx, 0.42, 0));
+    } else if (p.kind === "arco") { // arco de fútbol
+      const white = std(0xffffff, 0.4);
+      for (const sx of [-1.4, 1.4]) { g.add(cyl(0.06, 0.06, 1.9, white, sx, 0.95, 0, 8)); g.add(cyl(0.04, 0.04, 1.2, white, sx, 0.05, -0.6, 6).rotateX(Math.PI / 2)); }
+      g.add(cyl(0.06, 0.06, 2.9, white, 0, 1.9, 0, 8).rotateZ(Math.PI / 2));
+      const net = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 1.9, 14, 9), basic(0xffffff, { wireframe: true, transparent: true, opacity: 0.55 }));
+      net.position.set(0, 0.95, -1.2); g.add(net);
+      for (const sx of [-1.4, 1.4]) { const side = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.9, 6, 9), basic(0xffffff, { wireframe: true, transparent: true, opacity: 0.4 })); side.rotation.y = Math.PI / 2; side.position.set(sx, 0.95, -0.6); g.add(side); }
+      g.add(ball(0.3, std(0xffffff, 0.5), 0.5, 0.3, 1.0));
+    } else if (p.kind === "futbolin") {
+      g.add(rbox(3.2, 0.9, 1.9, 0.1, std(0x8a4b2c, 0.6), 0, 0.5, 0));
+      g.add(box(2.9, 0.06, 1.6, std(0x4fb04a, 0.8), 0, 1.0, 0));
+      for (const [i, x] of [-1.1, -0.35, 0.35, 1.1].entries()) {
+        g.add(cyl(0.035, 0.035, 2.4, std(0xcfd3dc, 0.3, { metalness: 0.8 }), x, 1.3, 0, 6).rotateX(Math.PI / 2));
+        for (const z of [-0.4, 0.4]) g.add(rbox(0.16, 0.34, 0.1, 0.03, std(i % 2 ? 0xe83a3a : 0x2f6fd6, 0.5), x, 1.2, z));
+        g.add(ball(0.1, std(0x1c1c22, 0.5), x, 1.3, 1.25));
+      }
+      for (const [x, z] of [[-1.5, -0.85], [1.5, -0.85], [-1.5, 0.85], [1.5, 0.85]]) g.add(box(0.2, 0.5, 0.2, std(0x5a3a22, 0.6), x, 0.1, z));
+      g.add(ball(0.09, basic(0xffffff), 0.2, 1.1, 0.1));
+    } else if (p.kind === "telescopio") {
+      const metal = std(0x9aa3b2, 0.3, { metalness: 0.7 });
+      for (const a of [0, 2.1, 4.2]) { const leg = cyl(0.04, 0.05, 1.7, metal, Math.sin(a) * 0.35, 0.8, Math.cos(a) * 0.35, 6); leg.rotation.z = -Math.sin(a) * 0.25; leg.rotation.x = Math.cos(a) * 0.25; g.add(leg); }
+      const tube = cyl(0.2, 0.28, 1.8, std(0xd4216c, 0.4), 0, 1.9, 0, 16); tube.rotation.x = -0.9; g.add(tube);
+      const lens = cyl(0.25, 0.25, 0.05, std(0x9fdcff, 0.1, { metalness: 0.5 }), 0, 2.45, 0.7, 16); lens.rotation.x = -0.9; g.add(lens);
+    } else if (p.kind === "acuario") {
+      g.add(rbox(3.0, 0.5, 1.4, 0.06, std(0x8a4b2c, 0.6), 0, 0.25, 0));
+      g.add(rbox(2.8, 1.5, 1.2, 0.04, std(0x6fd0ff, 0.1, { transparent: true, opacity: 0.4 }), 0, 1.25, 0));
+      g.add(rbox(2.8, 0.2, 1.2, 0.05, std(0xf0d9a0, 0.9), 0, 0.6, 0));
+      for (const x of [-1, 0.2, 1.1]) { const pl = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.8, 5), std(0x3fa24a, 0.7)); pl.position.set(x, 1.0, -0.3); g.add(pl); }
+      const fish = [0xff8a2a, 0xffd34d, 0xff6fb0].map((c, i) => { const f = new THREE.Group(); f.add(ball(0.13, std(c, 0.4)), (() => { const t = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.18, 4), std(c, 0.4)); t.rotation.z = Math.PI / 2; t.position.x = -0.18; return t; })()); g.add(f); return f; });
+      ticks.push((t) => fish.forEach((f, i) => { const a = t * (0.6 + i * 0.15) + i * 2; f.position.set(Math.cos(a) * 1.0, 1.2 + Math.sin(a * 1.7) * 0.3, Math.sin(a) * 0.3); f.rotation.y = -a + Math.PI; }));
+    } else if (p.kind === "caballete") {
+      const wd = std(0xc98a4b, 0.6);
+      for (const [x, z, r] of [[-0.5, 0.3, 0.25], [0.5, 0.3, -0.25], [0, -0.4, 0]]) { const l = box(0.08, 2.4, 0.08, wd, x, 1.2, z); l.rotation.z = r; g.add(l); }
+      g.add(box(1.5, 0.08, 0.5, wd, 0, 0.9, 0.35));
+      const tex = canvasTexture(256, 200, (c, w, h) => { c.fillStyle = "#fff6e6"; c.fillRect(0, 0, w, h); c.fillStyle = "#ff6fb0"; c.beginPath(); c.arc(w * 0.3, h * 0.45, 40, 0, 6.3); c.fill(); c.fillStyle = "#6fd0ff"; c.fillRect(w * 0.5, h * 0.2, 80, 100); c.fillStyle = "#ffd34d"; c.beginPath(); c.arc(w * 0.78, h * 0.25, 28, 0, 6.3); c.fill(); });
+      const cv = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 1.0), new THREE.MeshBasicMaterial({ map: tex })); cv.position.set(0, 1.7, 0.4); cv.rotation.x = -0.12; g.add(cv);
+    } else if (p.kind === "escenario") {
+      g.add(rbox(4.2, 0.4, 3.0, 0.08, std(0x2a1a4a, 0.6), 0, 0.2, 0), rbox(4.2, 0.06, 0.2, 0.02, std(0xff3fa4, 0.4, { emissive: 0xff3fa4, emissiveIntensity: 0.6 }), 0, 0.4, 1.45));
+      const back = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.4), new THREE.MeshBasicMaterial({ map: wallTexture({ style: "estrellas", a: "#1c1a4a", b: "#ffd34d" }) })); back.position.set(0, 1.6, -1.45); g.add(back);
+      g.add(cyl(0.03, 0.03, 1.6, std(0x9aa3b2, 0.3, { metalness: 0.8 }), 0.4, 1.2, 0.5, 6), ball(0.1, std(0x1c1c22, 0.4), 0.4, 2.05, 0.5));
+      const lights = [-1.6, 1.6].map((x) => { const c = new THREE.Mesh(new THREE.ConeGeometry(0.25, 0.5, 12, 1, true), std(0xffe14a, 0.4, { emissive: 0xffe14a, emissiveIntensity: 0.6, side: THREE.DoubleSide })); c.position.set(x, 2.6, 0.5); c.rotation.x = Math.PI; g.add(c); return c; });
+      ticks.push((t) => lights.forEach((l, i) => { l.material.emissiveIntensity = 0.4 + Math.abs(Math.sin(t * 3 + i * 2)) * 0.6; }));
+    } else if (p.kind === "tobogan") {
+      const red = std(0xe83a3a, 0.5);
+      g.add(rbox(1.2, 0.2, 1.2, 0.05, std(0xffc800, 0.5), 0, 2.0, -0.8));
+      for (const [x, z] of [[-0.5, -1.3], [0.5, -1.3], [-0.5, -0.3], [0.5, -0.3]]) g.add(box(0.1, 2.0, 0.1, std(0x2f6fd6, 0.5), x, 1.0, z));
+      for (let i = 0; i < 5; i++) g.add(box(1.0, 0.07, 0.12, std(0x5a3a22, 0.6), 0, 0.4 + i * 0.35, -1.6 + i * 0.03));
+      const slide = rbox(0.9, 0.1, 3.0, 0.04, red, 0, 1.05, 0.9); slide.rotation.x = 0.62; g.add(slide);
+      for (const sx of [-0.5, 0.5]) { const rail = rbox(0.08, 0.2, 3.0, 0.03, std(0xffc800, 0.5), sx, 1.15, 0.9); rail.rotation.x = 0.62; g.add(rail); }
+    } else if (p.kind === "piscina") {
+      g.add(cyl(1.7, 1.7, 0.6, std(0xff6fb0, 0.5), 0, 0.3, 0, 32), cyl(1.5, 1.5, 0.62, std(0x6fd0ff, 0.2, { transparent: true, opacity: 0.85 }), 0, 0.31, 0, 32));
+      const duck = new THREE.Group(); duck.add(ball(0.22, std(0xffd83a, 0.5)), ball(0.14, std(0xffd83a, 0.5), 0.12, 0.2, 0), (() => { const b = box(0.1, 0.04, 0.08, std(0xff8a2a, 0.5), 0.26, 0.2, 0); return b; })());
+      g.add(duck);
+      ticks.push((t) => { duck.position.set(Math.cos(t * 0.8) * 0.8, 0.7 + Math.sin(t * 2) * 0.03, Math.sin(t * 0.8) * 0.8); duck.rotation.y = -t * 0.8; });
     } else if (p.kind === "mesacentro") {
       g.add(cyl(0.95, 0.95, 0.1, std(p.a, 0.5), 0, 0.62, 0, 28), cyl(0.15, 0.25, 0.55, std(p.a, 0.6), 0, 0.3, 0, 12), cyl(0.55, 0.6, 0.06, std(p.a, 0.6), 0, 0.03, 0, 20));
       g.add(cyl(0.16, 0.12, 0.2, std(0xffffff, 0.4), -0.35, 0.78, 0.1, 14), cyl(0.16, 0.12, 0.2, std(p.b, 0.4), 0.3, 0.78, -0.2, 14), ball(0.12, std(0xffd34d, 0.4), 0.1, 0.77, 0.4));

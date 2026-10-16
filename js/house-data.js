@@ -22,6 +22,8 @@ export const HOUSE_SPOTS = [
 
 const P = { comun: 30, raro: 110, epico: 260, legendario: 520 };
 // Precios de la casa según la rareza (ver docs/ECONOMIA.md); el 0 sigue siendo "viene con la casa".
+// `soon(...)` = se ve y se prueba pero todavía no se vende ("Próximamente"): son los que se cobrarán después.
+const soon = (item) => ({ ...item, soon: true });
 const HOUSE_X = { comun: 2, raro: 2, epico: 3.5, legendario: 4 };
 const it = (spot, id, name, icon, rarity, params = {}, price) => { const base = price ?? P[rarity]; return { id, spot, name, icon, rarity, price: base > 0 ? Math.round((base * HOUSE_X[rarity]) / 5) * 5 : 0, params }; };
 
@@ -108,6 +110,44 @@ export const HOUSE_ITEMS = [
   it("free", "fr_ropero", "Ropero", "🚪", "comun", { kind: "ropero", a: "#fff1d6", b: "#d4216c" }),
   it("free", "fr_tvmueble", "Mueble con tele", "📺", "raro", { kind: "tvmueble", a: "#8a4b2c" }),
   it("free", "fr_mesacentro", "Mesita de centro", "☕", "comun", { kind: "mesacentro", a: "#e0b070", b: "#ff7aa8" }),
+
+  // ---- NUEVO · Cheerleader ----
+  it("free", "fr_pompones", "Pompones gigantes", "📣", "comun", { kind: "pompones" }),
+  it("free", "fr_colchoneta", "Colchoneta de gimnasia", "🤸", "comun", { kind: "colchoneta" }),
+  it("free", "fr_barra", "Espejo y barra de ballet", "🩰", "raro", { kind: "barra" }),
+  it("free", "fr_trofeo_cheer", "Trofeo de cheer", "🏆", "raro", { kind: "copa" }),
+  it("free", "fr_escenario", "Escenario con luces", "🎤", "epico", { kind: "escenario" }),
+  it("wallC", "wc_banner_cheer", "Banner GO MATI", "📣", "comun", { kind: "banner", text: "GO MATI!", a: "#d4216c", b: "#fff6e6" }),
+  it("wallL", "wl1_pompones", "Pompones en la pared", "🎀", "comun", { kind: "pomponespared" }),
+  it("wallR", "wr_medallas", "Colgador de medallas", "🥇", "comun", { kind: "medallas" }),
+  it("rug", "rg_cheer", "Alfombra Cheer", "⭐", "comun", { kind: "estrella", a: "#ff6fb0", b: "#ffffff" }),
+  it("wall", "wl_cheer", "Rayas Cheer", "🎀", "comun", { style: "rayas", a: "#ffffff", b: "#ff6fb0" }),
+  // ---- NUEVO · Básquetbol ----
+  it("free", "fr_aro", "Aro de básquet", "🏀", "epico", { kind: "aro" }),
+  it("free", "fr_cesto_balones", "Cesto de balones", "🏀", "comun", { kind: "cestoBalones" }),
+  it("free", "fr_banca", "Banca de equipo", "🪑", "comun", { kind: "banca", a: "#c98a4b", b: "#ff8a2a" }),
+  it("wallC", "wc_aropared", "Aro de pared", "🏀", "raro", { kind: "aropared" }),
+  it("wallC", "wc_marcador", "Marcador electrónico", "🔢", "epico", { kind: "marcador" }),
+  it("rug", "rg_cancha_basquet", "Cancha de básquet", "🏀", "raro", { kind: "canchaB" }),
+  it("floor", "fl_parquet", "Parquet de cancha", "🏟️", "raro", { style: "madera", a: "#e3a44f", b: "#cf8a36" }),
+  it("wall", "wl_basquet", "Rayas de básquet", "🏀", "comun", { style: "rayas", a: "#ffe1b3", b: "#ff8a2a" }),
+  // ---- NUEVO · Fútbol ----
+  it("free", "fr_arco", "Arco de fútbol", "🥅", "raro", { kind: "arco" }),
+  it("free", "fr_futbolin", "Futbolín", "⚽", "epico", { kind: "futbolin" }),
+  it("free", "fr_copa_futbol", "Copa de campeón", "🏆", "epico", { kind: "copa", silver: true, big: true }),
+  it("wallL", "wl1_camiseta", "Camiseta enmarcada", "👕", "raro", { kind: "camiseta", a: "#d52b1e" }),
+  it("wallC", "wc_banner_futbol", "Banner de la hinchada", "⚽", "comun", { kind: "banner", text: "GOOOL!", a: "#1f57c9", b: "#ffffff" }),
+  it("rug", "rg_cancha_futbol", "Cancha de fútbol", "⚽", "raro", { kind: "canchaF" }),
+  it("wall", "wl_cancha", "Rayas de cancha", "🌿", "comun", { style: "rayas", a: "#d8f5c4", b: "#6cc04a" }),
+  // ---- NUEVO · Hobbies ----
+  it("free", "fr_caballete", "Caballete de pintura", "🎨", "comun", { kind: "caballete" }),
+  it("free", "fr_telescopio", "Telescopio", "🔭", "raro", { kind: "telescopio" }),
+  it("free", "fr_acuario", "Acuario con peces", "🐠", "epico", { kind: "acuario" }),
+  // ---- Próximamente (se ven y se prueban, todavía no se compran) ----
+  soon(it("free", "fr_copa_mundo", "Copa del Mundo", "🏆", "legendario", { kind: "copa", big: true, world: true })),
+  soon(it("free", "fr_tobogan", "Tobogán", "🛝", "epico", { kind: "tobogan" })),
+  soon(it("free", "fr_piscina", "Mini piscina", "🏊", "epico", { kind: "piscina" })),
+  soon(it("bed", "bd_princesa", "Cama de princesa", "👑", "legendario", { kind: "princesa" })),
   // ---- Techo ----
   it("ceiling", "ce_lampara", "Lámpara colgante", "💡", "comun", { kind: "lampara" }),
   it("ceiling", "ce_globos", "Globos", "🎈", "comun", { kind: "globos" }),
@@ -136,7 +176,7 @@ export function ownsHouseItem(progress, id) {
 /** Compra un objeto de la casa con Matipuntos (y lo deja puesto). */
 export function buyHouseItem(progress, id) {
   const item = getHouseItem(id);
-  if (!item || ownsHouseItem(progress, id)) return false;
+  if (!item || item.soon || ownsHouseItem(progress, id)) return false;
   if (!spendCoins(progress, item.price)) return false;
   progress.house.owned.push(id);
   progress.house.placed[item.spot] = id;
@@ -162,11 +202,13 @@ export function placeHouseItem(progress, spot, id) {
 
 /** Muebles que se pueden poner donde quieras (todo menos piso, paredes y techo). */
 export const FURNITURE_SPOTS = ["rug", "bed", "left", "right", "free", "wallL", "wallC", "wallR"];
-const ALL_FREE_UTIL = ["sofa", "mesa", "silla", "comoda", "ropero", "tvmueble", "mesacentro", "heladera", "cocina", "meson", "comedor", "tina", "lavabo"];
+const SPORT_KINDS = ["pompones", "colchoneta", "barra", "copa", "escenario", "aro", "cestoBalones", "banca", "arco", "futbolin"];
+const ALL_FREE_UTIL = ["sofa", "mesa", "silla", "comoda", "ropero", "tvmueble", "mesacentro", "heladera", "cocina", "meson", "comedor", "tina", "lavabo", ...SPORT_KINDS];
 export const FURN_CATEGORIES = [
   { id: "sit", name: "Sillones y mesas", icon: "🛋️", test: (i) => i.spot === "free" && ["sofa", "mesa", "silla", "comoda", "ropero", "tvmueble", "mesacentro"].includes(i.params.kind) },
   { id: "kitchen", name: "Cocina y comedor", icon: "🍳", test: (i) => i.spot === "free" && ["heladera", "cocina", "meson", "comedor"].includes(i.params.kind) },
   { id: "bath", name: "Baño", icon: "🛁", test: (i) => i.spot === "free" && ["tina", "lavabo"].includes(i.params.kind) },
+  { id: "sport", name: "Cheer y deportes", icon: "🏆", test: (i) => i.spot === "free" && SPORT_KINDS.includes(i.params.kind) },
   { id: "fun", name: "Juegos", icon: "🎪", test: (i) => i.spot === "free" && !ALL_FREE_UTIL.includes(i.params.kind) || ["lf_arcade", "lf_oso"].includes(i.id) },
   { id: "bed", name: "Camas", icon: "🛏️", test: (i) => i.spot === "bed" },
   { id: "plants", name: "Plantas y luces", icon: "🪴", test: (i) => (i.spot === "left" || i.spot === "right") && !["lf_arcade", "lf_oso"].includes(i.id) },
@@ -176,7 +218,8 @@ export const FURN_CATEGORIES = [
 export const isWallItem = (item) => !!item && item.spot.startsWith("wall") && item.spot.length === 5;
 export const furnitureOf = (catId) => {
   const c = FURN_CATEGORIES.find((x) => x.id === catId);
-  return HOUSE_ITEMS.filter((i) => FURNITURE_SPOTS.includes(i.spot) && c.test(i));
+  const all = HOUSE_ITEMS.filter((i) => FURNITURE_SPOTS.includes(i.spot) && c.test(i));
+  return [...all.filter((i) => !i.soon), ...all.filter((i) => i.soon)]; // lo "próximamente" al final
 };
 
 /** Posiciones de siempre de cada lugar (para pasar lo que ya tenías puesto al modo libre). */
@@ -249,7 +292,7 @@ export function layoutRemove(progress, uid) {
 /** Compra un mueble (o "otro igual" si ya lo tienes: cada compra es una unidad más). Se agrega con un toque. */
 export function buyFurniture(progress, id) {
   const item = getHouseItem(id);
-  if (!item || item.price <= 0) return false;
+  if (!item || item.soon || item.price <= 0) return false;
   const h = progress.house;
   const had = ownsHouseItem(progress, id);
   if (!spendCoins(progress, item.price)) return false;
