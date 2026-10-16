@@ -1846,3 +1846,4 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .lb-rename summary { cursor: pointer; font-weight: 800; font-size: 0.85rem; color: #ffe9f3; list-style: none; }
 .lb-rename summary::-webkit-details-marker { display: none; }
 .lb-rename .field-label { display: block; margin: 6px 0 4px; font-size: 0.75rem; color: #ffd0e6; opacity: 1; }
+.sh-card.busy { opacity: 0.78; filter: saturate(0.7); }

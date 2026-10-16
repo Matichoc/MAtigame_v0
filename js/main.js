@@ -5,7 +5,7 @@ import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
-  loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem,
+  loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem, wearers, canWear, takeOff, wardrobeCopies,
   getBestScore, getLeaderboard, canClaimDailyReward, claimDailyReward, claimAchievement,
 } from "./storage.js";
 import {
@@ -1868,14 +1868,19 @@ function renderShop() {
     const owned = ownsItem(progress, id);
     const equipped = (look[shopSlot] || "") === id && !shopTrial[shopSlot];
     const trying = shopTrial[shopSlot] === id && id !== "";
+    // una prenda comprada solo la lleva un Matichico a la vez: si otro la tiene, hay que quitársela o comprar otra
+    const busy = owned && item && !canWear(progress, ch.id, id);
+    const usedBy = busy ? wearers(progress, id).map((cid) => (CHARACTERS.find((c) => c.id === cid) || {}).name || "otro").join(", ") : "";
     const card = document.createElement("button");
     card.type = "button";
-    card.className = "sh-card" + (equipped ? " equipped" : "") + (trying ? " trying" : "") + (!owned ? " locked" : "");
+    card.className = "sh-card" + (equipped ? " equipped" : "") + (trying ? " trying" : "") + (!owned ? " locked" : "") + (busy ? " busy" : "");
     if (item) card.style.setProperty("--rar", RARITIES[item.rarity].color);
     card.innerHTML = `<span class="sh-ico">${item ? item.icon : "🚫"}</span><span class="sh-name">${item ? item.name : "Normal"}</span>` +
-      `<span class="sh-price">${equipped ? "✓ Puesto" : owned ? (item && item.price ? "Tuyo" : "Gratis") : priceLabel(item)}</span>`;
+      `<span class="sh-price">${equipped ? "✓ Puesto" : busy ? `Lo usa ${usedBy}` : owned ? (item && item.price ? "Tuyo" : "Gratis") : priceLabel(item)}</span>`;
     card.addEventListener("click", () => {
-      if (owned) {
+      if (busy) {
+        shopTrial[shopSlot] = id; // se mira puesto y abajo salen las opciones
+      } else if (owned) {
         equipItem(progress, ch.id, shopSlot, id);
         delete shopTrial[shopSlot];
         audio.playJump();
@@ -1895,7 +1900,49 @@ function renderShop() {
   shopBarEl.innerHTML = "";
   const tid = shopTrial[shopSlot];
   const titem = tid ? getItem(tid) : null;
-  if (titem) {
+  if (titem && ownsItem(progress, titem.id) && !canWear(progress, ch.id, titem.id)) {
+    // ya es tuyo pero lo lleva otro Matichico
+    const who = wearers(progress, titem.id);
+    const names = who.map((cid) => (CHARACTERS.find((c) => c.id === cid) || {}).name || "otro").join(" y ");
+    const txt = document.createElement("div");
+    txt.className = "sh-bar-txt";
+    txt.innerHTML = `<b>${titem.icon} ${titem.name}</b> — lo está usando <b>${names}</b>. Solo uno a la vez: pásalo a ${ch.name} o compra otro.`;
+    const pass = document.createElement("button");
+    pass.className = "btn-primary";
+    pass.textContent = `Pasárselo a ${ch.name}`;
+    pass.addEventListener("click", () => {
+      for (const cid of who) takeOff(progress, cid, titem.id);
+      equipItem(progress, ch.id, shopSlot, titem.id);
+      delete shopTrial[shopSlot];
+      audio.playJump();
+      renderShop();
+      refreshShopPreview();
+    });
+    shopBarEl.append(txt, pass);
+    if (!titem.event && titem.price > 0) {
+      const need = titem.price - progress.coins;
+      const more = document.createElement("button");
+      more.className = "btn-secondary";
+      more.textContent = need > 0 ? `Comprar otro (faltan ${need} 🍫✨)` : `Comprar otro · 🍫✨ ${titem.price}`;
+      more.disabled = need > 0;
+      more.addEventListener("click", () => {
+        if (!buyItem(progress, titem.id)) return;
+        equipItem(progress, ch.id, shopSlot, titem.id);
+        delete shopTrial[shopSlot];
+        audio.playPurchase();
+        showToast(`¡Compraste otro ${titem.name}! 🎉`);
+        renderShop();
+        refreshShopPreview();
+        refreshHubStats();
+      });
+      shopBarEl.append(more);
+    }
+    const cancel = document.createElement("button");
+    cancel.className = "btn-secondary";
+    cancel.textContent = "Cancelar";
+    cancel.addEventListener("click", () => { delete shopTrial[shopSlot]; renderShop(); refreshShopPreview(); });
+    shopBarEl.append(cancel);
+  } else if (titem) {
     const evt = titem.event ? eventById(titem.event) : null;
     const avail = !evt || eventItemAvailable(titem);
     const need = evt ? titem.tokens - eventTokens(progress, evt.id) : titem.price - progress.coins;

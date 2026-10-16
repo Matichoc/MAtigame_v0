@@ -22,7 +22,7 @@ function defaultProgress() {
     selectedCharacterId: null,
     // Guardarropa (ver js/wardrobe-data.js): objetos comprados (compartidos por todos los
     // Matichicos) y lo que lleva puesto cada uno.
-    wardrobe: { owned: [], looks: {} }, // looks: { [characterId]: { hair, hat, outfit, ... } }
+    wardrobe: { owned: [], looks: {}, copies: {} }, // looks: { [characterId]: { hair, hat, outfit, ... } }
     house: { owned: [], placed: {}, layout: null, size: 0 }, // Mi Casa (ver js/house-data.js)
     unlockedGames: [], // juegos canjeados con Matipuntos (ver js/unlocks.js)
     eventTokens: {}, // fichas de eventos de temporada: { [idEvento]: n }
@@ -76,7 +76,9 @@ function normalizeWardrobe(parsed) {
     if (!looks[charId]) looks[charId] = {};
     if (!looks[charId].outfit) looks[charId].outfit = outfitId;
   }
-  return { owned: [...owned], looks };
+  const copies = {};
+  for (const [id, n] of Object.entries(w.copies || {})) { const k = Math.floor(Number(n)); if (k > 1) copies[id] = k; }
+  return { owned: [...owned], looks, copies };
 }
 
 /** Carga (o crea) el progreso de un perfil. El id queda "pegado" al objeto
@@ -149,6 +151,38 @@ export function ownsItem(progress, itemId) {
   return item.price === 0 || progress.wardrobe.owned.includes(itemId);
 }
 
+// Cada prenda comprada se puede usar en UN Matichico a la vez (los mismos objetos pueden pasar de uno a otro, pero no estar
+// puestos en dos al mismo tiempo): para que dos la lleven hay que comprar otra. Lo que viene gratis no tiene límite.
+
+/** Cuántas unidades tienes de un objeto del guardarropa (Infinity si es gratis). */
+export function wardrobeCopies(progress, itemId) {
+  const item = getItem(itemId);
+  if (!item) return 0;
+  if (item.price === 0) return Infinity;
+  if (!progress.wardrobe.owned.includes(itemId)) return 0;
+  return Math.max(1, Math.floor(Number((progress.wardrobe.copies || {})[itemId])) || 1);
+}
+
+/** Ids de los Matichicos que lo llevan puesto ahora. */
+export function wearers(progress, itemId) {
+  return Object.entries(progress.wardrobe.looks).filter(([, look]) => Object.values(look).includes(itemId)).map(([charId]) => charId);
+}
+
+/** ¿Puede este Matichico ponérselo ahora? (si ya lo lleva, o si queda una unidad libre) */
+export function canWear(progress, characterId, itemId) {
+  if (!itemId) return true;
+  const w = wearers(progress, itemId);
+  return w.includes(characterId) || w.length < wardrobeCopies(progress, itemId);
+}
+
+/** Le saca el objeto a otro Matichico (queda con el normal de esa categoría). */
+export function takeOff(progress, characterId, itemId) {
+  const look = progress.wardrobe.looks[characterId];
+  if (!look) return;
+  for (const [slot, id] of Object.entries(look)) if (id === itemId) look[slot] = EMPTY_LOOK[slot] ?? "";
+  saveProgress(progress);
+}
+
 /** Lo que lleva puesto un Matichico (con los valores por defecto para lo que no se haya elegido). */
 export function getLook(progress, characterId) {
   return { ...EMPTY_LOOK, ...(progress.wardrobe.looks[characterId] || {}) };
@@ -161,6 +195,7 @@ export function equippedOutfitId(progress, characterId) {
 /** Se pone (o se quita, con itemId "") un objeto en la categoría `slot` del Matichico. */
 export function equipItem(progress, characterId, slot, itemId) {
   if (!ownsItem(progress, itemId)) return false;
+  if (!canWear(progress, characterId, itemId)) return false; // otro Matichico lo está usando y no hay otra unidad
   if (!progress.wardrobe.looks[characterId]) progress.wardrobe.looks[characterId] = {};
   progress.wardrobe.looks[characterId][slot] = itemId;
   saveProgress(progress);
@@ -174,11 +209,15 @@ export function spendCoins(progress, amount) {
   return true;
 }
 
+/** Compra un objeto (o "otro igual" si ya lo tienes: cada compra es una unidad más). */
 export function buyItem(progress, itemId) {
   const item = getItem(itemId);
-  if (!item || item.event || ownsItem(progress, itemId)) return false; // los de evento se compran con fichas
+  if (!item || item.event || item.price <= 0) return false; // los de evento se compran con fichas
+  const had = progress.wardrobe.owned.includes(itemId);
   if (!spendCoins(progress, item.price)) return false;
-  progress.wardrobe.owned.push(itemId);
+  if (!had) progress.wardrobe.owned.push(itemId);
+  progress.wardrobe.copies = progress.wardrobe.copies || {};
+  progress.wardrobe.copies[itemId] = had ? wardrobeCopies(progress, itemId) + 1 : 1;
   saveProgress(progress);
   return true;
 }
