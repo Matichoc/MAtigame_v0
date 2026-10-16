@@ -1680,3 +1680,21 @@ details.how > :not(summary) { font-size: 0.85rem; margin: 6px 0 0; }
 .tf-tip { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); z-index: 7; max-width: 80%; text-align: center; background: #fff6e6; color: #3d1f10; border: 3px solid var(--dorado, #ffc800); border-radius: 18px; padding: 8px 16px; font-weight: 800; box-shadow: 0 6px 18px rgba(0,0,0,0.3); pointer-events: none; }
 @media (max-height: 520px) { .tf-task { font-size: 0.72rem; padding: 3px 6px; } .tf-guide { max-width: min(210px, 42%); } }
 .canvas-wrap:has(.overlay:not(.hidden)) :is(.tf-guide, .tf-timer, .tf-tip) { display: none !important; }
+
+/* ---------- Calendario de recompensas ---------- */
+.cal-card { max-width: min(430px, 96vw); }
+.cal-sub { font-size: 0.8rem; opacity: 0.9; margin: 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-dow { text-align: center; font-weight: 900; font-size: 0.7rem; opacity: 0.7; }
+.cal-day { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; padding: 3px 0; min-height: 48px; background: rgba(255,255,255,0.08); border: 2px solid transparent; line-height: 1.05; }
+.cal-day b { font-size: 0.62rem; opacity: 0.75; }
+.cal-day .cal-ic { font-size: 1.15rem; }
+.cal-day small { font-size: 0.6rem; font-weight: 800; color: #ffd34d; }
+.cal-day.claimed { background: rgba(124,220,74,0.18); border-color: rgba(124,220,74,0.5); }
+.cal-day.missed { opacity: 0.4; filter: grayscale(0.7); }
+.cal-day.future { opacity: 0.85; }
+.cal-day.today { border-color: #ffd34d; background: rgba(255,211,77,0.25); animation: cal-pulse 1.2s ease-in-out infinite; }
+.cal-day.special { border-color: #35f0ff; box-shadow: 0 0 10px rgba(53,240,255,0.6) inset; }
+.cal-today { font-size: 0.95rem; text-align: center; padding: 4px; }
+@keyframes cal-pulse { 50% { transform: scale(1.07); } }
+@media (max-height: 520px) { .cal-card { padding: 8px 12px; gap: 4px; max-height: 96vh; } .cal-card h2 { font-size: 1.05rem; margin: 0; } .cal-day { min-height: 30px; padding: 1px 0; } .cal-day b { display: none; } .cal-day .cal-ic { font-size: 0.85rem; } .cal-day small { font-size: 0.55rem; } .cal-sub { font-size: 0.7rem; } .cal-today { padding: 0; font-size: 0.85rem; } }

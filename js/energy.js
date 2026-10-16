@@ -12,7 +12,7 @@
 import { saveProgress, earnCoins, dayKey } from "./storage.js";
 
 export const ENERGY_MAX = 100; // lo que se llena solo (por día y con el tiempo)
-export const ENERGY_CAP = 150; // tope con extras (cofres, logros...)
+export const ENERGY_CAP = 300; // tope con extras (cofres, logros, calendario...)
 export const REGEN_SECS = 360; // +1 de energía cada 6 minutos (10 por hora)
 export const SLEEP_MULT = 3; // durmiendo se recarga 3 veces más rápido
 export const EXTRA_DAILY_MAX = 50; // máximo de energía extra por día
@@ -106,14 +106,15 @@ export function spendEnergy(progress, n) {
 }
 
 /** Suma energía extra (cofres, misiones, logros, subir de nivel). Respeta el tope diario. Devuelve cuánto sumó. */
-export function addEnergy(progress, n, reason = "") {
+export function addEnergy(progress, n, reason = "", { calendar = false } = {}) {
   if (!(n > 0)) return 0;
   const e = energyOf(progress);
-  const room = Math.min(n, EXTRA_DAILY_MAX - e.extra, ENERGY_CAP - e.v);
+  // los premios del calendario mensual no cuentan para el tope diario de extras (solo para el tope general)
+  const room = Math.min(n, calendar ? Infinity : EXTRA_DAILY_MAX - e.extra, ENERGY_CAP - e.v);
   if (room <= 0) return 0;
   if (e.v >= ENERGY_MAX && e.v + room > ENERGY_MAX) e.t = Date.now();
   e.v += room;
-  e.extra += room;
+  if (!calendar) e.extra += room;
   saveProgress(progress);
   emitGain(room, reason);
   return room;

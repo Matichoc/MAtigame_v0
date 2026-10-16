@@ -25,6 +25,7 @@ import {
 } from "./progression.js";
 import { rankingEnabled, fetchRanking } from "./online.js";
 import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_MISSION, startSleep, stopSleep } from "./energy.js";
+import { monthPlan, rewardInfo, calendarOf, canClaimCalendar, claimCalendar, daysInMonth } from "./calendar.js";
 
 let progress = null;
 let selectedCharacter = null;
@@ -395,22 +396,66 @@ function bootHub() {
 const btnDailyReward = document.getElementById("btn-daily-reward");
 
 function updateDailyRewardButton() {
-  const can = canClaimDailyReward(progress);
-  btnDailyReward.disabled = !can;
+  const can = canClaimDailyReward(progress) || canClaimCalendar(progress);
+  btnDailyReward.disabled = false;
   btnDailyReward.classList.toggle("daily-ready", can); // sin cobrar: dorado, brillando y con puntito rojo
   btnDailyReward.textContent = can
     ? "🎁 ¡Cobra tu recompensa!"
-    : `🎁 Reclamado (racha ${progress.dailyStreak} día${progress.dailyStreak === 1 ? "" : "s"})`;
+    : `🎁 Calendario (racha ${progress.dailyStreak} día${progress.dailyStreak === 1 ? "" : "s"})`;
 }
 
-btnDailyReward.addEventListener("click", () => {
-  const result = claimDailyReward(progress);
-  if (!result) return;
+// ---------- CALENDARIO DE RECOMPENSAS DEL MES ----------
+const calDlg = document.getElementById("calendar-dialog");
+function renderCalendar(lastResult = null) {
+  const now = new Date();
+  const plan = monthPlan(now);
+  const cal = calendarOf(progress, now);
+  const today = now.getDate();
+  const first = new Date(now.getFullYear(), now.getMonth(), 1).getDay(); // 0 = domingo
+  const monthName = now.toLocaleDateString("es-CL", { month: "long", year: "numeric" });
+  document.getElementById("cal-title").textContent = `🎁 Recompensas de ${monthName}`;
+  document.getElementById("cal-sub").textContent = `Racha: ${progress.dailyStreak || 0} día${progress.dailyStreak === 1 ? "" : "s"} 🔥 · Cobraste ${cal.claimed.length} de ${daysInMonth(now)}. ¡Hay días especiales con 100 de energía! 🔋`;
+  const grid = document.getElementById("cal-grid");
+  grid.innerHTML = "";
+  for (const d of ["D", "L", "M", "M", "J", "V", "S"]) { const h = document.createElement("div"); h.className = "cal-dow"; h.textContent = d; grid.appendChild(h); }
+  for (let i = 0; i < first; i++) grid.appendChild(document.createElement("div"));
+  plan.forEach((r, i) => {
+    const day = i + 1;
+    const info = rewardInfo(r.type, progress);
+    const claimed = cal.claimed.includes(day);
+    const cell = document.createElement("div");
+    const state = claimed ? "claimed" : day === today ? "today" : day < today ? "missed" : "future";
+    cell.className = `cal-day ${state}${r.special ? " special" : ""}`;
+    // los días que faltan son sorpresa (solo se ven los especiales); hoy y los pasados se ven
+    const show = day <= today || claimed;
+    cell.innerHTML = `<b>${day}</b><span class="cal-ic">${claimed ? "✅" : show ? info.icon : r.special ? "🔋" : "🎁"}</span><small>${show ? info.short : r.special ? "100" : "?"}</small>`;
+    cell.title = show ? info.label : r.special ? "¡Día especial: 100 de energía!" : "Sorpresa";
+    grid.appendChild(cell);
+  });
+  const can = canClaimCalendar(progress, now);
+  const todayInfo = rewardInfo(plan[today - 1].type, progress);
+  const box = document.getElementById("cal-today");
+  box.innerHTML = lastResult
+    ? `<b>🎉 ¡Hoy te tocó ${lastResult.icon} ${lastResult.label}!</b>`
+    : can ? `Hoy te espera: <b>${todayInfo.icon} ${todayInfo.label}</b>` : `Hoy ya cobraste ✅ · Vuelve mañana por otra sorpresa`;
+  const btn = document.getElementById("cal-claim");
+  btn.disabled = !can && !canClaimDailyReward(progress);
+  btn.classList.toggle("hidden", !can && !canClaimDailyReward(progress));
+}
+function openCalendar() { renderCalendar(); calDlg.classList.remove("hidden"); }
+document.getElementById("cal-close").addEventListener("click", () => calDlg.classList.add("hidden"));
+document.getElementById("cal-claim").addEventListener("click", () => {
+  const streak = claimDailyReward(progress); // racha y Matipuntos base de siempre
+  const cal = claimCalendar(progress); // la sorpresa del día
+  if (!streak && !cal) return;
   audio.playPurchase();
   refreshHubStats();
   updateDailyRewardButton();
-  showToast(`¡+${result.reward} Matipuntos! Racha de ${result.streak} día${result.streak === 1 ? "" : "s"} 🔥`);
+  renderCalendar(cal);
+  showToast(`🎁 ${cal ? `${cal.icon} ${cal.label}` : ""}${streak ? ` · +${streak.reward} Matipuntos (racha de ${streak.streak} día${streak.streak === 1 ? "" : "s"} 🔥)` : ""}`, 4200);
+  try { renderProgress(); } catch (e) { /* la pantalla de progreso aún no está abierta */ }
 });
+btnDailyReward.addEventListener("click", openCalendar);
 
 // ---------- "Tienda" y "Lo que tengo": lo comprado va aparte de lo que falta por comprar ----------
 
@@ -1120,15 +1165,7 @@ document.getElementById("pg-chest").addEventListener("click", () => {
   refreshHubStats();
   renderProgress();
 });
-document.getElementById("pg-daily").addEventListener("click", () => {
-  const result = claimDailyReward(progress);
-  if (!result) return;
-  audio.playPurchase();
-  refreshHubStats();
-  updateDailyRewardButton();
-  showToast(`¡+${result.reward} Matipuntos! Racha de ${result.streak} día${result.streak === 1 ? "" : "s"} 🔥`);
-  renderProgress();
-});
+document.getElementById("pg-daily").addEventListener("click", openCalendar);
 
 /** Dibujo de una figurita: foto del producto, o un emoji sobre un fondo de color. */
 function stickerArt(s) {

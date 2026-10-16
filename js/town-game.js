@@ -486,7 +486,8 @@ export class TownGame extends Game3D {
       }
       const g = new THREE.Group();
       const tex = this.sprites[SPRITES[i % SPRITES.length]];
-      const disc = new THREE.Mesh(this.discGeo, [this.m.cream, new THREE.MeshStandardMaterial({ map: tex, roughness: 0.5 }), this.m.cream]);
+      // frente: el alfajor; dorso: el logo oficial de Matichoc (antes se veía un círculo blanco)
+      const disc = new THREE.Mesh(this.discGeo, [this.m.cream, new THREE.MeshStandardMaterial({ map: tex, roughness: 0.5 }), this.backMat || (this.backMat = new THREE.MeshStandardMaterial({ map: loadTexture("assets/brand/logo-badge.png"), roughness: 0.5 }))]);
       disc.rotation.x = Math.PI / 2;
       const rim = new THREE.Mesh(this.rimGeo, this.m.gold);
       rim.position.z = 0.03;
