@@ -1709,3 +1709,9 @@ details.how > :not(summary) { font-size: 0.85rem; margin: 6px 0 0; }
 .gar-card.on { border-color: #ffd34d; background: rgba(255,211,77,0.18); }
 .gar-card.locked { opacity: 0.9; border-style: dashed; }
 @media (max-height: 520px) { .gar-card { flex-basis: 112px; padding: 5px 4px; } .gar-card small { display: none; } .gar-card .gar-ic { font-size: 1.3rem; } }
+
+/* Aventura: botones de fuego y de entrar a la tubería (solo aparecen cuando sirven) */
+.av-fire, .av-down { position: absolute; right: 118px; width: 70px !important; height: 70px !important; font-size: 1.6rem; border-radius: 50%; }
+.av-fire { bottom: 18px; background: rgba(255,122,42,0.8) !important; border-color: #fff !important; }
+.av-down { bottom: 100px; right: 26px; background: rgba(53,200,255,0.8) !important; border-color: #fff !important; color: #fff; }
+.av-fire.hidden, .av-down.hidden { display: none !important; }
