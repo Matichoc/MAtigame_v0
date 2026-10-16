@@ -20,7 +20,7 @@ export const EXTRA_DAILY_MAX = 50; // máximo de energía extra por día
 export const CHEST_EVERY = 40 * 60 * 1000; // un cofre del tesoro cada 40 minutos
 export const CHEST_ENERGY = 10;
 /** Comprar energía con Matipuntos: sale caro a propósito y tiene tope por día. */
-export const BUY_ENERGY = { amount: 20, price: 80, perDay: 3 };
+export const BUY_ENERGY = { amount: 20, price: 80, perDay: 10 };
 
 /** Cuánto cuesta ENTRAR a jugar cada juego (0 = gratis). Además, durante la partida se gasta por acción (ver ENERGY_RULE). */
 export const ENERGY_COST = {
