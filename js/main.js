@@ -1515,7 +1515,7 @@ function gameThumb(entry) {
   }
   const ori = document.createElement("span");
   ori.className = `gorient ${entry.orient === "landscape" ? "land" : "any"}`;
-  ori.textContent = entry.orient === "landscape" ? "📱 Horizontal" : "📱 Vertical u horizontal";
+  ori.textContent = entry.orient === "landscape" ? "📱 Horizontal" : entry.id === "merge" ? "📱 Mejor vertical" : "📱 Vertical u horizontal";
   wrap.appendChild(ori);
   if (entry.id in ENERGY_COST && (ENERGY_COST[entry.id] > 0 || ENERGY_RULE[entry.id])) {
     const en = document.createElement("span");

@@ -1,14 +1,16 @@
-// Mati Merge 3D: juntar productos Matichoc. Arrastra un producto sobre otro IGUAL y se transforman en el siguiente de la
-// cadena (Bombón → Cuchuflí → alfajores… → Bomba Dorada → ¡Mati Dubai!). Cada "pieza nueva" gasta 1 ⚡ de energía.
-// Los clientes piden productos: entrégalos para ganar Matipuntos y liberar espacio. El tablero se guarda en tu perfil.
+// Mati Merge 3D: tablero lleno de productos Matichoc de 4 familias (alfajores, cuchuflís, bombones y tabletas).
+// Arrastra un producto sobre otro IGUAL y se transforma en el siguiente de su familia, del más chiquito al más grande, hasta el
+// ¡Mati Dubai! Los 4 generadores sacan productos nuevos (1 ⚡ cada uno) y los clientes piden productos para entregar.
+// El tablero se guarda en tu perfil.
 
-import { THREE, Game3D, lerp, rand, roundedBox, makeBunting, makeLogo, disposeGeometries } from "./three-kit.js";
+import { THREE, Game3D, lerp, rand, roundedBox, makeBunting, makeLogo } from "./three-kit.js";
 import * as audio from "./audio.js";
 import { recordRun } from "./progression.js";
-import { COLS, ROWS, CELLS, TIERS, MAX_TIER, tierInfo, mergeOf, spawnPiece, dropPiece, deliverOrder, canDeliver, emptyCells } from "./merge-data.js";
+import { COLS, ROWS, CELLS, CHAINS, TOTAL_ITEMS, DUBAI, itemInfo, chainIdx, tierIdx, codeOf, maxTier, foundCount, mergeOf, spawnPiece, dropPiece, deliverOrder, canDeliver, emptyCells } from "./merge-data.js";
+import { drawItem, loadProductImages } from "./merge-art.js";
 
 const GAME_ID = "merge";
-const CELL = 1.15;
+const CELL = 1.1;
 const cellX = (i) => ((i % COLS) - (COLS - 1) / 2) * CELL;
 const cellZ = (i) => (Math.floor(i / COLS) - (ROWS - 1) / 2) * CELL;
 
@@ -23,10 +25,13 @@ export class MergeGame extends Game3D {
     this.pointer = new THREE.Vector2();
     this.plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.25);
     this.pieces = new Array(CELLS).fill(null);
+    this.canvasCache = new Map();
     this.texCache = new Map();
+    this.urlCache = new Map();
+    this.images = {};
     this.drag = null;
     this.sessionMerges = 0;
-    this.onNoEnergy = () => this.banner("😴 Sin energía: ¡puedes seguir juntando y entregando, pero no sacar piezas nuevas!");
+    this.onNoEnergy = () => this.banner("😴 Sin energía: ¡puedes seguir juntando y entregando, pero no sacar productos nuevos!");
   }
 
   // ---------- escena ----------
@@ -44,10 +49,10 @@ export class MergeGame extends Game3D {
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -0.6;
     s.add(floor);
-    const base = new THREE.Mesh(roundedBox(COLS * CELL + 1.2, 0.6, ROWS * CELL + 1.2, 0.34, 0.08), std(0xb985c9, 0.55));
+    const base = new THREE.Mesh(roundedBox(COLS * CELL + 1.1, 0.6, ROWS * CELL + 1.1, 0.34, 0.08), std(0xb985c9, 0.55));
     base.position.y = -0.22;
     s.add(base);
-    const tray = new THREE.Mesh(roundedBox(COLS * CELL + 0.46, 0.16, ROWS * CELL + 0.46, 0.2, 0.05), std(0xfff0f6, 0.8));
+    const tray = new THREE.Mesh(roundedBox(COLS * CELL + 0.4, 0.16, ROWS * CELL + 0.4, 0.2, 0.05), std(0xfff0f6, 0.8));
     tray.position.y = 0.06;
     s.add(tray);
     const tileGeo = new THREE.PlaneGeometry(CELL * 0.94, CELL * 0.94);
@@ -58,7 +63,6 @@ export class MergeGame extends Game3D {
       t.position.set(cellX(i), 0.15, cellZ(i));
       s.add(t);
     }
-    // pared del fondo con el logo y banderines
     const wall = new THREE.Mesh(new THREE.PlaneGeometry(60, 24), std(0xf8e3ef, 0.95));
     wall.position.set(0, 9, -12);
     s.add(wall);
@@ -66,82 +70,62 @@ export class MergeGame extends Game3D {
     logo.position.set(0, 6.4, -11.8);
     s.add(logo);
     s.add(makeBunting(new THREE.Vector3(-13, 9.4, -11), new THREE.Vector3(13, 9.4, -11), { count: 26, sag: 1.4, size: 0.5 }));
-    // marcador de la pieza elegida
-    this.sel = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.05, 8, 28), new THREE.MeshBasicMaterial({ color: 0xff7ab8 }));
+    this.sel = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.05, 8, 28), new THREE.MeshBasicMaterial({ color: 0xff7ab8 }));
     this.sel.rotation.x = Math.PI / 2;
     this.sel.visible = false;
     s.add(this.sel);
+    // las fotos de los productos se cargan antes de dibujar las piezas
+    this.images = await loadProductImages(CHAINS.flatMap((c) => c.tiers.map((t) => t.img).filter(Boolean)));
   }
 
-  /** Cada nivel de la cadena tiene su dibujo: borde de color + foto real del producto + número. */
-  _tierTexture(t) {
-    if (this.texCache.has(t)) return this.texCache.get(t);
-    const info = tierInfo(t);
-    const cv = document.createElement("canvas");
-    cv.width = cv.height = 256;
-    const x = cv.getContext("2d");
-    const col = `#${info.color.toString(16).padStart(6, "0")}`;
-    const draw = (img) => {
-      x.clearRect(0, 0, 256, 256);
-      const grd = x.createRadialGradient(100, 90, 20, 128, 128, 128);
-      grd.addColorStop(0, "#ffffff");
-      grd.addColorStop(1, col);
-      x.fillStyle = grd;
-      x.beginPath(); x.arc(128, 128, 126, 0, Math.PI * 2); x.fill();
-      x.fillStyle = "#fff8fc";
-      x.beginPath(); x.arc(128, 128, 104, 0, Math.PI * 2); x.fill();
-      x.save();
-      x.beginPath(); x.arc(128, 128, 98, 0, Math.PI * 2); x.clip();
-      if (img && img.width) x.drawImage(img, 28, 28, 200, 200);
-      else if (t === MAX_TIER) {
-        const g2 = x.createRadialGradient(128, 110, 10, 128, 128, 100);
-        g2.addColorStop(0, "#fff7c8"); g2.addColorStop(1, "#ffc83a");
-        x.fillStyle = g2; x.fillRect(0, 0, 256, 256);
-        x.font = "92px serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText("👑", 128, 92);
-        if (this.logoImg && this.logoImg.width) x.drawImage(this.logoImg, 80, 112, 96, 96);
-      } else { x.fillStyle = col; x.fillRect(0, 0, 256, 256); }
-      x.restore();
-      // número del nivel
-      x.fillStyle = "#4a2440";
-      x.beginPath(); x.arc(206, 206, 34, 0, Math.PI * 2); x.fill();
-      x.fillStyle = "#fff";
-      x.font = "bold 40px sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
-      x.fillText(String(t), 206, 208);
-    };
-    const tex = new THREE.CanvasTexture(cv);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    tex.anisotropy = 4;
-    draw(null);
-    const load = (src, cb) => { const im = new Image(); im.onload = () => cb(im); im.src = src; };
-    if (info.img) load(`assets/products/${info.img}.jpg`, (im) => { draw(im); tex.needsUpdate = true; });
-    else load("assets/brand/logo-badge.png", (im) => { this.logoImg = im; draw(null); tex.needsUpdate = true; });
-    this.texCache.set(t, tex);
-    return tex;
+  /** El dibujo (256x256) de un producto. */
+  _canvasOf(code) {
+    let c = this.canvasCache.get(code);
+    if (!c) {
+      c = document.createElement("canvas");
+      c.width = c.height = 256;
+      drawItem(c, itemInfo(code), this.images);
+      this.canvasCache.set(code, c);
+    }
+    return c;
   }
 
-  _makePiece(t) {
-    const info = tierInfo(t);
+  _textureOf(code) {
+    let t = this.texCache.get(code);
+    if (!t) {
+      t = new THREE.CanvasTexture(this._canvasOf(code));
+      t.colorSpace = THREE.SRGBColorSpace;
+      t.anisotropy = 4;
+      this.texCache.set(code, t);
+    }
+    return t;
+  }
+
+  /** Imagen del producto para la interfaz (pedidos, lista de productos). */
+  _urlOf(code) {
+    let u = this.urlCache.get(code);
+    if (!u) { u = this._canvasOf(code).toDataURL("image/png"); this.urlCache.set(code, u); }
+    return u;
+  }
+
+  _makePiece(code) {
+    const info = itemInfo(code);
     const g = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.47, 0.5, 0.16, 36), new THREE.MeshStandardMaterial({ color: info.color, roughness: 0.45, metalness: t >= 12 ? 0.5 : 0.05, emissive: t >= 12 ? info.color : 0x000000, emissiveIntensity: t >= 12 ? 0.25 : 0 }));
+    const k = 0.84 + 0.16 * (info.t / info.max); // las piezas más avanzadas se ven un poco más grandes
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.46 * k, 0.49 * k, 0.16, 36), new THREE.MeshStandardMaterial({ color: info.gold ? 0xf2c030 : info.chain.color, roughness: 0.4, metalness: info.gold ? 0.55 : 0.05, emissive: info.gold ? 0xb88400 : 0x000000, emissiveIntensity: info.gold ? 0.35 : 0 }));
     body.position.y = 0.08;
     g.add(body);
-    const top = new THREE.Mesh(new THREE.CircleGeometry(0.46, 36), new THREE.MeshBasicMaterial({ map: this._tierTexture(t), transparent: true }));
+    const top = new THREE.Mesh(new THREE.CircleGeometry(0.5 * k, 36), new THREE.MeshBasicMaterial({ map: this._textureOf(code), transparent: true }));
     top.rotation.x = -Math.PI / 2;
-    top.position.y = 0.165;
+    top.position.y = 0.17;
     g.add(top);
-    if (t >= 10) {
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.035, 8, 32), new THREE.MeshStandardMaterial({ color: 0xffd36a, metalness: 0.7, roughness: 0.25, emissive: 0x6a4a00, emissiveIntensity: 0.4 }));
-      ring.rotation.x = Math.PI / 2;
-      ring.position.y = 0.1;
-      g.add(ring);
-    }
-    g.userData.noToon = true; // las piezas conservan sus colores reales
+    g.userData.noToon = true;
     return g;
   }
 
-  _addPiece(i, t, { from = null, grow = true } = {}) {
-    const mesh = this._makePiece(t);
-    const p = { tier: t, mesh, x: from ? from.x : cellX(i), z: from ? from.z : cellZ(i), y: from ? 0.6 : 0, scale: grow ? 0.05 : 1, pop: 0 };
+  _addPiece(i, code, { from = null, grow = true } = {}) {
+    const mesh = this._makePiece(code);
+    const p = { code, mesh, x: from ? from.x : cellX(i), z: from ? from.z : cellZ(i), y: from ? 0.6 : 0, scale: grow ? 0.05 : 1, pop: 0 };
     mesh.position.set(p.x, p.y, p.z);
     mesh.scale.setScalar(p.scale);
     this.scene.add(mesh);
@@ -153,7 +137,8 @@ export class MergeGame extends Game3D {
     const p = this.pieces[i];
     if (!p) return;
     this.scene.remove(p.mesh);
-    disposeGeometries(p.mesh);
+    // las texturas se comparten entre piezas: solo se liberan geometrías y materiales
+    p.mesh.traverse((o) => { o.geometry?.dispose?.(); o.material?.dispose?.(); });
     this.pieces[i] = null;
   }
 
@@ -161,11 +146,11 @@ export class MergeGame extends Game3D {
   _resync() {
     const m = mergeOf(this.progress);
     for (let i = 0; i < CELLS; i++) {
-      const t = m.grid[i];
+      const code = m.grid[i];
       const p = this.pieces[i];
-      if (!t) { if (p) this._removePiece(i); continue; }
-      if (!p) this._addPiece(i, t);
-      else if (p.tier !== t) { this._removePiece(i); this._addPiece(i, t, { grow: false }); this.pieces[i].pop = 0.35; }
+      if (!code) { if (p) this._removePiece(i); continue; }
+      if (!p) this._addPiece(i, code);
+      else if (p.code !== code) { this._removePiece(i); this._addPiece(i, code, { grow: false }); this.pieces[i].pop = 0.35; }
     }
   }
 
@@ -176,10 +161,11 @@ export class MergeGame extends Game3D {
     this.drag = null;
     this.sessionMerges = 0;
     const m = mergeOf(this.progress);
-    this.score = m.best * 100 + m.delivered;
+    this.score = foundCount(m) * 100 + m.delivered;
     this._resync();
     for (const p of this.pieces) if (p) { p.scale = 1; p.mesh.scale.setScalar(1); }
     this._bindBar();
+    this._renderGens();
     this._updateHud();
     this._renderChain();
     this._renderOrders();
@@ -192,11 +178,21 @@ export class MergeGame extends Game3D {
     if (m.spawned === 0 && m.merges === 0) this.banner("👆 Arrastra un producto sobre otro igual para juntarlos");
   }
 
+  _renderGens() {
+    const box = this.q("gens");
+    if (!box || box.dataset.ready) return;
+    box.dataset.ready = "1";
+    box.innerHTML = CHAINS.map((c, i) => `<button type="button" class="mg-gen" data-gen="${i}" title="Sacar ${c.short} nuevo"><img src="${this._urlOf(codeOf(i, 1))}" alt=""><span>${c.short}</span><small>-1 ⚡</small></button>`).join("");
+  }
+
   _bindBar() {
     if (this._barBound) return;
     this._barBound = true;
-    const spawn = this.q("btn-spawn");
-    if (spawn) spawn.addEventListener("click", () => this.spawn());
+    const gens = this.q("gens");
+    if (gens) gens.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-gen]");
+      if (b) this.spawn(Number(b.dataset.gen));
+    });
     const orders = this.q("orders");
     if (orders) orders.addEventListener("click", (e) => {
       const b = e.target.closest("[data-order]");
@@ -204,18 +200,17 @@ export class MergeGame extends Game3D {
     });
   }
 
-  spawn() {
+  spawn(c) {
     if (this.state !== "playing") return;
     const m = mergeOf(this.progress);
     if (!emptyCells(m).length) { this.banner("📦 ¡Tablero lleno! Junta productos o entrega pedidos"); audio.playBump(); return; }
-    if (!this.spendAction(1)) return; // cada pieza nueva gasta 1 ⚡
-    const r = spawnPiece(this.progress);
+    if (!this.spendAction(1)) return; // cada producto nuevo gasta 1 ⚡
+    const r = spawnPiece(this.progress, c);
     if (!r) return;
-    const btn = this.q("btn-spawn");
-    const from = btn ? { x: 0, z: ROWS * CELL * 0.5 + 1.5 } : null;
-    this._addPiece(r.cell, r.tier, { from });
+    this._addPiece(r.cell, r.code, { from: { x: (c - 1.5) * CELL * 1.3, z: ROWS * CELL * 0.5 + 1.6 } });
     audio.playPop();
     this._updateHud();
+    this._renderOrders();
   }
 
   deliver(idx) {
@@ -223,15 +218,16 @@ export class MergeGame extends Game3D {
     const m = mergeOf(this.progress);
     const o = m.orders[idx];
     if (!o) return;
-    const info = tierInfo(o.t);
+    const info = itemInfo(codeOf(o.c, o.t));
     const done = deliverOrder(this.progress, idx);
-    if (!done) { this.banner(`Aún no tienes ${info.name} (nivel ${o.t}) en el tablero`); audio.playBump(); return; }
+    if (!done) { this.banner(`Aún no tienes ${info.name} en el tablero`); audio.playBump(); return; }
     const p = this.pieces[done.cell];
-    if (p) { this.particles.burst(new THREE.Vector3(p.x, 0.5, p.z), [0xffd36a, 0xff7ab8, 0xffffff], 18, 4, 0.8, 6); }
+    if (p) this.particles.burst(new THREE.Vector3(p.x, 0.5, p.z), [0xffd36a, 0xff7ab8, 0xffffff], 18, 4, 0.8, 6);
     this._removePiece(done.cell);
-    this.popups.add(new THREE.Vector3(0, 1.2, -ROWS * CELL * 0.5 + 0.4), `+${done.coins} 🍫✨`, "combo");
+    this.popups.add(new THREE.Vector3(0, 1.2, -ROWS * CELL * 0.5 + 0.4), `+${done.coins} 🍫✨${done.pack ? " 🎴" : ""}`, "combo");
     audio.playPurchase();
     this.haptic(25);
+    this.score = foundCount(m) * 100 + m.delivered;
     this._updateHud();
     this._renderOrders();
   }
@@ -239,12 +235,12 @@ export class MergeGame extends Game3D {
   _afterMerge(res) {
     const m = mergeOf(this.progress);
     const to = res.to;
-    const info = tierInfo(res.tier);
+    const info = itemInfo(res.code);
     this._removePiece(res.from);
     this._removePiece(to);
-    const p = this._addPiece(to, res.tier, { grow: false });
+    const p = this._addPiece(to, res.code, { grow: false });
     p.pop = 0.4;
-    this.particles.burst(new THREE.Vector3(cellX(to), 0.5, cellZ(to)), [info.color, 0xffffff, 0xffd36a], 16 + res.tier, 3.5, 0.7, 5);
+    this.particles.burst(new THREE.Vector3(cellX(to), 0.5, cellZ(to)), [info.chain.color, 0xffffff, 0xffd36a], 12 + res.tier * 2, 3.5, 0.7, 5);
     audio.playCombo?.(Math.min(6, res.tier));
     this.haptic(20);
     this.sessionMerges++;
@@ -253,12 +249,12 @@ export class MergeGame extends Game3D {
       this.popups.add(new THREE.Vector3(cellX(res.gift), 1, cellZ(res.gift)), "🎁 ¡Regalo!", "combo");
     }
     if (res.record) {
-      this.banner(res.tier === MAX_TIER ? "👑 ¡¡LLEGASTE A LA MATI DUBAI!! +1000 🍫✨ y 3 sobres" : `🎉 ¡Nuevo producto: ${info.name}! +${res.coins} 🍫✨${res.tier >= 8 ? " y un sobre 🎴" : ""}`);
+      this.banner(res.dubai ? "👑 ¡¡LLEGASTE AL MATI DUBAI!! +1000 🍫✨ y 3 sobres" : `🎉 ¡Nuevo producto: ${info.name}! +${res.coins} 🍫✨`);
       audio.playMissionComplete();
-      this.particles.burst(new THREE.Vector3(cellX(to), 1, cellZ(to)), [0xffd36a, 0xff7ab8, 0x7ad8ff, 0xffffff], 40, 6, 1.2, 4, 1.3);
+      this.particles.burst(new THREE.Vector3(cellX(to), 1, cellZ(to)), [0xffd36a, 0xff7ab8, 0x7ad8ff, 0xffffff], res.dubai ? 90 : 40, 6, 1.2, 4, 1.3);
       this._renderChain();
     }
-    this.score = m.best * 100 + m.delivered;
+    this.score = foundCount(m) * 100 + m.delivered;
     this._updateHud();
     this._renderOrders();
   }
@@ -309,7 +305,7 @@ export class MergeGame extends Game3D {
       const to = h ? h.cell : -1;
       const p = this.pieces[d.from];
       if (!d.moved || to === d.from || to < 0) {
-        if (!d.moved && p) this._tip(p.tier);
+        if (!d.moved && p) this._tip(p.code);
         return;
       }
       const res = dropPiece(this.progress, d.from, to);
@@ -320,14 +316,16 @@ export class MergeGame extends Game3D {
         const a = this.pieces[d.from]; this.pieces[d.from] = this.pieces[to]; this.pieces[to] = a;
         audio.playBump();
       } else if (res.kind === "merge") this._afterMerge(res);
+      this._updateHud();
+      this._renderOrders();
     };
     wrap.addEventListener("pointerup", end);
     wrap.addEventListener("pointercancel", end);
   }
 
-  _tip(t) {
-    const info = tierInfo(t);
-    this.banner(t === MAX_TIER ? `${info.icon} ¡${info.name}! El producto más preciado` : `${info.icon} ${info.name} · nivel ${t} de ${MAX_TIER}`);
+  _tip(code) {
+    const info = itemInfo(code);
+    this.banner(info.top ? `👑 ¡${info.name}! El chocolate más preciado` : `${info.chain.icon} ${info.name} · nivel ${info.t} de ${info.max}`);
   }
 
   // ---------- interfaz ----------
@@ -335,10 +333,11 @@ export class MergeGame extends Game3D {
   _updateHud() {
     const m = mergeOf(this.progress);
     const set = (id, v) => { const el = this.q(id); if (el) el.textContent = v; };
-    set("hud-best", `${m.best}/${MAX_TIER}`);
+    set("hud-best", `${foundCount(m)}/${TOTAL_ITEMS}`);
     set("hud-coins", this.progress.coins);
     set("hud-free", emptyCells(m).length);
-    set("hud-name", tierInfo(m.best).name);
+    set("hud-name", m.dubai ? "¡Tienes el Mati Dubai! 👑" : `Tabletas: nivel ${m.bests[DUBAI.c]}/${maxTier(DUBAI.c)}`);
+    this.q("gens")?.classList.toggle("full", emptyCells(m).length === 0);
   }
 
   _renderOrders() {
@@ -346,9 +345,9 @@ export class MergeGame extends Game3D {
     if (!box) return;
     const m = mergeOf(this.progress);
     box.innerHTML = m.orders.map((o, i) => {
-      const info = tierInfo(o.t);
-      const img = info.img ? `<img src="assets/products/${info.img}.jpg" alt="">` : `<span class="mg-crown">👑</span>`;
-      return `<button type="button" class="mg-order${canDeliver(m, i) ? " ready" : ""}" data-order="${i}" title="${info.name}">${img}<em>${info.name}</em><b>${o.t}</b><span>🍫✨${o.coins}</span></button>`;
+      const code = codeOf(o.c, o.t);
+      const info = itemInfo(code);
+      return `<button type="button" class="mg-order${canDeliver(m, i) ? " ready" : ""}" data-order="${i}" title="${info.name}"><img src="${this._urlOf(code)}" alt=""><em>${info.name}</em><span>🍫✨${o.coins}</span></button>`;
     }).join("");
   }
 
@@ -356,13 +355,15 @@ export class MergeGame extends Game3D {
     const box = this.q("chain");
     if (!box) return;
     const m = mergeOf(this.progress);
-    box.innerHTML = TIERS.map((t, i) => {
-      const got = i + 1 <= m.best;
-      const img = t.img ? `<img src="assets/products/${t.img}.jpg" alt="">` : `<span class="mg-crown">👑</span>`;
-      return `<span class="mg-step${got ? " got" : ""}" title="${got ? t.name : "???"}">${got ? img : "?"}<small>${i + 1}</small></span>`;
+    box.innerHTML = CHAINS.map((c, ci) => {
+      const steps = c.tiers.map((t, ti) => {
+        const got = ti + 1 <= m.bests[ci];
+        return `<span class="mg-step${got ? " got" : ""}${t.top ? " top" : ""}" title="${got ? t.name : "???"}">${got ? `<img src="${this._urlOf(codeOf(ci, ti + 1))}" alt="">` : "?"}</span>`;
+      }).join("");
+      return `<div class="mg-row"><b>${c.icon} ${c.name}</b><div class="mg-steps">${steps}</div></div>`;
     }).join("");
     const next = this.q("next-goal");
-    if (next) next.textContent = m.best >= MAX_TIER ? "¡Lo lograste! Llegaste a la Mati Dubai 👑" : `Próximo producto: ${tierInfo(m.best + 1).name}`;
+    if (next) next.textContent = m.dubai ? "¡Lo lograste! Tienes el ¡Mati Dubai! 👑" : `Meta: llegar al ¡Mati Dubai! (el nivel ${maxTier(DUBAI.c)} de las Tabletas). Vas en el ${m.bests[DUBAI.c]}.`;
   }
 
   onResize() { this._fit(); }
@@ -372,15 +373,15 @@ export class MergeGame extends Game3D {
     const aspect = this.camera.aspect;
     const vf = (this.camera.fov * Math.PI) / 180;
     const wide = aspect > 1.25; // en celular acostado, el tablero va a la izquierda y la barra a la derecha
-    const needH = (ROWS * CELL * 0.9 + 1.8) / 2;
-    const needW = (COLS * CELL + 1.0) / 2 / (wide ? aspect * 0.66 : aspect);
+    const needH = (ROWS * CELL * (wide ? 1.08 : 0.92) + (wide ? 2.2 : 5.6)) / 2;
+    const needW = (COLS * CELL + 0.9) / 2 / (wide ? aspect * 0.66 : aspect);
     const half = Math.max(needH, needW);
     const dist = half / Math.tan(vf / 2);
-    const tilt = 0.5;
+    const tilt = 0.42;
     const shift = wide ? dist * Math.tan(vf / 2) * aspect * 0.34 : 0;
-    this.camBase = new THREE.Vector3(shift, Math.cos(tilt) * dist, Math.sin(tilt) * dist + 0.4);
+    this.camBase = new THREE.Vector3(shift, Math.cos(tilt) * dist, Math.sin(tilt) * dist + 0.3);
     this.camera.position.copy(this.camBase);
-    this.camLook = new THREE.Vector3(shift, 0, -0.1);
+    this.camLook = new THREE.Vector3(shift, 0, wide ? -0.1 : 2.4); // en vertical el tablero sube para dejar sitio a los botones de abajo
     this.camera.lookAt(this.camLook);
   }
 
@@ -402,17 +403,18 @@ export class MergeGame extends Game3D {
       p.scale = lerp(p.scale, 1, 1 - Math.pow(0.002, dt));
       if (p.pop > 0) p.pop -= dt;
       const bounce = p.pop > 0 ? 1 + Math.sin((p.pop / 0.4) * Math.PI) * 0.22 : 1;
-      p.mesh.position.set(p.x, p.y, p.z);
+      const info = itemInfo(p.code);
+      p.mesh.position.set(p.x, p.y + (info.gold ? Math.sin(this.time * 3 + i) * 0.03 : 0), p.z);
       p.mesh.scale.setScalar(p.scale * bounce);
-      if (p.tier >= 12) p.mesh.rotation.y += dt * 0.8;
-      if (p.tier === MAX_TIER && Math.random() < dt * 4) this.particles.burst(new THREE.Vector3(p.x + rand(-0.3, 0.3), 0.5, p.z + rand(-0.3, 0.3)), [0xffd36a, 0xffffff], 1, 0.8, 0.6, -1);
+      if (info.top && Math.random() < dt * 5) this.particles.burst(new THREE.Vector3(p.x + rand(-0.35, 0.35), 0.5, p.z + rand(-0.35, 0.35)), [0xffd36a, 0xffffff], 1, 0.8, 0.6, -1);
     }
-    // marca sobre la casilla donde se va a soltar
     const d = this.drag;
     if (d && d.moved && d.over != null && d.over >= 0) {
       this.sel.visible = true;
       this.sel.position.set(cellX(d.over), 0.22, cellZ(d.over));
-      const same = this.pieces[d.over] && this.pieces[d.from] && this.pieces[d.over].tier === this.pieces[d.from].tier && d.over !== d.from;
+      const a = this.pieces[d.from];
+      const b = this.pieces[d.over];
+      const same = a && b && a.code === b.code && d.over !== d.from && tierIdx(a.code) < maxTier(chainIdx(a.code));
       this.sel.material.color.setHex(same ? 0x7be08a : 0xff7ab8);
       this.sel.scale.setScalar(1 + Math.sin(this.time * 9) * 0.06);
     } else this.sel.visible = false;

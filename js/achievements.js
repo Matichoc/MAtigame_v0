@@ -278,7 +278,7 @@ chain("puntajes", "chofer", "Chofer Choco", "🚗", (p) => Math.floor(((p.stats 
 chain("puntajes", "dorados_ciudad", "Cazador de Brillos", "✨", stat("ciudadGold"), "Junta {n} alfajores dorados en Ciudad Choco.", [[20, 15], [100, 50], [300, 120], [800, 300]]);
 chain("puntajes", "pisotones", "Pisotones", "👟", stat("stompsTotal"), "Pisa {n} enemigos en Aventura Choco.", [[20, 15], [100, 50], [300, 120], [800, 300]]);
 chain("puntajes", "alfajores_av", "Alfajorero", "🍫", stat("aventuraCoins"), "Junta {n} alfajores en Aventura Choco.", [[100, 15], [500, 50], [1500, 120], [4000, 300]]);
-chain("puntajes", "merge_nivel", "Maestro del Merge", "🍬", (p) => (p.merge && p.merge.best) || 0, "Llega al producto nivel {n} en Mati Merge (el 13 es la Mati Dubai).", [[4, 15], [7, 50], [10, 120], [13, 400]]);
+chain("puntajes", "merge_nivel", "Coleccionista de Merge", "🍬", (p) => (p.merge && Array.isArray(p.merge.bests) ? p.merge.bests.reduce((a, b) => a + b, 0) : 0), "Descubre {n} productos distintos en Mati Merge (hay 26, el último es el Mati Dubai).", [[8, 15], [14, 50], [20, 120], [26, 400]]);
 chain("puntajes", "merge_pedidos", "Proveedor Estrella", "📦", (p) => (p.merge && p.merge.delivered) || 0, "Entrega {n} pedidos de clientes en Mati Merge.", [[5, 15], [25, 50], [80, 120], [250, 300]]);
 chain("puntajes", "especiales", "Piezas especiales", "✨", stat("dulcesSpecials"), "Crea {n} piezas especiales (rayadas, bombas doradas y envueltas).", [[10, 15], [40, 50], [120, 120], [300, 300]]);
 

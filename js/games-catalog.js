@@ -122,7 +122,7 @@ const ALL_GAMES = [
     orient: "any",
     name: "Mati Merge",
     icon: "🍬",
-    tagline: "Junta productos iguales y transfórmalos: de un Bombón hasta la ¡Mati Dubai! Entrega pedidos y completa tu colección.",
+    tagline: "Tablero lleno: junta alfajores, cuchuflís, bombones y tabletas del más chico al más grande, ¡hasta el Mati Dubai! Entrega pedidos y completa tu colección.",
     status: "available",
     tag: "Nuevo",
   },
