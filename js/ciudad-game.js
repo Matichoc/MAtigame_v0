@@ -365,7 +365,8 @@ export class CiudadGame extends Game3D {
     mk(2 * HALF - RW, false, 0, 0);
     mk(2 * HALF - RW, true, 0, 0);
     // pasos de cebra (todos juntos en una malla con instancias)
-    const zebraSpots = [[-22, HALF, true], [22, -HALF, true], [HALF, -22, false], [-HALF, 22, false], [0, 12, true], [0, -12, true], [12, 0, false], [-12, 0, false], [HALF - 14, 0, false]];
+    // [x, z, horiz]: horiz = la franja se extiende a lo ancho (en x) porque cruza una calle que va de norte a sur; si no, cruza una calle de este a oeste.
+    const zebraSpots = [[-22, HALF, false], [22, -HALF, false], [HALF, -22, true], [-HALF, 22, true], [0, 12, true], [0, -12, true], [12, 0, false], [-12, 0, false], [HALF - 14, 0, false]];
     const zg = new THREE.BoxGeometry(0.7, 0.02, 2.6);
     const zebra = new THREE.InstancedMesh(zg, new THREE.MeshBasicMaterial({ color: 0xffffff }), zebraSpots.length * 9);
     const mat = new THREE.Matrix4();
@@ -443,8 +444,9 @@ export class CiudadGame extends Game3D {
     body.position.y = h / 2;
     body.castShadow = true;
     body.receiveShadow = true;
-    const rf = new THREE.Mesh(new THREE.ConeGeometry(1, h * 0.42, 4), this._std(roof, 0.6));
-    rf.rotation.y = Math.PI / 4;
+    const rg = new THREE.ConeGeometry(1, h * 0.42, 4);
+    rg.rotateY(Math.PI / 4); // la base queda alineada con las paredes (si se girara la malla entera, el techo de una casa larga saldría torcido)
+    const rf = new THREE.Mesh(rg, this._std(roof, 0.6));
     rf.scale.set(w * 0.78, 1, d * 0.78);
     rf.position.y = h + h * 0.21;
     rf.castShadow = true;
@@ -741,12 +743,13 @@ export class CiudadGame extends Game3D {
 
   _buildTrees() {
     // árboles de afuera de la ciudad, para que el mundo no se vea vacío
+    // (en un cuadrado alrededor de las calles, bien separados de ellas: nunca sobre la calzada ni la vereda)
     for (let i = 0; i < 90; i++) {
       const a = rnd() * 6.28;
-      const r = 76 + rnd() * 16;
-      const x = Math.cos(a) * r;
-      const z = Math.sin(a) * r;
-      this._tree(x, z, 0.9 + rnd() * 0.9, false);
+      const dx = Math.cos(a);
+      const dz = Math.sin(a);
+      const d = Math.min(125, (76 + rnd() * 18) / Math.max(Math.abs(dx), Math.abs(dz)));
+      this._tree(dx * d, dz * d, 0.9 + rnd() * 0.9, false);
     }
     const n = this.treeSpots.length;
     const trunkGeo = new THREE.CylinderGeometry(0.18, 0.26, 1.8, 6);

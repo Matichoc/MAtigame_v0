@@ -73,6 +73,27 @@ export function buildLevel(L) {
 
   const enemy = (ex, ey, type = "E") => enemies.push({ x: ex, y: ey, type });
 
+  /** Ningún bloque flotante queda sobre un hueco o unas púas, ni justo antes ni justo después: así el salto nunca choca con la cabeza. */
+  function clearBlocksNearHazards() {
+    const Wd = map[0].length;
+    const hazard = (xx) => map[0][xx] === "." || map[1][xx] === "." || map.some((row) => row[xx] === "^");
+    const bad = new Array(Wd).fill(false);
+    for (let xx = 0; xx < Wd; xx++) if (hazard(xx)) for (let k = -5; k <= 3; k++) if (xx + k >= 0 && xx + k < Wd) bad[xx + k] = true;
+    for (let yy = 2; yy < H; yy++) for (let xx = 0; xx < Wd; xx++) {
+      const ch = map[yy][xx];
+      if ((ch === "?" || ch === "B") && bad[xx] && map[yy - 1][xx] === ".") map[yy][xx] = "."; // solo los que flotan (las torres de ladrillos salen del suelo)
+    }
+    // que siempre queden unos cuantos bloques ? en lugares despejados (suelo parejo y sin peligros cerca)
+    let count = 0;
+    for (const row of map) for (const ch of row) if (ch === "?") count++;
+    for (let xx = 20; xx < Wd - 30 && count < 4; xx += 3) {
+      let flat = true;
+      for (let k = -3; k <= 3 && flat; k++) flat = !bad[xx + k] && map[1][xx + k] === "#" && map[2][xx + k] === "." && map[3][xx + k] === "." && map[4][xx + k] === ".";
+      const near = map[4].slice(Math.max(0, xx - 14), xx + 14).includes("?") || map[4].slice(Math.max(0, xx - 14), xx + 14).includes("B");
+      if (flat && !near) { map[4][xx] = "?"; count++; }
+    }
+  }
+
   const chunks = {
     flat() {
       const n = ri(6, 11);
@@ -153,12 +174,12 @@ export function buildLevel(L) {
       x += n;
     },
     tower() {
-      const n = ri(9, 12);
+      const n = ri(12, 14); // con sitio de sobra antes y después de la torre
       ground(x, x + n, gh);
-      const tx = x + 3;
-      for (let i = 0; i < 3; i++) for (let y = gh; y < gh + 3; y++) set(tx + i, y, "B");
-      coin(tx + 1, gh + 4);
-      coin(tx, gh + 4); coin(tx + 2, gh + 4);
+      const tx = x + 4;
+      for (let i = 0; i < 3; i++) for (let y = gh; y < gh + 2; y++) set(tx + i, y, "B"); // de 2 de alto: se salta sin apuros
+      coin(tx + 1, gh + 3);
+      coin(tx, gh + 3); coin(tx + 2, gh + 3);
       x += n;
     },
     flyers() {
@@ -197,8 +218,13 @@ export function buildLevel(L) {
 
   const target = 150 + L * 4;
   let guardN = 0;
+  let lastObstacle = false; // el tramo anterior tenía tubería, torre o escalones
   while (x < target && guardN++ < 80) {
-    chunks[pool[ri(0, pool.length - 1)]]();
+    const name = pool[ri(0, pool.length - 1)];
+    // antes de un hueco o unas púas siempre hay suelo parejo para tomar carrera
+    if ((name === "gap" || name === "spikes") && lastObstacle) { ground(x, x + 5, gh); x += 5; }
+    chunks[name]();
+    lastObstacle = ["pipe", "tower", "steps", "platforms"].includes(name);
     if (x - (checkpoints[checkpoints.length - 1] || 0) > 46 && x < target - 20) {
       checkpoints.push(x);
       ground(x, x + 4, gh);
@@ -210,6 +236,7 @@ export function buildLevel(L) {
       set(bx, gh + 2, chance(0.5) ? "?" : "B");
     }
   }
+  clearBlocksNearHazards();
   if (!warpCandidates.length) chunks.pipe(); // que todos los niveles (menos los de jefe) tengan una tubería mágica
   ground(x, x + 14, 2);
   gh = 2;
