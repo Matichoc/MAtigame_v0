@@ -73,7 +73,7 @@ export const LOOK = {
   bloom: { strength: 0.32, radius: 0.55, threshold: 0.92 },
   grade: { sat: 1.16, contrast: 1.06, vig: 0.22, lift: 0, tint: [1, 1, 1] },
   // ambiente "kawaii": colores pastel, negros levantados con un velo rosado y brillo suave tipo ensueño
-  kawaii: { bloom: { strength: 0.32, radius: 0.6, threshold: 0.93 }, grade: { sat: 1.2, contrast: 0.98, vig: 0.14, lift: 0.04, tint: [1.0, 0.85, 0.93] } },
+  kawaii: { bloom: { strength: 0.2, radius: 0.5, threshold: 0.96 }, grade: { sat: 1.14, contrast: 1.0, vig: 0.16, lift: 0.025, tint: [1.0, 0.88, 0.94] } },
 };
 
 // Ajuste final de color (saturación, contraste y viñeta) sobre la imagen ya en sRGB.
@@ -723,7 +723,7 @@ function toonGradient() {
     c.width = 4;
     c.height = 1;
     const x = c.getContext("2d");
-    ["#7d6f9a", "#b9aad0", "#ece4f6", "#ffffff"].forEach((col, i) => { x.fillStyle = col; x.fillRect(i, 0, 1, 1); });
+    ["#7a6c94", "#b3a6c8", "#dcd2e8", "#f4eef9"].forEach((col, i) => { x.fillStyle = col; x.fillRect(i, 0, 1, 1); });
     toonGradTex = new THREE.CanvasTexture(c);
     toonGradTex.minFilter = THREE.NearestFilter;
     toonGradTex.magFilter = THREE.NearestFilter;
@@ -833,9 +833,9 @@ export function makeAmbient(parent, { petals = 36, hearts = 10, stars = 26, radi
     parent.add(pts);
     layers.push({ pts, geo, mat, off, fall, twinkle, base: size });
   };
-  mk("petal", petals, 0.95, 0.5, false);
-  mk("heart", hearts, 0.85, 0.28, false);
-  mk("star", stars, 0.7, 0.0, true);
+  mk("petal", petals, 0.8, 0.5, false);
+  mk("heart", hearts, 0.7, 0.28, false);
+  mk("star", stars, 0.5, 0.0, true);
   return {
     update(t, dt, c) {
       for (const L of layers) {
@@ -851,7 +851,7 @@ export function makeAmbient(parent, { petals = 36, hearts = 10, stars = 26, radi
           a[i * 3 + 2] = c.z + o.z + Math.cos(t * 0.6 + o.ph) * (L.fall ? 0.6 : 0.1);
         });
         L.geo.attributes.position.needsUpdate = true;
-        if (L.twinkle) L.mat.opacity = 0.55 + 0.45 * Math.sin(t * 2.2);
+        if (L.twinkle) L.mat.opacity = 0.35 + 0.3 * Math.sin(t * 2.2);
       }
     },
   };
