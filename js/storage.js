@@ -4,7 +4,7 @@
 // Todo el progreso vive dentro de un "perfil" (ver js/profiles.js), para que
 // varias personas puedan jugar desde el mismo navegador sin mezclar su avance.
 
-import { getItem, EMPTY_LOOK } from "./wardrobe-data.js";
+import { getItem, EMPTY_LOOK, lockReason } from "./wardrobe-data.js";
 import { queueSync } from "./online.js";
 import { addEnergy } from "./energy.js";
 
@@ -213,6 +213,7 @@ export function spendCoins(progress, amount) {
 export function buyItem(progress, itemId) {
   const item = getItem(itemId);
   if (!item || item.event || item.price <= 0) return false; // los de evento se compran con fichas
+  if (lockReason(progress, item)) return false; // lo exclusivo pide nivel o un logro
   const had = progress.wardrobe.owned.includes(itemId);
   if (!spendCoins(progress, item.price)) return false;
   if (!had) progress.wardrobe.owned.push(itemId);

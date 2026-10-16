@@ -703,6 +703,105 @@ function buildBack(hero, p, ticks) {
   return g;
 }
 
+// ---------------------------------------------------------------- tutús, faldas, vestidos y adornos de la ropa
+
+function boltShape(s = 0.09) {
+  const sh = new THREE.Shape();
+  [[0.25, 1], [-0.55, 0.05], [-0.05, 0.05], [-0.3, -1], [0.6, -0.1], [0.08, -0.1]].forEach(([x, y], i) => (i ? sh.lineTo(x * s, y * s) : sh.moveTo(x * s, y * s)));
+  sh.closePath();
+  return sh;
+}
+
+/** Faldas, tutús y vestidos + emblema del pecho + pompones, según `outfit.params` (ver OUTFITS en wardrobe-data.js). */
+function addOutfitExtras(hero, outfit, add, ticks) {
+  const p = outfit.params || {};
+  const { mats } = hero;
+  // piernas: con falda se ven (medias de color o chocolate); con pantalón, los jeans de siempre
+  mats.jeans.color.set(p.skirt ? (p.tights || mats.choco.color.getHex()) : hero.defaults.jeans);
+  hero.logo.visible = !p.emblem;
+
+  if (p.skirt) {
+    const g = new THREE.Group();
+    g.position.y = 0.34; // la cintura
+    const col = p.skirtColor || outfit.jersey;
+    const trim = p.skirtTrim || outfit.trim;
+    const tex = p.rainbow ? rainbowTexture() : null;
+    const mat = (c, tulle = false) => {
+      const m = std(c, 0.75, { flatShading: true, side: THREE.DoubleSide, ...(tulle ? { transparent: true, opacity: 0.92 } : {}) });
+      if (tex && c === col) { m.map = tex; m.color.set(0xffffff); }
+      if (p.shine) { m.metalness = 0.25; m.emissive.set(0x24101a); }
+      return m;
+    };
+    const layer = (rt, rb, h, y, c, seg = 16, tulle = false) => {
+      const m = mesh(new THREE.CylinderGeometry(rt, rb, h, seg, 1, true), mat(c, tulle), 0, y, 0);
+      m.scale.z = 0.84;
+      g.add(m);
+      return m;
+    };
+    const band = (r, y, c, h = 0.05) => { const m = layer(r, r + 0.005, h, y, c, 18); return m; };
+    const lighter = new THREE.Color(col).lerp(new THREE.Color(0xffffff), 0.35).getStyle();
+    if (p.skirt === "tutu") {
+      layer(0.26, 0.5, 0.17, -0.09, col, 18, true);
+      layer(0.25, 0.55, 0.13, -0.11, lighter, 18, true);
+      layer(0.24, 0.6, 0.09, -0.13, col, 18, true);
+      band(0.265, 0.0, trim);
+    } else if (p.skirt === "cheer") {
+      layer(0.26, 0.46, 0.25, -0.125, col, 22);
+      band(0.465, -0.245, trim, 0.045);
+      band(0.265, 0.0, trim);
+    } else if (p.skirt === "vestido") {
+      layer(0.25, 0.42, 0.5, -0.25, col, 18);
+      band(0.42, -0.5, trim, 0.045);
+      band(0.255, 0.0, trim);
+    } else { // "gala": vestido largo y ancho con una sobrefalda más clara
+      layer(0.26, 0.64, 0.66, -0.33, col, 22);
+      layer(0.25, 0.56, 0.4, -0.2, lighter, 22, true);
+      band(0.64, -0.66, trim, 0.05);
+      band(0.265, 0.0, trim, 0.06);
+    }
+    // el vuelo se mueve al andar, correr, saltar y bailar
+    ticks.push((t, mode) => {
+      const moving = mode === "run" || mode === "jump" || mode === "cheer" || mode === "dance" || mode === "walk";
+      const k = (moving ? 1.06 : 1) + Math.sin(t * (moving ? 12 : 2)) * (moving ? 0.035 : 0.008);
+      g.scale.set(k, 1, k);
+    });
+    add(hero.bodyGroup, g);
+  }
+
+  if (p.emblem) {
+    const shape = p.emblem === "star" ? starShape(0.085, 0.037) : p.emblem === "heart" ? heartShape(0.075) : p.emblem === "bolt" ? boltShape(0.09) : null;
+    if (shape) {
+      const e = new THREE.Mesh(new THREE.ShapeGeometry(shape), basic(outfit.trim, { side: THREE.DoubleSide }));
+      e.position.set(0, 0.54, 0.178);
+      add(hero.bodyGroup, e);
+    } else if (p.emblem === "bow") { // moño de gala en el cuello
+      const g = new THREE.Group();
+      for (const sx of [-1, 1]) {
+        const w = mesh(new THREE.ConeGeometry(0.07, 0.12, 3), basic(outfit.trim), sx * 0.075, 0, 0);
+        w.rotation.z = -sx * Math.PI / 2;
+        g.add(w);
+      }
+      g.add(mesh(new THREE.SphereGeometry(0.03, 8, 6), basic(outfit.trim)));
+      g.position.set(0, 0.69, 0.182);
+      add(hero.bodyGroup, g);
+    }
+  }
+
+  if (p.pompoms) {
+    for (const arm of hero.arms) {
+      const g = new THREE.Group();
+      g.position.set(0, -0.44, 0);
+      const m = std(p.pompoms, 0.9);
+      for (let i = 0; i < 9; i++) {
+        const a = (i / 9) * Math.PI * 2;
+        g.add(mesh(new THREE.SphereGeometry(0.05, 8, 6), m, Math.cos(a) * 0.09, Math.sin(i * 2.3) * 0.07, Math.sin(a) * 0.09));
+      }
+      g.add(mesh(new THREE.SphereGeometry(0.075, 8, 6), m));
+      add(arm, g);
+    }
+  }
+}
+
 // ---------------------------------------------------------------- aplicar
 
 function rainbowTexture() {
@@ -765,6 +864,7 @@ export function applyLook(hero, look = {}) {
   mats.shoe.emissiveIntensity = shoe && shoe.params.glow ? 0.7 : 0;
 
   const add = (parent, obj) => { parent.add(obj); hero.worn.push(obj); return obj; };
+  addOutfitExtras(hero, outfit, add, ticks);
 
   // peinado: cualquier peinado reemplaza al original del personaje
   const hair = getItem(L.hair);

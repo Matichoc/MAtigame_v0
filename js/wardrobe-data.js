@@ -30,24 +30,51 @@ export const SLOTS = [
 ];
 
 const P = { comun: 30, raro: 110, epico: 260, legendario: 520 };
-const it = (slot, id, name, icon, rarity, params = {}, price) => ({ id, slot, name, icon, rarity, price: price ?? P[rarity], params });
+// Precio final = precio base × factor de su rareza (lo raro cuesta bastante más: ver docs/ECONOMIA.md). El 0 sigue siendo "gratis".
+const PRICE_X = { comun: 1.5, raro: 2, epico: 2.5, legendario: 3 };
+const cost = (rarity, price) => { const base = price ?? P[rarity]; return base > 0 ? Math.round((base * PRICE_X[rarity]) / 5) * 5 : 0; };
+const it = (slot, id, name, icon, rarity, params = {}, price) => ({ id, slot, name, icon, rarity, price: cost(rarity, price), params });
 // Objetos exclusivos de un evento de temporada (ver js/events.js): se compran con fichas del evento.
-const ev = (event, tokens, slot, id, name, icon, rarity, params = {}) => ({ ...it(slot, id, name, icon, rarity, params, 99999), event, tokens });
+const ev = (event, tokens, slot, id, name, icon, rarity, params = {}) => ({ id, slot, name, icon, rarity, price: 99999, params, event, tokens });
 
-// Atuendos (colores de camiseta): los 4 primeros ya existían en la tienda original.
+// Atuendos: colores de la ropa y, en los de falda/tutú/vestido, la prenda (ver addOutfitExtras en wardrobe3d.js).
+//   params.skirt  "tutu" | "cheer" | "vestido" | "gala"   · skirtColor / skirtTrim / tights  · emblem "star" | "heart" | "bolt" | "bow"
+//   params.pompoms  color de los pompones de las manos     · rainbow/stars/shine  efectos
+//   minLevel / needs  lo exclusivo: se desbloquea con el nivel o con un logro (ver lockReason en storage.js)
+const out = (id, name, icon, rarity, jersey, trim, params = {}, price, extra = {}) => ({ id, slot: "outfit", name, icon, rarity, price: cost(rarity, price), jersey, trim, params, ...extra });
 export const OUTFITS = [
   { id: "polera", slot: "outfit", name: "Polera Matichoc", icon: "👕", rarity: "comun", price: 0, jersey: "#1C1C22", trim: "#E0368A", params: {} },
   { id: "liga", slot: "outfit", name: "Local Matichoc", icon: "👕", rarity: "comun", price: 0, jersey: "#D4216C", trim: "#FFC800", params: {} },
-  { id: "visita", slot: "outfit", name: "Visita Cacao", icon: "👕", rarity: "comun", price: 30, jersey: "#CFD767", trim: "#64321B", params: {} },
-  { id: "oro", slot: "outfit", name: "Edición Oro", icon: "👕", rarity: "raro", price: 60, jersey: "#FFC800", trim: "#64321B", params: {} },
-  { id: "noche", slot: "outfit", name: "Choco Oscuro", icon: "👕", rarity: "raro", price: 90, jersey: "#3d1f10", trim: "#D4216C", params: {} },
-  { id: "oceano", slot: "outfit", name: "Océano", icon: "🌊", rarity: "comun", price: 40, jersey: "#2F6FD6", trim: "#FFF6E6", params: {} },
-  { id: "menta", slot: "outfit", name: "Menta fresca", icon: "🌿", rarity: "comun", price: 40, jersey: "#5FCFB0", trim: "#3d1f10", params: {} },
-  { id: "caramelo", slot: "outfit", name: "Caramelo", icon: "🍬", rarity: "comun", price: 40, jersey: "#FF7AA8", trim: "#FFF6E6", params: {} },
-  { id: "atardecer", slot: "outfit", name: "Atardecer", icon: "🌇", rarity: "raro", price: 110, jersey: "#E8742A", trim: "#FFC800", params: {} },
-  { id: "galaxia", slot: "outfit", name: "Galaxia", icon: "🌌", rarity: "epico", price: 260, jersey: "#3a2d8a", trim: "#35F0FF", params: { stars: true } },
-  { id: "arcoiris", slot: "outfit", name: "Arcoíris", icon: "🌈", rarity: "epico", price: 280, jersey: "#ffffff", trim: "#FFC800", params: { rainbow: true } },
-  { id: "rubi", slot: "outfit", name: "Rubí", icon: "💎", rarity: "legendario", price: 520, jersey: "#C2185B", trim: "#FFFFFF", params: { shine: true } },
+  out("visita", "Visita Cacao", "👕", "comun", "#CFD767", "#64321B", {}, 30),
+  out("oro", "Edición Oro", "👕", "raro", "#FFC800", "#64321B", {}, 60),
+  out("noche", "Choco Oscuro", "👕", "raro", "#3d1f10", "#D4216C", {}, 90),
+  out("oceano", "Océano", "🌊", "comun", "#2F6FD6", "#FFF6E6", {}, 40),
+  out("menta", "Menta fresca", "🌿", "comun", "#5FCFB0", "#3d1f10", {}, 40),
+  out("caramelo", "Caramelo", "🍬", "comun", "#FF7AA8", "#FFF6E6", {}, 40),
+  out("atardecer", "Atardecer", "🌇", "raro", "#E8742A", "#FFC800", {}, 110),
+  out("galaxia", "Galaxia", "🌌", "epico", "#3a2d8a", "#35F0FF", { stars: true }, 260),
+  out("arcoiris", "Arcoíris", "🌈", "epico", "#ffffff", "#FFC800", { rainbow: true }, 280),
+  out("rubi", "Rubí", "💎", "legendario", "#C2185B", "#FFFFFF", { shine: true }, 520),
+
+  // ---- Tenidas con falda, tutú y vestido (cheerleader, bailarina, fiesta) ----
+  out("tutu_rosa", "Tutú Rosa", "🩰", "comun", "#FF7AA8", "#FFF6E6", { skirt: "tutu", skirtColor: "#FF9CC4", tights: "#FFFFFF" }, 40),
+  out("vestido_flores", "Vestido de flores", "🌸", "comun", "#FFD1E3", "#4FD09A", { skirt: "vestido", skirtColor: "#FFD1E3", skirtTrim: "#4FD09A", emblem: "heart" }, 45),
+  out("vestido_verano", "Vestido de verano", "☀️", "comun", "#FFC800", "#FFF6E6", { skirt: "vestido", skirtColor: "#FFD84D", skirtTrim: "#FF7AA8" }, 45),
+  out("cheer_rosa", "Uniforme Cheer", "📣", "raro", "#D4216C", "#FFFFFF", { skirt: "cheer", skirtColor: "#D4216C", skirtTrim: "#FFC800", emblem: "star", pompoms: "#FFC800" }, 100),
+  out("cheer_azul", "Cheer Azul", "🌊", "raro", "#2F6FD6", "#FFF6E6", { skirt: "cheer", skirtColor: "#2F6FD6", skirtTrim: "#FFFFFF", emblem: "star", pompoms: "#FFFFFF" }, 100),
+  out("bailarina", "Bailarina", "🩰", "raro", "#FFFFFF", "#FF7AA8", { skirt: "tutu", skirtColor: "#FFF0F6", tights: "#FFC2DC" }, 120),
+  out("vestido_fiesta", "Vestido de fiesta", "🎉", "raro", "#9A5CFF", "#FFC800", { skirt: "vestido", skirtColor: "#9A5CFF", skirtTrim: "#FFC800", shine: true, emblem: "star" }, 130),
+  out("hada", "Hada de azúcar", "🧚", "epico", "#5FCFB0", "#FFFFFF", { skirt: "tutu", skirtColor: "#8FE6CC", tights: "#FFFFFF", shine: true, emblem: "star" }, 270),
+  out("tutu_arcoiris", "Tutú Arcoíris", "🌈", "epico", "#FFFFFF", "#FFC800", { skirt: "tutu", rainbow: true, tights: "#FFFFFF", pompoms: "#FF7AA8" }, 300, { minLevel: 12 }),
+  out("princesa", "Princesa Cacao", "👸", "legendario", "#8A2B5C", "#FFC800", { skirt: "gala", skirtColor: "#B83A78", skirtTrim: "#FFC800", shine: true, emblem: "heart" }, 520, { minLevel: 20 }),
+  out("cheer_oro", "Cheer Campeona", "🏆", "legendario", "#FFC800", "#D4216C", { skirt: "cheer", skirtColor: "#FFC800", skirtTrim: "#D4216C", shine: true, emblem: "star", pompoms: "#FF3FA4" }, 600, { minLevel: 15 }),
+  out("gala_dorado", "Vestido de Gala", "💫", "legendario", "#FFC800", "#FFFFFF", { skirt: "gala", skirtColor: "#FFD84D", skirtTrim: "#FFFFFF", shine: true, emblem: "star" }, 800, { minLevel: 25 }),
+
+  // ---- Más tenidas exclusivas para todos ----
+  out("smoking", "Smoking de gala", "🤵", "raro", "#1C1C22", "#FFFFFF", { emblem: "bow" }, 130),
+  out("super", "Súper Choco", "🦸", "epico", "#2F6FD6", "#E83A3A", { emblem: "bolt" }, 300, { minLevel: 10 }),
+  out("astronauta", "Traje espacial", "🚀", "epico", "#F2F4FF", "#35F0FF", { emblem: "star", shine: true }, 320, { minLevel: 14 }),
+  out("dubai", "Edición Mati Dubai", "💎", "legendario", "#FFC800", "#FF3FA4", { shine: true, emblem: "star" }, 1500, { needs: "dubai" }),
 ];
 
 export const ITEMS = [
@@ -184,6 +211,16 @@ export const ITEMS = [
   ev("dianino", 50, "back", "ev_globos", "Globos", "🎈", "epico", { kind: "globos" }),
   ev("dianino", 80, "pet", "ev_globito", "Globito feliz", "🎈", "legendario", { kind: "globito" }),
 ];
+
+import { levelInfo } from "./xp.js";
+
+/** Si la prenda todavía está bloqueada devuelve por qué ("" si ya se puede comprar). Lo exclusivo pide nivel o un logro. */
+export function lockReason(progress, item) {
+  if (!item) return "";
+  if (item.minLevel && levelInfo(progress.xp).level < item.minLevel) return `Nivel ${item.minLevel}`;
+  if (item.needs === "dubai" && !(progress.merge && progress.merge.dubai)) return "Haz el ¡Mati Dubai! en Mati Merge";
+  return "";
+}
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));
 

@@ -379,9 +379,9 @@ export function createMatichico(character, outfit, look = null) {
   }
 
   const hero = {
-    group: outer, head, bodyGroup, arms, legs, animate, setOutfit,
+    group: outer, head, bodyGroup, arms, legs, animate, setOutfit, logo,
     mats, eyes, brows, mouth, defaultStyle,
-    defaults: { choco: mats.choco.color.getHex(), chocoDark: mats.chocoDark.color.getHex(), hair: mats.hair.color.getHex(), shoe: mats.shoe.color.getHex() },
+    defaults: { jeans: mats.jeans.color.getHex(), choco: mats.choco.color.getHex(), chocoDark: mats.chocoDark.color.getHex(), hair: mats.hair.color.getHex(), shoe: mats.shoe.color.getHex() },
     worn: [], tick: null, look: null,
     /** Viste al Matichico con un "look" completo (peinado, sombrero, ropa, etc.; ver wardrobe-data.js). */
     setLook(next) { applyLook(hero, next || {}); },
