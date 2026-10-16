@@ -239,6 +239,7 @@ function renderEnergy() {
   renderEnergyWays(i);
 }
 const enWaysEl = document.getElementById("en-ways");
+const enChestResultEl = document.getElementById("en-chest-wait");
 const enMissEl = document.getElementById("en-miss");
 let enNeed = 0;
 let enGame = "";
@@ -305,6 +306,7 @@ function openEnergy(need = 0, game = "", mid = false) {
   if (!progress) return;
   enNeed = need;
   enGame = game;
+  enChestResultEl.textContent = "";
   const i = energyInfo(progress);
   document.getElementById("en-icon").textContent = need ? "😴" : "⚡";
   document.getElementById("en-title").textContent = need ? "¡Matichico está cansado!" : "Tu energía";
@@ -324,7 +326,9 @@ document.getElementById("en-chest").addEventListener("click", () => {
   const r = claimEnergyChest(progress);
   if (!r) return;
   audio.playPurchase();
-  showToast(r.energy ? `🎁 ¡Cofre del tesoro! +${r.energy} ⚡ y +${r.coins} 🍫✨` : `🎁 ¡Cofre! Hoy ya tienes toda la energía extra, así que te da +${r.coins} 🍫✨`);
+  const msg = r.energy ? `🎁 ¡Cofre del tesoro! +${r.energy} ⚡ y +${r.coins} 🍫✨` : `🎁 ¡Cofre! Tu energía ya está en el tope (${energyInfo(progress).cap}), así que te da +${r.coins} 🍫✨`;
+  enChestResultEl.textContent = msg; // queda escrito en el diálogo (el aviso de abajo se tapaba con la ventana)
+  showToast(msg, 3500);
   refreshHubStats();
   renderEnergy();
 });

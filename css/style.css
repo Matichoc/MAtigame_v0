@@ -87,7 +87,7 @@ h1, h2, h3 {
   padding: 12px 22px;
   border-radius: 999px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-  z-index: 999;
+  z-index: 10000; /* por encima de las ventanas (modal = 9000) para que los avisos se vean */
   max-width: 90vw;
   text-align: center;
   transition: opacity .3s ease, transform .3s ease;
@@ -1660,6 +1660,7 @@ details.how > :not(summary) { font-size: 0.85rem; margin: 6px 0 0; }
 .en-bar i { position: absolute; inset: 0 auto 0 0; width: 100%; background: linear-gradient(90deg, #ffd34d, #ff9d00); transition: width 0.4s; }
 .en-bar span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #3d1f10; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
 .en-sub { font-size: 0.85rem; opacity: 0.85; }
+#en-chest-wait:not(:empty) { background: rgba(255, 200, 0, 0.2); border: 2px solid var(--dorado, #ffc800); border-radius: 12px; padding: 6px 10px; font-weight: 800; opacity: 1; }
 .en-card { max-height: 92vh; overflow-y: auto; }
 .en-card > * { flex-shrink: 0; }
 .en-miss { background: rgba(255, 90, 90, 0.2); border: 2px solid #ff8a8a; border-radius: 12px; padding: 6px 10px; font-size: 0.9rem; }
