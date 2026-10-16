@@ -1698,3 +1698,14 @@ details.how > :not(summary) { font-size: 0.85rem; margin: 6px 0 0; }
 .cal-today { font-size: 0.95rem; text-align: center; padding: 4px; }
 @keyframes cal-pulse { 50% { transform: scale(1.07); } }
 @media (max-height: 520px) { .cal-card { padding: 8px 12px; gap: 4px; max-height: 96vh; } .cal-card h2 { font-size: 1.05rem; margin: 0; } .cal-day { min-height: 30px; padding: 1px 0; } .cal-day b { display: none; } .cal-day .cal-ic { font-size: 0.85rem; } .cal-day small { font-size: 0.55rem; } .cal-sub { font-size: 0.7rem; } .cal-today { padding: 0; font-size: 0.85rem; } }
+
+/* ---------- Garaje de Autos ---------- */
+.garage { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 8px; margin: 0 0 6px; scroll-snap-type: x proximity; }
+.gar-card { flex: 0 0 132px; scroll-snap-align: start; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; border-radius: 16px; border: 2px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.08); color: var(--crema, #fff6e6); font-family: inherit; cursor: pointer; text-align: center; }
+.gar-card .gar-ic { font-size: 1.8rem; line-height: 1; }
+.gar-card b { font-size: 0.82rem; }
+.gar-card small { font-size: 0.64rem; opacity: 0.85; min-height: 2.2em; line-height: 1.1; }
+.gar-card em { font-style: normal; font-weight: 900; font-size: 0.78rem; color: #ffd34d; }
+.gar-card.on { border-color: #ffd34d; background: rgba(255,211,77,0.18); }
+.gar-card.locked { opacity: 0.9; border-style: dashed; }
+@media (max-height: 520px) { .gar-card { flex-basis: 112px; padding: 5px 4px; } .gar-card small { display: none; } .gar-card .gar-ic { font-size: 1.3rem; } }

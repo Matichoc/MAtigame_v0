@@ -621,7 +621,7 @@ export class Game3D {
     reportScore(this.progress, this.gameId, this.score);
     addToLeaderboard(this.progress, this.gameId, this.progress.playerName, this.score);
     // Matipuntos por terminar la partida, según el puntaje (cada juego puntúa distinto)
-    const bonus = runBonus(this.gameId, this.score);
+    const bonus = Math.round(runBonus(this.gameId, this.score) * (this.bonusMult || 1)); // algunos juegos dan más con mejoras (p. ej. autos del garaje)
     if (bonus > 0) {
       earnCoins(this.progress, bonus);
       saveProgress(this.progress);
@@ -712,7 +712,7 @@ export function disposeTree(obj) {
 
 /** Libera solo las geometrías de un objeto (para lo que se crea y se quita todo el rato, con materiales compartidos). */
 export function disposeGeometries(obj) {
-  obj.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
+  obj.traverse((o) => { if (o.geometry && !o.isSprite) o.geometry.dispose(); }); // los sprites comparten una sola geometría
 }
 
 // ---------- estilo "anime": sombreado por tonos (cel-shading) y contorno ----------
