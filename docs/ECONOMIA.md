@@ -46,6 +46,6 @@ Lo que ya compraste **no cambia**: el reajuste solo sube lo que aún no tienes.
 
 ## Pendiente de decidir
 
-- `UNLOCK_PRICE` (candado de Fútbol, Choco Match, Aventura y Ciudad): hoy 300 de prueba; con el plan de lanzamiento de 20.000 serían ~2 meses de juego por candado.
+- `UNLOCK_PRICE` (candado de Fútbol, Choco Match, Aventura y Ciudad): fijado en **2.000** (≈ una semana de juego por candado; 20.000 habrían sido ~2 meses).
 - Autos del garaje (400 / 900 / 1.800 / 4.000): se dejaron igual.
 - Revisar con datos reales de partidas (cuando haya ranking online) si el ritmo de ~300 al día es correcto.

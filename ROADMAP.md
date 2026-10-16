@@ -504,7 +504,7 @@ teclados no dejan apretar flechas + Espacio al mismo tiempo).
 ### Etapa 11m — Tres juegos nuevos que se canjean con Matipuntos ✅
 
 - **Canje:** Fútbol Choco, Choco Match, Aventura Choco y Ciudad Choco aparecen en el menú con candado y su precio; al juntar los Matipuntos se
-  canjean (`js/unlocks.js`). **Precio de prueba: 300** (una sola línea, `UNLOCK_PRICE`); para el lanzamiento se cambia a **20000**.
+  canjean (`js/unlocks.js`). **Precio: 2000** (≈ una semana de juego; una sola línea, `UNLOCK_PRICE`; para probar rápido se baja a 300).
   Las misiones diarias solo piden juegos ya desbloqueados.
 - **⚽ Fútbol Choco** (`js/futbol-game.js`): dos modos en el mismo juego, **Penales** (5 tiros contra un arquero que lee mejor cada nivel)
   y **Tiros libres** (barrera de 2 a 5 defensas que a veces saltan, hay que pasarla con un tiro en arco). 20 niveles por modo.
