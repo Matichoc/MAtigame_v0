@@ -663,6 +663,7 @@ export class Game3D {
    * estrellas, da puntos/XP y muestra la tarjeta "¡Nivel completado!" (overlay "win").
    */
   levelWin({ level, stars, text, title }) {
+    if (this.state === "gameover") return;
     audio.stopMusic();
     audio.playMissionComplete();
     this.state = "win";
@@ -683,6 +684,7 @@ export class Game3D {
 
   /** Cierra la partida: guarda puntaje/ranking y muestra el resumen. */
   finish(text) {
+    if (this.state === "gameover") return; // ya terminó (p. ej. se acabó la energía justo antes)
     audio.stopMusic();
     this.state = "gameover";
     if (this.mission && !this._missionWon) text = `🎯 Misión ${this.mission.n} (${this.mission.text.toLowerCase()}): ¡todavía no! ${text}`;
