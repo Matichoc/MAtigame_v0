@@ -1815,3 +1815,34 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 @media (pointer: coarse) { .cd-pedal:not(.hidden) { display: flex; } }
 @media (max-height: 520px) { .cd-pedal.gas { width: 78px; height: 78px; bottom: 10px; right: 10px; } .cd-pedal.stop { width: 58px; height: 58px; right: 98px; bottom: 10px; } .pk-joy.steer { width: 112px; height: 112px; } }
 .canvas-wrap:has(.overlay:not(.hidden)) .cd-pedal { display: none !important; }
+
+/* Ciudad Choco en el celular: el botón de acción (Subir/Bajar/Hablar...) es redondo y se acomoda sobre los pedales */
+#ciudad-btn-action .ab-i, #ciudad-btn-action small { display: none; }
+@media (pointer: coarse) {
+  #ciudad-btn-action { left: auto; right: 14px; bottom: 14px; width: 80px; height: 80px; max-width: none; padding: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; transform: none; }
+  #ciudad-btn-action.hidden { display: none; }
+  #ciudad-btn-action .ab-full { display: none; }
+  #ciudad-btn-action .ab-i { display: block; font-size: 1.9rem; line-height: 1; }
+  #ciudad-btn-action small { display: block; font-size: 0.62rem; font-weight: 900; letter-spacing: 0.03em; text-transform: uppercase; }
+  .canvas-wrap.driving #ciudad-btn-action { width: 66px; height: 66px; right: 22px; bottom: 122px; }
+  .canvas-wrap.driving #ciudad-btn-action .ab-i { font-size: 1.6rem; }
+  .canvas-wrap.driving .cd-horn { right: 102px; bottom: 100px; width: 50px; height: 50px; font-size: 1.4rem; }
+}
+@media (pointer: coarse) and (max-height: 520px) {
+  #ciudad-btn-action { right: 10px; bottom: 10px; width: 66px; height: 66px; }
+  .canvas-wrap.driving #ciudad-btn-action { width: 58px; height: 58px; right: 16px; bottom: 94px; }
+  .canvas-wrap.driving .cd-horn { right: 88px; bottom: 80px; width: 44px; height: 44px; font-size: 1.2rem; }
+}
+
+/* nueva vuelta / reiniciar niveles */
+.lvl-lap { display: flex; flex-direction: column; gap: 2px; width: 100%; margin-bottom: 6px; padding: 9px 12px; border-radius: 14px; border: 2px solid #fff; background: linear-gradient(180deg, #ffd36a, #f0a800); color: #4a2440; font: inherit; text-align: center; cursor: pointer; box-shadow: 0 3px 0 rgba(120, 80, 0, 0.55); animation: kw-pulse 1.6s ease-in-out infinite; touch-action: manipulation; }
+.lvl-lap b { font-size: 0.95rem; }
+.lvl-lap span { font-size: 0.8rem; font-weight: 800; }
+.lvl-note { margin-bottom: 6px; padding: 6px 10px; border-radius: 12px; background: rgba(123, 224, 138, 0.25); border: 1px solid rgba(123, 224, 138, 0.7); color: #eaffee; font-weight: 800; font-size: 0.82rem; text-align: center; }
+.lvl-reset { display: block; width: 100%; margin-top: 6px; padding: 7px 10px; border-radius: 12px; border: 2px dashed rgba(255, 255, 255, 0.5); background: transparent; color: #ffd0e6; font: inherit; font-weight: 800; font-size: 0.78rem; cursor: pointer; touch-action: manipulation; }
+
+/* "Cambiar mi nombre" (antes era un campo casi invisible al final de la columna) */
+.lb-rename { margin-top: 8px; border-radius: 12px; border: 2px solid rgba(255, 208, 230, 0.55); background: rgba(255, 255, 255, 0.07); padding: 6px 10px; color: #fff6e6; }
+.lb-rename summary { cursor: pointer; font-weight: 800; font-size: 0.85rem; color: #ffe9f3; list-style: none; }
+.lb-rename summary::-webkit-details-marker { display: none; }
+.lb-rename .field-label { display: block; margin: 6px 0 4px; font-size: 0.75rem; color: #ffd0e6; opacity: 1; }

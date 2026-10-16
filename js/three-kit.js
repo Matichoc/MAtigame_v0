@@ -8,7 +8,7 @@ import { getOutfit } from "./characters.js";
 import { addToLeaderboard, earnCoins, equippedOutfitId, getLook, reportScore, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
 import { recordRun, runBonus } from "./progression.js";
-import { campaignWin, campaignMode, campaignLevel, campaign, LEVELS_PER_GAME } from "./campaign.js";
+import { campaignWin, campaignMode, campaignLevel, campaign, campaignComplete, campaignStartOver, lapReward, LEVELS_PER_GAME } from "./campaign.js";
 import { missionFor } from "./missions.js";
 import { costOf, spendEnergy, energyOf } from "./energy.js";
 
@@ -678,8 +678,28 @@ export class Game3D {
     if (e.stars) e.stars.innerHTML = [1, 2, 3].map((n) => `<span class="${n <= stars ? "on" : "off"}">★</span>`).join("");
     if (e.winTitle) e.winTitle.textContent = title || `¡Nivel ${level} completado!`;
     if (e.winText) e.winText.textContent = `${text} +${bonus} Matipuntos 🍫✨ +${run.xp} XP ⭐`;
+    // al terminar el último nivel el botón pasa a ser "Nueva vuelta" (con premio) en vez de repetir el nivel 20
+    const campId = this.missionId || this.gameId;
+    const nb = e.q && e.q("btn-next");
+    this._lapNext = level >= LEVELS_PER_GAME && campaignComplete(this.progress, campId);
+    if (nb) {
+      if (!nb.dataset.orig) nb.dataset.orig = nb.textContent;
+      if (this._lapNext) {
+        const r = lapReward(this.progress, campId);
+        nb.textContent = `🔄 Nueva vuelta (🍫✨ ${r.coins} y ${r.packs} 🎴)`;
+        if (e.winTitle) e.winTitle.textContent = "🏆 ¡Completaste todos los niveles!";
+      } else nb.textContent = nb.dataset.orig;
+    }
     this.haptic(60);
     this.showOverlay("win");
+  }
+
+  /** Después del último nivel: empieza una vuelta nueva (premio + niveles desde el 1). */
+  startNewLap() {
+    const got = campaignStartOver(this.progress, this.missionId || this.gameId);
+    this._lapNext = false;
+    if (got) { try { window.dispatchEvent(new CustomEvent("lap-start", { detail: got })); } catch (e) { /* sin ventana */ } }
+    this.retry(); // arranca otra vez, ahora desde el nivel 1
   }
 
   /** Cierra la partida: guarda puntaje/ranking y muestra el resumen. */

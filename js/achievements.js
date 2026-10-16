@@ -49,7 +49,7 @@ const ALL_ACHIEVEMENTS = [
     icon: "🏆",
     reward: 40,
     desc: "Completa las 8 canchas de Recolecta y Corre.",
-    isDone: (p) => (p.unlockedLevel || 0) >= 8,
+    isDone: (p) => recLevel(p) >= 8,
   },
   {
     id: "leyenda_liga",
@@ -57,7 +57,7 @@ const ALL_ACHIEVEMENTS = [
     icon: "👑",
     reward: 80,
     desc: "Completa los 20 niveles de Recolecta y Corre.",
-    isDone: (p) => (p.unlockedLevel || 0) >= 20,
+    isDone: (p) => recLevel(p) >= 20,
   },
   {
     id: "ahorrista",
@@ -168,9 +168,17 @@ const ALL_ACHIEVEMENTS = [
 
 // ---------- métricas (lo que se mide en el progreso de cada perfil) ----------
 
-const camp = (p, g) => (p.campaign && p.campaign[g]) || { unlocked: 1, stars: {} };
+const camp = (p, g) => {
+  const c = (p.campaign && p.campaign[g]) || { unlocked: 1, stars: {} };
+  // los logros cuentan lo logrado en TODAS las vueltas (empezar una vuelta nueva no los pierde)
+  const won = (c.hist && c.hist.won) || {};
+  const stars = { ...c.stars };
+  for (const [n, s] of Object.entries(won)) stars[n] = Math.max(stars[n] || 0, s);
+  return { ...c, stars };
+};
+const recLevel = (p) => Math.max(p.unlockedLevel || 0, (((p.campaign || {}).recolecta || {}).hist || {}).rec || 0);
 /** Niveles (o misiones) ya cumplidos de un juego. */
-const levelsDone = (g) => (p) => Math.max(Object.keys(camp(p, g).stars).length, g === "recolecta" ? p.unlockedLevel || 0 : 0);
+const levelsDone = (g) => (p) => Math.max(Object.keys(camp(p, g).stars).length, g === "recolecta" ? recLevel(p) : 0);
 const starsOf = (g) => (p) => Object.values(camp(p, g).stars).reduce((a, b) => a + b, 0);
 const best = (g) => (p) => getBestScore(p, g);
 const stat = (k) => (p) => (p.stats && p.stats[k]) || 0;

@@ -6,7 +6,7 @@ import { THREE, Game3D, clamp, lerp, canvasTexture, roundedBox, makeBunting } fr
 import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
-import { campaign, campaignWin, renderLevelPicker, LEVELS_PER_GAME } from "./campaign.js";
+import { campaign, campaignWin, campaignComplete, campaignStartOver, renderLevelPicker, LEVELS_PER_GAME } from "./campaign.js";
 
 const CARD_W = 0.95;
 const CARD_H = 1.3;
@@ -276,7 +276,8 @@ export class MemoriaGame extends Game3D {
   /** En la tarjeta de inicio se elige con qué nivel empezar (solo los desbloqueados). */
   onIntro() {
     const c = campaign(this.progress, "memoria");
-    if (!this.startLevel || this.startLevel > c.unlocked) this.startLevel = Math.min(c.unlocked, this.startLevel || c.unlocked);
+    // si ya completaste todo, se parte desde el principio (no desde el último nivel)
+    if (!this.startLevel || this.startLevel > c.unlocked) this.startLevel = Math.min(c.unlocked, this.startLevel || (campaignComplete(this.progress, "memoria") ? 1 : c.unlocked));
     const mount = () => renderLevelPicker(this.els.q("lvlpick"), {
       id: "memoria", progress: this.progress, selected: this.startLevel,
       onSelect: (n) => { this.startLevel = n; this.reset(); },
@@ -610,6 +611,10 @@ export class MemoriaGame extends Game3D {
       audio.playVictory();
       const t = this.els.q("gameover-title");
       if (t) t.textContent = `¡Terminaste los ${LEVELS_PER_GAME} niveles! 🏆`;
+      // empieza una vuelta nueva sola: premio y los niveles vuelven a empezar desde el 1
+      const lap = campaignStartOver(this.progress, "memoria");
+      this.startLevel = 1;
+      if (lap) { try { window.dispatchEvent(new CustomEvent("lap-start", { detail: lap })); } catch (e) { /* sin ventana */ } }
       this.finish(
         `Completaste los ${LEVELS.length} niveles con ${this.stars.reduce((a, b) => a + b, 0)} estrellas y ${this.score} puntos` +
           (this.coinsEarned > 0 ? `, ganando ${this.coinsEarned} Matipuntos.` : ".")

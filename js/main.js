@@ -269,6 +269,7 @@ document.getElementById("en-sleep").addEventListener("click", () => {
   window.__sleepOnEnter = true;
   document.getElementById("btn-open-house").click();
 });
+window.addEventListener("lap-start", (e) => { showToast(`🎉 ¡Vuelta ${e.detail.lap}! +${e.detail.coins} 🍫✨ y ${e.detail.packs} sobre${e.detail.packs > 1 ? "s" : ""} 🎴`, 4200); refreshHubStats(); });
 window.addEventListener("no-energy", (e) => openEnergy(e.detail.need, e.detail.game, !!e.detail.mid));
 window.addEventListener("energy-gain", (e) => { showToast(`⚡ +${e.detail.n} energía${e.detail.reason ? ` (${e.detail.reason})` : ""}`); renderEnergy(); });
 setInterval(renderEnergy, 1000);
@@ -2121,10 +2122,10 @@ async function launchOrResume3d(key) {
       if (q("btn-retry")) q("btn-retry").addEventListener("click", () => game.retry());
       if (q("btn-menu")) q("btn-menu").addEventListener("click", goToHub);
       if (q("btn-gameover-menu")) q("btn-gameover-menu").addEventListener("click", goToHub);
-      if (q("btn-next")) q("btn-next").addEventListener("click", () => game.nextLevel());
+      if (q("btn-next")) q("btn-next").addEventListener("click", () => (game._lapNext ? game.startNewLap() : game.nextLevel()));
       if (q("btn-win-menu")) q("btn-win-menu").addEventListener("click", goToHub);
       // Convención nueva: cualquier botón con data-action dentro de la pantalla.
-      const actions = { begin: () => game.beginPlaying(), next: () => game.nextLevel(), retry: () => game.retry(), restart: () => game.restart?.() ?? game.startRun(selectedCharacter, progress), menu: goToHub };
+      const actions = { begin: () => game.beginPlaying(), next: () => (game._lapNext ? game.startNewLap() : game.nextLevel()), retry: () => game.retry(), restart: () => game.restart?.() ?? game.startRun(selectedCharacter, progress), menu: goToHub };
       document.getElementById(`screen-${pre}`).querySelectorAll("[data-action]").forEach((btn) => {
         btn.addEventListener("click", () => actions[btn.dataset.action]?.());
       });

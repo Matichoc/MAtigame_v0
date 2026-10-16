@@ -1269,6 +1269,7 @@ export class CiudadGame extends Game3D {
   _setDriveUi(on) {
     const joy = this.q("joy");
     if (joy) { joy.classList.toggle("steer", on); joy.style.setProperty("--steer", "0"); }
+    this.els.wrap?.classList.toggle("driving", on);
     for (const id of ["btn-gas", "btn-stop"]) this.q(id)?.classList.toggle("hidden", !on);
     this.joy.x = 0; this.joy.y = 0;
     this.keys.gas = false; this.keys.stop = false;
@@ -1821,15 +1822,15 @@ export class CiudadGame extends Game3D {
   _pickTarget() {
     const pl = this._playerXZ();
     let t = null;
-    if (this.dialog) { this.actionTarget = { label: "Seguir ▶", fn: () => this._advanceDialog() }; this._updateActionBtn(); return; }
+    if (this.dialog) { this.actionTarget = { label: "Seguir ▶", icon: "▶", short: "Seguir", fn: () => this._advanceDialog() }; this._updateActionBtn(); return; }
     if (this.inCar) {
-      if (Math.abs(this.car.speed) < 7) t = { label: "🚪 Bajar del auto", fn: () => this._leaveCar() };
+      if (Math.abs(this.car.speed) < 7) t = { label: "🚪 Bajar del auto", icon: "🚪", short: "Bajar", fn: () => this._leaveCar() };
     } else {
       const a = this.active;
       if (a && a.id === "flores") {
         let best = null;
         for (const p of this.pots) if (!p.watered && Math.hypot(pl.x - p.x, pl.z - p.z) < 2.8 && (!best || Math.hypot(pl.x - p.x, pl.z - p.z) < Math.hypot(pl.x - best.x, pl.z - best.z))) best = p;
-        if (best) t = { label: "💧 Regar", fn: () => this._waterPot(best, true) };
+        if (best) t = { label: "💧 Regar", icon: "💧", short: "Regar", fn: () => this._waterPot(best, true) };
       }
       if (!t) {
         let bestN = null;
@@ -1838,11 +1839,11 @@ export class CiudadGame extends Game3D {
           const d = Math.hypot(pl.x - n.x, pl.z - n.z);
           if (d < bd) { bd = d; bestN = n; }
         }
-        if (bestN) t = { label: `💬 Hablar con ${GIVERS[bestN.id].name}`, fn: () => this._talk(bestN.id) };
+        if (bestN) t = { label: `💬 Hablar con ${GIVERS[bestN.id].name}`, icon: "💬", short: "Hablar", fn: () => this._talk(bestN.id) };
       }
-      if (!t && Math.hypot(pl.x - this.car.x, pl.z - this.car.z) < 3.8) t = { label: "🚗 Subir al auto", fn: () => this._enterCar() };
+      if (!t && Math.hypot(pl.x - this.car.x, pl.z - this.car.z) < 3.8) t = { label: "🚗 Subir al auto", icon: "🚗", short: "Subir", fn: () => this._enterCar() };
       if (!t) {
-        for (const p of this.peds) if (Math.hypot(pl.x - p.x, pl.z - p.z) < 2.6) { t = { label: "👋 Saludar", fn: () => this._pedSay(p) }; break; }
+        for (const p of this.peds) if (Math.hypot(pl.x - p.x, pl.z - p.z) < 2.6) { t = { label: "👋 Saludar", icon: "👋", short: "Saludar", fn: () => this._pedSay(p) }; break; }
       }
     }
     this.actionTarget = t;
@@ -1854,7 +1855,12 @@ export class CiudadGame extends Game3D {
     if (!b) return;
     const t = this.actionTarget;
     b.classList.toggle("hidden", !t || this.state !== "playing");
-    if (t && b.textContent !== t.label) b.textContent = t.label;
+    // en el celular es un botón redondo (ícono + palabra corta); con mouse se ve la frase completa
+    if (t && b.dataset.label !== t.label) {
+      b.dataset.label = t.label;
+      b.innerHTML = `<span class="ab-full">${t.label}</span><span class="ab-i">${t.icon || "✋"}</span><small>${t.short || ""}</small>`;
+      b.setAttribute("aria-label", t.label);
+    }
   }
 
   act() {
