@@ -25,7 +25,7 @@ import {
   spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, TRADE_NORMAL, TRADE_FOIL,
 } from "./progression.js";
 import { rankingEnabled, fetchRanking } from "./online.js";
-import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_RULE, ENERGY_MISSION, startSleep, stopSleep } from "./energy.js";
+import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_RULE, ENERGY_MISSION, startSleep, stopSleep, buyEnergy, BUY_ENERGY, REGEN_SECS, SLEEP_MULT, CHEST_EVERY, CHEST_ENERGY } from "./energy.js";
 import { monthPlan, rewardInfo, calendarOf, canClaimCalendar, claimCalendar, daysInMonth } from "./calendar.js";
 
 let progress = null;
@@ -236,19 +236,82 @@ function renderEnergy() {
   document.getElementById("en-count").textContent = i.v > i.max ? `${i.v} (¡extra!)` : `${i.v}/${i.max}`;
   document.getElementById("en-next").textContent = i.v >= i.max ? "¡Energía llena!" : `${i.sleeping ? "😴 Durmiendo: " : ""}+1 ⚡ en ${fmtSecs(i.nextInSecs)} · llena en ${fmtSecs(i.fullInSecs)}`;
   document.getElementById("en-chest").classList.toggle("hidden", !i.chestReady);
-  document.getElementById("en-chest-wait").textContent = i.chestReady ? "" : `🎁 Próximo cofre del tesoro en ${fmtSecs(i.chestInSecs)}`;
-  document.getElementById("en-sleep").classList.toggle("hidden", i.v >= i.max);
+  renderEnergyWays(i);
+}
+const enWaysEl = document.getElementById("en-ways");
+const enMissEl = document.getElementById("en-miss");
+let enNeed = 0;
+let enGame = "";
+/** ¿Estamos en el menú (o en una pantalla fuera de un juego)? Solo ahí se puede "ir" a otro lugar desde el aviso. */
+const enCanGo = () => !screenHub.classList.contains("hidden");
+function renderEnergyWays(i) {
+  // cuánto falta
+  const miss = enNeed ? Math.max(0, enNeed - i.v) : 0;
+  enMissEl.classList.toggle("hidden", !enNeed);
+  if (enNeed) enMissEl.innerHTML = miss > 0 ? `Necesitas <b>${enNeed} ⚡</b> y tienes <b>${i.v}</b>: te faltan <b>${miss} ⚡</b>.` : `¡Ya tienes la energía que necesitas (${enNeed} ⚡)!`;
+  enWaysEl.innerHTML = "";
+  const row = (ico, html, btnText, fn, disabled = false) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="ew-ico">${ico}</span><span class="ew-txt">${html}</span>`;
+    if (btnText) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "ew-go";
+      b.textContent = btnText;
+      b.disabled = disabled;
+      b.addEventListener("click", fn);
+      li.appendChild(b);
+    }
+    enWaysEl.appendChild(li);
+  };
+  const go = (btnId) => () => { closeEnergy(); document.getElementById(btnId).click(); };
+  const hub = enCanGo();
+  const perHour = Math.round(3600 / REGEN_SECS);
+  row("⏳", `<b>Esperar</b> · gratis · +1 ⚡ cada ${REGEN_SECS / 60} min (${perHour} por hora)${i.v < i.max ? ` · llena en ${fmtSecs(i.fullInSecs)}` : ""}`);
+  row("😴", `<b>Dormir en tu cama</b> · gratis · ${SLEEP_MULT} veces más rápido (+1 ⚡ cada ${REGEN_SECS / 60 / SLEEP_MULT} min)`, i.v < i.max && hub ? "Ir a dormir" : "", () => {
+    closeEnergy();
+    window.__sleepOnEnter = true;
+    document.getElementById("btn-open-house").click();
+  });
+  row("🎁", `<b>Cofre del tesoro</b> · gratis · +${CHEST_ENERGY} ⚡ cada ${CHEST_EVERY / 60000} min${i.chestReady ? " · ¡ya está listo!" : ` · en ${fmtSecs(i.chestInSecs)}`}`);
+  row("📋", `<b>Misiones diarias</b> · +5 ⚡ cada una y +15 ⚡ el cofre del día`, hub ? "Ver misiones" : "", go("btn-open-progress"));
+  row("🏅", `<b>Logros</b> · +5 ⚡ (+10 ⚡ los grandes) · y <b>subir de nivel</b> +10 ⚡`, hub ? "Ver logros" : "", go("btn-open-achievements"));
+  row("🏘️", `<b>Actividades del Pueblo</b> (pasear, ayudar a los vecinos) · +10 ⚡`);
+  const room = Math.max(0, i.cap - i.v);
+  row("🍫✨", `<b>Comprar</b> +${BUY_ENERGY.amount} ⚡ por 🍫✨ ${BUY_ENERGY.price} · te quedan <b>${i.buysLeft}</b> compra${i.buysLeft === 1 ? "" : "s"} hoy`,
+    i.buysLeft > 0 ? (progress.coins < BUY_ENERGY.price ? `Faltan ${BUY_ENERGY.price - progress.coins} 🍫✨` : room <= 0 ? "Ya estás al tope" : "Comprar") : "Vuelve mañana",
+    () => {
+      const n = buyEnergy(progress);
+      if (!n) return;
+      audio.playPurchase();
+      refreshHubStats();
+      renderEnergy();
+    }, !(i.buysLeft > 0 && progress.coins >= BUY_ENERGY.price && room > 0));
+  // lo que gasta cada juego
+  const costs = document.getElementById("en-costs");
+  if (!costs.childElementCount) {
+    for (const g of GAMES_CATALOG) {
+      if (g.status !== "available" || !(g.id in ENERGY_COST)) continue;
+      const li = document.createElement("li");
+      const c = ENERGY_COST[g.id];
+      const rule = ENERGY_RULE[g.id];
+      li.innerHTML = `<span>${g.icon} ${g.name}</span><b>${c ? `${c} ⚡ al entrar` : "gratis al entrar"}${rule ? ` · ${rule}` : g.id === "ciudad" ? ` · misión ${ENERGY_MISSION} ⚡` : ""}</b>`;
+      costs.appendChild(li);
+    }
+  }
 }
 function openEnergy(need = 0, game = "", mid = false) {
   if (!progress) return;
+  enNeed = need;
+  enGame = game;
   const i = energyInfo(progress);
   document.getElementById("en-icon").textContent = need ? "😴" : "⚡";
   document.getElementById("en-title").textContent = need ? "¡Matichico está cansado!" : "Tu energía";
   document.getElementById("en-text").textContent = need && mid
-    ? `Se acabó la energía en plena partida (tienes ${i.v} ⚡). Tu puntaje quedó guardado. Puedes descansar, dormir en tu casa o recargar:`
+    ? `Se acabó la energía en plena partida (tienes ${i.v} ⚡). Tu puntaje quedó guardado. Para recargar:`
     : need
-    ? `Para jugar ${game ? "esto " : ""}necesitas ${need} ⚡ y tienes ${i.v}. Puedes seguir decorando tu casa, vistiendo a tu Matichico, pasear por el Pueblo y Ciudad Choco, o recargar:`
-    : `Al entrar a un juego se gasta un poco de energía y después se va gastando mientras juegas (cada tiro, cada pieza, cada movimiento, cada tantos metros...). Mira en cada tarjeta cuánto gasta. Una misión de Ciudad Choco cuesta ${ENERGY_MISSION}. Se recarga sola y con premios:`;
+    ? `Para jugar ${game ? "esto " : ""}necesitas ${need} ⚡ y tienes ${i.v}. Mientras tanto puedes decorar tu casa, vestir a tu Matichico o pasear por el Pueblo y Ciudad Choco (¡eso no gasta!). Para recargar:`
+    : `Cada juego gasta energía al entrar y mientras juegas (mira abajo cuánto). Pueblo, Ciudad, casa y vestuario no gastan. Para conseguir más:`;
   enOpen = true;
   enDlg.classList.remove("hidden");
   renderEnergy();
@@ -263,11 +326,6 @@ document.getElementById("en-chest").addEventListener("click", () => {
   showToast(r.energy ? `🎁 ¡Cofre del tesoro! +${r.energy} ⚡ y +${r.coins} 🍫✨` : `🎁 ¡Cofre! Hoy ya tienes toda la energía extra, así que te da +${r.coins} 🍫✨`);
   refreshHubStats();
   renderEnergy();
-});
-document.getElementById("en-sleep").addEventListener("click", () => {
-  closeEnergy();
-  window.__sleepOnEnter = true;
-  document.getElementById("btn-open-house").click();
 });
 window.addEventListener("lap-start", (e) => { showToast(`🎉 ¡Vuelta ${e.detail.lap}! +${e.detail.coins} 🍫✨ y ${e.detail.packs} sobre${e.detail.packs > 1 ? "s" : ""} 🎴`, 4200); refreshHubStats(); });
 window.addEventListener("no-energy", (e) => openEnergy(e.detail.need, e.detail.game, !!e.detail.mid));

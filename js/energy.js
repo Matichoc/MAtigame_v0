@@ -7,9 +7,10 @@
 //   day       día local de la última revisión (cada día nuevo se vuelve a llenar hasta 100)
 //   extra     energía "extra" ganada hoy (cofres, misiones, logros...); tiene tope diario
 //   chestAt   cuándo estará listo el próximo cofre del tesoro (ms)
+//   bought    veces que compró energía con Matipuntos hoy
 //   sleepUntil mientras el Matichico duerme en su cama la recarga es más rápida
 
-import { saveProgress, earnCoins, dayKey } from "./storage.js";
+import { saveProgress, earnCoins, spendCoins, dayKey } from "./storage.js";
 
 export const ENERGY_MAX = 100; // lo que se llena solo (por día y con el tiempo)
 export const ENERGY_CAP = 300; // tope con extras (cofres, logros, calendario...)
@@ -18,6 +19,8 @@ export const SLEEP_MULT = 3; // durmiendo se recarga 3 veces más rápido
 export const EXTRA_DAILY_MAX = 50; // máximo de energía extra por día
 export const CHEST_EVERY = 40 * 60 * 1000; // un cofre del tesoro cada 40 minutos
 export const CHEST_ENERGY = 10;
+/** Comprar energía con Matipuntos: sale caro a propósito y tiene tope por día. */
+export const BUY_ENERGY = { amount: 20, price: 80, perDay: 3 };
 
 /** Cuánto cuesta ENTRAR a jugar cada juego (0 = gratis). Además, durante la partida se gasta por acción (ver ENERGY_RULE). */
 export const ENERGY_COST = {
@@ -48,11 +51,13 @@ export function energyOf(progress, now = Date.now()) {
   if (!Number.isFinite(e.t) || e.t > now) e.t = now; // el reloj se atrasó: no se regala tiempo
   if (!Number.isFinite(e.chestAt) || e.chestAt - now > CHEST_EVERY * 2) e.chestAt = now + CHEST_EVERY;
   e.extra = Math.max(0, e.extra || 0);
+  e.bought = Math.max(0, e.bought || 0);
   e.sleepUntil = e.sleepUntil || 0;
   const today = dayKey(new Date(now));
   if (e.day !== today) {
     e.day = today;
     e.extra = 0;
+    e.bought = 0;
     if (e.v < ENERGY_MAX) e.v = ENERGY_MAX; // cada día se empieza con 100
     e.t = now;
   }
@@ -93,7 +98,7 @@ export function energyInfo(progress, now = Date.now()) {
   return {
     v: Math.floor(e.v), max: ENERGY_MAX, cap: ENERGY_CAP, nextInSecs: next, sleeping: now < e.sleepUntil,
     chestReady: now >= e.chestAt, chestInSecs: Math.max(0, Math.ceil((e.chestAt - now) / 1000)),
-    extraLeft: Math.max(0, EXTRA_DAILY_MAX - e.extra),
+    extraLeft: Math.max(0, EXTRA_DAILY_MAX - e.extra), buysLeft: Math.max(0, BUY_ENERGY.perDay - e.bought),
     fullInSecs: e.v >= ENERGY_MAX ? 0 : Math.ceil(((ENERGY_MAX - e.v - 1) * REGEN_SECS * 1000 / (now < e.sleepUntil ? SLEEP_MULT : 1)) / 1000) + next,
   };
 }
@@ -124,6 +129,20 @@ export function addEnergy(progress, n, reason = "", { calendar = false } = {}) {
   saveProgress(progress);
   emitGain(room, reason);
   return room;
+}
+
+/** Compra energía con Matipuntos. Devuelve cuánta sumó, o 0 si no se pudo (sin puntos, tope del día o ya está al máximo). */
+export function buyEnergy(progress) {
+  const e = energyOf(progress);
+  if (e.bought >= BUY_ENERGY.perDay || e.v >= ENERGY_CAP || (progress.coins || 0) < BUY_ENERGY.price) return 0;
+  const n = Math.min(BUY_ENERGY.amount, ENERGY_CAP - e.v);
+  if (!spendCoins(progress, BUY_ENERGY.price)) return 0;
+  if (e.v >= ENERGY_MAX && e.v + n > ENERGY_MAX) e.t = Date.now();
+  e.v += n;
+  e.bought++;
+  saveProgress(progress);
+  emitGain(n, "comprada");
+  return n;
 }
 
 /** Cobra el cofre del tesoro si ya está listo: energía (si queda cupo extra hoy) y unos Matipuntos. */
