@@ -180,7 +180,7 @@ export const furnitureOf = (catId) => {
 /** Posiciones de siempre de cada lugar (para pasar lo que ya tenías puesto al modo libre). */
 const OLD_ANCHORS = {
   rug: { x: 0.2, z: 1.0 }, bed: { x: -3.4, z: -2.2 }, left: { x: -4.0, z: 2.8 }, right: { x: 3.7, z: -3.8 },
-  wallL: { wall: "left", u: 0.4, y: 2.7 }, wallC: { wall: "back", u: 0.3, y: 2.8 }, wallR: { wall: "back", u: 3.4, y: 2.7 },
+  wallL: { wall: "back", u: -3.4, y: 2.7 }, wallC: { wall: "back", u: 0.3, y: 2.8 }, wallR: { wall: "back", u: 3.4, y: 2.7 },
 };
 let uidCounter = 0;
 const newUid = () => `f${Date.now().toString(36)}${(uidCounter++).toString(36)}`;

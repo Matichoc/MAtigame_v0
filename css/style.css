@@ -1793,3 +1793,10 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .hr-pill.hr-add { border-style: dashed; }
 .sh-stage canvas { transition: opacity 0.2s ease; }
 .sh-stage.fade canvas { opacity: 0; }
+
+/* flechas para pasar de un cuarto a otro (la casa se ve de lado) */
+.hs-arrow { position: absolute; bottom: 8px; z-index: 3; max-width: 46%; padding: 7px 12px; border-radius: 999px; border: 2px solid #fff; background: linear-gradient(180deg, #ff8fc0, #d4216c); color: #fff; font: inherit; font-weight: 900; font-size: 0.8rem; cursor: pointer; box-shadow: 0 3px 0 rgba(120, 10, 60, 0.6); touch-action: manipulation; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hs-arrow.left { left: 8px; }
+.hs-arrow.right { right: 8px; }
+.hs-arrow span { font-weight: 800; }
+.hs-arrow:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(120, 10, 60, 0.6); }

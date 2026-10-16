@@ -560,15 +560,7 @@ async function openHousePreview() {
     }
     house3d.layoutData = houseLayout(progress);
     house3d.setPlaced(housePlaced());
-    updateDoorLabel();
-    if (!house3d._doorBound) {
-      house3d._doorBound = true;
-      house3d.onDoor(() => {
-        const n = nextRoomOf(progress);
-        if (n) openRoom(n.rid);
-        else { houseMode = "rooms"; renderHouse(); }
-      });
-    }
+    refreshNeighbors();
     house3d.setSelected(houseSel);
     house3d.freezeOnSel = true;
     if (!house3d._lifeBound) {
@@ -689,8 +681,9 @@ function bindHouseDrag() {
   const snap = (v) => Math.round(v * 4) / 4;
   cv.addEventListener("pointerdown", (e) => {
     if (houseMode === "live") {
-      // tocar la puerta: va hasta ahí y pasa al otro cuarto
-      if (house3d.pickDoor(e.clientX, e.clientY)) { house3d.walkToDoor(); return; }
+      // tocar otro cuarto de la casa (a los lados): pasa a ese cuarto
+      const nb = house3d.pickRoom(e.clientX, e.clientY);
+      if (nb) { openRoom(nb); return; }
       // tocar un mueble: lo usa; tocar el piso: camina hasta ahí (y se levanta si dormía)
       const u = house3d.pick(e.clientX, e.clientY);
       if (u && house3d.interact(u)) return;
@@ -836,38 +829,72 @@ function renderRoomStrip() {
   }
 }
 
-function updateDoorLabel() {
+/** Los cuartos que no están abiertos se ven a los lados (la casa de lado, como en Avatar World) y las flechas dicen a cuál van. */
+function refreshNeighbors() {
   if (!house3d) return;
-  const n = nextRoomOf(progress);
-  house3d.setDoorLabel(n ? `${roomType(n.type).icon} ${n.name} →` : "🚪 Más cuartos");
+  const h = progress.house;
+  const rooms = roomsOf(progress);
+  const cur = rooms.findIndex((r) => r.rid === h.curRoom);
+  house3d.setRoomName(`${roomType(rooms[cur].type).icon} ${rooms[cur].name}`);
+  house3d.setNeighbors(rooms.map((r, i) => ({ r, i })).filter(({ i }) => i !== cur).map(({ r, i }) => {
+    const d = h.roomData[r.rid] || {};
+    return { rid: r.rid, dx: i - cur, name: `${roomType(r.type).icon} ${r.name}`, placed: d.placed || {}, layout: d.layout || [] };
+  }));
+  renderRoomArrows();
 }
 
-/** Muestra en 3D el cuarto que está abierto (muebles, piso y paredes) y deja la puerta con su cartel. */
-function refreshRoom3d(enter = false) {
+const arrowPrev = document.getElementById("house-prev");
+const arrowNext = document.getElementById("house-next");
+function renderRoomArrows() {
+  const rooms = roomsOf(progress);
+  const cur = rooms.findIndex((r) => r.rid === progress.house.curRoom);
+  const prev = rooms[cur - 1];
+  const next = rooms[cur + 1];
+  arrowPrev.classList.toggle("hidden", !prev);
+  if (prev) arrowPrev.innerHTML = `◀ <span>${roomType(prev.type).icon} ${prev.name}</span>`;
+  const canAdd = rooms.length < MAX_ROOMS;
+  arrowNext.classList.toggle("hidden", !next && !canAdd);
+  arrowNext.innerHTML = next ? `<span>${roomType(next.type).icon} ${next.name}</span> ▶` : `<span>➕ Cuarto nuevo</span>`;
+}
+arrowPrev.addEventListener("click", () => { const r = roomsOf(progress); const i = r.findIndex((x) => x.rid === progress.house.curRoom); if (r[i - 1]) openRoom(r[i - 1].rid); });
+arrowNext.addEventListener("click", () => {
+  const r = roomsOf(progress);
+  const i = r.findIndex((x) => x.rid === progress.house.curRoom);
+  if (r[i + 1]) openRoom(r[i + 1].rid);
+  else { houseMode = "rooms"; houseBuying = null; clearFurniturePreview(); selectPiece(null); renderHouse(); }
+});
+
+/** Muestra en 3D el cuarto que está abierto (muebles, piso y paredes) y los vecinos a los lados. */
+function refreshRoom3d(enterSide = 0) {
   if (!house3d) return;
   house3d.layoutData = houseLayout(progress);
   house3d.setPlaced(housePlaced());
-  updateDoorLabel();
+  refreshNeighbors();
   house3d.setSelected(null);
-  if (enter) house3d.enterRoom();
+  house3d.snapCam();
+  if (enterSide) house3d.enterRoom(enterSide);
 }
 
-/** Pasa a otro cuarto (con un fundido corto). */
-function openRoom(rid, { enter = true } = {}) {
-  if (!progress || rid === progress.house.curRoom) return;
+/** Pasa a otro cuarto: la cámara se desliza hasta él (los cuartos están uno al lado del otro). */
+let roomMoving = false;
+function openRoom(rid) {
+  if (!progress || roomMoving || rid === progress.house.curRoom) return;
+  const rooms = roomsOf(progress);
+  const from = rooms.findIndex((r) => r.rid === progress.house.curRoom);
+  const to = rooms.findIndex((r) => r.rid === rid);
+  if (to < 0) return;
   houseSel = null;
   houseTrial = {};
   houseBuying = null;
   clearFurniturePreview();
   if (house3d) house3d.wake();
-  const stage = document.querySelector("#screen-house .sh-stage");
   const go = () => {
+    roomMoving = false;
     if (!switchRoom(progress, rid)) return;
-    refreshRoom3d(enter);
+    refreshRoom3d(to > from ? 1 : -1);
     renderHouse();
-    if (stage) stage.classList.remove("fade");
   };
-  if (stage && house3d) { stage.classList.add("fade"); setTimeout(go, 220); } else go();
+  if (house3d && house3d.ready) { roomMoving = true; house3d.slideTo(to - from, go); } else go();
 }
 
 function renderHouseRooms() {

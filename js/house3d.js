@@ -553,7 +553,7 @@ export class House3D {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80);
+    this.camera = new THREE.PerspectiveCamera(20, 1, 0.1, 160); // lente "largo": se ve casi de frente y plano, como una casa de muñecas de lado
     this.hemi = new THREE.HemisphereLight(0xfff0e0, 0x8a5a60, 1.35);
     this.scene.add(this.hemi);
     const sun = new THREE.DirectionalLight(0xfff3dc, 2.4);
@@ -575,19 +575,57 @@ export class House3D {
       const h = Math.max(1, canvas.clientHeight);
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
-      const fit = Math.max(1, 1.35 / this.camera.aspect);
-      const d = 17.5 * fit * (this.size / 10);
-      this.camera.position.set(d * 0.62, d * 0.46, d * 0.7);
-      this.camera.lookAt(0, 1.9, 0);
+      // vista "de lado": se ve el cuarto completo y un pedacito de los vecinos
+      const tv = Math.tan((this.camera.fov * Math.PI) / 360);
+      const halfW = W / 2 + (this.neighbors && this.neighbors.length ? 2.7 : 0.9); // con vecinos se asoma un pedazo de ellos
+      const halfH = (H + 2.6) / 2;
+      this._camD = Math.max(halfH / tv, halfW / (tv * this.camera.aspect));
       this.camera.updateProjectionMatrix();
+      this._placeCam();
     };
+    this._camX = 0;
     new ResizeObserver(this._resize).observe(canvas);
     this._resize();
     this._loop = this._loop.bind(this);
     this.ready = true;
   }
 
-  /** Arma (o rearma) piso, paredes y marcos para un cuarto de `size` x `size`. */
+  /**
+   * Un cuarto visto "de lado", como una casa de muñecas abierta por el frente (estilo Avatar World): piso, pared del fondo,
+   * paredes laterales (que separan un cuarto del vecino), techo y base. `floorMat`/`wallMat` son los materiales del piso y del fondo.
+   */
+  _shellGroup(w, floorMat, wallMat, castShadow = true) {
+    const g = new THREE.Group();
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(w, w), floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    const back = new THREE.Mesh(new THREE.PlaneGeometry(w, H), wallMat);
+    back.position.set(0, H / 2, -w / 2);
+    back.receiveShadow = true;
+    const trim = std(0xffffff, 0.5);
+    const frame = std(0xd4216c, 0.5);
+    const t = 0.3;
+    const parts = [
+      box(w, 0.3, 0.2, trim, 0, 0.15, -w / 2 + 0.1), // zócalo
+      box(w + 2 * t, 0.5, w + 0.3, std(0x8a5a36, 0.7), 0, -0.26, 0.05), // base de la casa
+      box(t, H + 0.4, w, frame, -(w / 2 + t / 2), H / 2 + 0.2 - 0.05, 0), // paredes laterales
+      box(t, H + 0.4, w, frame, w / 2 + t / 2, H / 2 + 0.2 - 0.05, 0),
+      box(w + 2 * t, 0.45, 0.6, frame, 0, H + 0.22, -w / 2 + 0.3), // viga del techo (solo al fondo: así no tapa el cuarto)
+    ];
+    for (const m of parts.slice(2)) m.castShadow = false; // el marco no da sombra adentro
+    if (!castShadow) for (const m of parts) m.castShadow = false;
+    g.add(floor, back, ...parts);
+    return { group: g, floor, back, parts };
+  }
+
+  _placeCam() {
+    const d = this._camD || 20;
+    const x = this._camX || 0;
+    this.camera.position.set(x, 2.4 + d * 0.27, d * 0.96);
+    this.camera.lookAt(x, 2.2, 0);
+  }
+
+  /** Arma (o rearma) el cuarto abierto para un tamaño `size` x `size`. */
   _buildShell(size) {
     if (this.shell) {
       this.scene.remove(this.shell);
@@ -595,110 +633,142 @@ export class House3D {
     }
     this.size = size;
     W = size;
-    const shell = new THREE.Group();
-    const keepFloor = this.floor?.material;
-    const keepWall = this.back?.material;
-    this.floor = new THREE.Mesh(new THREE.PlaneGeometry(W, W), keepFloor || std(0xffffff, 0.7));
-    this.floor.rotation.x = -Math.PI / 2;
-    this.floor.receiveShadow = true;
-    this.back = new THREE.Mesh(new THREE.PlaneGeometry(W, H), keepWall || std(0xffffff, 0.9));
-    this.back.position.set(0, H / 2, -W / 2);
-    this.back.receiveShadow = true;
-    this.left = new THREE.Mesh(new THREE.PlaneGeometry(W, H), this.left?.material || std(0xffffff, 0.9));
-    this.left.position.set(-W / 2, H / 2, 0);
-    this.left.rotation.y = Math.PI / 2;
-    this.left.receiveShadow = true;
-    const trim = std(0xffffff, 0.5);
-    const base1 = box(W, 0.3, 0.2, trim, 0, 0.15, -W / 2 + 0.1);
-    const base2 = box(0.2, 0.3, W, trim, -W / 2 + 0.1, 0.15, 0);
-    const slab = box(W + 0.6, 0.5, W + 0.6, std(0x8a5a36, 0.7), 0, -0.26, 0);
-    const edge1 = box(W + 0.6, H + 0.5, 0.3, std(0xd4216c, 0.5), 0, H / 2 - 0.01, -W / 2 - 0.19);
-    const edge2 = box(0.3, H + 0.5, W + 0.6, std(0xd4216c, 0.5), -W / 2 - 0.19, H / 2 - 0.01, 0);
-    shell.add(this.floor, this.back, this.left, base1, base2, slab, edge1, edge2);
-    this._buildDoor(shell);
-    this.shell = shell;
-    this.scene.add(shell);
+    const s = this._shellGroup(W, this.floor?.material || std(0xffffff, 0.7), this.back?.material || std(0xffffff, 0.9));
+    this.floor = s.floor;
+    this.back = s.back;
+    this.shell = s.group;
+    this.scene.add(this.shell);
+    this._labelFor(this.roomName || "");
     // las texturas se repiten según el tamaño para que los dibujos no se estiren
-    for (const m of [this.floor.material, this.back.material, this.left.material]) if (m.map) { m.map.wrapS = THREE.RepeatWrapping; }
+    for (const m of [this.floor.material, this.back.material]) if (m.map) { m.map.wrapS = THREE.RepeatWrapping; }
     this._fitTextures();
     this.sun && Object.assign(this.sun.shadow.camera, { left: -W * 0.9, right: W * 0.9, top: W * 0.9, bottom: -W * 0.9 });
     this.sun && this.sun.shadow.camera.updateProjectionMatrix();
     this._resize && this._resize();
+    if (this._nbData) this.setNeighbors(this._nbData);
   }
 
-  /** Puerta en la pared izquierda (adelante): lleva al otro cuarto. Cartel con el nombre del cuarto al que va. */
-  _buildDoor(shell) {
-    const g = new THREE.Group();
-    const dz = W / 2 - 1.6;
-    const wood = std(0xfff6e6, 0.5);
-    g.add(box(0.28, 3.7, 2.1, wood, 0, 1.85, 0));
-    const panel = box(0.2, 3.35, 1.7, std(0xb9703c, 0.55), 0.06, 1.68, 0);
-    g.add(panel);
-    g.add(rbox(0.1, 1.2, 1.2, 0.08, std(0xd18a52, 0.55), 0.17, 2.3, 0), rbox(0.1, 1.0, 1.2, 0.08, std(0xd18a52, 0.55), 0.17, 0.95, 0));
-    g.add(ball(0.12, std(0xffc800, 0.3, { metalness: 0.7 }), 0.2, 1.7, 0.6));
-    g.position.set(-W / 2 + 0.15, 0, dz);
-    shell.add(g);
-    this.doorMeshes = [];
-    g.traverse((o) => { if (o.isMesh) this.doorMeshes.push(o); });
-    this.doorGroup = g;
-    this._drawDoorSign();
-  }
+  /** Distancia entre el centro de un cuarto y el del vecino. */
+  get stride() { return W + 0.6; }
 
-  _drawDoorSign() {
-    if (!this.doorGroup) return;
-    if (this.doorSign) { this.doorGroup.remove(this.doorSign); this.doorSign.material.map?.dispose(); this.doorSign.material.dispose(); }
-    const label = this.doorLabel || "🚪 Más cuartos";
+  _labelSprite(text) {
     const c = document.createElement("canvas");
     c.width = 512; c.height = 128;
     const x = c.getContext("2d");
-    x.fillStyle = "rgba(74,36,64,0.92)";
+    x.fillStyle = "rgba(74,36,64,0.9)";
     x.beginPath(); x.roundRect ? x.roundRect(6, 10, 500, 108, 40) : x.rect(6, 10, 500, 108); x.fill();
     x.strokeStyle = "#ffd0e6"; x.lineWidth = 6; x.stroke();
     x.font = "900 54px system-ui, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillStyle = "#fff6e6";
-    x.fillText(label, 256, 66);
+    x.fillText(text, 256, 66);
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
-    this.doorSign = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
-    this.doorSign.renderOrder = 11;
-    this.doorSign.scale.set(3.6, 0.9, 1);
-    this.doorSign.position.set(0.5, 4.4, 0);
-    this.doorGroup.add(this.doorSign);
-    this.doorMeshes = this.doorMeshes.filter((m) => !m.isSprite);
-    this.doorMeshes.push(this.doorSign);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+    sp.renderOrder = 11;
+    sp.scale.set(4.2, 1.05, 1);
+    return sp;
   }
 
-  /** Cartel de la puerta ("🍳 Cocina →"). */
-  setDoorLabel(text) {
-    this.doorLabel = text;
-    this._drawDoorSign();
+  /** Cartel con el nombre del cuarto abierto. */
+  _labelFor(text) {
+    this.roomName = text;
+    if (this.roomLabel) { this.scene.remove(this.roomLabel); this.roomLabel.material.map?.dispose(); this.roomLabel.material.dispose(); this.roomLabel = null; }
+    if (!text || !this.shell) return;
+    this.roomLabel = this._labelSprite(text);
+    this.roomLabel.position.set(0, H + 1.15, 0);
+    this.scene.add(this.roomLabel);
   }
 
-  /** ¿Tocó la puerta? */
-  pickDoor(clientX, clientY) {
-    if (!this.ready || !this.doorMeshes || !this.doorMeshes.length) return false;
-    return this._ray(clientX, clientY).intersectObjects(this.doorMeshes, true).length > 0;
+  setRoomName(text) { this._labelFor(text); }
+
+  // ---------- los otros cuartos de la casa, a los lados ----------
+
+  /**
+   * `list` = [{ rid, dx, name, placed, layout }]: los cuartos que no están abiertos, `dx` = cuántos lugares a la derecha (+) o a la
+   * izquierda (-) del cuarto abierto. Se dibujan quietos (sin Matichico) para ver la casa completa de lado.
+   */
+  setNeighbors(list) {
+    this._nbData = list;
+    for (const n of this.neighbors || []) {
+      this.scene.remove(n.group);
+      n.group.traverse((o) => { o.geometry?.dispose?.(); if (o.isSprite) { o.material.map?.dispose(); o.material.dispose(); } });
+      n.mats.forEach((m) => { m.map?.dispose(); m.dispose(); });
+    }
+    this.neighbors = [];
+    this.nTicks = [];
+    for (const item of list) {
+      const fl = getHouseItem((item.placed || {}).floor) || getHouseItem("fl_madera");
+      const wl = getHouseItem((item.placed || {}).wall) || getHouseItem("wl_crema");
+      const fm = std(0xffffff, 0.7);
+      fm.map = floorTexture(fl.params);
+      const wm = std(0xffffff, 0.9);
+      wm.map = wallTexture(wl.params);
+      for (const m of [fm, wm]) { m.map.wrapS = m.map.wrapT = THREE.RepeatWrapping; }
+      fm.map.repeat.set(fm.map.repeat.x * (W / 10), fm.map.repeat.y * (W / 10));
+      wm.map.repeat.set(wm.map.repeat.x * (W / 10), wm.map.repeat.y);
+      const s = this._shellGroup(W, fm, wm, false);
+      const g = s.group;
+      g.position.x = item.dx * this.stride;
+      const half = W / 2 - 0.5;
+      for (const d of item.layout || []) {
+        const it = getHouseItem(d.id);
+        if (!it) continue;
+        const holder = new THREE.Group();
+        holder.add(this._buildFurnQuiet(it));
+        if (d.wall) {
+          const u = Math.max(-half, Math.min(half, d.u || 0));
+          holder.position.set(u, Math.max(1.4, Math.min(4.2, d.y || 2.8)), -W / 2 + 0.1);
+        } else {
+          holder.position.set(Math.max(-half, Math.min(half, d.x || 0)), 0, Math.max(-half, Math.min(half, d.z || 0)));
+          holder.rotation.y = d.rot || 0;
+        }
+        holder.scale.setScalar(d.s || 1);
+        g.add(holder);
+      }
+      const ceil = getHouseItem((item.placed || {}).ceiling);
+      if (ceil && ceil.spot === "ceiling") g.add(BUILD.ceiling(ceil.params, this.nTicks));
+      g.traverse((o) => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; } });
+      const label = this._labelSprite(item.name || "");
+      label.position.set(0, H + 1.15, 0);
+      g.add(label);
+      g.userData.rid = item.rid;
+      this.scene.add(g);
+      this.neighbors.push({ group: g, rid: item.rid, dx: item.dx, mats: [fm, wm] });
+    }
+    this._toon();
+    this._resize && this._resize();
   }
 
-  /** El Matichico camina hasta la puerta y, al llegar, avisa (onDoor) para pasar al otro cuarto. */
-  walkToDoor() {
+  _buildFurnQuiet(item) {
+    const kind = isWallItem(item) ? "wall" : item.spot;
+    return BUILD[kind](item.params, this.nTicks);
+  }
+
+  /** ¿Tocó un cuarto vecino? Devuelve su `rid` (o null). */
+  pickRoom(clientX, clientY) {
+    if (!this.ready || !this.neighbors || !this.neighbors.length) return null;
+    const hit = this._ray(clientX, clientY).intersectObjects(this.neighbors.map((n) => n.group), true).find((h) => !h.object.isSprite);
+    if (!hit) return null;
+    let o = hit.object;
+    while (o && !o.userData.rid) o = o.parent;
+    return o ? o.userData.rid : null;
+  }
+
+  /** Desliza la cámara hasta el cuarto que está `dx` lugares a un lado; al llegar avisa (para cambiar de cuarto). */
+  slideTo(dx, done) {
+    this._slide = { x: dx * this.stride, done };
+  }
+
+  /** Vuelve la cámara al cuarto abierto de golpe (después de cambiar de cuarto). */
+  snapCam() { this._slide = null; this._camX = 0; this._placeCam(); }
+
+  /** Entra al cuarto por el lado `side` (+1 = llegó yendo hacia la derecha, entra por la izquierda) y camina hacia adentro. */
+  enterRoom(side = 1) {
     const L = this.life;
-    if (!this.hero) { this._onDoor?.(); return; }
-    if (L.state === "act") this._leaveAct(true);
-    L.target = { uid: null, i: null, door: true, pt: { x: -W / 2 + 1.5, z: W / 2 - 1.6 } };
-    L.state = "walk";
-    L.stuck = 0;
-    L.walkT = 0;
-  }
-
-  onDoor(fn) { this._onDoor = fn; }
-
-  /** Entra por la puerta al cuarto nuevo y camina hacia el centro. */
-  enterRoom() {
-    const L = this.life;
-    L.hx = -W / 2 + 1.4; L.hz = W / 2 - 1.6; L.yaw = Math.PI / 2;
+    const edge = W / 2 - 0.95;
+    L.hx = -side * edge; L.hz = 0.8; L.yaw = side > 0 ? Math.PI / 2 : -Math.PI / 2;
     L.state = "idle"; L.target = null; L.cur = null; L.last = null; L.t = 0.4;
     if (this.hero) { this.hero.group.position.set(L.hx, 0, L.hz); this.hero.group.rotation.set(0, L.yaw, 0); }
-    this.walkTo(0.5, 0.8);
+    this.walkTo(-side * (edge - 2.2), 1.2);
   }
 
   _fitTextures() {
@@ -710,7 +780,7 @@ export class House3D {
       map.repeat.set(map.userData.base.x * kx, map.userData.base.y * ky);
     };
     fit(this.floor.material.map, k, k);
-    for (const m of [this.back, this.left]) fit(m.material.map, k, 1);
+    fit(this.back.material.map, k, 1);
   }
 
   /** Cambia el tamaño del cuarto (10, 14 o 18). */
@@ -752,11 +822,9 @@ export class House3D {
       this.floor.material.needsUpdate = true;
     }
     if (wl) {
-      for (const m of [this.back, this.left]) {
-        m.material.map?.dispose();
-        m.material.map = wallTexture(wl.params);
-        m.material.needsUpdate = true;
-      }
+      this.back.material.map?.dispose();
+      this.back.material.map = wallTexture(wl.params);
+      this.back.material.needsUpdate = true;
     }
     this._fitTextures();
     for (const [spot, obj] of Object.entries(this.spotObjs)) { this.scene.remove(obj); obj.traverse((o) => { o.geometry?.dispose?.(); }); delete this.spotObjs[spot]; }
@@ -821,11 +889,12 @@ export class House3D {
     const g = f.group;
     const half = W / 2 - 0.5;
     if (d.wall) {
-      const u = Math.max(-half, Math.min(half, d.u));
-      const y = Math.max(1.4, Math.min(4.2, d.y));
+      d.wall = "back"; // la casa se ve de lado: lo que estaba en la pared izquierda pasa a la del fondo
+      const u = Math.max(-half, Math.min(half, d.u || 0));
+      const y = Math.max(1.4, Math.min(4.2, d.y || 2.8));
       d.u = u; d.y = y;
-      if (d.wall === "back") { g.position.set(u, y, -W / 2 + 0.1); g.rotation.y = 0; }
-      else { g.position.set(-W / 2 + 0.1, y, u); g.rotation.y = Math.PI / 2; }
+      g.position.set(u, y, -W / 2 + 0.1);
+      g.rotation.y = 0;
     } else {
       d.x = Math.max(-half, Math.min(half, d.x));
       d.z = Math.max(-half, Math.min(half, d.z));
@@ -871,17 +940,12 @@ export class House3D {
     return ok ? { x: p.x, z: p.z } : null;
   }
 
-  /** Punto de pared bajo el dedo: { wall, u, y } (la más cercana de las dos paredes visibles). */
+  /** Punto de la pared del fondo bajo el dedo: { wall, u, y }. */
   wallPoint(clientX, clientY) {
     const ray = this._ray(clientX, clientY).ray;
     const back = new THREE.Vector3();
-    const left = new THREE.Vector3();
-    const okB = ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), W / 2), back);
-    const okL = ray.intersectPlane(new THREE.Plane(new THREE.Vector3(1, 0, 0), W / 2), left);
-    const inB = okB && Math.abs(back.x) <= W / 2 && back.y >= 0 && back.y <= H;
-    const inL = okL && Math.abs(left.z) <= W / 2 && left.y >= 0 && left.y <= H;
-    if (inB && (!inL || back.y >= 0)) return { wall: "back", u: back.x, y: back.y };
-    if (inL) return { wall: "left", u: left.z, y: left.y };
+    const ok = ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), W / 2), back);
+    if (ok && Math.abs(back.x) <= W / 2 + 1 && back.y >= 0 && back.y <= H) return { wall: "back", u: back.x, y: back.y };
     return null;
   }
 
@@ -1185,6 +1249,15 @@ export class House3D {
     this.time += dt;
     if (this.hero) this._lifeTick(dt);
     for (const f of this.ticks) f(this.time, dt);
+    if (this.nTicks) for (const f of this.nTicks) f(this.time, dt);
+    const sl = this._slide;
+    const goal = sl ? sl.x : 0;
+    if (Math.abs(this._camX - goal) > 0.01) {
+      this._camX += (goal - this._camX) * Math.min(1, dt * 7) + Math.sign(goal - this._camX) * dt * 0.8;
+      if (Math.abs(this._camX - goal) < 0.12) this._camX = goal;
+      this._placeCam();
+    }
+    if (sl && this._camX === goal) { this._slide = null; sl.done && sl.done(); }
     if (this.ambient) this.ambient.update(this.time, dt, this.ambientC);
     if ((this._tt = (this._tt || 0) + dt) > 0.5) { this._tt = 0; this._toon(); } // lo nuevo (pisos, muebles, techos) también entra al estilo
     this._syncSelRing();
