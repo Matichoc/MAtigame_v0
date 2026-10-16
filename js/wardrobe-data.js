@@ -22,6 +22,7 @@ export const SLOTS = [
   { id: "glasses", name: "Anteojos", icon: "🕶️" },
   { id: "neck", name: "Cuello", icon: "🧣" },
   { id: "back", name: "Espalda", icon: "🦋" },
+  { id: "hand", name: "Mano", icon: "🪄" },
   { id: "outfit", name: "Ropa", icon: "👕" },
   { id: "shoes", name: "Zapatos", icon: "👟" },
   { id: "skin", name: "Chocolate", icon: "🍫" },
@@ -93,6 +94,13 @@ export const OUTFITS = [
   out("cheer_lunares", "Cheer Lunares", "🔴", "raro", "#FFFFFF", "#D4216C", { skirt: "cheer", skirtColor: "#D4216C", skirtTrim: "#FFFFFF", emblem: "heart", pompoms: "#FFFFFF" }, 105),
   out("hada_noche", "Hada de la noche", "🧚‍♀️", "epico", "#3A2D8A", "#35F0FF", { skirt: "tutu", skirtColor: "#6A4DD8", tights: "#35F0FF", stars: true, emblem: "star" }, 280, { minLevel: 18 }),
 
+  out("vestido_cumple", "Vestido de cumpleaños", "🎂", "raro", "#FF7AA8", "#FFFFFF", { skirt: "vestido", skirtColor: "#FF9CC4", skirtTrim: "#FFD34D", emblem: "heart", pompoms: "#FFD34D" }, 115),
+  out("falda_volantes", "Falda de volantes", "💃", "comun", "#FFD1E3", "#FF7AA8", { skirt: "tutu", skirtColor: "#FF7AA8", tights: "#FFFFFF", emblem: "heart" }, 45),
+  out("disfraz_gatita", "Disfraz de gatita", "🐱", "raro", "#FFB3D1", "#FF6FB0", { skirt: "tutu", skirtColor: "#FF8AB8", tights: "#FFB3D1", emblem: "heart" }, 105),
+  out("vestido_mariposa", "Vestido de mariposa", "🦋", "raro", "#B06BFF", "#FFFFFF", { skirt: "vestido", skirtColor: "#B06BFF", skirtTrim: "#FFD1E3", emblem: "star", shine: true }, 125),
+  out("vestido_sirena", "Vestido de sirena", "🧜‍♀️", "epico", "#2FB5B0", "#FFFFFF", { skirt: "gala", skirtColor: "#3FD0C8", skirtTrim: "#B6FFF2", shine: true, emblem: "star" }, 280),
+  out("reina", "Vestido de reina", "👑", "epico", "#C2185B", "#FFD34D", { skirt: "gala", skirtColor: "#D4216C", skirtTrim: "#FFD34D", shine: true, emblem: "heart" }, 290, { minLevel: 22 }),
+  soon(out("vestido_arcoiris", "Vestido arcoíris", "🌈", "epico", "#FFFFFF", "#FF7AA8", { skirt: "gala", rainbow: true, emblem: "heart", shine: true }, 290)),
   // ---- Próximamente (se ven y se prueban, todavía no se compran) ----
   soon(out("copa_oro", "Copa de Oro", "🏆", "legendario", "#FFC800", "#1C1C22", { pants: "#FFC800", shine: true, emblem: "star" }, 540)),
   soon(out("unicornio", "Disfraz de unicornio", "🦄", "legendario", "#FFFFFF", "#FF7AA8", { skirt: "tutu", rainbow: true, tights: "#FFFFFF", shine: true, emblem: "star", pompoms: "#FF7AA8" }, 540)),
@@ -289,6 +297,53 @@ export const ITEMS = [
   it("pet", "pet_trofeo", "Copita", "🏆", "epico", { kind: "trofeo" }),
   soon(it("pet", "pet_unicornio2", "Unicornio arcoíris", "🦄", "legendario", { kind: "unicornio", rainbow: true })),
 
+  // ---- NUEVO · Cosas para la mano (varitas, paraguas, carteras, helados…) ----
+  it("hand", "hand_varita", "Varita mágica", "🪄", "raro", { kind: "varita", color: "#ff6fb0" }),
+  it("hand", "hand_ramo", "Ramo de flores", "💐", "comun", { kind: "ramo" }),
+  it("hand", "hand_paraguas", "Paraguas rosa", "☂️", "comun", { kind: "paraguas", color: "#ff6fb0" }),
+  it("hand", "hand_paraguas_celeste", "Paraguas celeste", "🌂", "comun", { kind: "paraguas", color: "#6fd0ff" }),
+  it("hand", "hand_cartera", "Carterita", "👛", "comun", { kind: "cartera", color: "#ff7aa8" }),
+  it("hand", "hand_helado", "Helado de frutilla", "🍦", "comun", { kind: "helado" }),
+  it("hand", "hand_globo", "Globo de corazón", "🎈", "comun", { kind: "globo", color: "#ff3b6b" }),
+  it("hand", "hand_peluche", "Osito de peluche", "🧸", "raro", { kind: "osito" }),
+  it("hand", "hand_micro", "Micrófono de estrella", "🎤", "raro", { kind: "micro" }),
+  it("hand", "hand_balon", "Balón de fútbol", "⚽", "comun", { kind: "balon" }),
+  it("hand", "hand_basquet", "Pelota de básquet", "🏀", "comun", { kind: "pelota" }),
+  it("hand", "hand_copa", "Copa de campeona", "🏆", "epico", { kind: "copa" }),
+  soon(it("hand", "hand_varita_unicornio", "Varita de unicornio", "🦄", "legendario", { kind: "varita", color: "#b06bff", big: true })),
+
+  // ---- NUEVO · Caras, maquillaje y pendientes ----
+  it("face", "face_pestanas", "Pestañas y labios", "💋", "comun", { eyes: "normal", mouth: "sonrisa", extras: ["pestanas", "labios"] }),
+  it("face", "face_brillitos", "Brillitos", "✨", "comun", { eyes: "normal", mouth: "sonrisa", extras: ["brillitos", "mejillas"] }),
+  it("face", "face_pendientes", "Pendientes de corazón", "💖", "raro", { eyes: "normal", mouth: "sonrisa", extras: ["pendientes", "mejillas"] }),
+  it("face", "face_maquillaje", "Maquillaje de estrellas", "🌟", "epico", { eyes: "normal", mouth: "sonrisa", extras: ["pestanas", "labios", "brillitos", "pendientes"] }),
+
+  // ---- NUEVO · Más pelo y sombreros ----
+  it("hair", "hair_flequillo_lazo", "Flequillo con lazo", "🎀", "comun", { style: "flequilloLazo" }),
+  soon(it("hair", "hair_rapunzel", "Trenza gigante", "👸", "legendario", { style: "rapunzel" })),
+  it("hat", "hat_mariposas", "Mariposas en el pelo", "🦋", "raro", { kind: "mariposas" }),
+  it("hat", "hat_horquillas", "Pasadores de colores", "📎", "comun", { kind: "horquillas" }),
+
+  // ---- NUEVO · Mochilas, bolsitos y collares ----
+  it("back", "back_mochila_unicornio", "Mochila de unicornio", "🦄", "raro", { kind: "mochilaAnimal", animal: "unicornio", color: "#ffd1e3" }),
+  it("back", "back_mochila_gato", "Mochila de gatito", "🐱", "comun", { kind: "mochilaAnimal", animal: "gato", color: "#ff8ab8" }),
+  it("back", "back_mochila_conejo", "Mochila de conejita", "🐰", "comun", { kind: "mochilaAnimal", animal: "conejo", color: "#fff6e6" }),
+  it("back", "back_bolsito", "Bolsito de corazón", "👜", "comun", { kind: "bolsito", color: "#ff3b6b" }),
+  it("neck", "neck_corazon", "Collar de corazón", "💗", "comun", { kind: "colgante", shape: "corazon", color: "#ff3b6b" }),
+  it("neck", "neck_estrella", "Collar de estrella", "⭐", "comun", { kind: "colgante", shape: "estrella", color: "#ffc800" }),
+  it("neck", "neck_lazo", "Lazo de seda", "🎀", "comun", { kind: "corbatin", color: "#ff7aa8" }),
+
+  // ---- NUEVO · Calzado de fiesta ----
+  it("shoes", "sh_bailarinas_rojas", "Bailarinas rojas", "🩰", "comun", { kind: "ballet", color: "#e83a6a" }),
+  it("shoes", "sh_botas_corazones", "Botas de corazones", "💕", "raro", { kind: "bota", color: "#ff6fb0" }),
+  it("shoes", "sh_luces", "Zapatillas con luces", "💡", "epico", { kind: "cheer", color: "#ffffff", glow: "#ff3fa4" }),
+
+  // ---- NUEVO · Mascotas de cuento ----
+  it("pet", "pet_osito", "Osito Rosa", "🧸", "comun", { kind: "osito" }),
+  it("pet", "pet_conejita", "Conejita Pompón", "🐰", "raro", { kind: "conejita" }),
+  it("pet", "pet_mariposa", "Mariposa Brillos", "🦋", "raro", { kind: "mariposa" }),
+  soon(it("pet", "pet_hada", "Hada Madrina", "🧚‍♀️", "legendario", { kind: "hada" })),
+
   // ---- Exclusivos de eventos de temporada ----
   ev("halloween", 40, "hat", "ev_bruja", "Sombrero de bruja", "🧙‍♀️", "epico", { kind: "bruja" }),
   ev("halloween", 50, "back", "ev_murcielago", "Alas de murciélago", "🦇", "epico", { kind: "murcielago" }),
@@ -342,4 +397,4 @@ export function trailColors(look) {
   return item ? item.params.colors.map((c) => Number.parseInt(c.slice(1), 16)) : [0xffc800, 0xfff6e6];
 }
 
-export const EMPTY_LOOK = { hair: "", hairColor: "", face: "", hat: "", glasses: "", neck: "", back: "", outfit: "polera", shoes: "", skin: "", trail: "", pet: "" };
+export const EMPTY_LOOK = { hair: "", hairColor: "", face: "", hat: "", glasses: "", neck: "", back: "", hand: "", outfit: "polera", shoes: "", skin: "", trail: "", pet: "" };

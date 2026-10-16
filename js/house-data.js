@@ -143,6 +143,25 @@ export const HOUSE_ITEMS = [
   it("free", "fr_caballete", "Caballete de pintura", "🎨", "comun", { kind: "caballete" }),
   it("free", "fr_telescopio", "Telescopio", "🔭", "raro", { kind: "telescopio" }),
   it("free", "fr_acuario", "Acuario con peces", "🐠", "epico", { kind: "acuario" }),
+
+  // ---- NUEVO · Princesas, hadas y cuentos ----
+  it("free", "fr_munecas", "Casa de muñecas", "🏠", "epico", { kind: "munecas" }),
+  it("free", "fr_tocador", "Tocador con espejo", "💄", "raro", { kind: "tocador" }),
+  it("free", "fr_mesa_te", "Mesa de té", "🫖", "comun", { kind: "mesaTe" }),
+  it("free", "fr_caballito", "Caballito mecedor", "🐴", "raro", { kind: "caballito" }),
+  it("free", "fr_castillo", "Castillo de juguete", "🏰", "epico", { kind: "castillo" }),
+  it("free", "fr_cuentos", "Biblioteca de cuentos", "📚", "raro", { kind: "cuentos" }),
+  it("free", "fr_lampara_unicornio", "Lámpara de unicornio", "🦄", "comun", { kind: "lamparaUnicornio" }),
+  it("wallL", "wl1_mariposas", "Mariposas en la pared", "🦋", "comun", { kind: "mariposas" }),
+  it("wallR", "wr_espejo_corazon", "Espejo de corazón", "💖", "raro", { kind: "espejoCorazon" }),
+  it("ceiling", "ce_movil", "Móvil de mariposas", "🦋", "raro", { kind: "movil" }),
+  it("ceiling", "ce_nubes", "Nubes de algodón", "☁️", "comun", { kind: "nubes" }),
+  it("rug", "rg_flor", "Alfombra de flor", "🌸", "comun", { kind: "flor", a: "#ff9ec6", b: "#ffd1e3" }),
+  it("floor", "fl_nubes_rosa", "Nubes rosadas", "🩷", "raro", { style: "nubes", a: "#ffd1e3", b: "#ffffff" }),
+  it("wall", "wl_noche_rosa", "Noche rosada", "🌙", "raro", { style: "estrellas", a: "#6a2a6a", b: "#ffd1f0" }),
+  it("wall", "wl_mariposas_bg", "Jardín de mariposas", "🦋", "comun", { style: "flores", a: "#ffe8f4", b: "#ff9ec6" }),
+  soon(it("free", "fr_castillo_princesa", "Castillo de princesa", "🏰", "legendario", { kind: "castillo", big: true })),
+  soon(it("free", "fr_carruaje", "Carruaje de cuento", "🎃", "legendario", { kind: "carruaje" })),
   // ---- Próximamente (se ven y se prueban, todavía no se compran) ----
   soon(it("free", "fr_copa_mundo", "Copa del Mundo", "🏆", "legendario", { kind: "copa", big: true, world: true })),
   soon(it("free", "fr_tobogan", "Tobogán", "🛝", "epico", { kind: "tobogan" })),
@@ -202,12 +221,14 @@ export function placeHouseItem(progress, spot, id) {
 
 /** Muebles que se pueden poner donde quieras (todo menos piso, paredes y techo). */
 export const FURNITURE_SPOTS = ["rug", "bed", "left", "right", "free", "wallL", "wallC", "wallR"];
+const GIRL_KINDS = ["munecas", "tocador", "mesaTe", "caballito", "castillo", "cuentos", "lamparaUnicornio", "carruaje"];
 const SPORT_KINDS = ["pompones", "colchoneta", "barra", "copa", "escenario", "aro", "cestoBalones", "banca", "arco", "futbolin"];
-const ALL_FREE_UTIL = ["sofa", "mesa", "silla", "comoda", "ropero", "tvmueble", "mesacentro", "heladera", "cocina", "meson", "comedor", "tina", "lavabo", ...SPORT_KINDS];
+const ALL_FREE_UTIL = ["sofa", "mesa", "silla", "comoda", "ropero", "tvmueble", "mesacentro", "heladera", "cocina", "meson", "comedor", "tina", "lavabo", ...SPORT_KINDS, ...GIRL_KINDS];
 export const FURN_CATEGORIES = [
   { id: "sit", name: "Sillones y mesas", icon: "🛋️", test: (i) => i.spot === "free" && ["sofa", "mesa", "silla", "comoda", "ropero", "tvmueble", "mesacentro"].includes(i.params.kind) },
   { id: "kitchen", name: "Cocina y comedor", icon: "🍳", test: (i) => i.spot === "free" && ["heladera", "cocina", "meson", "comedor"].includes(i.params.kind) },
   { id: "bath", name: "Baño", icon: "🛁", test: (i) => i.spot === "free" && ["tina", "lavabo"].includes(i.params.kind) },
+  { id: "girl", name: "Princesas y cuentos", icon: "👑", test: (i) => i.spot === "free" && GIRL_KINDS.includes(i.params.kind) },
   { id: "sport", name: "Cheer y deportes", icon: "🏆", test: (i) => i.spot === "free" && SPORT_KINDS.includes(i.params.kind) },
   { id: "fun", name: "Juegos", icon: "🎪", test: (i) => i.spot === "free" && !ALL_FREE_UTIL.includes(i.params.kind) || ["lf_arcade", "lf_oso"].includes(i.id) },
   { id: "bed", name: "Camas", icon: "🛏️", test: (i) => i.spot === "bed" },
