@@ -1800,3 +1800,18 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .hs-arrow.right { right: 8px; }
 .hs-arrow span { font-weight: 800; }
 .hs-arrow:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(120, 10, 60, 0.6); }
+
+/* Ciudad Choco en auto: el joystick es un volante y hay pedales */
+.pk-joy.steer { width: 136px; height: 136px; position: relative; background: rgba(28,15,7,0.35); }
+.pk-joy.steer .pk-knob { display: none; }
+.pk-joy.steer::before { content: ""; position: absolute; inset: 14px; border-radius: 50%; border: 10px solid #ffd36a; box-shadow: 0 0 0 2px rgba(60,30,0,0.5), inset 0 0 0 2px rgba(60,30,0,0.35); transform: rotate(calc(var(--steer, 0) * 80deg)); transition: transform 0.06s linear; }
+.pk-joy.steer::after { content: ""; position: absolute; inset: 14px; border-radius: 50%; transform: rotate(calc(var(--steer, 0) * 80deg)); transition: transform 0.06s linear;
+  background: linear-gradient(#e0a800, #e0a800) 50% 50% / 86% 9px no-repeat, linear-gradient(#e0a800, #e0a800) 50% 100% / 9px 50% no-repeat, radial-gradient(circle, #d4216c 0 11px, transparent 12px); }
+.cd-pedal { position: absolute; z-index: 6; border-radius: 50%; border: 3px solid #fff; font-size: 1.7rem; line-height: 1; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #fff; font-weight: 900; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; box-shadow: 0 5px 0 rgba(0,0,0,0.35); }
+.cd-pedal small { font-size: 0.55rem; letter-spacing: 0.04em; }
+.cd-pedal.gas { right: 14px; bottom: 14px; width: 96px; height: 96px; background: linear-gradient(180deg, #5be08a, #1f9a4e); }
+.cd-pedal.stop { right: 120px; bottom: 14px; width: 70px; height: 70px; background: linear-gradient(180deg, #ff7a7a, #d02a2a); font-size: 1.4rem; }
+.cd-pedal.down { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.35); filter: brightness(1.15); }
+@media (pointer: coarse) { .cd-pedal:not(.hidden) { display: flex; } }
+@media (max-height: 520px) { .cd-pedal.gas { width: 78px; height: 78px; bottom: 10px; right: 10px; } .cd-pedal.stop { width: 58px; height: 58px; right: 98px; bottom: 10px; } .pk-joy.steer { width: 112px; height: 112px; } }
+.canvas-wrap:has(.overlay:not(.hidden)) .cd-pedal { display: none !important; }

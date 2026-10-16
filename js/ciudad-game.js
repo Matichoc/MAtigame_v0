@@ -1183,6 +1183,13 @@ export class CiudadGame extends Game3D {
     const inp = this._input();
     let thr = inp.iy;
     let steer = inp.ix;
+    // pedales de la pantalla: ⛽ acelera; 🛑 frena y, si ya estás detenido y lo mantienes un ratito, da reversa
+    if (this.keys.gas) thr = 1;
+    if (this.keys.stop) {
+      this._revT = (this._revT || 0) + dt;
+      if (c.speed > 0.5) thr = -1;
+      else thr = this._revT > 0.6 ? -0.7 : 0;
+    } else this._revT = 0;
     if (this.keys.brake) thr = Math.min(thr, -0.001);
     if (this.dialog || this.lock > 0) { thr = 0; steer = 0; }
     const road = onRoad(c.x, c.z);
@@ -1254,11 +1261,22 @@ export class CiudadGame extends Game3D {
     g.rotation.set(0, 0, 0);
     g.scale.setScalar(0.64);
     audio.playPowerup();
-    this.banner("🚗 ¡A manejar! Joystick: ←→ gira, ↑ acelera, ↓ frena");
+    this._setDriveUi(true);
+    this.banner("🚗 ¡A manejar! Gira con el volante y mantén ⛽ para avanzar");
+  }
+
+  /** En el auto, el joystick pasa a ser un volante (solo gira) y aparecen los pedales: ⛽ acelerar y 🛑 frenar. */
+  _setDriveUi(on) {
+    const joy = this.q("joy");
+    if (joy) { joy.classList.toggle("steer", on); joy.style.setProperty("--steer", "0"); }
+    for (const id of ["btn-gas", "btn-stop"]) this.q(id)?.classList.toggle("hidden", !on);
+    this.joy.x = 0; this.joy.y = 0;
+    this.keys.gas = false; this.keys.stop = false;
   }
 
   _leaveCar(silent = false) {
     if (!this.inCar) return;
+    this._setDriveUi(false);
     const c = this.car;
     this.inCar = false;
     const g = this.hero.group;
@@ -2052,7 +2070,7 @@ export class CiudadGame extends Game3D {
       if (e.code === "Space") this.keys.hand = false;
       if (e.code === "ShiftLeft" || e.code === "ShiftRight") this.keys.sprint = false;
     });
-    window.addEventListener("blur", () => { this.keys = {}; });
+    window.addEventListener("blur", () => { this.keys = {}; this.q("btn-gas")?.classList.remove("down"); this.q("btn-stop")?.classList.remove("down"); });
 
     const cv = this.els.canvas;
     let drag = null;
@@ -2075,6 +2093,15 @@ export class CiudadGame extends Game3D {
     on("btn-action", () => this.act());
     on("btn-horn", () => this.horn());
     on("btn-missions", () => (this.listOpen ? this._closeList() : this.openList()));
+    for (const [id, key] of [["btn-gas", "gas"], ["btn-stop", "stop"]]) {
+      const b = this.q(id);
+      if (!b) continue;
+      b.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); try { b.setPointerCapture?.(e.pointerId); } catch (err) { /* sin captura */ } this.keys[key] = true; b.classList.add("down"); });
+      const up = () => { this.keys[key] = false; b.classList.remove("down"); };
+      b.addEventListener("pointerup", up);
+      b.addEventListener("pointercancel", up);
+      b.addEventListener("lostpointercapture", up);
+    }
     on("btn-brake", () => { this.keys.hand = true; });
     const brake = this.q("btn-brake");
     if (brake) { const up = () => { this.keys.hand = false; }; brake.addEventListener("pointerup", up); brake.addEventListener("pointercancel", up); brake.addEventListener("pointerleave", up); }
