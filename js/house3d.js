@@ -422,6 +422,75 @@ const BUILD = {
       const ring = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.1, 8, 32), std(0xffc800, 0.4, { metalness: 0.5 }));
       ring.rotation.x = Math.PI / 2; ring.position.y = 0.8; g.add(ring);
       for (let i = 0; i < 6; i++) { const a = (i / 6) * 6.283; g.add(cyl(0.07, 0.07, 0.75, std(0xcfcfd4, 0.3, { metalness: 0.8 }), Math.sin(a) * 1.55, 0.38, Math.cos(a) * 1.55, 8)); }
+    } else if (p.kind === "heladera") {
+      const body = std(p.a, 0.4);
+      g.add(rbox(1.6, 3.1, 1.3, 0.14, body, 0, 1.55, 0));
+      g.add(rbox(1.5, 1.0, 0.08, 0.04, std(0xdfe8f2, 0.5), 0, 2.55, 0.66), rbox(1.5, 1.75, 0.08, 0.04, std(0xdfe8f2, 0.5), 0, 1.0, 0.66));
+      g.add(rbox(0.08, 0.55, 0.12, 0.03, std(0x9aa3b2, 0.3, { metalness: 0.7 }), 0.6, 2.5, 0.74), rbox(0.08, 0.9, 0.12, 0.03, std(0x9aa3b2, 0.3, { metalness: 0.7 }), 0.6, 1.35, 0.74));
+      [[-0.35, 2.7, 0xff7aa8], [0.05, 2.35, 0xffd34d], [-0.2, 1.7, 0x35c8ff]].forEach(([x, y, c]) => g.add(rbox(0.28, 0.28, 0.06, 0.05, std(c, 0.5), x, y, 0.72)));
+    } else if (p.kind === "cocina") {
+      g.add(rbox(2.2, 1.5, 1.3, 0.1, std(p.a, 0.35, { metalness: 0.3 }), 0, 0.75, 0));
+      g.add(rbox(2.3, 0.1, 1.4, 0.04, std(0x2a2a34, 0.4), 0, 1.52, 0));
+      const glass = std(0x1a1a22, 0.2);
+      g.add(rbox(1.5, 0.75, 0.06, 0.05, glass, 0, 0.62, 0.66));
+      const fire = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 0.45), basic(0xff9a2a));
+      fire.position.set(0, 0.6, 0.7); g.add(fire);
+      g.add(rbox(1.5, 0.08, 0.08, 0.03, std(0xcfcfd4, 0.3, { metalness: 0.8 }), 0, 1.15, 0.72));
+      for (const [x, z] of [[-0.55, -0.25], [0.55, -0.25], [-0.55, 0.3], [0.55, 0.3]]) g.add(cyl(0.3, 0.3, 0.05, std(0x111116, 0.4), x, 1.6, z, 20));
+      for (let i = 0; i < 4; i++) g.add(ball(0.09, std(p.b, 0.4), -0.75 + i * 0.5, 1.2, 0.68));
+      const pot = cyl(0.3, 0.27, 0.35, std(0xd4216c, 0.35, { metalness: 0.4 }), -0.55, 1.8, -0.25, 18);
+      const lid = cyl(0.31, 0.31, 0.06, std(0xcfcfd4, 0.3, { metalness: 0.8 }), -0.55, 2.0, -0.25, 18);
+      const steam = ball(0.14, std(0xffffff, 0.9, { transparent: true, opacity: 0.55 }), -0.55, 2.3, -0.25);
+      g.add(pot, lid, steam);
+      ticks.push((t) => { fire.material.color.setHSL(0.08 + Math.sin(t * 7) * 0.02, 1, 0.55); steam.position.y = 2.25 + ((t * 0.6) % 1) * 0.5; steam.material.opacity = 0.55 * (1 - ((t * 0.6) % 1)); });
+    } else if (p.kind === "meson") {
+      g.add(rbox(2.8, 1.45, 1.2, 0.08, std(p.a, 0.7), 0, 0.72, 0));
+      g.add(rbox(2.9, 0.12, 1.3, 0.04, std(p.b, 0.6), 0, 1.5, 0));
+      for (let i = 0; i < 3; i++) { g.add(rbox(0.8, 1.05, 0.05, 0.04, std(0xffffff, 0.6), -0.9 + i * 0.9, 0.7, 0.62)); g.add(ball(0.06, std(p.b, 0.3), -0.6 + i * 0.9, 0.9, 0.67)); }
+      g.add(rbox(0.9, 0.06, 0.6, 0.04, std(0xb7bfcc, 0.25, { metalness: 0.8 }), -0.7, 1.57, 0.05));
+      g.add(cyl(0.04, 0.04, 0.5, std(0xcfcfd4, 0.25, { metalness: 0.8 }), -0.7, 1.8, -0.35, 8));
+      g.add(rbox(0.5, 0.2, 0.3, 0.05, std(0xff7aa8, 0.5), 0.8, 1.66, 0), cyl(0.2, 0.2, 0.25, std(0xe0b070, 0.7), 1.1, 1.7, 0.1, 14));
+    } else if (p.kind === "comedor") {
+      const wd = std(p.a, 0.6);
+      g.add(rbox(2.6, 0.16, 1.6, 0.06, wd, 0, 1.15, 0));
+      for (const [x, z] of [[-1.15, -0.65], [1.15, -0.65], [-1.15, 0.65], [1.15, 0.65]]) g.add(box(0.14, 1.1, 0.14, wd, x, 0.55, z));
+      for (const z of [1.45, -1.45]) {
+        const s = z > 0 ? 1 : -1;
+        g.add(rbox(0.9, 0.14, 0.9, 0.05, std(p.b, 0.6), 0, 0.78, z), rbox(0.9, 0.95, 0.12, 0.05, std(p.b, 0.6), 0, 1.3, z + s * 0.42));
+        for (const [x, dz] of [[-0.38, -0.38], [0.38, -0.38], [-0.38, 0.38], [0.38, 0.38]]) g.add(box(0.09, 0.78, 0.09, wd, x, 0.39, z + dz));
+      }
+      for (const x of [-0.7, 0.7]) { g.add(cyl(0.3, 0.3, 0.04, std(0xffffff, 0.4), x, 1.25, 0.1, 20), cyl(0.2, 0.2, 0.02, std(p.b, 0.5), x, 1.28, 0.1, 18)); }
+      g.add(cyl(0.2, 0.28, 0.5, std(0xffd34d, 0.4), 0, 1.5, -0.2, 14), ball(0.2, std(0xff3b6b, 0.4), 0, 1.85, -0.2));
+    } else if (p.kind === "tina") {
+      g.add(rbox(3.0, 1.1, 1.7, 0.4, std(0xffffff, 0.3), 0, 0.55, 0));
+      g.add(rbox(2.5, 0.06, 1.25, 0.3, std(0x9fdcff, 0.2, { transparent: true, opacity: 0.9 }), 0, 1.0, 0));
+      for (let i = 0; i < 14; i++) { const a = i * 2.1; g.add(ball(0.17 + (i % 3) * 0.04, std(0xffffff, 0.9), Math.sin(a) * 0.95, 1.08 + (i % 2) * 0.08, Math.cos(a) * 0.45)); }
+      g.add(cyl(0.05, 0.05, 0.55, std(0xcfcfd4, 0.25, { metalness: 0.8 }), 1.3, 1.35, -0.55, 8), box(0.35, 0.05, 0.05, std(0xcfcfd4, 0.25, { metalness: 0.8 }), 1.15, 1.62, -0.55));
+      for (const sx of [-1.25, 1.25]) g.add(ball(0.15, std(0xffd34d, 0.4, { metalness: 0.6 }), sx, 0.05, 0.6));
+      const bub = [];
+      for (let i = 0; i < 4; i++) { const b = ball(0.1, std(0xffffff, 0.2, { transparent: true, opacity: 0.6 }), 0, 1.2, 0); g.add(b); bub.push({ b, t: i / 4 }); }
+      ticks.push((t, dt) => { for (const o of bub) { o.t = (o.t + dt * 0.35) % 1; o.b.position.set(Math.sin(o.t * 9 + o.b.id) * 0.8, 1.15 + o.t * 1.1, Math.cos(o.t * 7 + o.b.id) * 0.3); o.b.material.opacity = 0.6 * (1 - o.t); } });
+    } else if (p.kind === "lavabo") {
+      g.add(cyl(0.3, 0.38, 1.1, std(0xffffff, 0.3), 0, 0.55, 0, 16), rbox(1.5, 0.35, 1.0, 0.2, std(0xffffff, 0.3), 0, 1.25, 0.05));
+      g.add(rbox(1.0, 0.06, 0.6, 0.15, std(0x9fdcff, 0.2), 0, 1.4, 0.1));
+      g.add(cyl(0.04, 0.04, 0.45, std(0xcfcfd4, 0.25, { metalness: 0.8 }), 0, 1.6, -0.3, 8), box(0.05, 0.05, 0.3, std(0xcfcfd4, 0.25, { metalness: 0.8 }), 0, 1.82, -0.18));
+      const mir = rbox(1.3, 1.5, 0.08, 0.15, std(0xd7ecff, 0.08, { metalness: 0.9 }), 0, 2.7, -0.45);
+      g.add(mir, rbox(1.45, 1.65, 0.05, 0.18, std(0xff7aa8, 0.5), 0, 2.7, -0.5));
+    } else if (p.kind === "ropero") {
+      g.add(rbox(2.3, 3.7, 1.1, 0.1, std(p.a, 0.6), 0, 1.85, 0));
+      for (const sx of [-0.57, 0.57]) { g.add(rbox(1.05, 3.3, 0.06, 0.05, std(0xffffff, 0.55), sx, 1.85, 0.57)); g.add(ball(0.07, std(p.b, 0.3), sx * 0.2 * 1.0 + (sx > 0 ? 0.12 : -0.12), 1.85, 0.64)); }
+      g.add(rbox(2.4, 0.14, 1.2, 0.05, std(p.b, 0.5), 0, 3.75, 0));
+    } else if (p.kind === "tvmueble") {
+      g.add(rbox(3.0, 0.9, 1.1, 0.08, std(p.a, 0.6), 0, 0.45, 0));
+      for (let i = 0; i < 2; i++) g.add(rbox(1.3, 0.6, 0.05, 0.04, std(0xffe3b8, 0.6), -0.7 + i * 1.4, 0.45, 0.57));
+      g.add(rbox(2.5, 1.5, 0.15, 0.06, std(0x15151d, 0.3), 0, 1.9, 0.0));
+      const scr = new THREE.Mesh(new THREE.PlaneGeometry(2.3, 1.3), basic(0x35c8ff));
+      scr.position.set(0, 1.9, 0.09); g.add(scr);
+      g.add(cyl(0.1, 0.2, 0.4, std(0x15151d, 0.4), 0, 1.1, 0, 10));
+      ticks.push((t) => { scr.material.color.setHSL((t * 0.12) % 1, 0.7, 0.55); });
+    } else if (p.kind === "mesacentro") {
+      g.add(cyl(0.95, 0.95, 0.1, std(p.a, 0.5), 0, 0.62, 0, 28), cyl(0.15, 0.25, 0.55, std(p.a, 0.6), 0, 0.3, 0, 12), cyl(0.55, 0.6, 0.06, std(p.a, 0.6), 0, 0.03, 0, 20));
+      g.add(cyl(0.16, 0.12, 0.2, std(0xffffff, 0.4), -0.35, 0.78, 0.1, 14), cyl(0.16, 0.12, 0.2, std(p.b, 0.4), 0.3, 0.78, -0.2, 14), ball(0.12, std(0xffd34d, 0.4), 0.1, 0.77, 0.4));
     }
     return g;
   },
@@ -546,6 +615,7 @@ export class House3D {
     const edge1 = box(W + 0.6, H + 0.5, 0.3, std(0xd4216c, 0.5), 0, H / 2 - 0.01, -W / 2 - 0.19);
     const edge2 = box(0.3, H + 0.5, W + 0.6, std(0xd4216c, 0.5), -W / 2 - 0.19, H / 2 - 0.01, 0);
     shell.add(this.floor, this.back, this.left, base1, base2, slab, edge1, edge2);
+    this._buildDoor(shell);
     this.shell = shell;
     this.scene.add(shell);
     // las texturas se repiten según el tamaño para que los dibujos no se estiren
@@ -554,6 +624,81 @@ export class House3D {
     this.sun && Object.assign(this.sun.shadow.camera, { left: -W * 0.9, right: W * 0.9, top: W * 0.9, bottom: -W * 0.9 });
     this.sun && this.sun.shadow.camera.updateProjectionMatrix();
     this._resize && this._resize();
+  }
+
+  /** Puerta en la pared izquierda (adelante): lleva al otro cuarto. Cartel con el nombre del cuarto al que va. */
+  _buildDoor(shell) {
+    const g = new THREE.Group();
+    const dz = W / 2 - 1.6;
+    const wood = std(0xfff6e6, 0.5);
+    g.add(box(0.28, 3.7, 2.1, wood, 0, 1.85, 0));
+    const panel = box(0.2, 3.35, 1.7, std(0xb9703c, 0.55), 0.06, 1.68, 0);
+    g.add(panel);
+    g.add(rbox(0.1, 1.2, 1.2, 0.08, std(0xd18a52, 0.55), 0.17, 2.3, 0), rbox(0.1, 1.0, 1.2, 0.08, std(0xd18a52, 0.55), 0.17, 0.95, 0));
+    g.add(ball(0.12, std(0xffc800, 0.3, { metalness: 0.7 }), 0.2, 1.7, 0.6));
+    g.position.set(-W / 2 + 0.15, 0, dz);
+    shell.add(g);
+    this.doorMeshes = [];
+    g.traverse((o) => { if (o.isMesh) this.doorMeshes.push(o); });
+    this.doorGroup = g;
+    this._drawDoorSign();
+  }
+
+  _drawDoorSign() {
+    if (!this.doorGroup) return;
+    if (this.doorSign) { this.doorGroup.remove(this.doorSign); this.doorSign.material.map?.dispose(); this.doorSign.material.dispose(); }
+    const label = this.doorLabel || "🚪 Más cuartos";
+    const c = document.createElement("canvas");
+    c.width = 512; c.height = 128;
+    const x = c.getContext("2d");
+    x.fillStyle = "rgba(74,36,64,0.92)";
+    x.beginPath(); x.roundRect ? x.roundRect(6, 10, 500, 108, 40) : x.rect(6, 10, 500, 108); x.fill();
+    x.strokeStyle = "#ffd0e6"; x.lineWidth = 6; x.stroke();
+    x.font = "900 54px system-ui, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillStyle = "#fff6e6";
+    x.fillText(label, 256, 66);
+    const tex = new THREE.CanvasTexture(c);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    this.doorSign = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+    this.doorSign.renderOrder = 11;
+    this.doorSign.scale.set(3.6, 0.9, 1);
+    this.doorSign.position.set(0.5, 4.4, 0);
+    this.doorGroup.add(this.doorSign);
+    this.doorMeshes = this.doorMeshes.filter((m) => !m.isSprite);
+    this.doorMeshes.push(this.doorSign);
+  }
+
+  /** Cartel de la puerta ("🍳 Cocina →"). */
+  setDoorLabel(text) {
+    this.doorLabel = text;
+    this._drawDoorSign();
+  }
+
+  /** ¿Tocó la puerta? */
+  pickDoor(clientX, clientY) {
+    if (!this.ready || !this.doorMeshes || !this.doorMeshes.length) return false;
+    return this._ray(clientX, clientY).intersectObjects(this.doorMeshes, true).length > 0;
+  }
+
+  /** El Matichico camina hasta la puerta y, al llegar, avisa (onDoor) para pasar al otro cuarto. */
+  walkToDoor() {
+    const L = this.life;
+    if (!this.hero) { this._onDoor?.(); return; }
+    if (L.state === "act") this._leaveAct(true);
+    L.target = { uid: null, i: null, door: true, pt: { x: -W / 2 + 1.5, z: W / 2 - 1.6 } };
+    L.state = "walk";
+    L.stuck = 0;
+    L.walkT = 0;
+  }
+
+  onDoor(fn) { this._onDoor = fn; }
+
+  /** Entra por la puerta al cuarto nuevo y camina hacia el centro. */
+  enterRoom() {
+    const L = this.life;
+    L.hx = -W / 2 + 1.4; L.hz = W / 2 - 1.6; L.yaw = Math.PI / 2;
+    L.state = "idle"; L.target = null; L.cur = null; L.last = null; L.t = 0.4;
+    if (this.hero) { this.hero.group.position.set(L.hx, 0, L.hz); this.hero.group.rotation.set(0, L.yaw, 0); }
+    this.walkTo(0.5, 0.8);
   }
 
   _fitTextures() {
@@ -787,7 +932,15 @@ export class House3D {
     if (k === "piano") return { act: "piano", enter: [0, 0, 2.8], at: [0, 0.78, 2.0], face: Math.PI };
     if (k === "trampolin") return { act: "hop", enter: [0, 0, 2.3], at: [0, 0.88, 0], face: 0 };
     if (k === "pelotero") return { act: "hop", enter: [0, 0, 2.2], at: [0, 0.35, 0], face: 0 };
-    if (["planta", "estanteria", "oso", "tipi", "pastel", "cofre", "fuente", "flores", "cacao", "lampara", "mesa", "comoda"].includes(k)) {
+    if (k === "heladera") return { act: "fridge", enter: [0, 0, 2.0], at: [0, 0, 2.0], face: Math.PI };
+    if (k === "cocina") return { act: "cook", enter: [0, 0, 2.0], at: [0, 0, 1.9], face: Math.PI };
+    if (k === "meson") return { act: "wash", enter: [0.7, 0, 1.9], at: [-0.7, 0, 1.9], face: Math.PI };
+    if (k === "lavabo") return { act: "wash", enter: [0, 0, 1.8], at: [0, 0, 1.6], face: Math.PI };
+    if (k === "comedor") return { act: "eat", enter: [0, 0, 2.9], at: [0, 0.88, 1.45], face: Math.PI };
+    if (k === "tina") return { act: "bath", enter: [0, 0, 2.4], at: [0, 1.0, 0.1], face: 0 };
+    if (k === "ropero") return { act: "wardrobe", enter: [0, 0, 2.0], at: [0, 0, 1.9], face: Math.PI };
+    if (k === "tvmueble") return { act: "watch", enter: [0, 0, 3.6], at: [0, 0, 3.6], face: Math.PI };
+    if (["planta", "estanteria", "oso", "tipi", "pastel", "cofre", "fuente", "flores", "cacao", "lampara", "mesa", "comoda", "mesacentro"].includes(k)) {
       return { act: "admire", enter: [0, 0, 1.9], at: [0, 0, 1.9], face: Math.PI };
     }
     return null;
@@ -900,7 +1053,7 @@ export class House3D {
       L.walkT += dt;
       if (dist < 0.18 || L.walkT > 14) {
         if (tg.uid) { L.state = "enter"; L.blend = 0; L.enterFrom = { x: L.hx, z: L.hz, yaw: L.yaw }; this._beginAct(); }
-        else { L.state = "idle"; L.t = 3 + Math.random() * 5; }
+        else { L.state = "idle"; L.t = 3 + Math.random() * 5; if (tg.door) { L.target = null; this._onDoor?.(); } }
         return;
       }
       dx /= dist; dz /= dist;
@@ -951,7 +1104,7 @@ export class House3D {
       const k = L.state === "enter" ? Math.min(1, L.blend + dt / 0.8) : 1;
       L.blend = k;
       const e = k * k * (3 - 2 * k);
-      const sitY = { sit: -0.84, type: -0.84, piano: -0.84 }[i.act];
+      const sitY = { sit: -0.84, type: -0.84, piano: -0.84, eat: -0.84, bath: -0.84 }[i.act];
       let py = wpos.y + (sitY || 0);
       let rx = 0;
       if (i.act === "sleep") { py = wpos.y; rx = -Math.PI / 2; }
@@ -963,7 +1116,7 @@ export class House3D {
       const fx = L.enterFrom.x, fz = L.enterFrom.z;
       g.position.set(fx + (wpos.x - fx) * e, py * e, fz + (wpos.z - fz) * e);
       g.rotation.set(rx * e, L.enterFrom.yaw + dy * e, 0, "YXZ");
-      mode = { sleep: "sleep", sit: "sit", type: "type", piano: "piano", arcade: "arcade", hop: "cheer", admire: "admire" }[i.act];
+      mode = { sleep: "sleep", sit: "sit", type: "type", piano: "piano", arcade: "arcade", hop: "cheer", admire: "admire", fridge: "admire", cook: "dance", wash: "admire", eat: "sit", bath: "sit", wardrobe: "admire", watch: "admire" }[i.act];
       if (L.state === "enter" && k >= 1) { L.state = "act"; L.t = (i.act === "sleep" ? 30 : 8 + Math.random() * 8); this._onLife?.({ type: "start", act: i.act }); L.cur = i; }
       if (L.state === "act") {
         L.t -= dt;

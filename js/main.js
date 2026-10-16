@@ -17,6 +17,7 @@ import { activeEvent, eventById, eventEnd, nextEvent, eventTokens, eventItemAvai
 import {
   HOUSE_SPOTS, houseItemsOfSpot, getHouseItem, ownsHouseItem, buyHouseItem, placeHouseItem, placedWithDefaults,
   FURN_CATEGORIES, furnitureOf, isWallItem, houseLayout, layoutAdd, layoutRemove, buyFurniture, HOUSE_SIZES, houseSize, buyHouseSize,
+  ROOM_TYPES, MAX_ROOMS, roomType, roomsOf, nextRoomOf, roomHasBed, switchRoom, buyRoom,
 } from "./house-data.js";
 import {
   levelInfo, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
@@ -209,8 +210,10 @@ function refreshHubStats() {
   renderEnergy();
   const hs = document.getElementById("house-banner-sub");
   if (hs && progress.house) {
-    const n = (progress.house.layout || []).length;
-    hs.textContent = `${houseSize(progress).name}${n ? ` · ${n} mueble${n > 1 ? "s" : ""}` : ""} — ¡arrastra muebles, decora y agranda tu casa!`;
+    const h = progress.house;
+    const n = (h.layout || []).length + Object.values(h.roomData || {}).reduce((a, d) => a + ((d && d.layout) || []).length, 0);
+    const nr = (h.rooms || []).length || 1;
+    hs.textContent = `${houseSize(progress).name}${nr > 1 ? ` · ${nr} cuartos` : ""}${n ? ` · ${n} mueble${n > 1 ? "s" : ""}` : ""} — ¡decora, agranda y suma cuartos a tu casa!`;
   }
 }
 
@@ -550,8 +553,22 @@ async function openHousePreview() {
     const key = `${selectedCharacter.id}|${JSON.stringify(look)}`;
     if (house3d.key !== key) house3d.setHero(selectedCharacter, look, key);
     house3d.setSize(houseSize(progress).size);
+    // si venía a dormir y este cuarto no tiene cama, pasa al cuarto que sí la tenga
+    if (window.__sleepOnEnter && !roomHasBed(progress, progress.house.curRoom)) {
+      const r = roomsOf(progress).find((x) => roomHasBed(progress, x.rid));
+      if (r) switchRoom(progress, r.rid);
+    }
     house3d.layoutData = houseLayout(progress);
     house3d.setPlaced(housePlaced());
+    updateDoorLabel();
+    if (!house3d._doorBound) {
+      house3d._doorBound = true;
+      house3d.onDoor(() => {
+        const n = nextRoomOf(progress);
+        if (n) openRoom(n.rid);
+        else { houseMode = "rooms"; renderHouse(); }
+      });
+    }
     house3d.setSelected(houseSel);
     house3d.freezeOnSel = true;
     if (!house3d._lifeBound) {
@@ -672,6 +689,8 @@ function bindHouseDrag() {
   const snap = (v) => Math.round(v * 4) / 4;
   cv.addEventListener("pointerdown", (e) => {
     if (houseMode === "live") {
+      // tocar la puerta: va hasta ahí y pasa al otro cuarto
+      if (house3d.pickDoor(e.clientX, e.clientY)) { house3d.walkToDoor(); return; }
       // tocar un mueble: lo usa; tocar el piso: camina hasta ahí (y se levanta si dormía)
       const u = house3d.pick(e.clientX, e.clientY);
       if (u && house3d.interact(u)) return;
@@ -759,17 +778,19 @@ function renderHouse() {
   document.getElementById("house-coins").textContent = String(progress.coins);
   // modos
   houseModesEl.innerHTML = "";
-  for (const [id, icon, name] of [["live", "🧸", "Vivir"], ["decor", "🛋️", "Decorar"], ["style", "🎨", "Piso y paredes"], ["size", "🏡", "Agrandar casa"]]) {
+  for (const [id, icon, name] of [["live", "🧸", "Vivir"], ["decor", "🛋️", "Decorar"], ["style", "🎨", "Piso y paredes"], ["size", "🏡", "Agrandar"], ["rooms", "🚪", "Cuartos"]]) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "sh-mode" + (id === houseMode ? " active" : "");
     b.innerHTML = `<span>${icon}</span> ${name}`;
-    b.addEventListener("click", () => { houseMode = id; houseBuying = null; houseTrial = {}; clearFurniturePreview(); clearSizePreview(); if (id !== "decor") selectPiece(null); renderHouse(); house3d && house3d.setPlaced(housePlaced()); });
+    b.addEventListener("click", () => { houseMode = id; houseBuying = null; houseTrial = {}; houseRoomLook = null; clearFurniturePreview(); clearSizePreview(); if (id !== "decor") selectPiece(null); renderHouse(); house3d && house3d.setPlaced(housePlaced()); });
     houseModesEl.appendChild(b);
   }
   renderHouseTools();
-  houseViewsEl.classList.toggle("hidden", houseMode === "size" || houseMode === "live");
-  if (houseMode !== "size" && houseMode !== "live") {
+  renderRoomStrip();
+  const noViews = houseMode === "size" || houseMode === "live" || houseMode === "rooms";
+  houseViewsEl.classList.toggle("hidden", noViews);
+  if (!noViews) {
     const mine = (x) => ownsHouseItem(progress, x.id);
     const pool = houseMode === "decor" ? FURN_CATEGORIES.flatMap((c) => furnitureOf(c.id)) : STYLE_SPOTS.flatMap((sp) => houseItemsOfSpot(sp.id));
     const own = pool.filter(mine).length;
@@ -785,18 +806,123 @@ function renderHouse() {
   if (houseMode === "live") renderHouseLive();
   else if (houseMode === "decor") renderHouseDecor();
   else if (houseMode === "style") renderHouseStyle();
+  else if (houseMode === "rooms") renderHouseRooms();
   else renderHouseSize();
 }
 
+// ---------- varios cuartos ----------
+let houseRoomLook = null; // tipo de cuarto que se está mirando para comprar
+const roomsStripEl = document.getElementById("house-rooms");
 
-const LIVE_ICONS = { sleep: "😴", sit: "🛋️", type: "💻", arcade: "🕹️", piano: "🎹", hop: "🤸", admire: "👀" };
-const LIVE_NAMES = { sleep: "Dormir", sit: "Sentarse", type: "Usar el computador", arcade: "Jugar a la arcade", piano: "Tocar el piano", hop: "Saltar", admire: "Mirar" };
+function renderRoomStrip() {
+  if (!roomsStripEl) return;
+  const rooms = roomsOf(progress);
+  roomsStripEl.innerHTML = "";
+  for (const r of rooms) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "hr-pill" + (r.rid === progress.house.curRoom ? " active" : "");
+    b.innerHTML = `<span>${roomType(r.type).icon}</span> ${r.name}`;
+    b.addEventListener("click", () => openRoom(r.rid));
+    roomsStripEl.appendChild(b);
+  }
+  if (rooms.length < MAX_ROOMS) {
+    const add = document.createElement("button");
+    add.type = "button";
+    add.className = "hr-pill hr-add";
+    add.textContent = "➕ Cuarto";
+    add.addEventListener("click", () => { houseMode = "rooms"; houseBuying = null; clearFurniturePreview(); selectPiece(null); renderHouse(); });
+    roomsStripEl.appendChild(add);
+  }
+}
+
+function updateDoorLabel() {
+  if (!house3d) return;
+  const n = nextRoomOf(progress);
+  house3d.setDoorLabel(n ? `${roomType(n.type).icon} ${n.name} →` : "🚪 Más cuartos");
+}
+
+/** Muestra en 3D el cuarto que está abierto (muebles, piso y paredes) y deja la puerta con su cartel. */
+function refreshRoom3d(enter = false) {
+  if (!house3d) return;
+  house3d.layoutData = houseLayout(progress);
+  house3d.setPlaced(housePlaced());
+  updateDoorLabel();
+  house3d.setSelected(null);
+  if (enter) house3d.enterRoom();
+}
+
+/** Pasa a otro cuarto (con un fundido corto). */
+function openRoom(rid, { enter = true } = {}) {
+  if (!progress || rid === progress.house.curRoom) return;
+  houseSel = null;
+  houseTrial = {};
+  houseBuying = null;
+  clearFurniturePreview();
+  if (house3d) house3d.wake();
+  const stage = document.querySelector("#screen-house .sh-stage");
+  const go = () => {
+    if (!switchRoom(progress, rid)) return;
+    refreshRoom3d(enter);
+    renderHouse();
+    if (stage) stage.classList.remove("fade");
+  };
+  if (stage && house3d) { stage.classList.add("fade"); setTimeout(go, 220); } else go();
+}
+
+function renderHouseRooms() {
+  const rooms = roomsOf(progress);
+  const full = rooms.length >= MAX_ROOMS;
+  for (const t of ROOM_TYPES.slice(1)) {
+    const have = rooms.filter((r) => r.type === t.id).length;
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "sh-card sh-size" + (houseRoomLook === t.id ? " trying" : "");
+    card.innerHTML = `<span class="sh-ico">${t.icon}</span><span class="sh-name">${t.name}</span><small>${have ? `Tienes ${have}` : "Nuevo"}</small><span class="sh-price">🍫✨ ${t.price}</span>`;
+    card.addEventListener("click", () => { houseRoomLook = t.id; renderHouse(); });
+    houseGridEl.appendChild(card);
+  }
+  const t = houseRoomLook && roomType(houseRoomLook);
+  if (t) {
+    const need = t.price - progress.coins;
+    const txt = document.createElement("div");
+    txt.className = "sh-bar-txt";
+    txt.innerHTML = `<b>${t.icon} ${t.name}</b> — ${t.blurb} Viene con sus muebles de regalo.`;
+    const buy = document.createElement("button");
+    buy.className = "btn-primary";
+    buy.textContent = full ? "Ya tienes todos los cuartos que caben" : need > 0 ? `Te faltan ${need} 🍫✨` : `Comprar · 🍫✨ ${t.price}`;
+    buy.disabled = full || need > 0;
+    buy.addEventListener("click", () => {
+      const rid = buyRoom(progress, t.id);
+      if (!rid) return;
+      audio.playPurchase();
+      showToast(`¡Nuevo cuarto: ${t.name}! 🎉 Ya viene amoblado.`);
+      houseRoomLook = null;
+      houseMode = "live";
+      openRoom(rid);
+      refreshHubStats();
+    });
+    const cancel = document.createElement("button");
+    cancel.className = "btn-secondary";
+    cancel.textContent = "Cerrar";
+    cancel.addEventListener("click", () => { houseRoomLook = null; renderHouse(); });
+    houseBarEl.append(txt, buy, cancel);
+  } else {
+    houseBarEl.className = "sh-bar hint";
+    houseBarEl.innerHTML = `<div class="sh-bar-txt">Tu casa tiene <b>${rooms.length}</b> cuarto${rooms.length > 1 ? "s" : ""} (máximo ${MAX_ROOMS}). Toca uno de abajo para ver qué trae y comprarlo. ¡Pasas de un cuarto a otro por la <b>puerta</b> 🚪 o con las pestañas de arriba!</div>`;
+  }
+}
+
+
+const LIVE_ICONS = { sleep: "😴", sit: "🛋️", type: "💻", arcade: "🕹️", piano: "🎹", hop: "🤸", admire: "👀", fridge: "🧊", cook: "🍳", wash: "🚰", eat: "🍽️", bath: "🛁", wardrobe: "👗", watch: "📺" };
+const LIVE_NAMES = { sleep: "Dormir", sit: "Sentarse", type: "Usar el computador", arcade: "Jugar a la arcade", piano: "Tocar el piano", hop: "Saltar", admire: "Mirar", fridge: "Abrir la heladera", cook: "Cocinar", wash: "Lavar", eat: "Comer", bath: "Darse un baño", wardrobe: "Mirar el ropero", watch: "Ver tele" };
 /** Modo "Vivir": el Matichico camina por la casa y usa los muebles. */
 function renderHouseLive() {
   const i = energyInfo(progress);
   houseBarEl.innerHTML = `<div class="sh-bar-txt">Tu Matichico vive aquí: <b>toca un mueble</b> y irá a usarlo, o <b>toca el piso</b> para que camine. ${i.v < i.max ? `Si duerme en su cama, ¡la energía vuelve 3 veces más rápido! (⚡ ${i.v}/${i.max})` : ""}</div>`;
   const spots = house3d ? house3d._spots() : [];
-  const cats = { sleep: [], sit: [], type: [], arcade: [], piano: [], hop: [], admire: [] };
+  const ACTS = ["sleep", "sit", "type", "arcade", "piano", "hop", "fridge", "cook", "wash", "eat", "bath", "wardrobe", "watch", "admire"];
+  const cats = Object.fromEntries(ACTS.map((a) => [a, []]));
   for (const { f, i: it } of spots) cats[it.act].push(f);
   const mk = (act, f) => {
     const b = document.createElement("button");
@@ -806,7 +932,7 @@ function renderHouseLive() {
     b.addEventListener("click", () => house3d && house3d.interact(f.data.uid));
     houseGridEl.appendChild(b);
   };
-  for (const act of ["sleep", "sit", "type", "arcade", "piano", "hop", "admire"]) for (const f of cats[act]) mk(act, f);
+  for (const act of ACTS) for (const f of cats[act]) mk(act, f);
   if (!spots.length) houseGridEl.innerHTML = `<div class="sh-empty">Aún no hay muebles para usar. ¡Pon una cama, un sillón o un computador en <b>Decorar</b>!</div>`;
 }
 

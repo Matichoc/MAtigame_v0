@@ -112,6 +112,11 @@ export function loadProgress(profileId) {
         placed: { ...((parsed.house && parsed.house.placed) || {}) },
         layout: parsed.house && Array.isArray(parsed.house.layout) ? parsed.house.layout.map((f) => ({ ...f })) : null,
         size: (parsed.house && parsed.house.size) || 0,
+        starterBed: !!(parsed.house && parsed.house.starterBed),
+        // habitaciones extra (ver js/house-data.js): lista, cuál está abierta y lo guardado de las que no están abiertas
+        rooms: parsed.house && Array.isArray(parsed.house.rooms) ? parsed.house.rooms.map((r) => ({ ...r })) : null,
+        roomData: parsed.house && parsed.house.roomData && typeof parsed.house.roomData === "object" ? JSON.parse(JSON.stringify(parsed.house.roomData)) : {},
+        curRoom: (parsed.house && parsed.house.curRoom) || "r0",
       },
       unlockedGames: Array.isArray(parsed.unlockedGames) ? [...parsed.unlockedGames] : [],
       albumClaimed: parsed.albumClaimed || [],

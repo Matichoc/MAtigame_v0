@@ -1777,3 +1777,12 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 100px; }
   .mg-crown { line-height: 34px; font-size: 1.4rem; }
   .mg-spawn { padding: 8px 10px; }
 }
+
+/* varios cuartos en Mi Casa */
+.house-rooms { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 8px; margin-bottom: 4px; scrollbar-width: none; }
+.house-rooms::-webkit-scrollbar { display: none; }
+.hr-pill { flex: 0 0 auto; padding: 7px 12px; border-radius: 999px; border: 2px solid rgba(255, 208, 230, 0.7); background: rgba(255,255,255,0.08); color: var(--crema); font: inherit; font-weight: 800; font-size: 0.82rem; cursor: pointer; white-space: nowrap; touch-action: manipulation; }
+.hr-pill.active { background: linear-gradient(180deg, #ffd36a, #ffb400); color: #4a2440; border-color: #fff; }
+.hr-pill.hr-add { border-style: dashed; }
+.sh-stage canvas { transition: opacity 0.2s ease; }
+.sh-stage.fade canvas { opacity: 0; }

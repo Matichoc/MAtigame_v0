@@ -117,7 +117,7 @@ export function buildLevel(L) {
     qblocks() {
       const n = ri(8, 11);
       ground(x, x + n, gh);
-      const by = gh + 3;
+      const by = gh + 2; // bajitos: se pueden golpear y subir encima para tomar el premio
       const bx = x + ri(2, 4);
       const cnt = ri(1, 3);
       for (let i = 0; i < cnt; i++) set(bx + i * 2, by, chance(0.5) ? "?" : "B");
@@ -185,7 +185,7 @@ export function buildLevel(L) {
     const ax = x;
     ground(ax, ax + 34, 2);
     for (let y = 2; y < 9; y++) set(ax + 33, y, "#");
-    set(ax + 10, 5, "?"); set(ax + 22, 5, "?"); // dos bloques ? por si necesitas un corazón
+    set(ax + 10, 4, "?"); set(ax + 22, 4, "?"); // dos bloques ? por si necesitas un corazón
     for (let i = 0; i < 3; i++) set(ax + 15 + i, 7, "=");
     for (let y = 2; y < 6; y++) set(ax + 30, y, "."); // salida cerrada por la pared hasta vencer
     x = ax + 34;
@@ -207,7 +207,7 @@ export function buildLevel(L) {
     // a veces, bloques de ? sueltos con alfajores
     if (chance(0.25)) {
       const bx = x - ri(4, 8);
-      set(bx, gh + 3, chance(0.5) ? "?" : "B");
+      set(bx, gh + 2, chance(0.5) ? "?" : "B");
     }
   }
   if (!warpCandidates.length) chunks.pipe(); // que todos los niveles (menos los de jefe) tengan una tubería mágica
@@ -232,7 +232,7 @@ export function buildLevel(L) {
       }
       for (let y = 0; y < H; y++) { set(bx0 - 1, y, "#"); set(bx0 + bw, y, "#"); }
       for (let xx = bx0 + 3; xx < bx0 + bw - 5; xx++) { coins.push([xx, 3, 1]); set(xx, 3, "o"); if (xx % 2) { coins.push([xx, 5, 1]); set(xx, 5, "o"); } }
-      set(bx0 + 11, 5, "?"); // el premio gordo de la sala
+      set(bx0 + 11, 4, "?"); // el premio gordo de la sala
       const ex = bx0 + bw - 3;
       for (let y = 2; y < 4; y++) set(ex, y, "P");
       warp = { x: wc.x, top: wc.top };
@@ -1010,7 +1010,11 @@ export class AventuraGame extends Game3D {
     mesh.position.set(tx + 0.5, ty + 0.2, -0.1);
     this.levelGroup.add(mesh);
     const dir = this.player && this.player.x > tx + 0.5 ? -1 : 1;
-    this.items.push({ kind, mesh, x: tx + 0.5, y: ty + 0.2, baseY: ty + 1, vx: kind === "flower" ? 0 : 2.4 * dir, vy: 0, state: "emerge", t: 0 });
+    // si el bloque queda muy alto para subirse encima, la flor también se desliza y cae al lado, para poder tomarla
+    let g = ty - 1;
+    while (g >= 0 && !this._solid(tx + 0.5, g + 0.5)) g--;
+    const drop = kind === "flower" && ty - g - 1 >= 3;
+    this.items.push({ kind, mesh, drop, x: tx + 0.5, y: ty + 0.2, baseY: ty + 1, vx: kind === "flower" && !drop ? 0 : 2.4 * dir, vy: 0, state: "emerge", t: 0 });
     audio.playPowerup();
   }
 
@@ -1022,13 +1026,13 @@ export class AventuraGame extends Game3D {
       if (it.state === "emerge") {
         it.y = lerp(it.baseY - 0.8, it.baseY, Math.min(1, it.t / 0.45));
         if (it.t >= 0.45) { it.state = "go"; it.y = it.baseY; }
-      } else if (it.kind !== "flower") {
+      } else if (it.kind !== "flower" || it.drop) {
         it.vy -= GRAV * dt;
         const front = it.x + Math.sign(it.vx) * 0.3;
         if (this._solid(front, it.y + 0.25)) it.vx = -it.vx;
         it.x += it.vx * dt;
         it.y += it.vy * dt;
-        if (it.vy <= 0 && (this._solid(it.x, it.y) || this._solid(it.x - 0.2, it.y) || this._solid(it.x + 0.2, it.y))) { it.y = Math.floor(it.y) + 1; it.vy = 0; }
+        if (it.vy <= 0 && (this._solid(it.x, it.y) || this._solid(it.x - 0.2, it.y) || this._solid(it.x + 0.2, it.y))) { it.y = Math.floor(it.y) + 1; it.vy = 0; if (it.kind === "flower") { it.vx = 0; it.drop = false; } }
         if (it.y < -3) { it.gone = true; this.levelGroup.remove(it.mesh); continue; }
       }
       it.mesh.position.set(it.x, it.y, -0.1);
