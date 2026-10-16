@@ -24,28 +24,33 @@ Estimación para una niña que juega ~1 hora al día (la energía es el freno: 1
 
 Un legendario costaba **dos días** de juego y casi todo el guardarropa se compraba en un par de semanas. Por eso nunca faltaban Matipuntos.
 
-## Metas de precio (cuánto hay que jugar para comprarlo)
+## Metas de precio (con ~300 🍫✨ de ganancia al día)
 
-| Tipo | Objetivo | Precio nuevo |
+| Qué | Objetivo | Precio |
 |---|---|---|
-| Común | unos minutos | 45 (antes 30) |
-| Raro | ~1 día | 220 (antes 110) |
-| Épico | 2–3 días | 650 (antes 260) |
-| Legendario | ~1 semana | 1.560 (antes 520) |
-| Exclusivas (nivel o logro) | 1–3 semanas | 1.560 – 4.500 |
+| Cosas comunes (peinados, anteojos, colores…) | 2–3 en un día | 45 – 135 |
+| Raros | ≈ 1 día | 120 – 260 |
+| Premium (épicos, muebles grandes) | ≈ 3 días | 910 – 1.120 |
+| Lo más premium (legendarios, exclusivas) | ≈ 7 días | 2.080 – 2.160 |
+| Un cuarto nuevo (todos iguales) | ≈ 3 días | 900 |
+| Agrandar un cuarto: Mediano | ≈ 3 días más | 900 |
+| Agrandar un cuarto: Grande (acumulado) | 6 días en total | 1.800 (los últimos 900) |
+| Autos del garaje | 1,3 · 3 · 5 · 7 días | 400 · 900 · 1.500 · 2.100 |
+| Candados de juego | ≈ 1 semana | 2.000 |
+| Energía con Matipuntos (hasta 100) | gasto opcional | 80 por 20 ⚡, 10 veces al día |
+
+Con eso, llevar un cuarto de "pequeño" a "grande" cuesta 2.700 en total (el doble de lo que costó el cuarto, más el cuarto): un jugador promedio llega al tamaño más grande de su primer cuarto extra en unas 2 semanas. Quien juega más llega antes; quien juega menos, después.
 
 Lo que ya compraste **no cambia**: el reajuste solo sube lo que aún no tienes.
 
 ## Cambios aplicados
 
-- **Guardarropa**: el precio base de cada cosa se multiplica por su rareza (común ×1,5 · raro ×2 · épico ×2,5 · legendario ×3). Total ≈ 48.900 con las prendas nuevas.
-- **Casa**: muebles y estilos ×2 (≈ 14.200 y 19.000); cuartos 800–1.800 (antes 400–900); tamaño Mediano 600 y Grande 1.800 (antes 300 y 900), por cada cuarto.
+- **Guardarropa**: precio base × factor de rareza (común ×3 · raro ×2 · épico ×3,5 · legendario ×4). Total ≈ 60.000 con las prendas nuevas.
+- **Casa**: muebles y estilos con los mismos factores (común ×2 · raro ×2 · épico ×3,5 · legendario ×4).
 - **Ropa nueva** (28 tenidas en total, 16 nuevas): tutús, vestidos, uniformes cheerleader con pompones, vestido de gala, smoking, Súper Choco, traje espacial.
-- **Exclusivas**: piden **nivel** (Tutú Arcoíris 12 · Cheer Campeona 15 · Princesa Cacao 20 · Vestido de Gala 25 · Súper Choco 10 · Traje espacial 14) o un **logro** (Edición Mati Dubai: llegar al ¡Mati Dubai! en Mati Merge). Mientras no se cumple sale "🔒 Nivel N".
+- **Exclusivas**: piden **nivel** (Súper Choco 10 · Tutú Arcoíris 12 · Traje espacial 14 · Cheer Campeona 15 · Princesa Cacao 20 · Vestido de Gala 25) o un **logro** (Edición Mati Dubai: llegar al ¡Mati Dubai! en Mati Merge). Mientras no se cumple sale "🔒 Nivel N".
 - **Comprar otra unidad**: cualquier prenda o mueble de pago se puede comprar más de una vez (una unidad por Matichico a la vez). En la tienda, al tocar una prenda que ya llevas puesta aparece "Comprar otro".
 
-## Pendiente de decidir
+## Pendiente
 
-- `UNLOCK_PRICE` (candado de Fútbol, Choco Match, Aventura y Ciudad): fijado en **2.000** (≈ una semana de juego por candado; 20.000 habrían sido ~2 meses).
-- Autos del garaje (400 / 900 / 1.800 / 4.000): se dejaron igual.
-- Revisar con datos reales de partidas (cuando haya ranking online) si el ritmo de ~300 al día es correcto.
+- Revisar con datos reales de partidas (cuando haya ranking online) si el ritmo de ~300 al día es correcto; si la gente gana más o menos, se ajusta en un solo lugar por sistema (`PRICE_X` en `wardrobe-data.js`, `HOUSE_X` en `house-data.js`, `UNLOCK_PRICE`, `ROOM_TYPES`/`HOUSE_SIZES`, autos en `autos-garage.js`).

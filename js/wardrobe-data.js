@@ -30,8 +30,9 @@ export const SLOTS = [
 ];
 
 const P = { comun: 30, raro: 110, epico: 260, legendario: 520 };
-// Precio final = precio base × factor de su rareza (lo raro cuesta bastante más: ver docs/ECONOMIA.md). El 0 sigue siendo "gratis".
-const PRICE_X = { comun: 1.5, raro: 2, epico: 2.5, legendario: 3 };
+// Precio final = precio base × factor de su rareza. Con ~300 🍫✨ de ganancia al día: común ≈ 1/3 de día, raro ≈ 1 día, épico ≈ 3 días,
+// legendario ≈ 7 días (ver docs/ECONOMIA.md). El 0 sigue siendo "gratis".
+const PRICE_X = { comun: 3, raro: 2, epico: 3.5, legendario: 4 };
 const cost = (rarity, price) => { const base = price ?? P[rarity]; return base > 0 ? Math.round((base * PRICE_X[rarity]) / 5) * 5 : 0; };
 const it = (slot, id, name, icon, rarity, params = {}, price) => ({ id, slot, name, icon, rarity, price: cost(rarity, price), params });
 // Objetos exclusivos de un evento de temporada (ver js/events.js): se compran con fichas del evento.
@@ -67,14 +68,14 @@ export const OUTFITS = [
   out("hada", "Hada de azúcar", "🧚", "epico", "#5FCFB0", "#FFFFFF", { skirt: "tutu", skirtColor: "#8FE6CC", tights: "#FFFFFF", shine: true, emblem: "star" }, 270),
   out("tutu_arcoiris", "Tutú Arcoíris", "🌈", "epico", "#FFFFFF", "#FFC800", { skirt: "tutu", rainbow: true, tights: "#FFFFFF", pompoms: "#FF7AA8" }, 300, { minLevel: 12 }),
   out("princesa", "Princesa Cacao", "👸", "legendario", "#8A2B5C", "#FFC800", { skirt: "gala", skirtColor: "#B83A78", skirtTrim: "#FFC800", shine: true, emblem: "heart" }, 520, { minLevel: 20 }),
-  out("cheer_oro", "Cheer Campeona", "🏆", "legendario", "#FFC800", "#D4216C", { skirt: "cheer", skirtColor: "#FFC800", skirtTrim: "#D4216C", shine: true, emblem: "star", pompoms: "#FF3FA4" }, 600, { minLevel: 15 }),
-  out("gala_dorado", "Vestido de Gala", "💫", "legendario", "#FFC800", "#FFFFFF", { skirt: "gala", skirtColor: "#FFD84D", skirtTrim: "#FFFFFF", shine: true, emblem: "star" }, 800, { minLevel: 25 }),
+  out("cheer_oro", "Cheer Campeona", "🏆", "legendario", "#FFC800", "#D4216C", { skirt: "cheer", skirtColor: "#FFC800", skirtTrim: "#D4216C", shine: true, emblem: "star", pompoms: "#FF3FA4" }, 520, { minLevel: 15 }),
+  out("gala_dorado", "Vestido de Gala", "💫", "legendario", "#FFC800", "#FFFFFF", { skirt: "gala", skirtColor: "#FFD84D", skirtTrim: "#FFFFFF", shine: true, emblem: "star" }, 540, { minLevel: 25 }),
 
   // ---- Más tenidas exclusivas para todos ----
   out("smoking", "Smoking de gala", "🤵", "raro", "#1C1C22", "#FFFFFF", { emblem: "bow" }, 130),
   out("super", "Súper Choco", "🦸", "epico", "#2F6FD6", "#E83A3A", { emblem: "bolt" }, 300, { minLevel: 10 }),
   out("astronauta", "Traje espacial", "🚀", "epico", "#F2F4FF", "#35F0FF", { emblem: "star", shine: true }, 320, { minLevel: 14 }),
-  out("dubai", "Edición Mati Dubai", "💎", "legendario", "#FFC800", "#FF3FA4", { shine: true, emblem: "star" }, 1500, { needs: "dubai" }),
+  out("dubai", "Edición Mati Dubai", "💎", "legendario", "#FFC800", "#FF3FA4", { shine: true, emblem: "star" }, 540, { needs: "dubai" }),
 ];
 
 export const ITEMS = [

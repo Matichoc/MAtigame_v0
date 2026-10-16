@@ -21,9 +21,9 @@ export const HOUSE_SPOTS = [
 ];
 
 const P = { comun: 30, raro: 110, epico: 260, legendario: 520 };
-// Los precios de la casa se duplicaron en el reajuste de economía (ver docs/ECONOMIA.md); el 0 sigue siendo "viene con la casa".
-const HOUSE_X = 2;
-const it = (spot, id, name, icon, rarity, params = {}, price) => { const base = price ?? P[rarity]; return { id, spot, name, icon, rarity, price: base > 0 ? Math.round((base * HOUSE_X) / 5) * 5 : 0, params }; };
+// Precios de la casa según la rareza (ver docs/ECONOMIA.md); el 0 sigue siendo "viene con la casa".
+const HOUSE_X = { comun: 2, raro: 2, epico: 3.5, legendario: 4 };
+const it = (spot, id, name, icon, rarity, params = {}, price) => { const base = price ?? P[rarity]; return { id, spot, name, icon, rarity, price: base > 0 ? Math.round((base * HOUSE_X[rarity]) / 5) * 5 : 0, params }; };
 
 export const HOUSE_ITEMS = [
   // ---- Piso ----
@@ -263,9 +263,10 @@ export function buyFurniture(progress, id) {
 // ---------- agrandar la casa ----------
 
 // Cada cuarto tiene su propio tamaño: todos parten pequeños y tú eliges cuál agrandar (se compra aparte para cada uno).
+// El precio es acumulado: Mediano 900 (≈ 3 días) y Grande 1800 en total (otros 3 días): un cuarto grande cuesta el doble de lo que costó el cuarto.
 export const HOUSE_SIZES = [
   { level: 0, size: 10, name: "Pequeño", icon: "🏠", price: 0, blurb: "Un cuartito acogedor." },
-  { level: 1, size: 14, name: "Mediano", icon: "🏡", price: 600, blurb: "¡Mucho más espacio para muebles!" },
+  { level: 1, size: 14, name: "Mediano", icon: "🏡", price: 900, blurb: "¡Mucho más espacio para muebles!" },
   { level: 2, size: 18, name: "Grande", icon: "🏰", price: 1800, blurb: "Un salón enorme para decorar." },
 ];
 const sizeLevel = (n) => Math.min(HOUSE_SIZES.length - 1, Math.max(0, Math.floor(Number(n)) || 0));
@@ -301,17 +302,17 @@ export const MAX_ROOMS = 8;
 // starter: [idMueble, x, z, giro] — vienen de regalo con el cuarto (el giro 0 mira hacia el frente)
 export const ROOM_TYPES = [
   { id: "cuarto", name: "Mi cuarto", icon: "🏠", price: 0, blurb: "Tu cuartito de siempre." },
-  { id: "dormitorio", name: "Dormitorio", icon: "🛏️", price: 800, blurb: "Para dormir y descansar: cama, cómoda y ropero. ¡Durmiendo recargas energía más rápido!", floor: "fl_madera", wall: "wl_rosa",
+  { id: "dormitorio", name: "Dormitorio", icon: "🛏️", price: 900, blurb: "Para dormir y descansar: cama, cómoda y ropero. ¡Durmiendo recargas energía más rápido!", floor: "fl_madera", wall: "wl_rosa",
     starter: [["bd_rosa", -3.3, -1.6, 0], ["fr_comoda", 2.6, -3.9, 0], ["fr_ropero", -0.2, -3.9, 0]] },
-  { id: "cocina", name: "Cocina", icon: "🍳", price: 1000, blurb: "Heladera, cocina con hornito, mesón y una mesa para comer. Tu Matichico puede cocinar y comer.", floor: "fl_damero", wall: "wl_menta",
+  { id: "cocina", name: "Cocina", icon: "🍳", price: 900, blurb: "Heladera, cocina con hornito, mesón y una mesa para comer. Tu Matichico puede cocinar y comer.", floor: "fl_damero", wall: "wl_menta",
     starter: [["fr_heladera", -3.7, -3.9, 0], ["fr_cocina", -1.1, -3.9, 0], ["fr_meson", 1.5, -3.9, 0], ["fr_comedor", 1.0, 1.0, 0]] },
-  { id: "living", name: "Living", icon: "🛋️", price: 1200, blurb: "Sillón, tele y mesita de centro para descansar y ver tele.", floor: "fl_madera", wall: "wl_cielo",
+  { id: "living", name: "Living", icon: "🛋️", price: 900, blurb: "Sillón, tele y mesita de centro para descansar y ver tele.", floor: "fl_madera", wall: "wl_cielo",
     starter: [["fr_tvmueble", 0.2, -3.9, 0], ["fr_sofa", 0.2, 1.3, Math.PI], ["fr_mesacentro", 0.2, -0.6, 0]] },
-  { id: "bano", name: "Baño", icon: "🛁", price: 800, blurb: "Una tina de burbujas y un lavamanos.", floor: "fl_nubes", wall: "wl_cielo",
+  { id: "bano", name: "Baño", icon: "🛁", price: 900, blurb: "Una tina de burbujas y un lavamanos.", floor: "fl_nubes", wall: "wl_cielo",
     starter: [["fr_tina", -2.6, -3.5, 0], ["fr_lavabo", 2.6, -3.9, 0]] },
-  { id: "juegos", name: "Sala de juegos", icon: "🕹️", price: 1800, blurb: "Pelotero, juegos y una planta grande para pasarlo bien.", floor: "fl_damero", wall: "wl_lunares",
+  { id: "juegos", name: "Sala de juegos", icon: "🕹️", price: 900, blurb: "Pelotero, juegos y una planta grande para pasarlo bien.", floor: "fl_damero", wall: "wl_lunares",
     starter: [["fr_pelotero", -2.4, -2.4, 0], ["fr_tipi", 2.6, -2.4, 0], ["lf_planta", 3.9, 3.0, 0]] },
-  { id: "jardin", name: "Jardín", icon: "🌳", price: 1400, blurb: "Césped, flores y un árbol de cacao.", floor: "fl_cesped", wall: "wl_nubes",
+  { id: "jardin", name: "Jardín", icon: "🌳", price: 900, blurb: "Césped, flores y un árbol de cacao.", floor: "fl_cesped", wall: "wl_nubes",
     starter: [["rt_cacao", -3.6, -3.3, 0], ["rt_flores", 3.6, -3.6, 0], ["fr_mesa", 1.0, 1.0, 0]] },
 ];
 export const roomType = (id) => ROOM_TYPES.find((t) => t.id === id) || ROOM_TYPES[0];
