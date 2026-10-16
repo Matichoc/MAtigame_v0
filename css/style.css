@@ -1847,3 +1847,12 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .lb-rename summary::-webkit-details-marker { display: none; }
 .lb-rename .field-label { display: block; margin: 6px 0 4px; font-size: 0.75rem; color: #ffd0e6; opacity: 1; }
 .sh-card.busy { opacity: 0.78; filter: saturate(0.7); }
+
+/* orden de los cuartos de la casa */
+.sh-order { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px 4px; font-size: 0.8rem; color: var(--crema); }
+.sh-order > b { flex: 1 0 100%; }
+.so-chip { display: inline-flex; align-items: center; gap: 4px; background: rgba(255, 255, 255, 0.1); border: 2px solid transparent; border-radius: 999px; padding: 2px 4px; }
+.so-chip.open { border-color: var(--dorado, #f2c14e); }
+.so-chip span { padding: 0 4px; font-weight: 700; white-space: nowrap; }
+.so-chip button { min-width: 30px; min-height: 30px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.18); color: inherit; font-size: 0.85rem; cursor: pointer; }
+.so-chip button:disabled { opacity: 0.25; cursor: default; }

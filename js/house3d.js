@@ -648,9 +648,6 @@ export class House3D {
     if (this._nbData) this.setNeighbors(this._nbData);
   }
 
-  /** Distancia entre el centro de un cuarto y el del vecino. */
-  get stride() { return W + 0.6; }
-
   _labelSprite(text) {
     const c = document.createElement("canvas");
     c.width = 512; c.height = 128;
@@ -683,8 +680,8 @@ export class House3D {
   // ---------- los otros cuartos de la casa, a los lados ----------
 
   /**
-   * `list` = [{ rid, dx, name, placed, layout }]: los cuartos que no están abiertos, `dx` = cuántos lugares a la derecha (+) o a la
-   * izquierda (-) del cuarto abierto. Se dibujan quietos (sin Matichico) para ver la casa completa de lado.
+   * `list` = todos los cuartos de la casa en orden: { rid, size, name, active?, placed, layout }. El abierto (`active`) se dibuja con
+   * Matichico y muebles que se pueden mover; los demás se ven quietos a los lados, cada uno con su propio tamaño.
    */
   setNeighbors(list) {
     this._nbData = list;
@@ -695,7 +692,16 @@ export class House3D {
     }
     this.neighbors = [];
     this.nTicks = [];
-    for (const item of list) {
+    const ai = Math.max(0, list.findIndex((r) => r.active));
+    const wOf = (r) => (r.active ? W : r.size);
+    // posición (en x) del centro de cada cuarto; el abierto está en 0 y cada cuarto ocupa su ancho más sus dos paredes (0.3 c/u)
+    const xs = new Array(list.length).fill(0);
+    for (let j = ai + 1; j < list.length; j++) xs[j] = xs[j - 1] + wOf(list[j - 1]) / 2 + 0.3 + 0.3 + wOf(list[j]) / 2;
+    for (let j = ai - 1; j >= 0; j--) xs[j] = xs[j + 1] - wOf(list[j + 1]) / 2 - 0.3 - 0.3 - wOf(list[j]) / 2;
+    this._roomX = Object.fromEntries(list.map((r, j) => [r.rid, xs[j]]));
+    list.forEach((item, j) => {
+      if (item.active) return;
+      const w = item.size;
       const fl = getHouseItem((item.placed || {}).floor) || getHouseItem("fl_madera");
       const wl = getHouseItem((item.placed || {}).wall) || getHouseItem("wl_crema");
       const fm = std(0xffffff, 0.7);
@@ -703,12 +709,12 @@ export class House3D {
       const wm = std(0xffffff, 0.9);
       wm.map = wallTexture(wl.params);
       for (const m of [fm, wm]) { m.map.wrapS = m.map.wrapT = THREE.RepeatWrapping; }
-      fm.map.repeat.set(fm.map.repeat.x * (W / 10), fm.map.repeat.y * (W / 10));
-      wm.map.repeat.set(wm.map.repeat.x * (W / 10), wm.map.repeat.y);
-      const s = this._shellGroup(W, fm, wm, false);
+      fm.map.repeat.set(fm.map.repeat.x * (w / 10), fm.map.repeat.y * (w / 10));
+      wm.map.repeat.set(wm.map.repeat.x * (w / 10), wm.map.repeat.y);
+      const s = this._shellGroup(w, fm, wm, false);
       const g = s.group;
-      g.position.x = item.dx * this.stride;
-      const half = W / 2 - 0.5;
+      g.position.set(xs[j], 0, (w - W) / 2); // las paredes del fondo quedan alineadas con la del cuarto abierto
+      const half = w / 2 - 0.5;
       for (const d of item.layout || []) {
         const it = getHouseItem(d.id);
         if (!it) continue;
@@ -716,7 +722,7 @@ export class House3D {
         holder.add(this._buildFurnQuiet(it));
         if (d.wall) {
           const u = Math.max(-half, Math.min(half, d.u || 0));
-          holder.position.set(u, Math.max(1.4, Math.min(4.2, d.y || 2.8)), -W / 2 + 0.1);
+          holder.position.set(u, Math.max(1.4, Math.min(4.2, d.y || 2.8)), -w / 2 + 0.1);
         } else {
           holder.position.set(Math.max(-half, Math.min(half, d.x || 0)), 0, Math.max(-half, Math.min(half, d.z || 0)));
           holder.rotation.y = d.rot || 0;
@@ -732,8 +738,8 @@ export class House3D {
       g.add(label);
       g.userData.rid = item.rid;
       this.scene.add(g);
-      this.neighbors.push({ group: g, rid: item.rid, dx: item.dx, mats: [fm, wm] });
-    }
+      this.neighbors.push({ group: g, rid: item.rid, mats: [fm, wm] });
+    });
     this._toon();
     this._resize && this._resize();
   }
@@ -753,9 +759,9 @@ export class House3D {
     return o ? o.userData.rid : null;
   }
 
-  /** Desliza la cámara hasta el cuarto que está `dx` lugares a un lado; al llegar avisa (para cambiar de cuarto). */
-  slideTo(dx, done) {
-    this._slide = { x: dx * this.stride, done };
+  /** Desliza la cámara hasta el cuarto `rid`; al llegar avisa (para cambiar de cuarto). */
+  slideTo(rid, done) {
+    this._slide = { x: (this._roomX && this._roomX[rid]) || 0, done };
   }
 
   /** Vuelve la cámara al cuarto abierto de golpe (después de cambiar de cuarto). */

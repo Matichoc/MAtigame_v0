@@ -260,18 +260,32 @@ export function buyFurniture(progress, id) {
 
 // ---------- agrandar la casa ----------
 
+// Cada cuarto tiene su propio tamaño: todos parten pequeños y tú eliges cuál agrandar (se compra aparte para cada uno).
 export const HOUSE_SIZES = [
-  { level: 0, size: 10, name: "Cuarto", icon: "🏠", price: 0, blurb: "Tu cuartito de siempre." },
-  { level: 1, size: 14, name: "Casa mediana", icon: "🏡", price: 300, blurb: "¡Mucho más espacio para muebles!" },
-  { level: 2, size: 18, name: "Casa grande", icon: "🏰", price: 900, blurb: "Una mansión de chocolate para decorar." },
+  { level: 0, size: 10, name: "Pequeño", icon: "🏠", price: 0, blurb: "Un cuartito acogedor." },
+  { level: 1, size: 14, name: "Mediano", icon: "🏡", price: 300, blurb: "¡Mucho más espacio para muebles!" },
+  { level: 2, size: 18, name: "Grande", icon: "🏰", price: 900, blurb: "Un salón enorme para decorar." },
 ];
-export const houseSize = (progress) => HOUSE_SIZES[Math.min(HOUSE_SIZES.length - 1, progress.house.size || 0)];
+const sizeLevel = (n) => Math.min(HOUSE_SIZES.length - 1, Math.max(0, Math.floor(Number(n)) || 0));
+/** El tamaño (nivel 0 a 2) de un cuarto de la casa. */
+export function roomSizeLevel(progress, rid) {
+  const r = roomsOf(progress).find((x) => x.rid === rid);
+  return sizeLevel(r && r.size);
+}
+/** El tamaño del cuarto que está abierto. */
+export const houseSize = (progress) => HOUSE_SIZES[roomSizeLevel(progress, progress.house.curRoom)];
 
+/** Precio de llevar el cuarto abierto al tamaño `level` (se descuenta lo que ya valía su tamaño actual). */
+export const houseSizeCost = (progress, level) => Math.max(0, HOUSE_SIZES[level].price - houseSize(progress).price);
+
+/** Agranda el cuarto que está abierto al tamaño que elijas (puede saltarse uno). */
 export function buyHouseSize(progress, level) {
   const next = HOUSE_SIZES[level];
-  if (!next || level !== (progress.house.size || 0) + 1) return false;
-  if (!spendCoins(progress, next.price)) return false;
-  progress.house.size = level;
+  const r = currentRoom(progress);
+  if (!next || !r || level <= sizeLevel(r.size)) return false;
+  if (!spendCoins(progress, houseSizeCost(progress, level))) return false;
+  r.size = level;
+  if (r.rid === "r0") progress.house.size = level; // compatibilidad con guardados anteriores
   saveProgress(progress);
   return true;
 }
@@ -305,9 +319,22 @@ export function roomsOf(progress) {
   if (!Array.isArray(h.rooms) || !h.rooms.length) h.rooms = [{ rid: "r0", type: "cuarto", name: "Mi cuarto" }];
   if (!h.roomData || typeof h.roomData !== "object") h.roomData = {};
   if (!h.rooms.some((r) => r.rid === h.curRoom)) h.curRoom = h.rooms[0].rid;
+  // el cuarto de siempre conserva el tamaño que ya tenía la casa; los demás parten pequeños
+  for (const r of h.rooms) if (r.size === undefined) r.size = r.rid === "r0" ? sizeLevel(h.size) : 0;
   return h.rooms;
 }
-export const currentRoom = (progress) => roomsOf(progress).find((r) => r.rid === progress.house.curRoom);
+
+/** Cambia de lugar un cuarto en el orden de la casa (dir = -1 a la izquierda, +1 a la derecha). */
+export function moveRoom(progress, rid, dir) {
+  const rooms = roomsOf(progress);
+  const i = rooms.findIndex((r) => r.rid === rid);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= rooms.length) return false;
+  [rooms[i], rooms[j]] = [rooms[j], rooms[i]];
+  saveProgress(progress);
+  return true;
+}
+export function currentRoom(progress) { return roomsOf(progress).find((r) => r.rid === progress.house.curRoom); }
 export const nextRoomOf = (progress) => {
   const rs = roomsOf(progress);
   if (rs.length < 2) return null;
@@ -359,7 +386,7 @@ export function buyRoom(progress, typeId) {
   }
   for (const id of [t.floor, t.wall]) if (id && getHouseItem(id).price > 0 && !h.owned.includes(id)) h.owned.push(id);
   h.roomData[rid] = { placed: { floor: t.floor || DEFAULT_PLACED.floor, wall: t.wall || DEFAULT_PLACED.wall }, layout };
-  rooms.push({ rid, type: t.id, name: same ? `${t.name} ${same + 1}` : t.name });
+  rooms.push({ rid, type: t.id, name: same ? `${t.name} ${same + 1}` : t.name, size: 0 });
   saveProgress(progress);
   return rid;
 }

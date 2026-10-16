@@ -16,7 +16,7 @@ import { ACHIEVEMENTS, ACHIEVEMENT_CHAINS, CATEGORIES as ACH_CATEGORIES, achieve
 import { activeEvent, eventById, eventEnd, nextEvent, eventTokens, eventItemAvailable, buyEventItem } from "./events.js";
 import {
   HOUSE_SPOTS, houseItemsOfSpot, getHouseItem, ownsHouseItem, buyHouseItem, placeHouseItem, placedWithDefaults,
-  FURN_CATEGORIES, furnitureOf, isWallItem, houseLayout, layoutAdd, layoutRemove, buyFurniture, copiesOf, placedCount, HOUSE_SIZES, houseSize, buyHouseSize,
+  FURN_CATEGORIES, furnitureOf, isWallItem, houseLayout, layoutAdd, layoutRemove, buyFurniture, copiesOf, placedCount, HOUSE_SIZES, houseSize, roomSizeLevel, houseSizeCost, buyHouseSize, moveRoom,
   ROOM_TYPES, MAX_ROOMS, roomType, roomsOf, nextRoomOf, roomHasBed, switchRoom, buyRoom,
 } from "./house-data.js";
 import {
@@ -837,9 +837,9 @@ function refreshNeighbors() {
   const rooms = roomsOf(progress);
   const cur = rooms.findIndex((r) => r.rid === h.curRoom);
   house3d.setRoomName(`${roomType(rooms[cur].type).icon} ${rooms[cur].name}`);
-  house3d.setNeighbors(rooms.map((r, i) => ({ r, i })).filter(({ i }) => i !== cur).map(({ r, i }) => {
+  house3d.setNeighbors(rooms.map((r) => {
     const d = h.roomData[r.rid] || {};
-    return { rid: r.rid, dx: i - cur, name: `${roomType(r.type).icon} ${r.name}`, placed: d.placed || {}, layout: d.layout || [] };
+    return { rid: r.rid, size: HOUSE_SIZES[roomSizeLevel(progress, r.rid)].size, active: r.rid === h.curRoom, name: `${roomType(r.type).icon} ${r.name}`, placed: d.placed || {}, layout: d.layout || [] };
   }));
   renderRoomArrows();
 }
@@ -868,6 +868,7 @@ arrowNext.addEventListener("click", () => {
 /** Muestra en 3D el cuarto que está abierto (muebles, piso y paredes) y los vecinos a los lados. */
 function refreshRoom3d(enterSide = 0) {
   if (!house3d) return;
+  house3d.setSize(houseSize(progress).size);
   house3d.layoutData = houseLayout(progress);
   house3d.setPlaced(housePlaced());
   refreshNeighbors();
@@ -895,12 +896,35 @@ function openRoom(rid) {
     refreshRoom3d(to > from ? 1 : -1);
     renderHouse();
   };
-  if (house3d && house3d.ready) { roomMoving = true; house3d.slideTo(to - from, go); } else go();
+  if (house3d && house3d.ready) { roomMoving = true; house3d.slideTo(rid, go); } else go();
 }
 
 function renderHouseRooms() {
   const rooms = roomsOf(progress);
   const full = rooms.length >= MAX_ROOMS;
+  if (rooms.length > 1) {
+    const ord = document.createElement("div");
+    ord.className = "sh-order";
+    ord.innerHTML = `<b>Orden de tus cuartos</b> (de izquierda a derecha)`;
+    rooms.forEach((r, i) => {
+      const chip = document.createElement("div");
+      chip.className = "so-chip" + (r.rid === progress.house.curRoom ? " open" : "");
+      const mv = (dir, txt) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = txt;
+        b.setAttribute("aria-label", dir < 0 ? "Mover a la izquierda" : "Mover a la derecha");
+        b.disabled = dir < 0 ? i === 0 : i === rooms.length - 1;
+        b.addEventListener("click", () => { if (moveRoom(progress, r.rid, dir)) { refreshNeighbors(); renderHouse(); } });
+        return b;
+      };
+      const nm = document.createElement("span");
+      nm.textContent = `${roomType(r.type).icon} ${r.name}`;
+      chip.append(mv(-1, "◀"), nm, mv(1, "▶"));
+      ord.appendChild(chip);
+    });
+    houseGridEl.appendChild(ord);
+  }
   for (const t of ROOM_TYPES.slice(1)) {
     const have = rooms.filter((r) => r.type === t.id).length;
     const card = document.createElement("button");
@@ -937,7 +961,7 @@ function renderHouseRooms() {
     houseBarEl.append(txt, buy, cancel);
   } else {
     houseBarEl.className = "sh-bar hint";
-    houseBarEl.innerHTML = `<div class="sh-bar-txt">Tu casa tiene <b>${rooms.length}</b> cuarto${rooms.length > 1 ? "s" : ""} (máximo ${MAX_ROOMS}). Toca uno de abajo para ver qué trae y comprarlo. ¡Pasas de un cuarto a otro por la <b>puerta</b> 🚪 o con las pestañas de arriba!</div>`;
+    houseBarEl.innerHTML = `<div class="sh-bar-txt">Tu casa tiene <b>${rooms.length}</b> cuarto${rooms.length > 1 ? "s" : ""} (máximo ${MAX_ROOMS}). Con ◀ ▶ cambias el <b>orden</b>; pasas de un cuarto a otro con las flechas o las pestañas de arriba.</div>`;
   }
 }
 
@@ -1101,38 +1125,38 @@ function renderHouseStyle() {
 
 function renderHouseSize() {
   const cur = houseSize(progress);
+  const room = roomsOf(progress).find((r) => r.rid === progress.house.curRoom);
   HOUSE_SIZES.forEach((sz) => {
     const owned = sz.level <= cur.level;
-    const next = sz.level === cur.level + 1;
     const looking = housePreviewSize === sz.size;
     const card = document.createElement("button");
     card.type = "button";
     card.className = "sh-card sh-size" + (sz.level === cur.level ? " equipped" : "") + (looking ? " trying" : "") + (!owned ? " locked" : "");
     card.innerHTML = `<span class="sh-ico">${sz.icon}</span><span class="sh-name">${sz.name}</span><small>${sz.size} × ${sz.size}</small>` +
-      `<span class="sh-price">${sz.level === cur.level ? "✓ Tu casa" : owned ? "Tuya" : `🍫✨ ${sz.price}`}</span>`;
+      `<span class="sh-price">${sz.level === cur.level ? "✓ Este cuarto" : owned ? "Ya lo superó" : `🍫✨ ${houseSizeCost(progress, sz.level)}`}</span>`;
     card.addEventListener("click", () => {
-      // siempre se puede mirar cómo se vería (aunque todavía no alcance para comprarla)
+      // siempre se puede mirar cómo se vería (aunque todavía no alcance para comprarlo)
       housePreviewSize = owned ? null : sz.size;
-      house3d && house3d.setSize(owned ? cur.size : sz.size); // tocar una que ya tienes vuelve a tu casa
+      house3d && house3d.setSize(owned ? cur.size : sz.size); // tocar el que ya tienes vuelve a tu cuarto
       renderHouse();
     });
     houseGridEl.appendChild(card);
   });
   const look = housePreviewSize && HOUSE_SIZES.find((z) => z.size === housePreviewSize);
   if (look) {
-    const next = look.level === cur.level + 1;
-    const need = look.price - progress.coins;
+    const cost = houseSizeCost(progress, look.level);
+    const need = cost - progress.coins;
     const txt = document.createElement("div");
     txt.className = "sh-bar-txt";
-    txt.innerHTML = `<b>${look.icon} ${look.name}</b> · ${look.size} × ${look.size} — ${look.blurb}`;
+    txt.innerHTML = `<b>${look.icon} ${look.name}</b> · ${look.size} × ${look.size} para <b>${room.name}</b> — ${look.blurb}`;
     const buy = document.createElement("button");
     buy.className = "btn-primary";
-    buy.textContent = !next ? "🔒 Compra primero la anterior" : need > 0 ? `Te faltan ${need} 🍫✨` : `Comprar · 🍫✨ ${look.price}`;
-    buy.disabled = !next || need > 0;
+    buy.textContent = need > 0 ? `Te faltan ${need} 🍫✨` : `Comprar · 🍫✨ ${cost}`;
+    buy.disabled = need > 0;
     buy.addEventListener("click", () => {
       if (!buyHouseSize(progress, look.level)) return;
       audio.playPurchase();
-      showToast(`¡Ahora tienes una ${look.name.toLowerCase()}! 🎉`);
+      showToast(`¡${room.name} ahora es ${look.name.toLowerCase()}! 🎉`);
       housePreviewSize = null;
       houseMode = "decor";
       renderHouse();
@@ -1140,12 +1164,12 @@ function renderHouseSize() {
     });
     const cancel = document.createElement("button");
     cancel.className = "btn-secondary";
-    cancel.textContent = "Volver a mi casa";
+    cancel.textContent = "Volver a como estaba";
     cancel.addEventListener("click", () => { clearSizePreview(); renderHouse(); });
     houseBarEl.append(txt, buy, cancel);
   } else {
     houseBarEl.className = "sh-bar hint";
-    houseBarEl.innerHTML = `<div class="sh-bar-txt">Toca una casa para <b>verla</b> antes de comprarla. ${cur.level >= HOUSE_SIZES.length - 1 ? "¡Ya tienes la más grande!" : `Próxima: <b>${HOUSE_SIZES[cur.level + 1].name}</b> por 🍫✨ ${HOUSE_SIZES[cur.level + 1].price}.`}</div>`;
+    houseBarEl.innerHTML = `<div class="sh-bar-txt">El tamaño es de <b>cada cuarto</b>: ahora estás en <b>${room.name}</b> (${cur.name.toLowerCase()}). Toca un tamaño para <b>verlo</b> antes de comprarlo; para otro cuarto, ábrelo primero con las flechas.</div>`;
   }
 }
 
