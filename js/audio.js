@@ -170,6 +170,9 @@ export function playCountdown(go = false) {
 export function playIntro() {
   try {
     if (muted) return;
+    // en el navegador el sonido solo se permite después de tocar la pantalla; en la app (Capacitor) sí suena de entrada
+    const ua = navigator.userActivation;
+    if (ua && !ua.hasBeenActive && !window.Capacitor) return;
     const c = getCtx();
     if (c.state === "suspended") c.resume();
     [392, 523, 659, 784].forEach((f, i) => tone(f, 0.9, "sine", 0.1, 0.25 + i * 0.16));
