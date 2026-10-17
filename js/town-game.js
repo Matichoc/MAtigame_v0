@@ -1044,9 +1044,7 @@ export class TownGame extends Game3D {
       box.querySelector(".td-name").textContent = n.def.name;
       box.querySelector(".td-text").textContent = text;
       box.classList.remove("hidden");
-      this.dialogOpen = true;
-      clearTimeout(this._dialogTimer);
-      this._dialogTimer = setTimeout(() => this._closeDialog(), 6500);
+      this.dialogOpen = true; // se queda abierto hasta que la niña lo toque (antes se cerraba solo a los 6 segundos y no alcanzaba a leerlo)
     }
   }
 

@@ -231,15 +231,17 @@ function refreshHubStats() {
 
 
 // ---------- ENERGÍA ----------
-const ENERGY_FULL = 100;
 const enDlg = document.getElementById("energy-dialog");
 let enOpen = false;
 function renderEnergy() {
   if (!progress) return;
   const i = energyInfo(progress);
   document.getElementById("hub-energy").textContent = String(i.v);
+  document.getElementById("hub-energy-max").textContent = String(i.max);
   const he = document.getElementById("house-energy-v");
   if (he) he.textContent = String(i.v);
+  const hm = document.getElementById("house-energy-max");
+  if (hm) hm.textContent = String(i.max);
   document.getElementById("hub-energy-next").textContent = i.v < i.max ? `+1 en ${fmtSecs(i.nextInSecs)}` : "";
   document.getElementById("hub-energy-dot").classList.toggle("hidden", !i.chestReady);
   document.getElementById("btn-energy").classList.toggle("low", i.v < 5);
@@ -646,7 +648,7 @@ async function openHousePreview() {
         if (ev.act !== "sleep") return;
         if (ev.type === "start" || ev.type === "tick") {
           startSleep(progress, 90);
-          if (energyInfo(progress).v >= ENERGY_FULL) house3d.holdAct = false;
+          { const ei = energyInfo(progress); if (ei.v >= ei.max) house3d.holdAct = false; }
           renderEnergy();
         } else if (ev.type === "end") { stopSleep(progress); house3d.holdAct = false; renderEnergy(); }
       });
