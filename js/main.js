@@ -1,6 +1,8 @@
 import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot, lockReason } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
+import { initSplash } from "./splash.js";
+import { IS_DEMO, demoAllows, showDemoWall } from "./demo.js";
 import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
@@ -32,6 +34,8 @@ let progress = null;
 let selectedCharacter = null;
 let shopCharacterId = CHARACTERS[0].id;
 
+initSplash(); // sello de inicio: lo primero que se ve
+if (IS_DEMO) document.getElementById("demo-banner").classList.remove("hidden"); // aviso de la versión de prueba (web)
 const screenProfiles = document.getElementById("screen-profiles");
 const screenHub = document.getElementById("screen-hub");
 const screenShop = document.getElementById("screen-shop");
@@ -71,6 +75,14 @@ const toastEl = document.getElementById("toast");
 
 // Instancias únicas de cada motor, creadas recién la primera vez que se juegan
 // y reutilizadas entre partidas y entre perfiles (ver rebind en playGame()).
+/** "Siguiente nivel": nueva vuelta si se terminó todo; en la demo de la web, el cartel de Google Play cuando el nivel de más adelante es de la app. */
+function goNextLevel(game) {
+  if (game._lapNext) { game.startNewLap(); return; }
+  const cid = game.missionId || game.gameId;
+  if (!demoAllows(cid, (game.level || 0) + 1)) { showDemoWall(); return; }
+  game.nextLevel();
+}
+
 const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, merge: null, aventura: null, ciudad: null, creador: null };
 
 let toastTimer = null;
@@ -239,6 +251,7 @@ function renderEnergy() {
   renderEnergyWays(i);
 }
 const enWaysEl = document.getElementById("en-ways");
+const enChestResultEl = document.getElementById("en-chest-wait");
 const enMissEl = document.getElementById("en-miss");
 let enNeed = 0;
 let enGame = "";
@@ -305,6 +318,7 @@ function openEnergy(need = 0, game = "", mid = false) {
   if (!progress) return;
   enNeed = need;
   enGame = game;
+  enChestResultEl.textContent = "";
   const i = energyInfo(progress);
   document.getElementById("en-icon").textContent = need ? "😴" : "⚡";
   document.getElementById("en-title").textContent = need ? "¡Matichico está cansado!" : "Tu energía";
@@ -324,7 +338,9 @@ document.getElementById("en-chest").addEventListener("click", () => {
   const r = claimEnergyChest(progress);
   if (!r) return;
   audio.playPurchase();
-  showToast(r.energy ? `🎁 ¡Cofre del tesoro! +${r.energy} ⚡ y +${r.coins} 🍫✨` : `🎁 ¡Cofre! Hoy ya tienes toda la energía extra, así que te da +${r.coins} 🍫✨`);
+  const msg = r.energy ? `🎁 ¡Cofre del tesoro! +${r.energy} ⚡ y +${r.coins} 🍫✨` : `🎁 ¡Cofre! Tu energía ya está en el tope (${energyInfo(progress).cap}), así que te da +${r.coins} 🍫✨`;
+  enChestResultEl.textContent = msg; // queda escrito en el diálogo (el aviso de abajo se tapaba con la ventana)
+  showToast(msg, 3500);
   refreshHubStats();
   renderEnergy();
 });
@@ -2265,10 +2281,10 @@ async function launchOrResume3d(key) {
       if (q("btn-retry")) q("btn-retry").addEventListener("click", () => game.retry());
       if (q("btn-menu")) q("btn-menu").addEventListener("click", goToHub);
       if (q("btn-gameover-menu")) q("btn-gameover-menu").addEventListener("click", goToHub);
-      if (q("btn-next")) q("btn-next").addEventListener("click", () => (game._lapNext ? game.startNewLap() : game.nextLevel()));
+      if (q("btn-next")) q("btn-next").addEventListener("click", () => goNextLevel(game));
       if (q("btn-win-menu")) q("btn-win-menu").addEventListener("click", goToHub);
       // Convención nueva: cualquier botón con data-action dentro de la pantalla.
-      const actions = { begin: () => game.beginPlaying(), next: () => (game._lapNext ? game.startNewLap() : game.nextLevel()), retry: () => game.retry(), restart: () => game.restart?.() ?? game.startRun(selectedCharacter, progress), menu: goToHub };
+      const actions = { begin: () => game.beginPlaying(), next: () => goNextLevel(game), retry: () => game.retry(), restart: () => game.restart?.() ?? game.startRun(selectedCharacter, progress), menu: goToHub };
       document.getElementById(`screen-${pre}`).querySelectorAll("[data-action]").forEach((btn) => {
         btn.addEventListener("click", () => actions[btn.dataset.action]?.());
       });

@@ -37,10 +37,10 @@ const ALL_ACHIEVEMENTS = [
   },
   {
     id: "tetris_master",
-    name: "Maestro del Tetris",
+    name: "Maestro de los Bloques",
     icon: "🧱",
     reward: 20,
-    desc: "Consigue 500 puntos en Tetris de Productos.",
+    desc: "Consigue 500 puntos en Bloques de Productos.",
     isDone: (p) => getBestScore(p, "tetris") >= 500,
   },
   {
@@ -264,7 +264,7 @@ chain("campana", "campanas", "Maestro de campañas", "🗺️", sum([...LEVEL_GA
 // Récords en cada juego
 const REC = (id, name, icon, metric, text, tiers, extra) => chain("puntajes", id, name, icon, metric, text, tiers, extra);
 REC("rec_recolecta", "Récord Recolecta", "🍬", best("recolecta"), "Consigue {n} puntos en Recolecta y Corre.", [[500, 15], [2500, 40], [6000, 100], [10000, 250]]);
-REC("rec_tetris", "Récord Tetris", "🧩", best("tetris"), "Consigue {n} puntos en Tetris de Productos.", [[1000, 15], [4000, 40], [10000, 100], [25000, 250]]);
+REC("rec_tetris", "Récord Bloques", "🧩", best("tetris"), "Consigue {n} puntos en Bloques de Productos.", [[1000, 15], [4000, 40], [10000, 100], [25000, 250]]);
 REC("rec_basquet", "Récord Básquet", "🏀", best("basquet_tiros"), "Consigue {n} puntos en Lanzamientos de Básquet.", [[500, 15], [1500, 40], [3000, 100], [6000, 250]]);
 REC("rec_porristas", "Récord Porristas", "🤸", best("porristas"), "Consigue {n} puntos en Saltos de Porristas.", [[100, 15], [300, 40], [700, 100], [1500, 250]]);
 REC("rec_memoria", "Récord Memoria", "🧠", best("memoria"), "Consigue {n} puntos en Memoria Matichoc.", [[3000, 15], [12000, 40], [30000, 100], [60000, 250]]);

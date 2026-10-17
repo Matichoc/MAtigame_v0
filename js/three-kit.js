@@ -5,6 +5,7 @@
 
 import * as THREE from "../vendor/three.module.min.js";
 import { getOutfit } from "./characters.js";
+import { IS_DEMO, demoAllows } from "./demo.js";
 import { addToLeaderboard, earnCoins, equippedOutfitId, getLook, reportScore, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
 import { recordRun, runBonus } from "./progression.js";
@@ -688,7 +689,8 @@ export class Game3D {
         const r = lapReward(this.progress, campId);
         nb.textContent = `🔄 Nueva vuelta (🍫✨ ${r.coins} y ${r.packs} 🎴)`;
         if (e.winTitle) e.winTitle.textContent = "🏆 ¡Completaste todos los niveles!";
-      } else nb.textContent = nb.dataset.orig;
+      } else if (IS_DEMO && !demoAllows(campId, level + 1)) nb.textContent = "📲 Sigue en la app";
+      else nb.textContent = nb.dataset.orig;
     }
     this.haptic(60);
     this.showOverlay("win");

@@ -9,7 +9,7 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 |---|---|---|
 | 👣 **Primeros pasos** | Juega tu primera partida de cualquier juego. | 10 |
 | 🍬 **Recolector Novato** | Consigue 100 puntos en Recolecta y Corre. | 20 |
-| 🧱 **Maestro del Tetris** | Consigue 500 puntos en Tetris de Productos. | 20 |
+| 🧱 **Maestro de los Bloques** | Consigue 500 puntos en Bloques de Productos. | 20 |
 | 🏆 **Campeón Matichoc** | Completa las 8 canchas de Recolecta y Corre. | 40 |
 | 👑 **Leyenda de La Liga** | Completa los 20 niveles de Recolecta y Corre. | 80 |
 | 💰 **Ahorrista de Cacao** | Gana 200 Matipuntos en total. | 30 |
@@ -65,7 +65,7 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | Logro | Meta | Premio (Matipuntos) |
 |---|---|---|
 | 🍬 **Récord Recolecta** | Consigue 500 puntos en Recolecta y Corre → Consigue 2.500 puntos en Recolecta y Corre → Consigue 6.000 puntos en Recolecta y Corre → Consigue 10.000 puntos en Recolecta y Corre | 10 / 25 / 60 / 150 |
-| 🧩 **Récord Tetris** | Consigue 1.000 puntos en Tetris de Productos → Consigue 4.000 puntos en Tetris de Productos → Consigue 10.000 puntos en Tetris de Productos → Consigue 25.000 puntos en Tetris de Productos | 10 / 25 / 60 / 150 |
+| 🧩 **Récord Bloques** | Consigue 1.000 puntos en Bloques de Productos → Consigue 4.000 puntos en Bloques de Productos → Consigue 10.000 puntos en Bloques de Productos → Consigue 25.000 puntos en Bloques de Productos | 10 / 25 / 60 / 150 |
 | 🏀 **Récord Básquet** | Consigue 500 puntos en Lanzamientos de Básquet → Consigue 1.500 puntos en Lanzamientos de Básquet → Consigue 3.000 puntos en Lanzamientos de Básquet → Consigue 6.000 puntos en Lanzamientos de Básquet | 10 / 25 / 60 / 150 |
 | 🤸 **Récord Porristas** | Consigue 100 puntos en Saltos de Porristas → Consigue 300 puntos en Saltos de Porristas → Consigue 700 puntos en Saltos de Porristas → Consigue 1.500 puntos en Saltos de Porristas | 10 / 25 / 60 / 150 |
 | 🧠 **Récord Memoria** | Consigue 3.000 puntos en Memoria Matichoc → Consigue 12.000 puntos en Memoria Matichoc → Consigue 30.000 puntos en Memoria Matichoc → Consigue 60.000 puntos en Memoria Matichoc | 10 / 25 / 60 / 150 |

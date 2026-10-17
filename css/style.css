@@ -87,7 +87,7 @@ h1, h2, h3 {
   padding: 12px 22px;
   border-radius: 999px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-  z-index: 999;
+  z-index: 10000; /* por encima de las ventanas (modal = 9000) para que los avisos se vean */
   max-width: 90vw;
   text-align: center;
   transition: opacity .3s ease, transform .3s ease;
@@ -1660,6 +1660,7 @@ details.how > :not(summary) { font-size: 0.85rem; margin: 6px 0 0; }
 .en-bar i { position: absolute; inset: 0 auto 0 0; width: 100%; background: linear-gradient(90deg, #ffd34d, #ff9d00); transition: width 0.4s; }
 .en-bar span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; color: #3d1f10; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
 .en-sub { font-size: 0.85rem; opacity: 0.85; }
+#en-chest-wait:not(:empty) { background: rgba(255, 200, 0, 0.2); border: 2px solid var(--dorado, #ffc800); border-radius: 12px; padding: 6px 10px; font-weight: 800; opacity: 1; }
 .en-card { max-height: 92vh; overflow-y: auto; }
 .en-card > * { flex-shrink: 0; }
 .en-miss { background: rgba(255, 90, 90, 0.2); border: 2px solid #ff8a8a; border-radius: 12px; padding: 6px 10px; font-size: 0.9rem; }
@@ -1855,7 +1856,7 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .lvl-reset { display: block; width: 100%; margin-top: 6px; padding: 7px 10px; border-radius: 12px; border: 2px dashed rgba(255, 255, 255, 0.5); background: transparent; color: #ffd0e6; font: inherit; font-weight: 800; font-size: 0.78rem; cursor: pointer; touch-action: manipulation; }
 
 /* "Cambiar mi nombre" (antes era un campo casi invisible al final de la columna) */
-.lb-rename { margin-top: 8px; border-radius: 12px; border: 2px solid rgba(255, 208, 230, 0.55); background: rgba(255, 255, 255, 0.07); padding: 6px 10px; color: #fff6e6; }
+.lb-rename { margin-top: 8px; border-radius: 12px; border: 2px solid rgba(255, 208, 230, 0.55); background: rgba(61, 31, 16, 0.94); padding: 6px 10px; color: #fff6e6; }
 .lb-rename summary { cursor: pointer; font-weight: 800; font-size: 0.85rem; color: #ffe9f3; list-style: none; }
 .lb-rename summary::-webkit-details-marker { display: none; }
 .lb-rename .field-label { display: block; margin: 6px 0 4px; font-size: 0.75rem; color: #ffd0e6; opacity: 1; }
@@ -1869,3 +1870,35 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .so-chip span { padding: 0 4px; font-weight: 700; white-space: nowrap; }
 .so-chip button { min-width: 30px; min-height: 30px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.18); color: inherit; font-size: 0.85rem; cursor: pointer; }
 .so-chip button:disabled { opacity: 0.25; cursor: default; }
+
+/* ---------- Sello de inicio ("Desarrollado por Matichoc") ---------- */
+#splash { position: fixed; inset: 0; z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.4vmin; overflow: hidden; cursor: pointer;
+  background: radial-gradient(ellipse at 50% 42%, #5e2c15 0%, #2b130a 55%, #100604 100%); transition: opacity 0.6s ease; }
+#splash.out { opacity: 0; pointer-events: none; }
+#splash.gone { display: none; }
+#splash .sp-pattern { position: absolute; inset: 0; background: url("../assets/brand/pattern-cacao-subtle.png") center / 220px; opacity: 0.07; }
+#splash .sp-glow { position: absolute; width: 90vmin; height: 90vmin; border-radius: 50%; background: radial-gradient(circle, rgba(255, 200, 0, 0.35) 0%, rgba(212, 33, 108, 0.18) 40%, transparent 70%); opacity: 0; }
+#splash .sp-by { position: relative; margin: 0; font-family: var(--font-body, sans-serif); font-weight: 800; font-size: clamp(0.8rem, 2.6vmin, 1.3rem); letter-spacing: 0.42em; text-transform: uppercase; color: #f3e3c3; opacity: 0; }
+#splash .sp-logo { position: relative; width: min(44vmin, 340px); aspect-ratio: 1; border-radius: 50%; overflow: hidden; opacity: 0; box-shadow: 0 0 0 0.6vmin rgba(255, 200, 0, 0.55), 0 0 6vmin rgba(255, 200, 0, 0.45), 0 1.5vmin 5vmin rgba(0, 0, 0, 0.6); }
+#splash .sp-logo img { display: block; width: 100%; height: 100%; }
+#splash .sp-shine { position: absolute; inset: 0; background: linear-gradient(110deg, transparent 38%, rgba(255, 255, 255, 0.85) 50%, transparent 62%); transform: translateX(-130%); }
+#splash .sp-tag { position: relative; margin: 0; font-family: var(--font-display, sans-serif); font-size: clamp(0.95rem, 3.2vmin, 1.6rem); color: var(--dorado, #ffc800); opacity: 0; letter-spacing: 0.04em; }
+#splash .sp-star { position: absolute; color: var(--dorado, #ffc800); font-size: clamp(1.2rem, 5vmin, 2.4rem); opacity: 0; text-shadow: 0 0 12px rgba(255, 200, 0, 0.9); }
+#splash .s1 { left: 22%; top: 28%; } #splash .s2 { right: 20%; top: 24%; } #splash .s3 { left: 26%; bottom: 26%; } #splash .s4 { right: 24%; bottom: 30%; }
+#splash.play .sp-glow { animation: sp-glow 3s ease-out 0.1s both; }
+#splash.play .sp-by { animation: sp-rise 0.9s ease-out 0.35s both; }
+#splash.play .sp-logo { animation: sp-pop 1.1s cubic-bezier(0.2, 1.25, 0.3, 1) 0.2s both; }
+#splash.play .sp-shine { animation: sp-sweep 1.1s ease-in-out 1.15s both; }
+#splash.play .sp-tag { animation: sp-rise 0.9s ease-out 1.3s both; }
+#splash.play .sp-star { animation: sp-twinkle 1.6s ease-in-out infinite; }
+#splash.play .s1 { animation-delay: 0.9s; } #splash.play .s2 { animation-delay: 1.2s; } #splash.play .s3 { animation-delay: 1.5s; } #splash.play .s4 { animation-delay: 1.05s; }
+@keyframes sp-pop { 0% { opacity: 0; transform: scale(0.55); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes sp-rise { 0% { opacity: 0; transform: translateY(14px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes sp-sweep { 0% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
+@keyframes sp-glow { 0% { opacity: 0; transform: scale(0.6); } 40% { opacity: 1; } 100% { opacity: 0.7; transform: scale(1); } }
+@keyframes sp-twinkle { 0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); } 50% { opacity: 1; transform: scale(1.1) rotate(25deg); } }
+@media (prefers-reduced-motion: reduce) { #splash.play * { animation-duration: 0.01s !important; animation-delay: 0s !important; } }
+
+/* aviso de la versión de prueba de la web */
+.demo-banner { margin: 6px 10px 0; padding: 7px 12px; border-radius: 12px; background: rgba(255, 200, 0, 0.3); border: 2px dashed var(--dorado-osc, #c99900); color: var(--marron-osc, #3d1f10); font-size: 0.82rem; text-align: center; line-height: 1.3; }
+@media (max-height: 520px) { .demo-banner { font-size: 0.72rem; padding: 4px 8px; margin-top: 3px; } }

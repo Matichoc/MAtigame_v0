@@ -157,8 +157,9 @@ export function claimEnergyChest(progress) {
   const now = Date.now();
   const e = energyOf(progress, now);
   if (now < e.chestAt) return null;
-  const energy = addEnergy(progress, CHEST_ENERGY, "cofre");
-  const coins = energy > 0 ? 5 : 8; // si ya no hay cupo de energía extra, se compensa con puntos
+  // el cofre siempre da su energía: no cuenta para el tope diario de extras (solo para el tope general de 300)
+  const energy = addEnergy(progress, CHEST_ENERGY, "cofre", { calendar: true });
+  const coins = energy > 0 ? 5 : 8; // si ya no cabe más energía (tope general), se compensa con puntos
   earnCoins(progress, coins);
   e.chestAt = now + CHEST_EVERY;
   saveProgress(progress);

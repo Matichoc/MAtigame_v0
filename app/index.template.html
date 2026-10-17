@@ -73,10 +73,19 @@
   <div class="modal-card">
     <div class="um-icon">🎮</div>
     <h2>¡Esto sigue en la app!</h2>
-    <p>Ya probaste lo primero de este juego. Para seguir jugando todos los niveles, descarga Matijuego en Google Play.</p>
+    <p>Ya probaste lo primero de este juego. <b>Matijuego completo</b> (todos los niveles y todos los juegos) llegará pronto a Google Play: ¡prepárate para seguir jugando!</p>
     <a id="demo-wall-link" class="btn-primary" target="_blank" rel="noopener">📲 Descargar en Google Play</a>
     <button id="demo-wall-close" class="btn-secondary" type="button">Seguir mirando</button>
   </div>
+</div>
+<!-- Sello de inicio (como al prender una consola): sale al abrir la app y cuando se vuelve después de un buen rato -->
+<div id="splash" aria-hidden="true">
+  <div class="sp-pattern"></div>
+  <div class="sp-glow"></div>
+  <p class="sp-by">Desarrollado por</p>
+  <div class="sp-logo"><img src="assets/brand/logo-badge.png" alt="Matichoc, pasión por el cacao"><i class="sp-shine"></i></div>
+  <p class="sp-tag">Matijuego · el arcade de Matichoc</p>
+  <span class="sp-star s1">✦</span><span class="sp-star s2">✦</span><span class="sp-star s3">✦</span><span class="sp-star s4">✦</span>
 </div>
 <div id="app">
 
@@ -131,6 +140,8 @@
           <button id="btn-switch-profile" class="btn-tiny">Cambiar</button>
         </div>
       </header>
+
+      <div id="demo-banner" class="demo-banner hidden">🧪 <b>Versión de prueba en la web:</b> algunos juegos traen solo 2 o 3 niveles. <b>Matijuego completo, próximamente en Google Play</b> 📲</div>
 
       <div class="lb-body">
         <aside class="lb-stage">
@@ -380,7 +391,7 @@
         <button id="tetris-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
         <img id="tetris-hud-avatar" class="hud-avatar" alt="">
         <div>
-          <div class="hud-level">Tetris de Productos</div>
+          <div class="hud-level">Bloques de Productos</div>
           <div class="hud-mission">Encaja las golosinas y completa líneas</div>
         </div>
       </div>
@@ -401,7 +412,7 @@
 
       <div id="tetris-overlay-intro" class="overlay hidden">
         <div class="overlay-card">
-          <h2>Tetris de Productos 3D</h2>
+          <h2>Bloques de Productos 3D</h2>
           <p class="fps-tag">Ahora en 3D</p>
           <details class="how"><summary>📖 Cómo se juega</summary>
           <p>Encaja las golosinas cayendo y completa líneas. ← → para mover,
