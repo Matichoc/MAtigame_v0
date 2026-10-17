@@ -13,7 +13,13 @@
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
 <link rel="preload" href="assets/fonts/baby-chipmunk.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="preload" href="assets/fonts/adorable-mother-script.otf" as="font" type="font/otf" crossorigin>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css"><!--WEB--><style>
+/* Enlaces del juego hacia matichoc.cl (solo en la web; la app no los lleva ni este estilo): discretos. Texto chico, sin íconos ni colores de marca,
+   para que el juego no empuje hacia la tienda. Siguen siendo legibles (color de texto de cada pantalla) y accesibles. */
+.site-links { gap: 2px 14px; margin: 18px 0 6px; }
+.site-links a, .lb-links a { color: inherit; font-weight: 400; font-size: 0.7rem; opacity: 1; }
+.site-links a:hover, .site-links a:focus-visible { text-decoration: underline; }
+</style><!--/WEB-->
 </head>
 <body>
 <div id="toast" class="toast hidden"></div>
@@ -97,9 +103,9 @@
         <h1 class="logo">Matijuego<span>el arcade de Matichoc</span></h1>
       </div>
       <!--WEB--><nav class="site-links" aria-label="Enlaces a matichoc.cl">
-        <a href="https://matichoc.cl/">← Volver a matichoc.cl</a>
-        <a href="https://matichoc.cl/pages/tienda.html">🍫 Tienda</a>
+        <a href="https://matichoc.cl/">matichoc.cl</a>
         <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
+        <a href="https://matichoc.cl/pages/tienda.html">Tienda</a>
       </nav><!--/WEB--><!--APP--><p class="app-credit">🍫 Un juego promovido por <b>Matichoc</b> · pasión por el cacao</p><!--/APP-->
       <p class="tagline">¿Quién juega? Cada perfil guarda su propio progreso.</p>
       <div id="profile-grid" class="profile-grid"></div>
@@ -174,9 +180,9 @@
           <div id="game-feature" class="lb-feature"></div>
           <div id="game-grid" class="game-grid lb-grid"></div>
           <!--WEB--><nav class="site-links lb-links" aria-label="Enlaces a matichoc.cl">
-            <a href="https://matichoc.cl/">← Volver a matichoc.cl</a>
-            <a href="https://matichoc.cl/pages/tienda.html">🍫 Tienda</a>
+            <a href="https://matichoc.cl/">matichoc.cl</a>
             <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
+            <a href="https://matichoc.cl/pages/tienda.html">Tienda</a>
           </nav><!--/WEB--><!--APP--><p class="app-credit">🍫 Un juego promovido por <b>Matichoc</b> · pasión por el cacao</p><!--/APP-->
         </main>
       </div>
