@@ -4,7 +4,7 @@ Revisión de precios hecha el 16-oct-2026 con los números reales del código (`
 
 ## ¿Cuánto gana un jugador?
 
-Estimación para una niña que juega ~1 hora al día (la energía es el freno: 100 al día + 10 por hora):
+Estimación para una niña que juega ~1 hora al día (la energía es el freno: **200 de tope y se recuperan 15 por hora**, así que se gasta y se va reutilizando):
 
 | Fuente | Matipuntos |
 |---|---|
@@ -37,7 +37,7 @@ Un legendario costaba **dos días** de juego y casi todo el guardarropa se compr
 | Agrandar un cuarto: Grande (acumulado) | 6 días en total | 1.800 (los últimos 900) |
 | Autos del garaje | 1,3 · 3 · 5 · 7 días | 400 · 900 · 1.500 · 2.100 |
 | Candados de juego | ≈ 1 semana | 2.000 |
-| Energía con Matipuntos (hasta 100) | gasto opcional | 80 por 20 ⚡, 10 veces al día |
+| Energía con Matipuntos (hasta el tope de 200) | gasto opcional | 80 por 20 ⚡, 10 veces al día |
 
 Con eso, llevar un cuarto de "pequeño" a "grande" cuesta 2.700 en total (el doble de lo que costó el cuarto, más el cuarto): un jugador promedio llega al tamaño más grande de su primer cuarto extra en unas 2 semanas. Quien juega más llega antes; quien juega menos, después.
 
@@ -69,4 +69,15 @@ Ropa (vestidos, tutús, uniformes cheer, falda de volantes, disfraz de gatita, v
 
 ## Cofre del tesoro (energía)
 
-Cada 40 minutos hay un cofre: **+10 ⚡ y +5 🍫✨**. Desde oct-2026 el cofre **no cuenta para el tope diario de energía extra (50)**, solo para el tope general de 300 ⚡ (antes, si ya habías llegado a los 50 extra del día por misiones, logros o niveles, el cofre daba solo puntos). El resultado queda escrito en la ventana de energía y el aviso aparece por encima de las ventanas.
+Cada 40 minutos hay un cofre: **+10 ⚡ y +5 🍫✨**. Desde oct-2026 el cofre **no cuenta para el tope diario de energía extra (100)**, solo para el tope general de 400 ⚡ (antes, si ya habías llegado a los 50 extra del día por misiones, logros o niveles, el cofre daba solo puntos). El resultado queda escrito en la ventana de energía y el aviso aparece por encima de las ventanas.
+
+## Energía (nov-2026): 200 de tope, 15 por hora
+
+- Tope de energía: **200** (antes 100). Recarga: **+1 cada 4 minutos (15 por hora)**; durmiendo en Mi Casa se recarga más rápido.
+- Energía extra por misiones, logros y niveles: hasta **100 por día**; tope total con extras: **400**.
+- En la actualización, la energía se reinicia **una sola vez** a 200 llenas (versión de energía 2). Matipuntos, ropa, casa, niveles, logros y todo lo demás se mantienen.
+- Consecuencia para la economía: con el doble de energía se juega más tiempo seguido, así que los ingresos por hora suben aproximadamente al doble en los juegos que pagan por partida. Si los precios se quedan cortos, el primer ajuste es subir los premios de las tiendas, no bajar la energía.
+
+## Parkour (nov-2026)
+
+La Aventura pasó a **7 etapas**: la 6 es el **Parkour Troll** (los bloques normales son trampa; solo se pisan las líneas rojas). Las líneas rojas sobre los bloques de las otras etapas hacen volver al último lugar seguro (en el Mundo infinito cuestan una vida). No cambian los premios de Matipuntos del Parkour.

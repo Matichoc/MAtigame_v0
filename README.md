@@ -9,7 +9,7 @@ Arcade web de Matichoc: cada persona elige su perfil, su Matichico (Matichico, C
 atuendos comprados en la tienda, para jugar cualquiera de los minijuegos
 disponibles con ese mismo personaje. **Los 13 juegos son 3D** (Three.js),
 con brillo (bloom), música generada en vivo, color vivo y un Matichico 3D que cambia con la tienda:
-**Parkour Choco** (estilo Roblox: **Mundo infinito** con 10 ambientes, poderes y récord de metros, o la Aventura de 6 etapas),
+**Parkour Choco** (estilo Roblox: **Mundo infinito** con 10 ambientes, poderes y récord de metros, o la Aventura de 7 etapas con líneas rojas que hacen perder, paredes, una casa para escalar y una etapa "Parkour Troll"),
 **Recolecta y Corre** (20 niveles 3D con guardias, cintas transportadoras, impulso y estrellas),
 **Bloques de Productos** (pieza guardada, cubos de poder, combos y 20 niveles),
 **Lanzamientos de Básquet** (5 posiciones, rachas, modo «en llamas» y 20 niveles),
@@ -101,7 +101,7 @@ js/characters.js      Definición/dibujo procedural de los Matichicos y atuendos
 js/games-catalog.js  Catálogo de modos de juego (disponibles y "próximamente")
 js/levels.js          Camino/corredor, obstáculos, coleccionables y misiones
 js/audio.js           Efectos de sonido generados con Web Audio API
-js/parkour-game.js    Parkour Choco 3D (obby estilo Roblox: Aventura de 6 etapas)
+js/parkour-game.js    Parkour Choco 3D (obby estilo Roblox: Aventura de 7 etapas, líneas rojas, paredes, casa y etapa troll)
 js/events.js          Eventos de temporada (fichas, decoración, objetos exclusivos)
 js/house-data.js, js/house3d.js  Mi Casa (cuarto decorable)
 js/wardrobe-pets.js   Mascotas flotantes del Vestuario
