@@ -1,5 +1,5 @@
 import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
-import { SLOTS, RARITIES, getItem, itemsOfSlot, lockReason } from "./wardrobe-data.js";
+import { SLOTS, RARITIES, getItem, itemsOfSlot, lockReason, CUSTOM_COLORS, CUSTOM_EMBLEMS, customizeOutfit, isHexColor } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
 import { initSplash } from "./splash.js";
 import { IS_DEMO, demoAllows, showDemoWall } from "./demo.js";
@@ -7,7 +7,7 @@ import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
-  loadProgress, saveProgress, ownsItem, getLook, equipItem, buyItem, wearers, canWear, takeOff, wardrobeCopies,
+  loadProgress, saveProgress, ownsItem, getLook, equipItem, setOutfitCustom, buyItem, wearers, canWear, takeOff, wardrobeCopies,
   getBestScore, getLeaderboard, canClaimDailyReward, claimDailyReward, claimAchievement,
 } from "./storage.js";
 import {
@@ -96,7 +96,7 @@ function showToast(message, ms = 2600) {
 /** Dibuja el retrato de un Matichico: primero el dibujo 2D (al instante) y luego el modelo 3D con todo lo que lleva puesto. */
 function paintAvatar(canvas, char, lookOverride = null, prog = progress) {
   const look = lookOverride || getLook(prog, char.id);
-  renderCharacterThumb(canvas, char, getOutfit(look.outfit));
+  renderCharacterThumb(canvas, char, customizeOutfit(getOutfit(look.outfit), look));
   import("./thumb3d.js")
     .then((m) => {
       m.renderHeroThumb(canvas, char, look);
@@ -2085,6 +2085,52 @@ function renderShop() {
   } else {
     shopBarEl.innerHTML = `<div class="sh-bar-txt">${wantOwn ? "Toca uno de tus objetos para ponértelo." : "Toca un objeto para probártelo antes de comprarlo. ¡Gana más Matipuntos jugando!"}</div>`;
   }
+  renderShopCustom(ch);
+}
+
+/** Prendas "a tu gusto" (como el Uniforme Cheer): con una sola compra eliges el color (cualquiera) y la figura del centro. */
+function renderShopCustom(ch) {
+  const box = document.getElementById("shop-custom");
+  if (!box) return;
+  const cur = shopTrial.outfit || getLook(progress, ch.id).outfit;
+  const item = shopSlot === "outfit" ? getItem(cur) : null;
+  box.classList.toggle("hidden", !(item && item.custom));
+  if (!(item && item.custom)) return;
+  const look = getLook(progress, ch.id);
+  const color = isHexColor(look.outfitColor) ? look.outfitColor.toUpperCase() : item.jersey.toUpperCase();
+  const emblem = CUSTOM_EMBLEMS.some((e) => e.id === look.outfitEmblem) ? look.outfitEmblem : item.params.emblem;
+  box.innerHTML = "";
+  const apply = (patch) => { setOutfitCustom(progress, ch.id, patch); renderShop(); refreshShopPreview(); };
+  const row1 = document.createElement("div");
+  row1.className = "sc-row";
+  row1.innerHTML = `<b>🎨 Color</b>`;
+  for (const c of CUSTOM_COLORS) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "sc-sw" + (c.toUpperCase() === color ? " on" : "");
+    b.style.background = c;
+    b.setAttribute("aria-label", `Color ${c}`);
+    b.addEventListener("click", () => apply({ outfitColor: c }));
+    row1.appendChild(b);
+  }
+  const pick = document.createElement("label");
+  pick.className = "sc-pick";
+  pick.title = "Cualquier color";
+  pick.innerHTML = `🌈 <span>Otro</span><input type="color" value="${color.toLowerCase()}" aria-label="Elegir cualquier color">`;
+  pick.querySelector("input").addEventListener("change", (e) => apply({ outfitColor: e.target.value }));
+  row1.appendChild(pick);
+  const row2 = document.createElement("div");
+  row2.className = "sc-row";
+  row2.innerHTML = `<b>✨ Figura del centro</b>`;
+  for (const e of CUSTOM_EMBLEMS) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "sc-em" + (e.id === emblem ? " on" : "");
+    b.innerHTML = `<span>${e.icon}</span><small>${e.name}</small>`;
+    b.addEventListener("click", () => apply({ outfitEmblem: e.id }));
+    row2.appendChild(b);
+  }
+  box.append(row1, row2);
 }
 
 // ---------- TABLA DE PUNTAJES ----------
