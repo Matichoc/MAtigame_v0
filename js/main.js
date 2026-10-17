@@ -1182,6 +1182,7 @@ function renderHouseStyle() {
     buy.textContent = need > 0 ? `Te faltan ${need} Matipuntos` : `Comprar · 🍫✨ ${titem.price}`;
     buy.disabled = need > 0;
     buy.addEventListener("click", () => {
+      const had = ownsHouseItem(progress, titem.id);
       if (!buyHouseItem(progress, titem.id)) return;
       delete houseTrial[houseSpot];
       audio.playPurchase();

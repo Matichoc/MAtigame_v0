@@ -11,7 +11,7 @@ Parkour, básquet, memoria y más: juegos 3D de Matichoc para niñas y niños
 
 Elige a tu Matichico, cámbiale peinado, ropa, sombreros y mucho más en la tienda con los Matipuntos que ganas jugando y juega 12 aventuras en 3D hechas con mucho cacao:
 
-🧗 PARKOUR CHOCO — ¡Un mundo infinito! Corre y salta por plataformas que se mueven, se rompen o parpadean a través de 10 mundos (praderas, caramelo, nubes, galaxias…), junta poderes 🧲🛡️⚡🦘 y bate tu récord de metros. También hay una aventura de 6 etapas con capa, gafas y corona.
+🧗 PARKOUR CHOCO — ¡Un mundo infinito! Corre y salta por plataformas que se mueven, se rompen o parpadean a través de 10 mundos (praderas, caramelo, nubes, galaxias…), junta poderes 🧲🛡️⚡🦘 y bate tu récord de metros. También hay una aventura de 7 etapas (con casa para escalar, paredes, líneas rojas y una etapa troll) con capa, gafas y corona.
 
 🏘️ PUEBLO MATICHOC — Pasea por un pueblo 3D con fuente de chocolate, boutique, fábrica y un arcade con puertas mágicas. Saluda a los vecinos, junta alfajores dorados y mira cómo se hace de noche.
 

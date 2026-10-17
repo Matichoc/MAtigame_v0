@@ -363,6 +363,18 @@ que no termina (`js/parkour-infinite.js`, mixin de `ParkourGame`):
 - Al terminar cada partida, Matipuntos extra según el puntaje (`Game3D.finish`).
 - La Aventura de 6 etapas sigue como modo aparte (elige al entrar).
 
+
+### Etapa 11c — Parkour más difícil y variado (nov-2026) ✅
+
+Pedido tras probarlo con la hija: "muy monótono y fácil". Cambios (`js/parkour-game.js`, `js/parkour-infinite.js`):
+
+- **Líneas rojas** sobre los bloques (`_addHazard`): si las pisas vuelves al último lugar seguro (en el Mundo infinito cuesta una vida; el escudo lo evita). Se saltan.
+- **Paredes** (`_addWall`): macizas, se pasan por el lado; algunas se deslizan de lado a lado ("barredoras").
+- **Casa para escalar** (figura `house`): balcones que suben por el costado, azotea con líneas rojas y una pared, y bajada saltando. Aparece en la etapa 2 y en el Mundo infinito.
+- **Etapa 6 "Parkour Troll"**: al revés. Los bloques normales son trampa (te devuelven) y solo se pisan las líneas rojas; una única ruta con señuelos (`_trollRoute`). La Cumbre pasó a ser la etapa 7.
+- **Arreglo**: las plataformas con flechas que nacían dentro de una figura (zigzag) no se movían (`amp` 0); ahora siempre se mueven. Tras una plataforma móvil ya no arranca una figura en el Mundo infinito (la barría).
+- Verificado con un bot que recorre toda la Aventura y el Mundo infinito por tramos sin atascos con las líneas rojas, las paredes, la casa y la etapa troll, y con una revisión de que ninguna plataforma se superpone con otra.
+
 ### Etapa 11c — Mi aventura: XP, misiones, racha y álbum ✅ (Fase 3 del plan)
 
 Para que haya una razón de volver cada día (`js/progression.js`, pantalla "Mi aventura"):
