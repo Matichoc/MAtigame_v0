@@ -7,7 +7,7 @@
 
 Arcade web de Matichoc: cada persona elige su perfil, su Matichico (Matichico, Chocolatina, Matichico Baller o Chocolatina Cheer: los personajes de matichoc.cl) y lo personaliza con
 atuendos comprados en la tienda, para jugar cualquiera de los minijuegos
-disponibles con ese mismo personaje. **Los 13 juegos son 3D** (Three.js),
+disponibles con ese mismo personaje. **Todos los juegos son 3D** (Three.js; 15 entradas en el menú de la app, ver `js/games-catalog.js`),
 con brillo (bloom), música generada en vivo, color vivo y un Matichico 3D que cambia con la tienda:
 **Parkour Choco** (estilo Roblox: **Mundo infinito** con 10 ambientes, poderes y récord de metros, o la Aventura de 7 etapas con líneas rojas que hacen perder, paredes, una casa para escalar y una etapa "Parkour Troll"),
 **Recolecta y Corre** (20 niveles 3D con guardias, cintas transportadoras, impulso y estrellas),
@@ -41,7 +41,7 @@ planeados (el hub ya muestra los 7, marcando cuáles están disponibles).
    juegos de tu perfil.
 3. Reclama tu **🎁 Recompensa diaria** (una vez por día, con racha) y revisa
    tus **🏅 Logros** — ambos dan Matipuntos extra.
-4. Elige un juego de la grilla: **Recolecta y Corre**, **Tetris de
+4. Elige un juego de la grilla: **Recolecta y Corre**, **Bloques de
    Productos**, **Lanzamientos de Básquet** y **Saltos de Porristas**
    están disponibles; el resto son los próximos modos del
    [`ROADMAP.md`](./ROADMAP.md). Cada tarjeta muestra tu mejor puntaje en
@@ -88,7 +88,8 @@ variables de `css/style.css`.
 ```
 index.html          Pantallas (perfiles, hub, tienda, puntajes, logros, juegos)
 assets/brand/        Logos, patrón e íconos oficiales (copiados de matichoc.cl)
-assets/fonts/        Baby Chipmunk y Adorable Mother Script (fuentes de marca)
+assets/fonts/        Baby Chipmunk y Adorable Mother Script (fuentes de marca; SIN comprobante de licencia comercial, ver docs/AUDITORIA-PREPUBLICACION.md)
+assets/fonts-libres/ Fredoka y Dancing Script (SIL OFL): sustitutas con MATIJUEGO_FONTS=libres
 assets/products/     Recortes de fotos reales de productos
 assets/games/        Capturas de cada juego (imagen de sus tarjetas en el menú)
 vendor/              Three.js (MIT) y sus efectos de postprocesado
@@ -147,30 +148,28 @@ sprites o spritesheets ilustrados más adelante sin tocar la lógica del juego.
 
 ## Ejecutar en local
 
-No requiere instalación. Basta con servir la carpeta como sitio estático,
-por ejemplo:
+La página sale de una plantilla (`app/index.template.html`) y se arma en dos variantes con `scripts/build.mjs`
+(la `index.html` de la raíz solo redirige a matichoc.cl/matijuego). Requiere Node 22:
 
 ```bash
-python3 -m http.server 8080
-# abrir http://localhost:8080
+npm ci
+npm run build:web                      # web-www/  (versión web completa)
+python3 -m http.server -d web-www 8080 # abrir http://localhost:8080
+# variante app (la que se empaqueta en Android): npm run build:app && npm run verify:app  → app-www/
 ```
 
-(Abrir `index.html` directamente con doble clic también funciona en la
-mayoría de navegadores, aunque un servidor local evita restricciones de
-módulos ES en algunos casos.)
+No abras `index.html` con doble clic: los módulos ES y las rutas necesitan un servidor.
+Pruebas de navegador (Playwright + Chromium, sin dependencias nuevas en el proyecto): ver `scripts/qa/` y
+`docs/AUDITORIA-PREPUBLICACION.md`.
 
 ## Despliegue
 
-El repo incluye un workflow de GitHub Actions
-(`.github/workflows/deploy-pages.yml`) que publica el sitio en GitHub Pages
-en cada push a `main`. Para activarlo:
-
-1. Ve a **Settings → Pages** del repositorio.
-2. En "Build and deployment", selecciona **GitHub Actions** como fuente.
-3. Haz push a `main`: el workflow construye y publica automáticamente.
-
-También puedes desplegarlo en cualquier hosting estático (Netlify, Vercel,
-Cloudflare Pages, etc.) apuntando a la raíz del repositorio.
+- **Web (producción)**: `MATIJUEGO_DEMO=1 node scripts/deploy-matiweb.mjs <ruta-a-matiweb>` arma `web-www/` y la copia a
+  `matijuego/` del repo `Matichoc/matiweb` (publica matichoc.cl/matijuego, incluida su página de política de privacidad
+  `matijuego/privacy.html`). El despliegue lo hace quien hace merge en matiweb.
+- **GitHub Pages de este repo**: `.github/workflows/deploy-pages.yml` publica **toda la raíz** del repositorio en cada push a
+  `main` (no es la web de producción: la raíz solo redirige a matichoc.cl).
+- **Android**: workflow "Compilar app Android" (`.github/workflows/android.yml`); pasos en `docs/PLAY-STORE.md`.
 
 ## Próximos pasos sugeridos
 
