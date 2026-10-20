@@ -1916,3 +1916,11 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .sc-em small { font-size: 0.66rem; }
 .sc-em.on { border-color: var(--dorado, #ffc800); background: rgba(255, 200, 0, 0.25); }
 @media (max-height: 520px) { .sh-custom { padding: 5px 8px; gap: 3px; } .sc-sw { width: 24px; height: 24px; } .sc-em { min-width: 48px; padding: 2px 4px; } .sc-em small { display: none; } }
+
+/* Privacidad y créditos/licencias: texto legal dentro de la app (iframe con privacy.html / licenses.html) */
+.legal-links { margin: 6px 0 2px; text-align: center; font-size: 0.74rem; }
+.legal-links .legal-open { background: none; border: 0; padding: 4px 2px; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; opacity: 0.85; }
+.legal-card { width: min(760px, 100%); height: min(92vh, 640px); text-align: left; }
+.legal-card h2 { text-align: center; }
+.legal-frame { flex: 1; min-height: 0; width: 100%; border: 0; border-radius: 12px; background: #fff8f0; }
+.legal-card .menu-secondary-row { flex: none; }

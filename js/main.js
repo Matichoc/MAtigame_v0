@@ -1782,7 +1782,32 @@ document.getElementById("um-buy").addEventListener("click", () => {
   renderGameGrid();
   playGame(entry.id);
 });
-document.getElementById("demo-wall-close").addEventListener("click", () => document.getElementById("demo-wall").classList.add("hidden"));
+document.getElementById("demo-wall-close")?.addEventListener("click", () => document.getElementById("demo-wall").classList.add("hidden"));
+
+// ---- Privacidad y créditos/licencias: se leen dentro del juego (iframe con privacy.html / licenses.html), sin abrir el navegador ----
+{
+  const dialog = document.getElementById("legal-dialog");
+  const frame = document.getElementById("legal-frame");
+  const title = document.getElementById("legal-title");
+  const swap = document.getElementById("legal-switch");
+  const PAGES = { privacy: ["Privacidad", "privacy.html", "📜 Créditos y licencias", "licenses"], licenses: ["Créditos y licencias", "licenses.html", "🔒 Privacidad", "privacy"] };
+  let current = "privacy";
+  const show = (which) => {
+    const [t, url, label] = PAGES[which];
+    current = which;
+    title.textContent = t;
+    swap.textContent = label;
+    frame.src = url;
+    dialog.classList.remove("hidden");
+    document.getElementById("legal-close").focus();
+  };
+  const close = () => { dialog.classList.add("hidden"); frame.src = "about:blank"; };
+  document.querySelectorAll(".legal-open").forEach((b) => b.addEventListener("click", () => show(b.dataset.legal)));
+  swap.addEventListener("click", () => show(PAGES[current][3]));
+  document.getElementById("legal-close").addEventListener("click", close);
+  dialog.addEventListener("click", (e) => { if (e.target === dialog) close(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !dialog.classList.contains("hidden")) close(); });
+}
 
 function playGame(gameId) {
   if (!selectedCharacter) {

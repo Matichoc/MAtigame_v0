@@ -446,11 +446,14 @@ export class CreadorGame extends Game3D {
     save.type = "button";
     save.disabled = r.saved;
     save.addEventListener("click", () => this._save());
-    const wa = el("button", "btn-whatsapp", "💬 Pedir algo parecido por WhatsApp");
-    wa.type = "button";
-    wa.addEventListener("click", () => window.open(whatsappUrl(c), "_blank", "noopener"));
-    // En la app de tienda (sin enlaces a matichoc.cl ni a WhatsApp) el botón no se muestra.
+    // En la app de tienda (sin enlaces a matichoc.cl ni a WhatsApp) el botón ni siquiera se crea.
     const inApp = document.documentElement.dataset.app === "1";
+    let wa = null;
+    if (!inApp) {
+      wa = el("button", "btn-whatsapp", "💬 Pedir algo parecido por WhatsApp");
+      wa.type = "button";
+      wa.addEventListener("click", () => window.open(whatsappUrl(c), "_blank", "noopener"));
+    }
     const again = el("button", "btn-secondary", "🔁 Crear otro");
     again.type = "button";
     again.addEventListener("click", () => { this.cfg = defaultCreation(); this.step = 0; this.view = "wizard"; this.touched = false; this.userYaw = 0; this._rebuild(true); this._renderPanel(); });

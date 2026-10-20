@@ -6,7 +6,8 @@
   "scripts": {
     "build:app": "node scripts/build.mjs app",
     "build:web": "node scripts/build.mjs web",
-    "sync:android": "npm run build:app && npx cap sync android"
+    "sync:android": "npm run build:app && npx cap sync android",
+    "verify:app": "node scripts/verificar-app.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
