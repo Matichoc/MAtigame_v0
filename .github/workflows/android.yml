@@ -15,6 +15,15 @@ on:
       version_code:
         description: "Número de versión interno (déjalo vacío: sube solo con cada compilación). Debe SUBIR en cada actualización"
         default: ""
+      release:
+        description: "Es una compilación para Play Store: si faltan los secretos de firma, la ejecución FALLA (en vez de saltarse el .aab)"
+        type: boolean
+        default: false
+      fonts:
+        description: "Tipografías: 'marca' (Baby Chipmunk / Adorable Mother Script) o 'libres' (SIL OFL, sin comprobante necesario). Ver docs/AUDITORIA-PREPUBLICACION.md"
+        type: choice
+        options: [marca, libres]
+        default: marca
   pull_request:
     paths:
       - "android/**"
@@ -61,9 +70,12 @@ jobs:
           "$SDKM" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Instalar dependencias y preparar la carpeta de la app
+        env:
+          MATIJUEGO_FONTS: ${{ inputs.fonts == 'libres' && 'libres' || '' }}
         run: |
           npm ci
           npm run build:app
+          npm run verify:app
           npx cap sync android
 
       - name: APK de prueba
@@ -75,17 +87,57 @@ jobs:
           name: matijuego-prueba-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
+      # Lo que de verdad quedó dentro del APK (no basta con mirar el código): permisos, copia de seguridad, librerías nativas y Choco Blaster.
+      - name: Comprobar el APK de prueba (manifest final y contenido)
+        run: |
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          AAPT2=$(ls "$ANDROID_HOME"/build-tools/36.0.0/aapt2)
+          echo "== Permisos"; "$AAPT2" dump permissions "$APK"
+          # DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION lo agrega AndroidX solo (permiso propio de la app, nivel "signature")
+          PERMS=$("$AAPT2" dump permissions "$APK" | grep -E "^uses-permission" | sed -E "s/.*name='([^']+)'.*/\\1/" | grep -v "\\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION$" | sort -u)
+          echo "Permisos pedidos (sin los internos de AndroidX): $PERMS"
+          if [ "$PERMS" != "android.permission.INTERNET" ]; then echo "::error::El APK pide permisos distintos de INTERNET"; exit 1; fi
+          echo "== Manifest (application)"; "$AAPT2" dump xmltree --file AndroidManifest.xml "$APK" | sed -n '1,60p'
+          echo "== Librerías nativas (16 KB): se espera ninguna"; unzip -l "$APK" | grep -E "\.so$" || echo "(ninguna)"
+          if unzip -l "$APK" | grep -Ei "assets/public/js/fps-|fps3d"; then echo "::error::Choco Blaster dentro del APK"; exit 1; fi
+          unzip -l "$APK" | grep -E "assets/public/(privacy|licenses)\.html" | wc -l | grep -qx 2 || { echo "::error::Faltan privacy.html o licenses.html en el APK"; exit 1; }
+
+      - name: Falta la llave de firma (solo si se pidió una compilación de tienda)
+        if: inputs.release == true && env.HAS_KEYSTORE != 'true'
+        run: |
+          echo "::error::Se pidió una compilación de Play Store (release) pero no están cargados los secretos ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS y ANDROID_KEY_PASSWORD (ver docs/PLAY-STORE.md)."
+          exit 1
+
       - name: Paquete firmado para Play Store (.aab)
         if: env.HAS_KEYSTORE == 'true'
         working-directory: android
         env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/upload.keystore"
+          umask 077
+          printf '%s' "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/upload.keystore"
           export KEYSTORE_PATH="$RUNNER_TEMP/upload.keystore"
           ./gradlew bundleRelease --no-daemon
+
+      # El .aab de tienda NO puede ir firmado con la llave de pruebas (pública, está en el repositorio).
+      - name: Comprobar la firma del .aab
+        if: env.HAS_KEYSTORE == 'true'
+        run: |
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
+          keytool -printcert -jarfile "$AAB" | grep -E "Owner|SHA256" || { echo "::error::El .aab no está firmado"; exit 1; }
+          FIRMA=$(keytool -printcert -jarfile "$AAB" | grep "SHA256:" | head -1 | sed 's/.*SHA256: *//')
+          PRUEBA=$(keytool -list -keystore android/app/matijuego-test.keystore -storepass matijuego 2>/dev/null | grep -i "SHA-\\?256" | head -1 | sed -E 's/^[^:]*: *//')
+          [ -n "$PRUEBA" ] || { echo "::error::No se pudo leer la huella de la llave de pruebas"; exit 1; }
+          if [ "$FIRMA" = "$PRUEBA" ]; then echo "::error::El .aab está firmado con la llave PÚBLICA de pruebas"; exit 1; fi
+          echo "Firma distinta de la llave de pruebas: OK"
+          echo "== Librerías nativas en el .aab (16 KB): se espera ninguna"; unzip -l "$AAB" | grep -E "\.so$" || echo "(ninguna)"
+
+      - name: Borrar la llave de firma del servidor
+        if: always()
+        run: rm -f "$RUNNER_TEMP/upload.keystore"
 
       - uses: actions/upload-artifact@v4
         if: env.HAS_KEYSTORE == 'true'
