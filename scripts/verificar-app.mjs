@@ -64,7 +64,11 @@ if (!existsSync(join(DIR, "vendor/THREE-LICENSE.txt"))) falla("Falta vendor/THRE
 const marca = existsSync(join(DIR, "assets/fonts"));
 const libres = existsSync(join(DIR, "assets/fonts-libres"));
 if (marca && libres) falla("Hay tipografías de marca Y libres a la vez");
-if (marca) avisos.push("Se distribuyen las tipografías de marca (Baby Chipmunk, Adorable Mother Script): sin comprobante de licencia comercial. Alternativa: MATIJUEGO_FONTS=libres.");
+if (marca && DIR.startsWith("app")) {
+  // Las tipografías de marca no tienen comprobante de licencia comercial: en la app solo se aceptan si alguien lo confirma de forma explícita.
+  if (process.env.MATIJUEGO_FONTS_LICENCIA_CONFIRMADA === "1") avisos.push("Se distribuyen las tipografías de marca con la licencia CONFIRMADA por el titular (MATIJUEGO_FONTS_LICENCIA_CONFIRMADA=1): conserva el comprobante.");
+  else falla("La app incluye las tipografías de marca (Baby Chipmunk, Adorable Mother Script) sin licencia comercial confirmada. Usa las libres (por defecto) o define MATIJUEGO_FONTS_LICENCIA_CONFIRMADA=1 solo si tienes el comprobante.");
+} else if (marca) avisos.push("Se distribuyen las tipografías de marca (Baby Chipmunk, Adorable Mother Script): sin comprobante de licencia comercial. Alternativa: MATIJUEGO_FONTS=libres.");
 if (!marca && !libres) falla("No hay ninguna tipografía");
 
 // resumen

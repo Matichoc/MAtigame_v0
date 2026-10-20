@@ -5,15 +5,14 @@
 //
 // Variables de entorno (todas opcionales):
 //   MATIJUEGO_DEMO=1      web en modo demo (ver js/demo.js)
-//   MATIJUEGO_FONTS=libres  usa tipografías de licencia libre (SIL OFL, assets/fonts-libres/) en vez de las de marca
-//                           (Baby Chipmunk / Adorable Mother Script), y NO copia las de marca al resultado.
+//   MATIJUEGO_FONTS=libres|marca  libres = tipografías de licencia libre (SIL OFL, assets/fonts-libres/) en vez de las de marca
+//                           (Baby Chipmunk / Adorable Mother Script) y NO se copian las de marca. Por defecto: libres en la app, marca en la web.
 //   MATIJUEGO_ONLINE=1    la app (Android) conserva la configuración del ranking en línea de js/online-config.js.
 //                         Sin esto, la app SIEMPRE sale con el ranking apagado y sin conexión a ningún servidor.
 import { cpSync, rmSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { basename } from "node:path";
 
-const FUENTES_LIBRES = process.env.MATIJUEGO_FONTS === "libres";
 // Tipografías de licencia libre que reemplazan a las de marca (mismos nombres de familia en el CSS: solo cambia el archivo).
 const FUENTES = {
   "assets/fonts/baby-chipmunk.ttf": ["assets/fonts-libres/fredoka-latin-600-normal.woff2", "font/woff2", "woff2"],
@@ -21,6 +20,10 @@ const FUENTES = {
 };
 
 const variant = process.argv[2];
+// Tipografías: la APP usa por defecto las de licencia libre (SIL OFL) porque las de marca no tienen comprobante de licencia comercial
+// (ver docs/AUDITORIA-PREPUBLICACION.md). Para usar las de marca en la app hay que pedirlo con MATIJUEGO_FONTS=marca (y confirmar la licencia al verificar).
+// La WEB (matichoc.cl/matijuego) conserva las de marca por defecto, como el resto del sitio; MATIJUEGO_FONTS=libres también sirve ahí.
+const FUENTES_LIBRES = process.env.MATIJUEGO_FONTS ? process.env.MATIJUEGO_FONTS === "libres" : variant === "app";
 if (!["app", "web"].includes(variant)) {
   console.error("Uso: node scripts/build.mjs app|web");
   process.exit(1);

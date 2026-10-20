@@ -20,23 +20,14 @@ on:
         type: boolean
         default: false
       fonts:
-        description: "Tipografías: 'marca' (Baby Chipmunk / Adorable Mother Script) o 'libres' (SIL OFL, sin comprobante necesario). Ver docs/AUDITORIA-PREPUBLICACION.md"
+        description: "Tipografías: 'libres' (SIL OFL; por defecto) o 'marca' (Baby Chipmunk / Adorable Mother Script: exige confirmar la licencia). Ver docs/AUDITORIA-PREPUBLICACION.md"
         type: choice
-        options: [marca, libres]
-        default: marca
-  pull_request:
-    paths:
-      - "android/**"
-      - "app/**"
-      - "js/**"
-      - "css/**"
-      - "assets/**"
-      - "capacitor.config.json"
-      - "package.json"
-      - "package-lock.json"
-      - "scripts/**"
-      - "resources/**"
-      - ".github/workflows/android.yml"
+        options: [libres, marca]
+        default: libres
+      fuentes_marca_con_licencia:
+        description: "Solo si eliges fonts=marca: confirmo que tengo licencia comercial de ambas tipografías (guarda el comprobante)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -71,7 +62,9 @@ jobs:
 
       - name: Instalar dependencias y preparar la carpeta de la app
         env:
-          MATIJUEGO_FONTS: ${{ inputs.fonts == 'libres' && 'libres' || '' }}
+          # en pull requests y por defecto: tipografías libres; las de marca solo si se pidió y se confirmó la licencia
+          MATIJUEGO_FONTS: ${{ inputs.fonts == 'marca' && 'marca' || 'libres' }}
+          MATIJUEGO_FONTS_LICENCIA_CONFIRMADA: ${{ inputs.fonts == 'marca' && inputs.fuentes_marca_con_licencia && '1' || '' }}
         run: |
           npm ci
           npm run build:app
@@ -91,7 +84,7 @@ jobs:
       - name: Comprobar el APK de prueba (manifest final y contenido)
         run: |
           APK=android/app/build/outputs/apk/debug/app-debug.apk
-          AAPT2=$(ls "$ANDROID_HOME"/build-tools/36.0.0/aapt2)
+          AAPT2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
           echo "== Permisos"; "$AAPT2" dump permissions "$APK"
           # DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION lo agrega AndroidX solo (permiso propio de la app, nivel "signature")
           PERMS=$("$AAPT2" dump permissions "$APK" | grep -E "^uses-permission" | sed -E "s/.*name='([^']+)'.*/\\1/" | grep -v "\\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION$" | sort -u)

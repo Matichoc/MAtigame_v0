@@ -88,8 +88,8 @@ variables de `css/style.css`.
 ```
 index.html          Pantallas (perfiles, hub, tienda, puntajes, logros, juegos)
 assets/brand/        Logos, patrón e íconos oficiales (copiados de matichoc.cl)
-assets/fonts/        Baby Chipmunk y Adorable Mother Script (fuentes de marca; SIN comprobante de licencia comercial, ver docs/AUDITORIA-PREPUBLICACION.md)
-assets/fonts-libres/ Fredoka y Dancing Script (SIL OFL): sustitutas con MATIJUEGO_FONTS=libres
+assets/fonts/        Baby Chipmunk y Adorable Mother Script (fuentes de marca; SIN comprobante de licencia comercial: solo la web las usa por defecto, ver docs/AUDITORIA-PREPUBLICACION.md)
+assets/fonts-libres/ Fredoka y Dancing Script (SIL OFL): las que usa la app por defecto (MATIJUEGO_FONTS=marca|libres cambia la elección)
 assets/products/     Recortes de fotos reales de productos
 assets/games/        Capturas de cada juego (imagen de sus tarjetas en el menú)
 vendor/              Three.js (MIT) y sus efectos de postprocesado
