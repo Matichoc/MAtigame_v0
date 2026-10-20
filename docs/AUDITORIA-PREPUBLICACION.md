@@ -29,7 +29,7 @@ Leyenda: ✅ comprobado · ⚠️ pendiente o con condiciones · ❌ bloquea (pu
 
 - **Qué se revisó**: instrucciones del repositorio y de matiweb (`CLAUDE.md`, skills), `docs/PLAY-STORE.md`, `docs/LEGAL-Y-TIENDAS.md`, `store/listing-es.md`, `scripts/build.mjs`, workflows (`android.yml`, `deploy-pages.yml`), `android/` (Gradle, manifest, `MainActivity`), `capacitor.config.json`, `package.json`/lockfile, todo `js/`, `css/`, `assets/`, `vendor/`, y la variante `app-www/` generada.
 - **Cómo se contrastó**: cada afirmación de cumplimiento de la documentación se buscó en el código (búsqueda estática) y, cuando fue posible, se comprobó ejecutando el juego en Chromium con un registro de **todas** las peticiones de red (comprobación dinámica).
-- **Qué NO se hizo** (por instrucción): push, merge, despliegues, publicaciones; no se generó ni se tocó ninguna llave de firma real ni secretos. Las llaves que aparecen en las pruebas del workflow son descartables y se crearon en `/tmp` solo para probar la lógica del script.
+- **Qué NO se hizo**: durante la revisión no hubo push, merge, despliegues ni publicaciones; después se autorizó **solo** subir las ramas de trabajo (sección 13). Sigue sin hacerse merge, despliegue ni publicación. No se generó ni se tocó ninguna llave de firma real ni secretos. Las llaves que aparecen en las pruebas del workflow son descartables y se crearon en `/tmp` solo para probar la lógica del script.
 
 ### Entorno de la revisión y sus límites
 | Recurso | Resultado |
@@ -125,7 +125,7 @@ Datos legales (razón social, RUT, domicilio, correo) **no se cambiaron**: son l
 
 #### 3.1.5 Ruta pública en matiweb (preparada, NO publicada)
 
-- Repositorio local `/home/user/matiweb`, rama `claude/matijuego-politica-privacidad` (commit local `f8a8905`, **sin push**): agrega `matijuego/privacy.html` (copia exacta de `app/privacy.html`) y una nota en `CLAUDE.md`. **No** toca `pages/privacidad.html` (política general de matichoc.cl).
+- Repositorio local `/home/user/matiweb`, rama `claude/matijuego-politica-privacidad` (commit `f8a890545958f70cca54e663ccf46376463fe9b9`, subido a esa rama; **sin merge ni despliegue**): agrega `matijuego/privacy.html` (copia exacta de `app/privacy.html`) y una nota en `CLAUDE.md`. **No** toca `pages/privacidad.html` (política general de matichoc.cl).
 - URL destino: `https://matichoc.cl/matijuego/privacy.html`. Es estable porque `matijuego/` se regenera con `scripts/deploy-matiweb.mjs`, que copia `web-www/` (que ahora incluye `privacy.html`): el despliegue la repone en vez de borrarla.
 - Estado de verificación: ✅ se abre bien servida desde la copia local (ver sección 4); 🔎 **no está publicada**, así que no se verificó la URL real. Antes de usarla en Play Console: hacer merge/despliegue en matiweb, abrirla **sin sesión** desde otra red y comprobar que carga (no PDF, no redirige a login) y que el texto es el de `app/privacy.html`.
 - Observación: la política general de matiweb (`pages/privacidad.html`, línea ~103) ya dice que el progreso del Matijuego no sale del dispositivo ni se envía a ningún servidor; coincide con esta versión. No se editó (los textos legales de matiweb requieren confirmación del dueño). Conviene que ahí se enlace la política del juego: decisión del dueño.
@@ -218,7 +218,7 @@ Hallazgos menores del manifest (no se cambiaron; no se pueden probar sin disposi
 | `npx cap sync android` | ✅ copia `app-www/` (3,9 MB, incluye `privacy.html` y `licenses.html`); no modifica archivos versionados |
 | `./gradlew assembleDebug`, `bundleRelease`, `aapt2`, `apksigner` | 🔎 **no ejecutables aquí**: sin Android SDK y sin acceso a `dl.google.com`/`maven.google.com` |
 | Manifest final y APK de prueba | 🔎 **no generados ni inspeccionados**. El último APK de CI (`matijuego-prueba-apk`) tampoco se pudo descargar para inspeccionarlo (almacenamiento de blobs bloqueado) |
-| Ejecuciones del workflow "Compilar app Android" en GitHub | ✅ las más recientes (`6b5b443`, run 39039680411, y `58ddaba`, run 38994099500) terminaron en verde; **eso no valida los cambios de esta rama**, que no se han subido |
+| Ejecuciones del workflow "Compilar app Android" en GitHub | ✅ las más recientes (`6b5b443`, run 39039680411, y `58ddaba`, run 38994099500) terminaron en verde; **eso no valida los cambios de esta rama**: la rama ya está subida, pero no hay pull request ni ejecución manual sobre ella, así que el workflow aún no ha corrido con estos cambios |
 
 #### 3.4.3 Workflow de GitHub (`.github/workflows/android.yml`)
 
@@ -302,7 +302,7 @@ Observado y **no** corregido (requiere decisión o dispositivo): ver 3.4.1 (File
 
 ## 6. Cambios realizados (archivos afectados)
 
-Rama `claude/prepublicacion-play` de `Matichoc/MAtigame_v0` (commits locales, **sin push**) y rama `claude/matijuego-politica-privacidad` de `Matichoc/matiweb` (commit local, **sin push**).
+Rama `claude/prepublicacion-play` de `Matichoc/MAtigame_v0` y rama `claude/matijuego-politica-privacidad` de `Matichoc/matiweb` (ambas subidas; SHAs en la sección 13).
 
 | Área | Archivos |
 |---|---|
@@ -419,11 +419,11 @@ Marca cada una con fecha y modelo de teléfono. **Bloque A: antes de pruebas int
 ## 11. Pendientes priorizados
 
 **Antes de pruebas internas (en este orden)**
-1. Subir esta rama y correr "Compilar app Android" en GitHub **con `release` y tus secretos de firma** (cargados solo en GitHub); revisar los pasos de comprobación de APK y firma del `.aab`. *(Lo que más reduce incertidumbre: nada del Gradle se ejecutó aquí.)*
+1. Correr "Compilar app Android" sobre esta rama (abrir un pull request o lanzarlo a mano) en GitHub **con `release` y tus secretos de firma** (cargados solo en GitHub); revisar los pasos de comprobación de APK y firma del `.aab`. *(Lo que más reduce incertidumbre: nada del Gradle se ejecutó aquí.)*
 2. Corregir lo que arroje el workflow si algo falla (los scripts de comprobación nunca se ejecutaron en GitHub).
 3. Instalar el APK en un teléfono real y hacer el **bloque A** de la sección 9 (primera carga, modo avión, atrás, rotación, segundo plano, audio, rendimiento, actualización).
 4. Decidir tipografías (para pruebas internas sirve cualquiera; el aviso queda a la vista).
-5. Desplegar la página de la política en matiweb (rama local ya preparada) **solo cuando decidas**, y abrir `https://matichoc.cl/matijuego/privacy.html` sin sesión para confirmarla.
+5. Desplegar la página de la política en matiweb (rama ya subida, sin merge) **solo cuando decidas**, y abrir `https://matichoc.cl/matijuego/privacy.html` sin sesión para confirmarla.
 
 **Antes de producción**
 6. Comprobante de licencia de tipografías **o** build `libres` (sección 10, ❌).
@@ -446,3 +446,16 @@ Marca cada una con fecha y modelo de teléfono. **Bloque A: antes de pruebas int
 | bcn.cl (leyes), inapi.cl, ftc.gov | — | **no consultados** |
 | Metadatos de los archivos de fuentes (fontTools 4.67), `package.json`/licencias de `node_modules`, POM de `org.apache.cordova:framework:14.0.1` en Maven Central | tipografías, MIT, Apache-2.0 | citados en 3.3 |
 
+## 13. Ramas y commits (estado al subirlas)
+
+Verificación previa a la subida: el diff contra `origin/main` solo contiene archivos de código, documentación, textos de licencia, imágenes de la ficha y scripts; **ningún** keystore, llave, `.apk`/`.aab`, `node_modules`, `app-www/`, `web-www/`, `local.properties`, `.env` ni artefacto de compilación (la única llave versionada, `android/app/matijuego-test.keystore`, es la pública de pruebas que ya estaba en el repositorio y no forma parte de estos cambios); búsqueda de patrones de secretos (claves privadas, tokens de GitHub/AWS/Google/Slack, JWT, `service_role`, cadenas base64 largas) sin coincidencias en el contenido añadido, salvo la contraseña de una llave **descartable** que `scripts/qa/probar-logica-workflow.sh` crea y borra en un directorio temporal.
+
+| Repositorio | Rama | Commit | Mensaje |
+|---|---|---|---|
+| `Matichoc/MAtigame_v0` | `claude/prepublicacion-play` | `e19e5be27d69b7cadd53e5da3086eb4f6e9fa78a` | Privacidad y licencias dentro de la app; la app sale siempre con el ranking apagado y se verifica el paquete |
+| `Matichoc/MAtigame_v0` | `claude/prepublicacion-play` | `864371e842abebdc69433c11937b2b0f738502e9` | Workflow Android: comprobar permisos, contenido y firma; secretos por entorno; entradas release y fonts |
+| `Matichoc/MAtigame_v0` | `claude/prepublicacion-play` | `c57b719f066da5029c047f7910dc6ba4f9d1c6db` | Ficha, capturas y documentación de prepublicación; pruebas de navegador reproducibles; informe de auditoría |
+| `Matichoc/MAtigame_v0` | `claude/prepublicacion-play` | (commit siguiente: ver `git log`) | Informe: estado de ramas tras la subida |
+| `Matichoc/matiweb` | `claude/matijuego-politica-privacidad` | `f8a890545958f70cca54e663ccf46376463fe9b9` | Matijuego: página pública de la política de privacidad (matijuego/privacy.html), preparada sin publicar |
+
+Sin pull requests, sin merge, sin despliegue y sin publicación. La página `https://matichoc.cl/matijuego/privacy.html` **no existe todavía** en producción: solo se publicará cuando alguien haga merge del cambio de matiweb y se despliegue.
