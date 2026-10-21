@@ -6,6 +6,18 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-21
 
+### Regla nueva: la bitácora no lleva PR propio
+- Decisión de la persona dueña: no abrir PRs solo para la bitácora. Su commit va en el PR que esté abierto o, si no hay ninguno, en el siguiente. Anotado en `CLAUDE.md`.
+
+### Compilación nº 74: versión para la prueba cerrada en Google Play
+- Desde `main` `d31fde0` (merge del #42: "atrás" cierra todos los cuadros), con `release`, `fonts=libres` e **`icono=habitual`** (el Matichico). Decisión de la persona dueña: el ícono habitual, para que sea simple.
+- Versión 1.0.0, `versionCode` 74. Todos los pasos en verde: APK de prueba revisado y `.aab` firmado con la llave de subida (no con la de pruebas). La llave se borró del servidor.
+- Artefactos: https://github.com/Matichoc/MAtigame_v0/actions/runs/39633296344 (`matijuego-prueba-apk` y `matijuego-play-store-aab`).
+- Pendiente: probar en el celular que "atrás" cierra Energía y Calendario. Después, crear la app en Play Console y subir este `.aab` a la prueba cerrada.
+
+### PR #42 mergeado
+- "Atrás" cierra Energía, Calendario, Canje y Ranking.
+
 ### Cuenta de Google Play validada
 - La persona dueña informa que Google **validó su cuenta de desarrollador** (cuenta personal). Ya se puede crear la app en Play Console.
 - Siguiente: merge del #42 → compilar el `.aab` definitivo → crear la app en Play Console → prueba cerrada (cuenta personal nueva: al menos 12 testers durante 14 días, según la consola) → solicitar acceso a producción.
