@@ -1,6 +1,6 @@
 # Temporadas: arte del evento en la app, en Android y en Google Play
 
-Halloween ("Noche de Cacao") es la primera temporada con arte propio. Este documento explica cómo se elige el arte, qué se cambia solo y qué se cambia a mano, y cómo agregar otra temporada.
+Todos los eventos de `js/events.js` tienen arte propio: San Valentín, Pascua, Día de las Niñas y Niños (`dianino`), Fiestas Patrias, Halloween y Navidad. Además hay un arte **habitual** para la pantalla de carga cuando no hay evento. La hoja `docs/temporadas/resumen-temporadas.png` muestra todos los íconos y artes juntos, y `docs/temporadas/capturas/carga-todas-telefono.jpg` las 7 pantallas de carga en un teléfono. Este documento explica cómo se elige el arte, qué se cambia solo y qué se cambia a mano, y cómo agregar otra temporada.
 
 ## 1. El calendario es el que ya existía (`js/events.js`)
 
@@ -109,3 +109,11 @@ Si un evento no tiene arte, no hay que hacer nada: se ve lo habitual.
 - El logo de Matichoc dibujado en la polera del Matichico **se deja como está**, como parte de la ilustración.
 - El ícono de Halloween muestra al personaje y el habitual muestra el logo del cacao: **aceptado**.
 - Las imágenes las **generó la propia persona dueña** con una herramienta de IA. Antes de subirlas a la tienda conviene guardar de qué herramienta salieron y revisar sus condiciones de uso comercial. No se pudieron consultar desde este entorno: openai.com no responde.
+
+## 9. Todas las temporadas y el arte habitual (21-10-2026)
+
+- Originales en `resources/temporadas/<id>/` (`habitual`, `sanvalentin`, `pascua`, `dianino`, `patrias`, `halloween`, `navidad`). La carpeta `ninez` de Drive corresponde al evento `dianino`. Cada una trae su `recortes.json` calibrado a ojo.
+- Todas las imágenes generadas traen el título "Matjuego" y la insignia aproximada: quedan fuera de los recortes, igual que en Halloween. En algunas queda una franja mínima del borde del título, tapada por el difuminado del borde.
+- **Pantalla de carga**: el evento activo usa su arte; sin evento, el **habitual**. Si una imagen no carga, se ve el sello con el logo.
+- **Ícono**: con `icono=evento` se usa el de la temporada activa ese día (las 6 tienen). **El ícono habitual sigue siendo el logo del cacao**: hay un ícono habitual con el personaje listo en `resources/temporadas/habitual/android` y `store/temporadas/habitual/icon-512.png`, pero no se aplica hasta que la persona dueña lo decida.
+- Comprobado en el navegador (`scripts/qa/temporada.cjs`): cada evento en su fecha real muestra su arte y no pide imágenes de otras temporadas; sin evento se ve el habitual; un evento sin arte propio usa el habitual.

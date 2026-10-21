@@ -72,9 +72,10 @@ if (marca && DIR.startsWith("app")) {
 if (!marca && !libres) falla("No hay ninguna tipografía");
 
 // arte de temporada (js/season-art.js): cada imagen nombrada debe venir dentro de la app (si falta, se vería el sello habitual y quedaría una petición fallida)
-const season = readFileSync(join(DIR, "js/season-art.js"), "utf8");
-for (const m of season.matchAll(/["'](assets\/temporadas\/[^"']+)["']/g)) {
-  if (!existsSync(join(DIR, m[1]))) falla(`Falta el arte de temporada ${m[1]} (lo nombra js/season-art.js): genera los recursos con scripts/temporada-recursos.mjs (ver docs/TEMPORADAS.md)`);
+const seasons = [...readFileSync(join(DIR, "js/season-art.js"), "utf8").matchAll(/\bart\("([a-z0-9-]+)"/g)].map((m) => m[1]);
+if (!seasons.includes("habitual")) falla("js/season-art.js no tiene el arte habitual");
+for (const id of seasons) {
+  for (const f of [`assets/temporadas/${id}/carga.webp`, `assets/temporadas/${id}/carga-fondo.webp`]) if (!existsSync(join(DIR, f))) falla(`Falta el arte de temporada ${f} (${id}, en js/season-art.js): genera los recursos con scripts/temporada-recursos.mjs (ver docs/TEMPORADAS.md)`);
 }
 
 // resumen
