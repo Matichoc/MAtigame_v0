@@ -193,7 +193,7 @@ Salvedades:
 | Identificador | `cl.chocojuego.matichoc` (`applicationId`, `namespace`, `appId` de Capacitor, `strings.xml`) | ✅ coherente; **no se puede cambiar una vez publicada** |
 | SDK | `minSdk 24`, `compileSdk 36`, `targetSdk 36` | ✅ cumple el requisito de Play vigente (ver fuentes: desde el 31-ago-2026 las apps nuevas deben apuntar a API 36) |
 | AGP / Gradle / Java | AGP 8.13.0, Gradle 8.14.3 (`-all`, sin `distributionSha256Sum`), Java 21 | ✅ compila en CI (ejecuciones en verde). ⚠️ conviene fijar el hash de Gradle y revisar que sigan vigentes |
-| Capacitor | 8.5.3 (`^8.0.0` en `package.json`, versión exacta en el lockfile), sin plugins nativos (`capacitor.plugins.json` = `[]`) | ✅ superficie nativa mínima |
+| Capacitor | 8.5.3 (`^8.0.0` en `package.json`, versión exacta en el lockfile), un solo plugin nativo, `@capacitor/app` 8.1.2 (MIT; sin permisos en su manifest), agregado solo para el botón "atrás" del celular (sección 15); antes `capacitor.plugins.json` era `[]` | ✅ superficie nativa mínima |
 | Manifest (repositorio) | permiso `INTERNET`; `allowBackup=true`; actividad principal `exported=true` (necesario) con `singleTask`; `FileProvider` no exportado | ✅/⚠️ ver abajo |
 | `capacitor.config.json` | `allowMixedContent: false`, `webContentsDebuggingEnabled: false` | ✅ |
 | Versionado | `versionCode` = `VERSION_CODE` (número de ejecución del workflow) y `versionName` = `VERSION_NAME` (por defecto `1.0.0`) | ✅ sube solo; debe ser mayor en cada subida a Play |
@@ -262,7 +262,7 @@ Entorno: Node 22.22.0, npm 10.9.4, Java 21.0.12, Chromium 141.0.7390.37, Playwri
 | Comando | Resultado |
 |---|---|
 | `npm ci` | ✅ terminó sin errores (`package-lock.json` coherente) |
-| `npm ls --omit=dev` | `@capacitor/android@8.5.3`, `@capacitor/core@8.5.3` (+ `tslib@2.6.2`) |
+| `npm ls --omit=dev` | `@capacitor/android@8.5.3`, `@capacitor/core@8.5.3` (+ `tslib@2.6.2`); desde la sección 15 también `@capacitor/app@8.1.2` |
 | `npm audit --omit=dev` | ✅ 0 vulnerabilidades |
 | `npm audit` (con desarrollo) | 7 (3 moderadas, 3 altas, 1 crítica) en `xcode`/`@trapezedev/*`, herramientas de `@capacitor/assets`; **no van en el paquete** |
 | `node scripts/build.mjs app` | ✅ `app-www/` (110 archivos, 3,5 MB; sin `fps-*.js` ni `fps3d.jpg`) |
@@ -473,3 +473,17 @@ Un revisor independiente reprodujo la preparación sobre los commits `cbb0f4d159
 Observación adicional del revisor, incorporada: AGP usa por defecto Build Tools 35.0.0 aunque el workflow instala 36.0.0; el paso de `aapt2` ya no fija la versión (toma la más reciente instalada). El APK de revisión que el revisor generó no está en el repositorio: el revisor conserva su propio `matijuego-prueba-fuentes-libres.apk`; no se agregó ningún artefacto de compilación a Git.
 
 Lo que el revisor deja **sin resolver y se mantiene abierto aquí**: validar una ejecución del workflow con estos commits y el `.aab` firmado con la llave de subida; pruebas en Android real; licencias transitivas; comprobantes de derechos; publicación y verificación de la URL de privacidad; revisión humana de promoción de alimentos a menores, marca y declaración de anuncios (sección 7). **No se declara listo para producción.**
+
+## 15. Botón "atrás" del celular (21-oct-2026)
+
+**Hallazgo (prueba real de la persona dueña, APK de la ejecución nº 71 en un Android):** el botón "atrás" del teléfono cerraba la app de inmediato incluso en el menú principal, y dentro de un juego también salía de la app en vez de volver al menú.
+
+**Causa:** la app no tenía el plugin `@capacitor/app` (confirmado en el código fuente de Capacitor 8: sin ese plugin el botón de Android lo maneja la actividad y la cierra).
+
+**Cambio:** se agrega `@capacitor/app` 8.1.2 (licencia MIT; su `AndroidManifest.xml` no declara permisos) y un bloque en `js/main.js` que solo actúa dentro de la app (si existe `window.Capacitor` nativo; en la web no hace nada). Comportamiento: con un cuadro abierto, lo cierra; en una pantalla interna (tienda, casa, logros, puntajes, álbum), vuelve al menú; dentro de un juego, avisa "Toca otra vez para volver al menú" y a la segunda pulsación (en 2 s) vuelve al menú; en el menú principal avisa "Toca otra vez para salir" y a la segunda pulsación sale de la app. Se actualizaron `android/app/capacitor.build.gradle` y `android/capacitor.settings.gradle` (generados por `cap sync`) y la página de créditos.
+
+**Comprobado aquí (navegador, plugin simulado):** `node scripts/qa/atras.cjs` → 13/13 (registro del botón, aviso en el menú, salida en la segunda pulsación, caducidad del aviso a los 2 s, tienda, cuadro de Privacidad, juego y vuelta al menú, 0 errores, 0 externas).
+
+**No comprobado (pendiente en un Android real):** que el botón físico/gesto de "atrás" llegue de verdad al aviso y que la segunda pulsación cierre la app; que el APK compilado siga mostrando solo el permiso `INTERNET` (el workflow lo comprueba y falla si aparece otro); el gesto de "atrás" por deslizamiento en Android 13+ (predictive back).
+
+**Riesgo conocido:** si por un fallo no se registrara el oyente, con el plugin instalado el botón "atrás" no haría nada en vez de cerrar la app; por eso la prueba en el celular es obligatoria antes de subir el `.aab`.
