@@ -109,7 +109,15 @@ async function alMenu(p) {
       if (!ini || !(await p.$(ini))) r.sinInicio = true;
       else {
         if (AUTOPRUEBA && g.id === "tetris") await p.evaluate((sel) => { const b = document.querySelector(sel); b.replaceWith(b.cloneNode(true)); }, ini); // el clon no conserva los eventos: el inicio "no hace nada"
-        await p.click(ini, { timeout: 5000 }).catch(() => { r.sinInicio = true; });
+        // se espera una condición real de inicio (el botón visible y habilitado: los mundos 3D grandes, como el Pueblo,
+        // tardan en armarse en un equipo lento) y, si el clic falla, se guarda el error completo (no se oculta ni se relaja nada)
+        try {
+          await p.waitForSelector(ini, { state: "visible", timeout: 20000 });
+          await p.click(ini, { timeout: 10000 });
+        } catch (err) {
+          r.sinInicio = true;
+          r.errorInicio = String(err && err.message || err);
+        }
       }
       await p.waitForTimeout(1500);
       // ¿salió de la tarjeta de inicio? (el botón desaparece o el juego queda en "playing")
@@ -133,11 +141,11 @@ async function alMenu(p) {
       r.camposPorEntrada = cambios(f1, f2).filter((k) => !solos.has(k)).slice(0, 8);
       r.respondeAEntrada = r.camposPorEntrada.length > 0;
       await p.screenshot({ path: `${OUT}/${g.id}.png` });
-    } catch (err) { r.fallo = String(err.message).split("\n")[0]; }
+    } catch (err) { r.fallo = String(err.message).split("\n")[0]; r.falloCompleto = String(err.message); }
     r.errores = reg.errores.slice(e0); r.fallidas = reg.fallidas.slice(f0); r.externas = reg.externas.slice(x0);
     r.ok = !r.fallo && r.pantalla && r.iniciado && r.respondeAEntrada && !r.errores.length && !r.fallidas.length && !r.externas.length;
     salida.juegos[g.id] = r;
-    console.log(`${r.ok ? "OK " : "MAL"} ${g.id}${r.fallo ? " · " + r.fallo : ""}${r.sinInicio ? " · el inicio falló" : ""}${!r.iniciado ? " · no salió de la tarjeta de inicio" : ""}${r.iniciado && !r.respondeAEntrada ? " · sin respuesta a las entradas" : ""}${r.errores.length ? " · errores: " + r.errores[0].slice(0, 120) : ""} · campos por entrada: ${(r.camposPorEntrada || []).slice(0, 3).join(", ") || "ninguno"}`);
+    console.log(`${r.ok ? "OK " : "MAL"} ${g.id}${r.fallo ? " · " + r.fallo : ""}${r.sinInicio ? " · el inicio falló" + (r.errorInicio ? ` (${r.errorInicio.split("\n")[0]})` : "") : ""}${!r.iniciado ? " · no salió de la tarjeta de inicio" : ""}${r.iniciado && !r.respondeAEntrada ? " · sin respuesta a las entradas" : ""}${r.errores.length ? " · errores: " + r.errores[0].slice(0, 120) : ""} · campos por entrada: ${(r.camposPorEntrada || []).slice(0, 3).join(", ") || "ninguno"}`);
   }
   salida.peticionesExternas = reg.externas;
   salida.totalPeticiones = reg.peticiones.length;
