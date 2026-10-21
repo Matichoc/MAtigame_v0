@@ -1812,26 +1812,32 @@ document.getElementById("demo-wall-close")?.addEventListener("click", () => docu
 // ---- Botón "atrás" del celular (solo en la app Android; en la web no existe window.Capacitor) ----
 // Cuadro abierto: lo cierra. Pantalla interna (tienda, casa…): vuelve al menú. Dentro de un juego: avisa y, al tocar otra vez, vuelve al menú.
 // En el menú: avisa y, al tocar otra vez, sale de la app.
+// La app no usa empaquetador, así que no está @capacitor/core (ni su registerPlugin): se habla directo con el puente nativo
+// que Android inyecta en window.Capacitor (addListener / nativeCallback), y solo si el plugin App viene en la app.
 {
   const cap = window.Capacitor;
-  const appPlugin = cap?.isNativePlatform?.() && cap.registerPlugin ? cap.registerPlugin("App") : null;
-  if (appPlugin) {
+  const hasApp = !!cap && cap.isNativePlatform?.() && typeof cap.addListener === "function" && typeof cap.nativeCallback === "function"
+    && (cap.PluginHeaders || []).some((h) => h.name === "App");
+  if (hasApp) {
     const INNER_BACK = [[screenHouse, "btn-house-back"], [screenProgress, "btn-progress-back"], [screenAchievements, "btn-achievements-back"], [screenShop, "btn-shop-back"], [screenLeaderboard, "btn-leaderboard-back"]];
+    const exitApp = () => cap.nativeCallback("App", "exitApp", {});
     let armedAt = 0;
     const twice = (message, action) => {
       if (Date.now() - armedAt < 2000) { armedAt = 0; action(); return; }
       armedAt = Date.now();
       showToast(message, 2000);
     };
-    appPlugin.addListener("backButton", () => {
-      const modal = [...document.querySelectorAll(".modal:not(.hidden)")].pop();
-      if (modal) { (modal.id === "legal-dialog" ? document.getElementById("legal-close") : modal).click(); return; }
-      const visible = ALL_SCREENS.find((s) => !s.classList.contains("hidden"));
-      const inner = INNER_BACK.find(([s]) => s === visible);
-      if (inner) { document.getElementById(inner[1]).click(); return; }
-      if (visible && visible.classList.contains("game-screen")) twice("Toca otra vez para volver al menú", goToHub);
-      else twice("Toca otra vez para salir", () => appPlugin.exitApp());
-    }).catch(() => { /* sin el botón controlado, Android cierra la app como siempre */ });
+    try {
+      cap.addListener("App", "backButton", () => {
+        const modal = [...document.querySelectorAll(".modal:not(.hidden)")].pop();
+        if (modal) { (modal.id === "legal-dialog" ? document.getElementById("legal-close") : modal.id === "puzzle-dialog" ? document.getElementById("puzzle-close") : modal).click(); return; }
+        const visible = ALL_SCREENS.find((s) => !s.classList.contains("hidden"));
+        const inner = INNER_BACK.find(([s]) => s === visible);
+        if (inner) { document.getElementById(inner[1]).click(); return; }
+        if (visible && visible.classList.contains("game-screen")) twice("Toca otra vez para volver al menú", goToHub);
+        else twice("Toca otra vez para salir", exitApp);
+      });
+    } catch (e) { /* si el puente falla, Android se encarga del botón como siempre */ }
   }
 }
 
