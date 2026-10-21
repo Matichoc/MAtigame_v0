@@ -1,7 +1,7 @@
 import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot, lockReason, CUSTOM_COLORS, CUSTOM_EMBLEMS, customizeOutfit, isHexColor } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
-import { initSplash } from "./splash.js";
+import { initSplash, markAppReady } from "./splash.js";
 import { IS_DEMO, demoAllows, showDemoWall } from "./demo.js";
 import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
@@ -2389,3 +2389,4 @@ if (lastActiveId && existingProfiles.some((p) => p.id === lastActiveId)) {
 } else {
   goToProfiles();
 }
+markAppReady(); // el menú ya está listo: la pantalla de carga puede irse
