@@ -71,6 +71,12 @@ if (marca && DIR.startsWith("app")) {
 } else if (marca) avisos.push("Se distribuyen las tipografías de marca (Baby Chipmunk, Adorable Mother Script): sin comprobante de licencia comercial. Alternativa: MATIJUEGO_FONTS=libres.");
 if (!marca && !libres) falla("No hay ninguna tipografía");
 
+// arte de temporada (js/season-art.js): cada imagen nombrada debe venir dentro de la app (si falta, se vería el sello habitual y quedaría una petición fallida)
+const season = readFileSync(join(DIR, "js/season-art.js"), "utf8");
+for (const m of season.matchAll(/["'](assets\/temporadas\/[^"']+)["']/g)) {
+  if (!existsSync(join(DIR, m[1]))) falla(`Falta el arte de temporada ${m[1]} (lo nombra js/season-art.js): genera los recursos con scripts/temporada-recursos.mjs (ver docs/TEMPORADAS.md)`);
+}
+
 // resumen
 const bytes = todos.reduce((n, f) => n + statSync(f).size, 0);
 console.log(`${DIR}: ${todos.length} archivos, ${(bytes / 1048576).toFixed(1)} MB`);

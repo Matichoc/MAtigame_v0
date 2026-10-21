@@ -28,6 +28,11 @@ on:
         description: "Solo si eliges fonts=marca: confirmo que tengo licencia comercial de ambas tipografías (guarda el comprobante)"
         type: boolean
         default: false
+      icono:
+        description: "Ícono de la app: 'habitual' (por defecto) o 'evento' (el de la temporada activa HOY según js/events.js, hora de Chile; si no tiene, el habitual). Queda fijo en esa versión: ver docs/TEMPORADAS.md"
+        type: choice
+        options: [habitual, evento]
+        default: habitual
 
 permissions:
   contents: read
@@ -70,6 +75,13 @@ jobs:
           npm run build:app
           npm run verify:app
           npx cap sync android
+
+      # Ícono: el habitual, o el de la temporada activa (mismo calendario del juego: js/events.js, sin fechas duplicadas)
+      - name: Elegir el ícono
+        env:
+          ICONO: ${{ inputs.icono || 'habitual' }}
+          TZ: America/Santiago
+        run: node scripts/temporada-icono.mjs "$ICONO"
 
       - name: APK de prueba
         working-directory: android
