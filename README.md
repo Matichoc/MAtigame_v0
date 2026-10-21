@@ -109,6 +109,8 @@ js/splash.js          Pantalla de carga del juego: sello de Matichoc, arte de te
 js/house-data.js, js/house3d.js  Mi Casa (cuarto decorable)
 js/wardrobe-pets.js   Mascotas flotantes del Vestuario
 js/town-game.js       Pueblo Matichoc (mundo abierto con vecinos, tiendas y arcade)
+js/town-fun.js        Pueblo: actividades del día, trampolines, circuito, tesoros, parkour (Torre de Cacao y Escalera de Nubes) y casitas con puertas de juegos
+js/town-puzzles.js    Pueblo: cuadro de los juegos chicos (El Gato, Mini Sudoku 4×4, Cachipún); la lógica pura está en js/puzzles-logic.js
 js/progression.js     XP, niveles, misiones diarias y álbum de figuritas
 js/parkour-infinite.js Parkour: Mundo infinito (generador procedural, poderes, vidas, récord)
 js/wardrobe-data.js   Catálogo del Vestuario (~80 objetos, rarezas y precios en Matipuntos)
@@ -126,7 +128,7 @@ js/autos-game.js      Autos de Chocolate 3D
 js/memoria-game.js    Memoria Matichoc 3D
 js/futbol-game.js     Fútbol Choco 3D (penales, tiros libres con efecto y atajapenales)
 js/dulces-game.js     Choco Match 3D (3 en línea con productos Matichoc y jefes)
-js/ciudad-game.js     Ciudad Choco 3D (mundo abierto con auto, mapa y misiones)
+js/ciudad-game.js     Ciudad Choco 3D (mundo abierto con auto, mapa y misiones; las ya hechas vuelven cada día)
 js/online.js          Ranking y monitoreo del creador (apagado hasta llenar js/online-config.js; ver docs/RANKING.md)
 admin/ranking.html    Panel del creador: quién juega y ranking (solo apodos)
 js/aventura-game.js   Aventura Choco 3D (plataformas por mundos; los niveles se arman con una semilla)

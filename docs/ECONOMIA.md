@@ -81,3 +81,10 @@ Cada 40 minutos hay un cofre: **+10 ⚡ y +5 🍫✨**. Desde oct-2026 el cofre 
 ## Parkour (nov-2026)
 
 La Aventura pasó a **7 etapas**: la 6 es el **Parkour Troll** (los bloques normales son trampa; solo se pisan las líneas rojas). Las líneas rojas sobre los bloques de las otras etapas hacen volver al último lugar seguro (en el Mundo infinito cuestan una vida). No cambian los premios de Matipuntos del Parkour.
+
+## Pueblo y Ciudad: premios diarios nuevos (oct-2026)
+
+- **Ciudad Choco**: las misiones ya hechas vuelven cada día. El "!" reaparece sobre el vecino si no la hiciste hoy; repetirla paga **la mitad** de la recompensa (antes un 25 %), con tope de **4 pedidos pagados por día** (`REPEAT_CAP`, `REPEAT_PAY` en `js/ciudad-game.js`). La primera vez sigue pagando el premio completo. Máximo extra por día: ~4 × 20–40 = **80–160 🍫✨** (cuesta 2 ⚡ cada una).
+- **Pueblo Matichoc · parkour**: Torre de Cacao y Escalera de Nubes, **+10 🍫✨** cada cima, una vez al día (`COURSE_COINS` en `js/town-fun.js`).
+- **Pueblo Matichoc · puertas de juegos**: El Gato **+4**, Mini Sudoku **+8**, Cachipún **+3**, solo la primera victoria del día de cada una (`PUZZLES` en `js/town-puzzles.js`); después se juega por diversión.
+- Las "Actividades del día" del pueblo pasan de 5 a **7** (se agregan "sube a la cima" y "gana en las 3 puertas"); el premio por completarlas no cambia (+30 🍫✨, un sobre y 10 ⚡).

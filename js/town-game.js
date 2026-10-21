@@ -137,12 +137,13 @@ export class TownGame extends Game3D {
     this._buildFountain();
     this._buildBuildings();
     this._buildArcade();
+    this.fun = new TownFun(this); // faros llamativos, baile, trampolines, circuito, tesoros, parkour y puertas de juegos
+    this.fun.buildWorld(); // casitas y recorridos de parkour van antes que los árboles, para que nada quede dentro de uno
     this._buildDecor();
     this._buildCollectibles();
     this._buildNeighbors();
     this._buildEvent();
     this._ensureHero();
-    this.fun = new TownFun(this); // faros llamativos, baile, trampolines, circuito, tesoros y actividades del día
     this.fun.build();
   }
 
@@ -417,7 +418,8 @@ export class TownGame extends Game3D {
       const p = pol(deg, 26 + rnd() * 14);
       spots.push([p.x, p.z, 0.8 + rnd() * 0.6]);
     }
-    const good = spots.filter(([x, z]) => !this._nearStructure(x, z, 6));
+    const claimed = this.fun ? this.fun.claimed : []; // casitas y recorridos de parkour: sin árboles encima
+    const good = spots.filter(([x, z]) => !this._nearStructure(x, z, 6) && !claimed.some((c) => Math.hypot(x - c.x, z - c.z) < c.r + 2.5));
     const trunkGeo = new THREE.CylinderGeometry(0.28, 0.4, 2.4, 6);
     const crownGeo = new THREE.IcosahedronGeometry(1.7, 0);
     const trunks = new THREE.InstancedMesh(trunkGeo, this.m.choco, good.length);
@@ -754,7 +756,8 @@ export class TownGame extends Game3D {
   _move(dt) {
     const inp = this._input();
     const mv = this._move_();
-    const top = mv.speed * (this.keys.sprint ? 1.35 : 1);
+    let top = mv.speed * (this.keys.sprint ? 1.35 : 1);
+    if (this.fun && this.fun.airborne) top = Math.min(top, 7); // en el aire se controla mejor: los saltos de parkour no se pasan de largo
     const acc = (mv.id === "skates" || mv.id === "board" ? 34 : 60) * dt;
     this.vel.x += clamp(inp.x * top - this.vel.x, -acc, acc);
     this.vel.z += clamp(inp.z * top - this.vel.z, -acc, acc);
@@ -1017,6 +1020,7 @@ export class TownGame extends Game3D {
     audio.playPurchase();
     if (t.kind === "npc") this._talk(t.npc);
     else if (t.kind === "ring") { this.fun && this.fun.startCircuit(); }
+    else if (t.kind === "puzzle") { this.fun && this.fun.openDoor(t.puzzle); }
     else if (t.kind === "fountain") {
       this.popups.add(new THREE.Vector3(0, 4.6, 0), "¡Mmm, qué rico! 🍫", "combo");
       this.particles.burst(new THREE.Vector3(0, 3.6, 0), [0x64321b, 0xffc800, 0xfff6e6], 22, 4, 1, 4, 1);
@@ -1142,7 +1146,7 @@ export class TownGame extends Game3D {
   }
 
   _placeCamera(snap = false) {
-    const target = new THREE.Vector3(this.pos.x, 1.4, this.pos.z);
+    const target = new THREE.Vector3(this.pos.x, 1.4 + this.pos.y * 0.75, this.pos.z);
     if (!this.camFocus || snap) this.camFocus = target.clone();
     const portrait = this.camera.aspect < 0.95;
     const dist = portrait ? 12.5 : 9.5;
@@ -1154,7 +1158,7 @@ export class TownGame extends Game3D {
 
   _updateCamera(dt) {
     const k = 1 - Math.exp(-9 * Math.max(dt, 0.001));
-    const t = new THREE.Vector3(this.pos.x, 1.4, this.pos.z);
+    const t = new THREE.Vector3(this.pos.x, 1.4 + this.pos.y * 0.75, this.pos.z);
     if (!this.camFocus) this.camFocus = t.clone();
     this.camFocus.lerp(t, k);
     this._placeCamera();
@@ -1191,9 +1195,13 @@ export class TownGame extends Game3D {
   _bindInput() {
     const map = { ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right", ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down" };
     window.addEventListener("keydown", (e) => {
-      if (!this.running) return;
-      if (e.key === "e" || e.key === "E" || e.key === "Enter" || e.code === "Space") {
-        if (this.state === "playing") { e.preventDefault(); if (!e.repeat) this.act(); }
+      if (!this.running || (this.fun && this.fun.puzzleOpen)) return;
+      if (e.key === "e" || e.key === "E" || e.key === "Enter" || e.code === "Space" || e.key === "j" || e.key === "J") {
+        if (this.state === "playing") {
+          e.preventDefault();
+          // Espacio usa lo que tienes cerca (hablar, entrar...) y, si no hay nada, salta; J siempre salta
+          if (!e.repeat) { if (e.key === "j" || e.key === "J" || (e.code === "Space" && !this.target)) this.fun && this.fun.jump(); else this.act(); }
+        }
         return;
       }
       if (e.key === "q" || e.key === "Q") { this.camYaw += 0.25; return; }
@@ -1220,6 +1228,8 @@ export class TownGame extends Game3D {
 
     const joy = document.getElementById("town-joy");
     if (joy) bindStick(joy, (x, y) => { this.joy.x = x; this.joy.y = y; });
+    const jump = document.getElementById("town-btn-jump");
+    if (jump) jump.addEventListener("pointerdown", (e) => { e.preventDefault(); this.fun && this.fun.jump(); });
     const spd = document.getElementById("town-btn-speed");
     if (spd) spd.addEventListener("pointerdown", (e) => { e.preventDefault(); this.cycleMove(); });
     const act = document.getElementById("town-btn-action");
