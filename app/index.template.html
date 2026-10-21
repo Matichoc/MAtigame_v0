@@ -85,6 +85,17 @@
     </div>
   </div>
 </div>
+<div id="puzzle-dialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="puzzle-title">
+  <div class="modal-card pz-card">
+    <h2 id="puzzle-title">Juego</h2>
+    <p id="puzzle-status" class="pz-status" aria-live="polite"></p>
+    <div id="puzzle-board" class="pz-board"></div>
+    <div class="menu-secondary-row">
+      <button id="puzzle-again" class="btn-secondary" type="button">🔄 Otra vez</button>
+      <button id="puzzle-close" class="btn-primary" type="button">Salir</button>
+    </div>
+  </div>
+</div>
 <!--WEB--><!-- Cartel de la demo de la web: para seguir hay que bajar la app -->
 <div id="demo-wall" class="modal hidden" role="dialog" aria-modal="true">
   <div class="modal-card">
@@ -719,6 +730,7 @@
       <div id="town-popups" class="fps-popups" aria-hidden="true"></div>
       <div id="town-dialog" class="town-dialog hidden"><b class="td-name"></b><span class="td-text"></span><small>toca para cerrar</small></div>
       <button id="town-btn-action" class="town-action hidden" type="button"></button>
+      <button id="town-btn-jump" class="town-jump" type="button" aria-label="Saltar">⤴️</button>
       <button id="town-btn-speed" class="town-speed" type="button" aria-label="Cambiar cómo te mueves (correr, patines…)">🏃</button>
       <span id="town-speed-hint" class="town-speed-hint"></span>
       <div class="pk-touch" id="town-touch">
@@ -731,7 +743,8 @@
           <p class="fps-tag">Nuevo · mundo abierto</p>
           <details class="how"><summary>📖 Cómo se juega</summary>
           <p>Pasea por el pueblo con tu Matichico: prueba la fuente de chocolate, visita la Boutique y la Fábrica, saluda a los vecinos (¡te regalan Matipuntos!), junta alfajores dorados y entra a los juegos por las puertas brillantes del Arcade.</p>
-          <p class="fps-hint">Mover: WASD o flechas · Usar / hablar: E o Espacio · Cámara: arrastra el mouse o Q. En el celular, joystick y botón de acción.</p>
+          <p>Hay una torre y una escalera de nubes para <b>saltar</b> (parkour), y casitas con <b>puertas de juegos</b>: el Gato, el Mini Sudoku y el Cachipún.</p>
+          <p class="fps-hint">Mover: WASD o flechas · Saltar: Espacio o J · Usar / hablar: E o Enter · Cámara: arrastra el mouse o Q. En el celular, joystick, botón de salto ⤴️ y botón de acción.</p>
           </details>
           <button class="btn-primary" id="town-btn-start">¡A explorar!</button>
         </div>
@@ -1163,6 +1176,7 @@
         <div class="hud-chip">🏆 <span id="merge-hud-best">1/13</span></div>
         <div class="hud-chip">📦 <span id="merge-hud-free">0</span></div>
         <div class="hud-chip">🍫✨ <span id="merge-hud-coins">0</span></div>
+        <button id="merge-btn-hint" class="btn-icon" title="Pista: ¿qué puedo juntar?">💡</button>
         <button id="merge-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
       </div>
     </div>
@@ -1306,6 +1320,7 @@
       <div id="ciudad-list" class="overlay hidden">
         <div class="overlay-card cl-card">
           <h2>📋 Misiones de la ciudad</h2>
+          <p class="cl-hint">❗ misión nueva · 🔔 los vecinos te piden ayuda otra vez hoy (pagan la mitad, hasta 4 al día) · ✅ ya hecha hoy</p>
           <div class="cl-rows"></div>
           <button class="btn-secondary cl-cancel hidden" type="button">Cancelar la misión actual</button>
           <button class="btn-primary cl-close" type="button">Seguir paseando</button>
