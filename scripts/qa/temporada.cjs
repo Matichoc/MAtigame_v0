@@ -77,24 +77,33 @@ const ok = (cond, texto) => { console.log(`${cond ? "OK " : "MAL"} ${texto}`); i
     await ctx.close();
   }
 
-  // 3) sin evento (1-jul): sello habitual y no se pide ninguna imagen de temporada
+  // 3) sin evento (1-jul): arte habitual, y solo se piden sus imágenes (no las de otras temporadas)
   {
     const { ctx, p, reg } = await abrirEn("2026-07-01T12:00:00-04:00");
     await esperar(p, 1700);
     const e = await estado(p);
-    await p.waitForTimeout(1800);
+    await p.waitForTimeout(2600);
     await p.screenshot({ path: `${OUT}/carga-sin-evento.png` });
-    ok(!e.season && reg.temporada.length === 0, `sin evento: sello habitual, 0 imágenes de temporada pedidas (${reg.temporada.length})`);
+    ok(e.season && e.id === "habitual" && e.artOk && reg.temporada.every((u) => u.includes("/temporadas/habitual/")), `sin evento: arte habitual y solo se piden sus imágenes (${reg.temporada.length})`);
     await ctx.close();
   }
 
-  // 4) evento sin arte (Navidad, 10-dic): sello habitual
-  {
-    const { ctx, p, reg } = await abrirEn("2026-12-10T12:00:00-03:00");
+  // 4) cada evento del calendario muestra su propio arte (fechas reales de js/events.js, hora de Chile)
+  for (const [id, fecha] of [["sanvalentin", "2027-02-10T12:00:00-03:00"], ["pascua", "2027-03-25T12:00:00-03:00"], ["dianino", "2026-08-10T12:00:00-04:00"], ["patrias", "2026-09-15T12:00:00-03:00"], ["navidad", "2026-12-10T12:00:00-03:00"]]) {
+    const { ctx, p, reg } = await abrirEn(fecha);
     await esperar(p, 1700);
     const e = await estado(p);
     const ev = await p.evaluate(async () => (await import("./js/events.js")).activeEvent()?.id);
-    ok(ev === "navidad" && !e.season && reg.temporada.length === 0, `evento sin imagen (${ev}): sello habitual, 0 imágenes de temporada pedidas`);
+    await p.waitForTimeout(2600);
+    await p.screenshot({ path: `${OUT}/carga-${id}.png` });
+    ok(ev === id && e.season && e.id === id && e.artOk && reg.temporada.every((u) => u.includes(`/temporadas/${id}/`)), `${id} (${fecha.slice(0, 10)}): su propio arte, sin pedir imágenes de otras temporadas`);
+    await ctx.close();
+  }
+  // 4b) un evento sin arte propio usa el habitual (se prueba la regla directo: hoy todos los eventos tienen arte)
+  {
+    const { ctx, p } = await abrirEn("2026-07-01T12:00:00-04:00");
+    const r = await p.evaluate(async () => (await import("./js/season-art.js")).seasonArt({ id: "evento-sin-arte", name: "Prueba" }).id);
+    ok(r === "habitual", `evento sin imagen propia → arte habitual (${r})`);
     await ctx.close();
   }
 
@@ -122,7 +131,7 @@ const ok = (cond, texto) => { console.log(`${cond ? "OK " : "MAL"} ${texto}`); i
     await p.evaluate(() => { Object.defineProperty(document, "visibilityState", { configurable: true, get: () => "visible" }); document.dispatchEvent(new Event("visibilitychange")); });
     await esperar(p, 1700);
     const e2 = await estado(p);
-    ok(e1.id === "halloween" && !e2.gone && !e2.season, `transición: el 2-nov a las 23:50 había arte de Halloween; al volver el 3-nov 00:15 el sello es el habitual`);
+    ok(e1.id === "halloween" && !e2.gone && e2.id === "habitual", `transición: el 2-nov a las 23:50 había arte de Halloween; al volver el 3-nov 00:15 se ve el habitual`);
     await ctx.close();
   }
 

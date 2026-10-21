@@ -1,0 +1,23 @@
+{
+  "_nota": "Recortes en fracciones de la imagen original: [x, y, ancho, alto], calibrados a ojo sobre la imagen aprobada. Carga: deja fuera el título generado (\"Matjuego\", sin la i) y la insignia de Matichoc aproximada; en la app el nombre es texto real y el logo es el archivo original. Ícono: lo visible (72 dp del centro de la capa) es la cara con el mechón y el accesorio, sin la insignia ni el logo de la polera; la franja que se pide fuera de la imagen se rellena reflejada y queda fuera de lo visible.",
+  "carga": {
+    "fuente": "vertical.png",
+    "recorte": [
+      0,
+      0.212,
+      1,
+      0.563
+    ],
+    "anchoMax": 1080
+  },
+  "icono": {
+    "fuente": "cuadrada.png",
+    "recorte": [
+      0.175,
+      -0.055,
+      0.93,
+      0.93
+    ],
+    "fondo": "#2c5fa8"
+  }
+}
