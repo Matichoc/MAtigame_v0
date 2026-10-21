@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<!--WEB--><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6p13ug9Y/2TWPZMF0aIT0xv2TqxNkp62hhuZFDN2uAM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self' https://wa.me;">
+<!--WEB--><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-6p13ug9Y/2TWPZMF0aIT0xv2TqxNkp62hhuZFDN2uAM='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; frame-src 'self'; base-uri 'self'; form-action 'self' https://wa.me;">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta name="description" content="Matichoc Arcade: los juegos de Matichoc, chocolatería artesanal de La Ligua. Juega en el celular o en el computador.">
 <link rel="canonical" href="https://matichoc.cl/matijuego/"><!--/WEB-->
@@ -74,7 +74,18 @@
   </div>
 </div>
 
-<!-- Cartel de la demo de la web: para seguir hay que bajar la app -->
+<!-- Privacidad y licencias: se leen dentro del juego, sin salir de él -->
+<div id="legal-dialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="legal-title">
+  <div class="modal-card legal-card">
+    <h2 id="legal-title">Privacidad</h2>
+    <iframe id="legal-frame" class="legal-frame" title="Texto legal de Matijuego" sandbox="" src="about:blank"></iframe>
+    <div class="menu-secondary-row">
+      <button id="legal-switch" class="btn-secondary" type="button">📜 Créditos y licencias</button>
+      <button id="legal-close" class="btn-primary" type="button">Cerrar</button>
+    </div>
+  </div>
+</div>
+<!--WEB--><!-- Cartel de la demo de la web: para seguir hay que bajar la app -->
 <div id="demo-wall" class="modal hidden" role="dialog" aria-modal="true">
   <div class="modal-card">
     <div class="um-icon">🎮</div>
@@ -84,6 +95,7 @@
     <button id="demo-wall-close" class="btn-secondary" type="button">Seguir mirando</button>
   </div>
 </div>
+<!--/WEB-->
 <!-- Sello de inicio (como al prender una consola): sale al abrir la app y cuando se vuelve después de un buen rato -->
 <div id="splash" aria-hidden="true">
   <div class="sp-pattern"></div>
@@ -107,11 +119,12 @@
         <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
         <a href="https://matichoc.cl/pages/tienda.html">Tienda</a>
       </nav><!--/WEB--><!--APP--><p class="app-credit">🍫 Un juego promovido por <b>Matichoc</b> · pasión por el cacao</p><!--/APP-->
+      <p class="legal-links"><button type="button" class="legal-open" data-legal="privacy">🔒 Privacidad</button> · <button type="button" class="legal-open" data-legal="licenses">📜 Créditos y licencias</button></p>
       <p class="tagline">¿Quién juega? Cada perfil guarda su propio progreso.</p>
       <div id="profile-grid" class="profile-grid"></div>
 
       <div id="new-profile-form" class="new-profile-form hidden">
-        <input id="new-profile-name" class="text-input" type="text" maxlength="16" placeholder="Nombre o apodo">
+        <input id="new-profile-name" class="text-input" type="text" maxlength="16" placeholder="Apodo (inventado)">
         <div class="menu-secondary-row">
           <button id="btn-create-profile" class="btn-primary">Crear perfil</button>
           <button id="btn-cancel-profile" class="btn-secondary">Cancelar</button>
@@ -184,6 +197,7 @@
             <a href="https://matichoc.cl/pages/la_maestra.html">La Maestra</a>
             <a href="https://matichoc.cl/pages/tienda.html">Tienda</a>
           </nav><!--/WEB--><!--APP--><p class="app-credit">🍫 Un juego promovido por <b>Matichoc</b> · pasión por el cacao</p><!--/APP-->
+      <p class="legal-links"><button type="button" class="legal-open" data-legal="privacy">🔒 Privacidad</button> · <button type="button" class="legal-open" data-legal="licenses">📜 Créditos y licencias</button></p>
         </main>
       </div>
     </div>

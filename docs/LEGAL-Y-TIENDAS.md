@@ -1,6 +1,6 @@
 # Matijuego: qué revisar antes de subirlo a Google Play y a la App Store
 
-> **Importante:** esto es una guía técnica y de preparación, **no asesoría legal**. Las políticas de Google, Apple y la ley chilena cambian seguido: antes de publicar, verifica cada punto en la fuente oficial (los enlaces están al final) y, para lo legal (marcas, datos de menores, ventas), consulta con un abogado o con INAPI. Revisión hecha en octubre de 2026.
+> **Importante:** esto es una guía técnica y de preparación, **no asesoría legal**. Las políticas de Google, Apple y la ley chilena cambian seguido: antes de publicar, verifica cada punto en la fuente oficial (los enlaces están al final) y, para lo legal (marcas, datos de menores, ventas), consulta con un abogado o con INAPI. Revisión hecha en octubre de 2026. **Esta guía fue contrastada con el código en `docs/AUDITORIA-PREPUBLICACION.md`: donde ambas difieran, vale la auditoría** (que además dice qué quedó sin poder comprobar).
 
 Leyenda: ✅ ya está resuelto en el repositorio · ⚠️ hay que decidir o hacer algo · ❌ puede bloquear la publicación si no se resuelve.
 
@@ -10,12 +10,12 @@ Leyenda: ✅ ya está resuelto en el repositorio · ⚠️ hay que decidir o hac
 
 - ✅ **Sin anuncios, sin análisis de uso, sin rastreadores de terceros.** Eso simplifica muchísimo las políticas de niños.
 - ✅ **Sin cuentas ni datos personales**: los perfiles son apodos guardados en el dispositivo.
-- ✅ **Permisos mínimos**: la app de Android solo pide `INTERNET` (ni cámara, ni micrófono, ni ubicación, ni archivos).
-- ✅ **Política de privacidad** publicada en la app (`app/privacy.html`) con datos de contacto del responsable.
+- ✅ **Permisos mínimos**: el manifest del repositorio solo declara `INTERNET` (ni cámara, ni micrófono, ni ubicación, ni archivos); lo incluye Capacitor de fábrica y el juego no lo usa. El manifest **final** del APK se comprueba en el workflow (no se pudo armar el APK en el entorno de revisión).
+- ✅ **Política de privacidad** (`app/privacy.html`, versión 1.0, corregida: ya no describe un ranking que transmite datos) dentro de la app (botón del menú) y como página pública `matijuego/privacy.html` en matiweb (**preparada, no publicada**).
 - ✅ **Sin enlaces que saquen de la app** (la versión app no lleva enlaces a matichoc.cl).
 - ✅ **Sin juegos de disparos** en la app (Choco Blaster solo está en la web).
 - ✅ **Target API 36** (Android 16) y `minSdk 24` (`android/variables.gradle`).
-- ✅ **Ranking en línea apagado** (`js/online-config.js` vacío): hoy la app no envía nada a ningún servidor.
+- ✅ **Ranking en línea apagado**: el build de la app fuerza `js/online-config.js` vacío salvo `MATIJUEGO_ONLINE=1`, y `scripts/verificar-app.mjs` falla si queda un servidor configurado. Las pruebas de navegador registraron 0 peticiones fuera del origen.
 - ✅ En este PR se **quitaron marcas ajenas de los textos visibles**: "Tetris de Productos" pasó a **"Bloques de Productos"** ("¡TETRIS!" a "¡4 LÍNEAS!", "Maestro del Tetris" a "Maestro de los Bloques") y se sacó "estilo Roblox" de la descripción del Parkour.
 
 ---
@@ -25,9 +25,9 @@ Leyenda: ✅ ya está resuelto en el repositorio · ⚠️ hay que decidir o hac
 ### 2.1 Marcas y propiedad intelectual (las más importantes)
 - ⚠️ **"Matichoc" y "Matijuego"**: busca en INAPI (<https://www.inapi.cl>) si están registradas a nombre de la empresa, en clase 9 (software/juegos) y 41 (entretenimiento), además de la 30 (chocolatería) que ya debería estar. Si otro tiene "Matijuego" registrado, Google/Apple pueden bajar la app. Registrarla es barato comparado con perder la ficha.
 - ⚠️ **Nombres parecidos a juegos famosos**: ya quité "Tetris" y "Roblox". Revisa también las descripciones de la ficha (`store/listing-es.md`) y las capturas (`store/screenshots/03-tetris.jpg` es solo un nombre de archivo, pero revisa que no se lea "Tetris" en la imagen). Las **mecánicas** (juntar piezas, plataformas, tres en línea) no están protegidas, pero los **nombres, personajes y gráficos** sí. Evita en la ficha: "tipo Mario", "como Candy Crush", "estilo Fortnite/Roblox".
-- ⚠️ **Tipografías de marca** ("Baby Chipmunk" y "Adorable Mother Script", en `assets/fonts/`): confirma que la licencia permite **uso comercial dentro de una app**. Si son las tipografías oficiales de la marca que te entregó tu diseñador, pídele el comprobante de licencia.
+- ❌ **Tipografías de marca** ("Baby Chipmunk" y "Adorable Mother Script", en `assets/fonts/`): los metadatos del propio archivo de Baby Chipmunk dicen **"PERSONAL USE | CONTACT ME FOR COMMERCIAL USE"** (© Stefani Letter 2020) y Adorable Mother Script (© 7NTypes 2021) no trae licencia. Sin un comprobante de licencia comercial **no deben ir en una app publicada**. Por eso el build de la **app** usa por defecto sustitutas de licencia libre (Fredoka y Dancing Script, SIL OFL, `assets/fonts-libres/`) y el verificador rechaza las de marca salvo confirmación explícita (ver la auditoría). La web conserva las de marca por defecto.
 - ⚠️ **Fotos y logos de productos** (`assets/products/`, `assets/brand/`): deben ser tuyas (o con autorización). Las fotos de personas, si las hubiera, necesitan consentimiento.
-- ⚠️ **Licencias de código abierto**: la app incluye Three.js (MIT) y Capacitor (MIT). Esas licencias piden **conservar el aviso de copyright**. Hay que agregar una pantalla o página "Licencias" (puedo hacerla) con el texto de cada una.
+- ✅ **Licencias de código abierto**: Three.js (MIT), Capacitor (MIT) y las bibliotecas Apache 2.0 de Android quedan acreditadas en la pantalla "Créditos y licencias" del menú (`app/licenses.html`), con el texto de cada licencia. Falta revisar la lista final de dependencias del APK (ver la auditoría).
 - ✅ La música y los sonidos se **generan por código** (no hay archivos de terceros).
 - ⚠️ **Contenido hecho con IA**: la política de privacidad ya lo dice. Google y Apple permiten código/arte hecho con ayuda de IA, pero tú eres responsable de que no copie obras de otros. Si usaste generadores de imágenes para arte, guarda las condiciones de uso de esa herramienta.
 
@@ -62,14 +62,14 @@ Leyenda: ✅ ya está resuelto en el repositorio · ⚠️ hay que decidir o hac
 - ✅ Se sube un **.aab firmado** (los pasos están en `docs/PLAY-STORE.md`): primero hay que cargar los 4 secretos de GitHub.
 - ⚠️ **Nivel de API objetivo**: hoy es 36. Google sube el mínimo cada año (agosto): revisa que siga siendo válido cuando publiques.
 - ⚠️ **Páginas de memoria de 16 KB**: desde fines de 2025 las apps nuevas con código nativo deben soportarlo. Capacitor 8 y el WebView de Android no traen librerías nativas propias, pero **verifícalo en Play Console** (te lo avisa al subir el .aab).
-- ⚠️ **`allowBackup="true"`**: Android puede respaldar los datos del juego en la nube de Google. No es un problema legal, pero explica por qué un celular nuevo a veces "trae" el progreso; si no lo quieres, se cambia a `false`.
+- ⚠️ **`allowBackup="true"`**: Android puede respaldar los datos del juego en la copia de seguridad del teléfono (Google). La política ya lo explica. Confirma en Play Console cómo se declara eso en "Seguridad de los datos" (no se pudo consultar la definición oficial desde el entorno de revisión). Si prefieres que el progreso de un menor nunca salga del aparato, se cambia a `false` (a costa de perder el progreso al cambiar de celular).
 
 ### Formularios de Play Console
 - ⚠️ **Público objetivo y contenido**: elige rangos de edad (incluyendo menores de 13) → activa la revisión de **Diseñada para familias**. Responde que **no hay anuncios**.
-- ⚠️ **Clasificación de contenido (IARC)**: cuestionario; sin violencia real, sin compras (hoy). Sale "Para todos" si no hay interacción con usuarios ni compras.
+- ⚠️ **Clasificación de contenido (IARC)**: cuestionario que se responde pregunta por pregunta. Ojo: Aventura Choco tiene **combate de fantasía** (bolas de fuego que eliminan enemigos de caricatura, pisotones y jefes), así que no corresponde responder "sin violencia" por defecto; el detalle está en `store/listing-es.md`. No se puede asegurar de antemano qué clasificación resultará.
 - ⚠️ **Seguridad de los datos**: "no recopila ni comparte datos" **mientras el ranking esté apagado**. Si lo enciendes: declarar apodo + identificador + puntajes.
 - ⚠️ **Declaración de anuncios**: "No contiene anuncios".
-- ⚠️ **Política de privacidad**: URL pública (`app/privacy.html` hay que publicarla en una dirección, por ejemplo matichoc.cl/matijuego/privacy.html).
+- ⚠️ **Política de privacidad**: URL pública `https://matichoc.cl/matijuego/privacy.html` (preparada en matiweb, **aún no publicada**: ábrela en un navegador sin sesión antes de pegarla en Play Console).
 - ⚠️ **Capturas y ficha**: sin marcas ajenas, sin precios ni "#1", sin promesas de premios reales.
 
 ---
