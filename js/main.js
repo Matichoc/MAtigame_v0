@@ -1809,6 +1809,32 @@ document.getElementById("demo-wall-close")?.addEventListener("click", () => docu
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !dialog.classList.contains("hidden")) close(); });
 }
 
+// ---- Botón "atrás" del celular (solo en la app Android; en la web no existe window.Capacitor) ----
+// Cuadro abierto: lo cierra. Pantalla interna (tienda, casa…): vuelve al menú. Dentro de un juego: avisa y, al tocar otra vez, vuelve al menú.
+// En el menú: avisa y, al tocar otra vez, sale de la app.
+{
+  const cap = window.Capacitor;
+  const appPlugin = cap?.isNativePlatform?.() && cap.registerPlugin ? cap.registerPlugin("App") : null;
+  if (appPlugin) {
+    const INNER_BACK = [[screenHouse, "btn-house-back"], [screenProgress, "btn-progress-back"], [screenAchievements, "btn-achievements-back"], [screenShop, "btn-shop-back"], [screenLeaderboard, "btn-leaderboard-back"]];
+    let armedAt = 0;
+    const twice = (message, action) => {
+      if (Date.now() - armedAt < 2000) { armedAt = 0; action(); return; }
+      armedAt = Date.now();
+      showToast(message, 2000);
+    };
+    appPlugin.addListener("backButton", () => {
+      const modal = [...document.querySelectorAll(".modal:not(.hidden)")].pop();
+      if (modal) { (modal.id === "legal-dialog" ? document.getElementById("legal-close") : modal).click(); return; }
+      const visible = ALL_SCREENS.find((s) => !s.classList.contains("hidden"));
+      const inner = INNER_BACK.find(([s]) => s === visible);
+      if (inner) { document.getElementById(inner[1]).click(); return; }
+      if (visible && visible.classList.contains("game-screen")) twice("Toca otra vez para volver al menú", goToHub);
+      else twice("Toca otra vez para salir", () => appPlugin.exitApp());
+    }).catch(() => { /* sin el botón controlado, Android cierra la app como siempre */ });
+  }
+}
+
 function playGame(gameId) {
   if (!selectedCharacter) {
     window.alert("Elige primero a tu Matichico.");
