@@ -4,22 +4,24 @@ const { abrir, BASE, nuevoPerfil } = require("./lib.cjs");
 
 (async () => {
   const { b, p, reg } = await abrir({});
-  // plugin falso: guarda el callback y cuenta las salidas de la app
+  // puente nativo falso, con la misma forma que el que Android inyecta (native-bridge.js de Capacitor 8):
+  // window.Capacitor.addListener(plugin, evento, cb), nativeCallback(plugin, método, opciones) y PluginHeaders.
+  // OJO: NO trae registerPlugin (eso es de @capacitor/core, que esta app no empaqueta); la versión anterior de esta
+  // prueba lo simulaba y por eso pasó aunque en el celular el botón no funcionaba.
   await p.addInitScript(() => {
     window.__salidas = 0;
     window.Capacitor = {
       isNativePlatform: () => true,
-      registerPlugin: () => ({
-        addListener: (nombre, cb) => { if (nombre === "backButton") window.__atras = cb; return Promise.resolve({ remove() {} }); },
-        exitApp: () => { window.__salidas++; },
-      }),
+      PluginHeaders: [{ name: "App", methods: [{ name: "exitApp" }, { name: "addListener" }] }],
+      addListener: (plugin, nombre, cb) => { if (plugin === "App" && nombre === "backButton") window.__atras = cb; return { remove() {} }; },
+      nativeCallback: (plugin, metodo) => { if (plugin === "App" && metodo === "exitApp") window.__salidas++; },
     };
   });
   const fallos = [];
   const ok = (cond, texto) => { console.log(`${cond ? "OK " : "MAL"} ${texto}`); if (!cond) fallos.push(texto); };
   await nuevoPerfil(p);
   await p.waitForSelector("#screen-hub:not(.hidden)", { timeout: 15000 });
-  const atras = () => p.evaluate(() => window.__atras());
+  const atras = () => p.evaluate(() => window.__atras && window.__atras());
   const visible = (sel) => p.evaluate((s) => { const e = document.querySelector(s); return !!e && !e.classList.contains("hidden"); }, sel);
   const toast = () => p.evaluate(() => { const t = document.getElementById("toast"); return t && !t.classList.contains("hidden") ? t.textContent : ""; });
   const salidas = () => p.evaluate(() => window.__salidas);
