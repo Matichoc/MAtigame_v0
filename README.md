@@ -104,6 +104,8 @@ js/levels.js          Camino/corredor, obstáculos, coleccionables y misiones
 js/audio.js           Efectos de sonido generados con Web Audio API
 js/parkour-game.js    Parkour Choco 3D (obby estilo Roblox: Aventura de 7 etapas, líneas rojas, paredes, casa y etapa troll)
 js/events.js          Eventos de temporada (fichas, decoración, objetos exclusivos)
+js/season-art.js      Arte de cada temporada (pantalla de carga) según el evento activo; ver docs/TEMPORADAS.md
+js/splash.js          Pantalla de carga del juego: sello de Matichoc, arte de temporada e indicador de carga real
 js/house-data.js, js/house3d.js  Mi Casa (cuarto decorable)
 js/wardrobe-pets.js   Mascotas flotantes del Vestuario
 js/town-game.js       Pueblo Matichoc (mundo abierto con vecinos, tiendas y arcade)

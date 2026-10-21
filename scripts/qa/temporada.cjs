@@ -27,6 +27,7 @@ const ok = (cond, texto) => { console.log(`${cond ? "OK " : "MAL"} ${texto}`); i
     p.on("console", (m) => { if (m.type() === "error" && !/net::ERR_FAILED|sandboxed and the 'allow-scripts'/.test(m.text())) reg.errores.push(m.text()); }); // el iframe legal es sandbox="" a propósito: ese aviso de Chromium ya existía
     await p.clock.install({ time: new Date(fecha) });
     await p.clock.pauseAt(new Date(Date.parse(fecha) + 1)); // el reloj simulado solo avanza cuando la prueba lo pide (runFor)
+    await p.clock.pauseAt(new Date(Date.parse(fecha) + 1)); // el reloj simulado solo avanza cuando la prueba lo pide (runFor)
     await p.goto(BASE + query, { waitUntil: "load" });
     return { ctx, p, reg };
   }
@@ -48,7 +49,7 @@ const ok = (cond, texto) => { console.log(`${cond ? "OK " : "MAL"} ${texto}`); i
     const { ctx, p, reg } = await abrirEn("2026-10-25T12:00:00-03:00", { viewport: vp, touch: vp.width < 900 || nombre.startsWith("tablet") });
     await esperar(p, 1700);
     const e = await estado(p);
-    await p.waitForTimeout(1800); // las animaciones CSS del sello corren en tiempo real (el reloj simulado solo mueve los temporizadores)
+    await p.waitForTimeout(2600); // las animaciones CSS del sello corren en tiempo real (el reloj simulado solo mueve los temporizadores)
     await p.screenshot({ path: `${OUT}/carga-halloween-${nombre}.png` });
     // el arte y los textos deben quedar dentro de la pantalla (zona segura)
     const dentro = await p.evaluate(() => {

@@ -39,8 +39,16 @@ async function cropOf(def) {
   const { width: W, height: H } = await img.metadata();
   const [fx, fy, fw, fh] = def.recorte;
   const r = { left: Math.round(fx * W), top: Math.round(fy * H), width: Math.round(fw * W), height: Math.round(fh * H) };
-  if (r.left < 0 || r.top < 0 || r.left + r.width > W || r.top + r.height > H) throw new Error(`El recorte de ${def.fuente} se sale de la imagen (${W}x${H}): ${JSON.stringify(r)}`);
-  return { buf: await sharp(file).extract(r).toBuffer(), r, W, H };
+  // el ícono puede pedir un poco más allá del borde (esa franja queda fuera de lo visible del ícono adaptativo):
+  // se rellena con la imagen reflejada, nunca con bordes vacíos. Más de un 20 % afuera es un error de recorte.
+  const pad = { top: Math.max(0, -r.top), left: Math.max(0, -r.left), bottom: Math.max(0, r.top + r.height - H), right: Math.max(0, r.left + r.width - W) };
+  if (Math.max(pad.top, pad.bottom) > H * 0.2 || Math.max(pad.left, pad.right) > W * 0.2) throw new Error(`El recorte de ${def.fuente} se sale demasiado de la imagen (${W}x${H}): ${JSON.stringify(r)}`);
+  let base = sharp(file);
+  if (pad.top || pad.left || pad.bottom || pad.right) {
+    const { data, info } = await sharp(file).raw().toBuffer({ resolveWithObject: true }); // el reflejo necesita la imagen entera en memoria
+    base = sharp(await sharp(data, { raw: info }).extend({ ...pad, extendWith: "mirror" }).png().toBuffer());
+  }
+  return { buf: await base.extract({ ...r, left: r.left + pad.left, top: r.top + pad.top }).toBuffer(), r, W, H };
 }
 
 const svgMask = (size, kind) => {
@@ -48,6 +56,7 @@ const svgMask = (size, kind) => {
   const shapes = {
     circulo: `<circle cx="${s / 2}" cy="${s / 2}" r="${s / 2}"/>`,
     redondeado: `<rect width="${s}" height="${s}" rx="${s * 0.2}" ry="${s * 0.2}"/>`,
+    play: `<rect width="${s}" height="${s}" rx="${s * 0.3}" ry="${s * 0.3}"/>`, // Google Play redondea con un radio del 30 % del ícono
     squircle: `<path d="M${s / 2},0 C${s * 0.92},0 ${s},${s * 0.08} ${s},${s / 2} C${s},${s * 0.92} ${s * 0.92},${s} ${s / 2},${s} C${s * 0.08},${s} 0,${s * 0.92} 0,${s / 2} C0,${s * 0.08} ${s * 0.08},0 ${s / 2},0 Z"/>`,
     gota: `<path d="M${s / 2},0 H${s * 0.8} A${s * 0.2},${s * 0.2} 0 0 1 ${s},${s * 0.2} V${s / 2} A${s / 2},${s / 2} 0 0 1 ${s / 2},${s} A${s / 2},${s / 2} 0 0 1 0,${s / 2} A${s / 2},${s / 2} 0 0 1 ${s / 2},0 Z"/>`,
   };
@@ -98,9 +107,9 @@ if (cfg.icono) {
   writeFileSync(out(`${base}/mipmap-anydpi-v26/ic_launcher_round.xml`), xml);
   report.push(`${base}: ${Object.keys(DENS).length} densidades (capas 81–432 px, íconos 36–192 px) + XML adaptativo`);
 
-  // ---------- Google Play: PNG de 512x512 (32 bits con alfa), máximo 1024 KB; Play redondea las esquinas ----------
+  // ---------- Google Play: PNG de 512x512, 32 bits, sRGB, máximo 1024 KB, cuadrado completo y sin sombra: Play redondea (30 %) ----------
   const play = out(`store/temporadas/${id}/icon-512.png`);
-  await sharp(visible).resize(512, 512).ensureAlpha().png({ compressionLevel: 9 }).toFile(play);
+  await sharp(visible).resize(512, 512).toColorspace("srgb").ensureAlpha().png({ compressionLevel: 9 }).toFile(play);
   const pm = await sharp(play).metadata();
   const kb = statSync(play).size / 1024;
   report.push(`${play}: ${pm.width}x${pm.height} ${pm.format} ${pm.channels} canales, ${kb.toFixed(0)} KB${kb > 1024 ? "  ⚠️ PASA DE 1024 KB" : ""}`);
@@ -109,7 +118,7 @@ if (cfg.icono) {
   const cell = 150;
   const shapes = ["circulo", "squircle", "redondeado", "gota"];
   const sizes = [192, 96, 48, 36];
-  const W = 40 + cell * Math.max(shapes.length, 3) + 40;
+  const W = 40 + cell * (shapes.length + 2) + 40;
   const H = 70 + cell + 40 + sizes.length * 0 + 260 + 60;
   const comps = [];
   const label = (text, x, y, size = 18) => ({ input: Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${size + 10}"><text x="0" y="${size}" font-family="sans-serif" font-size="${size}" font-weight="bold" fill="#fff6e6">${text}</text></svg>`), left: x, top: y });
@@ -117,6 +126,14 @@ if (cfg.icono) {
   for (let i = 0; i < shapes.length; i++) {
     comps.push({ input: await masked(visible, 128, shapes[i]), left: 40 + i * cell, top: 60 });
     comps.push(label(shapes[i], 40 + i * cell, 194, 15));
+  }
+  // cómo lo muestra Google Play (esquinas al 30 %)
+  comps.push({ input: await masked(await sharp(play).toBuffer(), 128, "play"), left: 40 + shapes.length * cell, top: 60 });
+  comps.push(label("Google Play", 40 + shapes.length * cell, 194, 15));
+  // el habitual al lado, para comparar (deben sentirse de la misma marca)
+  if (existsSync("store/icon-512.png")) {
+    comps.push({ input: await masked(await sharp("store/icon-512.png").toBuffer(), 96, "play"), left: 40 + (shapes.length + 1) * cell - 4, top: 76 });
+    comps.push(label("habitual", 40 + (shapes.length + 1) * cell, 194, 15));
   }
   // capa completa con la zona segura marcada
   const safe = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="216" height="216"><rect x="36" y="36" width="144" height="144" fill="none" stroke="#35f0ff" stroke-width="2" stroke-dasharray="6 4"/><circle cx="108" cy="108" r="66" fill="none" stroke="#ffc800" stroke-width="3"/></svg>`);

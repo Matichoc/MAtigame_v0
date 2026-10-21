@@ -1,5 +1,23 @@
 {
-  "_nota": "Recortes en fracciones de la imagen original: [x, y, ancho, alto]. Valores iniciales estimados a ojo sobre las imágenes aprobadas; revisar con docs/temporadas/halloween/revision-icono.png y las capturas de la pantalla de carga, y ajustar si hace falta. El recorte de carga deja fuera el título generado (dice 'Matjuego', sin la i) y la insignia de Matichoc aproximada: en la app el nombre es texto real y el logo es el archivo original.",
-  "carga": { "fuente": "vertical.png", "recorte": [0, 0.215, 1, 0.56], "anchoMax": 1080 },
-  "icono": { "fuente": "cuadrada.png", "recorte": [0.11, 0.03, 0.78, 0.78], "fondo": "#24123d" }
+  "_nota": "Recortes en fracciones de la imagen original: [x, y, ancho, alto], calibrados sobre las imágenes aprobadas (vertical.png 941x1672 y cuadrada.png 1254x1254). Carga: deja fuera el título generado (dice 'Matjuego', sin la i), el cacao de arriba y la insignia de Matichoc aproximada; en la app el nombre es texto real y el logo es el archivo original. Ícono: la capa de 108 dp va de y=0 a 0,81; lo visible (72 dp) es la cara con el mechón y el cuello del polo, sin la insignia ni el logo estampado en la polera. Revisar con docs/temporadas/halloween/revision-icono.png.",
+  "carga": {
+    "fuente": "vertical.png",
+    "recorte": [
+      0,
+      0.245,
+      1,
+      0.53
+    ],
+    "anchoMax": 1080
+  },
+  "icono": {
+    "fuente": "cuadrada.png",
+    "recorte": [
+      0.055,
+      -0.135,
+      0.93,
+      0.93
+    ],
+    "fondo": "#24123d"
+  }
 }
