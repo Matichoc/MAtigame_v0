@@ -1830,7 +1830,8 @@ document.getElementById("demo-wall-close")?.addEventListener("click", () => docu
     try {
       cap.addListener("App", "backButton", () => {
         const modal = [...document.querySelectorAll(".modal:not(.hidden)")].pop();
-        if (modal) { (modal.id === "legal-dialog" ? document.getElementById("legal-close") : modal.id === "puzzle-dialog" ? document.getElementById("puzzle-close") : modal).click(); return; }
+        // cada cuadro marca su botón de cierre con data-back: se pulsa ese botón para que corra su propio cierre (y su estado, como enOpen)
+        if (modal) { const close = modal.querySelector("[data-back]"); if (close) close.click(); else modal.classList.add("hidden"); return; }
         const visible = ALL_SCREENS.find((s) => !s.classList.contains("hidden"));
         const inner = INNER_BACK.find(([s]) => s === visible);
         if (inner) { document.getElementById(inner[1]).click(); return; }

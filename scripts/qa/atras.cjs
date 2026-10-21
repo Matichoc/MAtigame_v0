@@ -49,6 +49,27 @@ const { abrir, BASE, nuevoPerfil } = require("./lib.cjs");
   ok(await visible("#legal-dialog"), "se abrió Privacidad");
   await atras();
   ok(!(await visible("#legal-dialog")) && await visible("#screen-hub"), "Privacidad: atrás la cierra y se queda en el menú");
+  // toques directos (las tarjetas del menú se animan y Playwright espera a que se queden quietas)
+  const tocar = (sel) => p.evaluate((s) => document.querySelector(s).click(), sel);
+  const tocarJuego = (nombre) => p.evaluate((n) => [...document.querySelectorAll(".game-card")].find((c) => c.textContent.includes(n)).click(), nombre);
+  // todos los cuadros (.modal) tienen su botón de cierre marcado con data-back (así ninguno nuevo se queda sin "atrás")
+  const sinCierre = await p.evaluate(() => [...document.querySelectorAll(".modal")].filter((m) => m.querySelectorAll("[data-back]").length !== 1).map((m) => m.id));
+  ok(sinCierre.length === 0, `cada cuadro tiene un solo botón de cierre data-back (${sinCierre.join(", ") || "todos"})`);
+  // Energía, Calendario y Canje: atrás corre su propio cierre y se pueden volver a abrir (el estado interno quedó bien)
+  for (const [nombre, abrir, cuadro] of [["Energía", () => tocar("#btn-energy"), "#energy-dialog"], ["Calendario", () => tocar("#btn-daily-reward"), "#calendar-dialog"], ["Canje de un juego bloqueado", () => tocarJuego("Fútbol"), "#unlock-dialog"]]) {
+    await abrir();
+    await p.waitForTimeout(300);
+    const abierto = await visible(cuadro);
+    await atras();
+    await p.waitForTimeout(200);
+    const cerrado = !(await visible(cuadro));
+    await abrir();
+    await p.waitForTimeout(300);
+    const reabre = await visible(cuadro);
+    await atras();
+    await p.waitForTimeout(200);
+    ok(abierto && cerrado && reabre && !(await visible(cuadro)) && await visible("#screen-hub") && (await salidas()) === 1, `${nombre}: atrás cierra el cuadro, se puede volver a abrir y no sale de la app`);
+  }
   // juego: avisa, y con otra pulsación vuelve al menú
   await p.locator(".game-card", { hasText: "Bloques" }).first().click();
   await p.waitForTimeout(1500);
