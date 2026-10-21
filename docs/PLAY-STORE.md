@@ -100,7 +100,7 @@ npm run sync:android   # arma app-www/ y lo copia al proyecto Android
 npm run verify:app     # comprueba app-www/ (sin Blaster, sin enlaces, ranking apagado, legales)
 cd android && ./gradlew assembleDebug   # requiere Android SDK y acceso a dl.google.com / maven.google.com
 ```
-La carpeta `app-www/` se genera sola (`scripts/build.mjs app`) a partir de `app/index.template.html`, `app/privacy.html`, `app/licenses.html`, `js/`, `css/`, `assets/` y `vendor/`, sin Choco Blaster y con el ranking en línea apagado. `npm run verify:app` comprueba el resultado. Los íconos y la pantalla de carga se regeneran con `npx @capacitor/assets generate --android --assetPath resources`.
+La carpeta `app-www/` se genera sola (`scripts/build.mjs app`) a partir de `app/index.template.html`, `app/privacy.html`, `app/licenses.html`, `js/`, `css/`, `assets/` y `vendor/`, sin Choco Blaster y con el ranking en línea apagado. `npm run verify:app` comprueba el resultado. El **ícono habitual** (el Matichico, desde el 21-oct-2026) sale de `resources/temporadas/habitual/`: se regenera con `node scripts/temporada-recursos.mjs habitual` y se copian los `ic_launcher*` de `resources/temporadas/habitual/android/res` a `android/app/src/main/res` (y `store/temporadas/habitual/icon-512.png` a `store/icon-512.png`). **No uses** `npx @capacitor/assets generate` para los íconos: volvería a poner el logo del cacao. Ese comando sirve solo para la pantalla de carga nativa (`resources/splash.png`).
 
 ---
 
