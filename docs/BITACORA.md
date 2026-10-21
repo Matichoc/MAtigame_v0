@@ -6,6 +6,9 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-21
 
+### Regla nueva: la bitácora no lleva PR propio
+- Decisión de la persona dueña: no abrir PRs solo para la bitácora. Su commit va en el PR que esté abierto o, si no hay ninguno, en el siguiente. Anotado en `CLAUDE.md`.
+
 ### Compilación nº 74: versión para la prueba cerrada en Google Play
 - Desde `main` `d31fde0` (merge del #42: "atrás" cierra todos los cuadros), con `release`, `fonts=libres` e **`icono=habitual`** (el Matichico). Decisión de la persona dueña: el ícono habitual, para que sea simple.
 - Versión 1.0.0, `versionCode` 74. Todos los pasos en verde: APK de prueba revisado y `.aab` firmado con la llave de subida (no con la de pruebas). La llave se borró del servidor.
