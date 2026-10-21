@@ -105,7 +105,7 @@ Si un evento no tiene arte, no hay que hacer nada: se ve lo habitual.
 3. Ver el ícono en un launcher que recorte con otra forma (Samsung, Xiaomi).
 4. Ver la pantalla de carga real en el celular, vertical y horizontal, y en una tablet si hay una.
 
-**Decisiones humanas:**
-- La polera del Matichico trae un logo de Matichoc **dibujado por la IA**, no el original; se ve chico en la pantalla de carga. ¿Se acepta como parte de la ilustración o se retoca?
-- Revisar los derechos y condiciones de uso de las imágenes generadas con IA antes de usarlas en la tienda.
-- El ícono de Halloween muestra al personaje y el habitual muestra el logo del cacao. ¿Se acepta ese cambio de concepto durante la temporada?
+**Decisiones tomadas (21-10-2026, por la persona dueña):**
+- El logo de Matichoc dibujado en la polera del Matichico **se deja como está**, como parte de la ilustración.
+- El ícono de Halloween muestra al personaje y el habitual muestra el logo del cacao: **aceptado**.
+- Las imágenes las **generó la propia persona dueña** con una herramienta de IA. Antes de subirlas a la tienda conviene guardar de qué herramienta salieron y revisar sus condiciones de uso comercial. No se pudieron consultar desde este entorno: openai.com no responde.
