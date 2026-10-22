@@ -203,3 +203,25 @@ Nada de esto sube archivos a Google Play.
 5. Cierra la app del todo a la mitad de un capítulo y vuelve a abrirla: debe seguir donde quedó.
 6. Prueba el botón **atrás** en la pantalla del festival y dentro de un partido.
 7. Anota lo que se sienta raro: botones difíciles de tocar, juego lento, textos cortados, IA demasiado fácil o difícil.
+
+## 12. Rendimiento en teléfonos de gama media-baja
+
+Decisión de la persona dueña (22-oct-2026): todo debe pensarse para teléfonos de gama media-baja hacia arriba.
+
+Medición en el navegador de pruebas, con pantalla táctil de 860 × 412: dibujos por cuadro de la escena (incluida la pasada de sombras) y triángulos.
+
+| Pantalla | Antes del ajuste | Después del ajuste | Referencia que ya funciona en el celular |
+|---|---|---|---|
+| Pichanga 3 contra 3 | 858 dibujos · 102 mil triángulos | **413 · 52 mil** | Fútbol (penales): 302 · 36 mil |
+| Básquet 2 contra 2 | 548 · 70 mil | **286 · 36 mil** | Lanzamientos: 209 · 50 mil |
+| Pueblo | 1561 · 186 mil (lo del festival suma 59 piezas) | sin cambio | el mismo Pueblo de siempre |
+
+Qué se hizo en los partidos nuevos, solo en celulares y tablets (pantalla táctil):
+- Sin sombras reales. Cada jugador lleva una sombra redonda simple, y todas se dibujan juntas en un solo dibujo (`MatchGame._makeBlobs`).
+- Sin brillo de posprocesado (bloom), que son pasadas de pantalla completa caras para una GPU modesta.
+- Las tablas de la cancha de la Pichanga se dibujan agrupadas: un dibujo por color en vez de uno por tabla.
+- Siguen activos los ajustes automáticos de siempre (`Game3D`): resolución tope de 1,25× en celulares y, si el juego va lento, baja la resolución.
+
+Lo que queda:
+- Cada Matichico tiene 55–82 piezas. Es el mismo modelo de todos los juegos. Agruparlo es más delicado (parpadeo, ropa que cambia) y queda como mejora futura si en el celular la Pichanga se siente lenta.
+- **Falta medirlo en un teléfono real de gama media-baja.** Las cifras de arriba vienen del navegador de pruebas.

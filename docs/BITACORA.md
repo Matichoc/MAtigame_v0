@@ -6,6 +6,12 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-22
 
+### Rendimiento para teléfonos de gama media-baja (mismo PR #44)
+- **Decisión de la persona dueña:** todo lo que se desarrolle debe funcionar en teléfonos de gama media-baja hacia arriba. Quedó como regla en `CLAUDE.md`.
+- Se midió lo nuevo. Dibujos por cuadro: Pichanga 858 (Fútbol de siempre: 302) y Básquet 2 contra 2: 548 (Lanzamientos: 209). La causa eran las sombras reales de 6 y 4 personajes.
+- Ajuste en celulares: sombras redondas simples en un solo dibujo, sin brillo de posprocesado y tablas de la cancha agrupadas. Quedó en Pichanga **413** y Básquet 2 contra 2 **286**. Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §12.
+- Pendiente: medir en un celular real de gama media-baja.
+
 ### Evolución integral: aventura del festival, Pichanga 3 contra 3 y Básquet 2 contra 2 (rama `claude/zealous-johnson-2ryf87`)
 - Encargo de la persona dueña: "Evolución integral de Matijuego". Situación: la app se prueba con APK en su celular y **no está subida a Play Console**. No se preparó ninguna publicación ni se tocaron credenciales, firmas ni el identificador de la app.
 - Plan, decisiones, criterios y estado por fase: `docs/EVOLUCION-JUGABILIDAD.md`.

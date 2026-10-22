@@ -70,7 +70,7 @@ export class PichangaGame extends MatchGame {
     s.add(new THREE.HemisphereLight(0xfff6e0, 0x4a7a40, 1.2));
     this.sun = new THREE.DirectionalLight(0xfff0d2, 2.3);
     this.sun.position.set(-10, 22, 14);
-    this.sun.castShadow = true;
+    this.sun.castShadow = !this.lite; // en celulares, sombras simples (ver MatchGame._makeBlobs)
     const sm = this.coarse ? 1024 : 2048;
     this.sun.shadow.mapSize.set(sm, sm);
     const sc = this.sun.shadow.camera;
@@ -78,7 +78,7 @@ export class PichangaGame extends MatchGame {
     this.sun.shadow.bias = -0.0006;
     this.sun.shadow.normalBias = 0.04;
     s.add(this.sun, this.sun.target);
-    this.onLowQuality = () => { this.sun.castShadow = false; };
+    this.onLowQuality = () => { this.sun.castShadow = false; if (this.blobs) this.blobs.visible = true; };
 
     const pitch = new THREE.Mesh(new THREE.PlaneGeometry(L + 3, W + 3), new THREE.MeshStandardMaterial({ map: pitchTexture(), roughness: 0.95 }));
     pitch.rotation.x = -Math.PI / 2;
@@ -105,11 +105,15 @@ export class PichangaGame extends MatchGame {
       if (Math.abs(z) < PITCH.goalW / 2 + 0.8) continue;
       for (const sx of [-1, 1]) boards.push([sx * (L / 2 + 1.4), z, 0.12, (W + 2.8) / 10 - 0.1, i % 2]);
     }
-    for (const [x, z, w, d, c] of boards) {
-      const b = new THREE.Mesh(new THREE.BoxGeometry(w, 0.55, d), boardMat[c]);
-      b.position.set(x, 0.27, z);
-      b.castShadow = true;
-      s.add(b);
+    // todas las tablas de un color en una sola pieza (un dibujo por color en vez de uno por tabla)
+    const unit = new THREE.BoxGeometry(1, 0.55, 1);
+    const tmp = new THREE.Object3D();
+    for (const c of [0, 1]) {
+      const list = boards.filter((bd) => bd[4] === c);
+      const inst = new THREE.InstancedMesh(unit, boardMat[c], list.length);
+      list.forEach(([x, z, w, d], i) => { tmp.position.set(x, 0.27, z); tmp.scale.set(w, 1, d); tmp.updateMatrix(); inst.setMatrixAt(i, tmp.matrix); });
+      inst.castShadow = !this.lite;
+      s.add(inst);
     }
     s.add(makeBunting(new THREE.Vector3(-L / 2, 3.4, -W / 2 - 2.2), new THREE.Vector3(L / 2, 3.4, -W / 2 - 2.2), { count: 26, sag: 0.9 }));
     for (const x of [-L / 2, 0, L / 2]) {
@@ -121,7 +125,7 @@ export class PichangaGame extends MatchGame {
     this._buildGoal(1);
 
     this.ball = new THREE.Mesh(new THREE.SphereGeometry(0.24, 22, 16), new THREE.MeshStandardMaterial({ map: ballTexture(), roughness: 0.5 }));
-    this.ball.castShadow = true;
+    this.ball.castShadow = !this.lite;
     s.add(this.ball);
     this.ballShadow = new THREE.Mesh(new THREE.CircleGeometry(0.3, 18), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false }));
     this.ballShadow.rotation.x = -Math.PI / 2;
@@ -138,6 +142,7 @@ export class PichangaGame extends MatchGame {
     s.add(this.activeArrow);
     this.teamRingGeo = new THREE.RingGeometry(0.5, 0.6, 28);
     this.teamRingGeo.rotateX(-Math.PI / 2);
+    this._makeBlobs(6);
   }
 
   _buildGoal(side) {
@@ -198,7 +203,7 @@ export class PichangaGame extends MatchGame {
       const jersey = p.role === "gk" ? (p.team === 0 ? 0x35c0ff : 0x9a5cff) : cols[p.team];
       if (!mine) hero.setOutfit({ jersey, trim: 0xffffff });
       hero.group.scale.setScalar(1.02);
-      hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+      if (!this.lite) hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
       hero.group.userData.noToon = true;
       this.scene.add(hero.group);
       const ring = new THREE.Mesh(this.teamRingGeo, new THREE.MeshBasicMaterial({ color: p.role === "gk" ? 0xffffff : cols[p.team], transparent: true, opacity: 0.75, depthWrite: false }));
@@ -296,6 +301,7 @@ export class PichangaGame extends MatchGame {
       md.ring.position.set(p.x, 0.04, p.z);
       md.ring.visible = p !== m.human;
     });
+    this._updateBlobs(m.players);
     const b = m.ball;
     this.ball.position.set(b.x, 0.24 + b.h, b.z);
     const sp = Math.hypot(b.vx, b.vz);

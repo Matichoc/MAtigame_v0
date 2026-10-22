@@ -12,7 +12,9 @@ const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export class MatchGame extends Game3D {
   constructor(gameId, sportId, character, progress, els, opts) {
-    super(gameId, character, progress, els, opts);
+    // en celulares los partidos parten sin brillo (bloom): son pasadas de pantalla completa caras para una GPU modesta
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    super(gameId, character, progress, els, coarse ? { ...opts, bloom: false } : opts);
     this.sportId = sportId;
     this.q = els.q;
     this.mode = "amistoso";
@@ -23,6 +25,33 @@ export class MatchGame extends Game3D {
     this.paused = false;
     this.reduced = REDUCED;
     this._tmpV = new THREE.Vector3();
+    // celulares y tablets (gama media-baja incluida): sin sombras reales; cada jugador lleva una sombra redonda simple.
+    // Las sombras reales obligan a dibujar dos veces a cada personaje (son decenas de piezas cada uno).
+    this.lite = this.coarse;
+  }
+
+  /** Sombras redondas bajo los jugadores: una sola pieza para todos (InstancedMesh = un solo dibujo). */
+  _makeBlobs(n) {
+    const geo = new THREE.CircleGeometry(0.42, 16);
+    geo.rotateX(-Math.PI / 2);
+    this.blobs = new THREE.InstancedMesh(geo, new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.28, depthWrite: false }), n);
+    this.blobs.renderOrder = 3;
+    this.blobs.frustumCulled = false;
+    this.blobs.visible = this.lite;
+    this.scene.add(this.blobs);
+    this._blobO = new THREE.Object3D();
+  }
+
+  _updateBlobs(players) {
+    if (!this.blobs || !this.blobs.visible) return;
+    const o = this._blobO;
+    players.forEach((p, i) => {
+      o.position.set(p.x, 0.025, p.z);
+      o.scale.setScalar(1 - Math.min(0.4, (p.jh || 0) * 0.4));
+      o.updateMatrix();
+      this.blobs.setMatrixAt(i, o.matrix);
+    });
+    this.blobs.instanceMatrix.needsUpdate = true;
   }
 
   get diff() { return sportOf(this.progress, this.sportId).diff; }

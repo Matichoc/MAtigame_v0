@@ -86,7 +86,7 @@ export class Basquet2v2Game extends MatchGame {
     s.add(new THREE.HemisphereLight(0xfff6e0, 0x6a5a40, 1.25));
     this.sun = new THREE.DirectionalLight(0xfff0d2, 2.2);
     this.sun.position.set(-8, 20, 16);
-    this.sun.castShadow = true;
+    this.sun.castShadow = !this.lite; // en celulares, sombras simples (ver MatchGame._makeBlobs)
     const sm = this.coarse ? 1024 : 2048;
     this.sun.shadow.mapSize.set(sm, sm);
     const sc = this.sun.shadow.camera;
@@ -95,7 +95,7 @@ export class Basquet2v2Game extends MatchGame {
     this.sun.shadow.normalBias = 0.04;
     s.add(this.sun, this.sun.target);
     this.sun.target.position.set(0, 0, 6);
-    this.onLowQuality = () => { this.sun.castShadow = false; };
+    this.onLowQuality = () => { this.sun.castShadow = false; if (this.blobs) this.blobs.visible = true; };
 
     const grass = new THREE.Mesh(new THREE.PlaneGeometry(160, 160), new THREE.MeshStandardMaterial({ color: 0x7cc65a, roughness: 1 }));
     grass.rotation.x = -Math.PI / 2;
@@ -144,7 +144,7 @@ export class Basquet2v2Game extends MatchGame {
     }
 
     this.ball = new THREE.Mesh(new THREE.SphereGeometry(0.17, 20, 14), new THREE.MeshStandardMaterial({ map: ballTexture(), roughness: 0.6 }));
-    this.ball.castShadow = true;
+    this.ball.castShadow = !this.lite;
     s.add(this.ball);
     this.ballShadow = new THREE.Mesh(new THREE.CircleGeometry(0.22, 16), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.3, depthWrite: false }));
     this.ballShadow.rotation.x = -Math.PI / 2;
@@ -160,6 +160,7 @@ export class Basquet2v2Game extends MatchGame {
     s.add(this.activeArrow);
     this.teamRingGeo = new THREE.RingGeometry(0.48, 0.58, 28);
     this.teamRingGeo.rotateX(-Math.PI / 2);
+    this._makeBlobs(4);
     this._applyStyle();
   }
 
@@ -189,7 +190,7 @@ export class Basquet2v2Game extends MatchGame {
       const hero = own ? createMatichico(charFor[i], this.outfit, this.look) : createMatichico(charFor[i], getOutfit("polera"));
       if (!own) hero.setOutfit({ jersey: cols[p.team], trim: 0xffffff });
       hero.group.scale.setScalar(1.05);
-      hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+      if (!this.lite) hero.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
       hero.group.userData.noToon = true;
       this.scene.add(hero.group);
       const ring = new THREE.Mesh(this.teamRingGeo, new THREE.MeshBasicMaterial({ color: cols[p.team], transparent: true, opacity: 0.8, depthWrite: false }));
@@ -286,6 +287,7 @@ export class Basquet2v2Game extends MatchGame {
       md.ring.position.set(p.x, 0.04, p.z);
       md.ring.visible = p !== m.human;
     });
+    this._updateBlobs(m.players);
     const b = m.ball;
     let bh = b.h;
     if (b.owner && !(b.owner.charge >= 0) && b.owner.jh <= 0.05) bh = 0.2 + Math.abs(Math.sin(t * 8.5)) * 0.8; // botando
