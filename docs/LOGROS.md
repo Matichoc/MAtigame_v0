@@ -59,6 +59,8 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | 🗺️ **Maestro de campañas** | Cumple 20 niveles y misiones en total (hay 160) → Cumple 60 niveles y misiones en total (hay 160) → Cumple 120 niveles y misiones en total (hay 160) → Cumple 160 niveles y misiones en total (hay 160) | 25 / 70 / 180 / 420 |
 | 🏙️ **Buen Vecino** | Cumple 1 misiones distintas en Ciudad Choco (hay 8) → Cumple 3 misiones distintas en Ciudad Choco (hay 8) → Cumple 6 misiones distintas en Ciudad Choco (hay 8) → Cumple 8 misiones distintas en Ciudad Choco (hay 8) | 10 / 35 / 90 / 210 |
 | 🏁 **Piloto Estrella** | Gana una medalla en la carrera de Ciudad Choco (1 bronce, 2 plata, 3 oro) → Gana una medalla en la carrera de Ciudad Choco (1 bronce, 2 plata, 3 oro) → Gana una medalla en la carrera de Ciudad Choco (1 bronce, 2 plata, 3 oro) | 15 / 35 / 90 |
+| ⚽ **Campeón de la Pichanga** | Gana 1 copas de la Pichanga Choco → Gana 3 copas de la Pichanga Choco | 25 / 60 |
+| 🏀 **Campeón del 2 contra 2** | Gana 1 copas de Básquet 2 contra 2 → Gana 3 copas de Básquet 2 contra 2 | 25 / 60 |
 
 ## 📈 Récords
 
@@ -95,6 +97,7 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | 👋 **Amigo de los vecinos** | Saluda a los vecinos 10 veces (una por vecino y día) → Saluda a los vecinos 40 veces (una por vecino y día) → Saluda a los vecinos 100 veces (una por vecino y día) | 10 / 30 / 70 |
 | 🍫 **Diseñador de chocolates** | Guarda 3 creaciones en Crea tu Chocolate → Guarda 10 creaciones en Crea tu Chocolate → Guarda 25 creaciones en Crea tu Chocolate | 10 / 35 / 90 |
 | 🎃 **Fiestero de temporada** | Junta 10 fichas de eventos de temporada → Junta 40 fichas de eventos de temporada → Junta 100 fichas de eventos de temporada | 20 / 50 / 120 |
+| 🎪 **Organizador del festival** | Completa 1 capítulos del gran festival del Pueblo (hay 3) → Completa 2 capítulos del gran festival del Pueblo (hay 3) → Completa 3 capítulos del gran festival del Pueblo (hay 3) | 10 / 25 / 50 |
 
 ## 👕 Estilo y casa
 
@@ -126,6 +129,6 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | 🌈 **Leyenda de dos mundos** | Llega a 5000 m en el Parkour infinito y a 25000 puntos en Salto Choco el mismo perfil. | 240 |
 | 🕹️ **Dueño de la Arcade** | Canjea con Matipuntos los 4 juegos nuevos: Fútbol, Choco Match, Aventura y Ciudad Choco. | 240 |
 | 🗓️ **Un mes con Matichoc** | Juega 30 días distintos y llega al nivel 20. | 300 |
-| 🧿 **Cazador de logros** | Cumple 10 logros → Cumple 30 logros → Cumple 60 logros → Cumple 100 logros → Cumple 262 logros | 20 / 60 / 150 / 300 / 900 |
+| 🧿 **Cazador de logros** | Cumple 10 logros → Cumple 30 logros → Cumple 60 logros → Cumple 100 logros → Cumple 269 logros | 20 / 60 / 150 / 300 / 900 |
 
-**Total: 267 logros · 24.385 Matipuntos en premios.**
+**Total: 274 logros · 24.640 Matipuntos en premios.**

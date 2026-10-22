@@ -1986,3 +1986,113 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .pz-score { font-weight: 900; font-size: 1.2rem; color: #ffc800; }
 .pz-duel { font-size: 3rem; line-height: 1.2; }
 #puzzle-dialog .menu-secondary-row { flex-wrap: wrap; justify-content: center; }
+
+/* ---------- AVENTURA DEL FESTIVAL (menú, pantalla y cuadros; ver js/adventure-ui.js) ---------- */
+.lb-paths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 10px; }
+.lp-btn { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 10px 12px; border-radius: 18px; border: 3px solid #fff; color: #fff; font-family: inherit; text-align: left; cursor: pointer; touch-action: manipulation; box-shadow: 0 5px 0 rgba(0,0,0,0.28); }
+.lp-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.28); }
+.lp-btn:focus-visible { outline: 3px solid var(--dorado); outline-offset: 2px; }
+.lp-ico { font-size: 1.9rem; line-height: 1; flex: none; }
+.lp-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lp-txt b { font-family: var(--font-display); font-size: 1.05rem; line-height: 1.1; }
+.lp-txt small { font-size: 0.78rem; line-height: 1.2; opacity: 0.95; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.lp-adv { background: linear-gradient(110deg, #ffb000, #e8742a 60%, #c4501a); }
+.lp-free { background: linear-gradient(110deg, #3bb4f2, #2f7fd0); }
+.lp-me { background: linear-gradient(110deg, #ff4f9a, #d4216c); }
+.lp-pulse { animation: lp-pulse 1.6s ease-in-out infinite; }
+@keyframes lp-pulse { 0%, 100% { box-shadow: 0 5px 0 rgba(0,0,0,0.28), 0 0 0 0 rgba(255,200,0,0.7); } 50% { box-shadow: 0 5px 0 rgba(0,0,0,0.28), 0 0 0 9px rgba(255,200,0,0); } }
+.lb-goal { margin: -2px 0 10px; padding: 6px 12px; border-radius: 12px; background: rgba(255,246,230,0.9); color: var(--marron); font-weight: 700; font-size: 0.85rem; }
+.lb-welcome { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; padding: 10px 12px; border-radius: 14px; background: #fff6e6; color: var(--marron-osc); border: 3px solid var(--dorado); font-size: 0.9rem; font-weight: 600; }
+.lb-welcome span { flex: 1; }
+.lb-welcome .btn-tiny { background: var(--rosa); color: #fff; border: none; font-size: 0.85rem; padding: 6px 14px; }
+.character-grid.need-pick { animation: need-pick 0.8s ease-in-out 3; border-radius: 16px; }
+@keyframes need-pick { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,200,0,0); } 50% { box-shadow: 0 0 0 6px rgba(255,200,0,0.95); } }
+@media (max-width: 760px) {
+  .lb-paths { grid-template-columns: 1fr; gap: 8px; }
+  .lp-btn { min-height: 56px; }
+}
+@media (max-height: 460px) and (orientation: landscape) {
+  .lb-paths { gap: 6px; }
+  .lp-btn { min-height: 48px; padding: 6px 8px; }
+  .lp-ico { font-size: 1.4rem; }
+  .lp-txt b { font-size: 0.9rem; }
+  .lp-txt small { font-size: 0.7rem; -webkit-line-clamp: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .lp-pulse, .character-grid.need-pick { animation: none; } .character-grid.need-pick { box-shadow: 0 0 0 4px rgba(255,200,0,0.95); } }
+
+#screen-adventure { align-items: stretch; padding: 10px; }
+.adv { width: 100%; max-width: 920px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; height: 100%; min-height: 0; }
+.adv-top { flex: none; }
+.adv-top .sh-title { flex: 1; }
+.adv-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 16px; }
+.adv-chapters { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.adv-ch { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 14px; background: rgba(255,246,230,0.92); color: var(--marron-osc); border: 3px solid transparent; }
+.adv-ch.now { border-color: var(--dorado); background: #fff6e6; box-shadow: 0 0 14px rgba(255,200,0,0.6); }
+.adv-ch.later { opacity: 0.6; }
+.adv-ch .ac-ico { font-size: 1.5rem; }
+.adv-ch .ac-txt { display: flex; flex-direction: column; min-width: 0; }
+.adv-ch b { font-size: 0.85rem; line-height: 1.15; }
+.adv-ch small { font-size: 0.75rem; }
+.adv-now, .adv-block { background: linear-gradient(180deg, #4b2e2e, #35201f); border: 3px solid var(--dorado); border-radius: 18px; padding: 12px 14px; color: var(--crema); }
+.adv-now h2, .adv-block h2 { margin: 0 0 6px; font-size: 1.15rem; color: var(--dorado); }
+.adv-need { margin: 0 0 8px; }
+.adv-steps { list-style: none; margin: 0 0 10px; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.adv-steps li { padding: 6px 10px; border-radius: 10px; background: rgba(255,255,255,0.06); font-size: 0.92rem; }
+.adv-steps li.now { background: rgba(255,200,0,0.2); font-weight: 700; }
+.adv-steps li.done { opacity: 0.7; text-decoration: line-through; text-decoration-thickness: 1px; }
+.adv-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.adv-actions .btn-primary { padding: 10px 18px; font-size: 0.98rem; }
+.adv-hint { margin: 8px 0 0; font-size: 0.82rem; opacity: 0.85; }
+.adv-built, .adv-sports { display: flex; flex-direction: column; gap: 8px; }
+.adv-place, .adv-sport { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 12px; background: rgba(255,255,255,0.07); }
+.adv-place span, .adv-sport span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.adv-place small, .adv-sport small { font-size: 0.8rem; opacity: 0.9; }
+.adv-place.off { opacity: 0.6; }
+.adv-sport .btn-small { padding: 8px 16px; font-size: 0.9rem; flex: none; }
+.adv-lock { font-size: 0.75rem; opacity: 0.8; max-width: 40%; text-align: right; }
+.adv-medals { margin: 4px 0 0; font-size: 0.85rem; }
+.adv-goals { display: flex; flex-wrap: wrap; gap: 8px; }
+.adv-goals .adv-hint { width: 100%; margin: 0 0 4px; }
+.adv-goal { padding: 8px 12px; border-radius: 999px; border: 2px solid rgba(255,200,0,0.5); background: rgba(255,255,255,0.06); color: var(--crema); font-family: inherit; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+.adv-goal.on { background: var(--dorado); color: var(--marron-osc); border-color: #fff; }
+@media (max-width: 640px) { .adv-chapters { grid-template-columns: 1fr; } }
+
+.adv-card, .me-card { width: min(460px, 100%); }
+.adv-options, .me-options { display: flex; flex-direction: column; gap: 8px; }
+.adv-opt, .me-opt { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center; text-align: left; padding: 10px 12px; border-radius: 14px; border: 3px solid var(--ao, rgba(255,200,0,0.6)); background: rgba(255,255,255,0.08); color: var(--crema); font-family: inherit; cursor: pointer; touch-action: manipulation; }
+.adv-opt .ao-ico, .me-opt span { grid-row: span 2; font-size: 1.8rem; }
+.adv-opt b, .me-opt b { font-size: 1rem; }
+.adv-opt small, .me-opt small { font-size: 0.8rem; opacity: 0.9; }
+.adv-opt.on { background: rgba(255,200,0,0.22); box-shadow: 0 0 0 2px #fff inset; }
+.adv-opt:focus-visible, .me-opt:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.fb-newmode { margin: 4px auto 6px; display: block; border-color: var(--dorado); background: rgba(255,200,0,0.18); }
+
+/* Pueblo: objetivo de la aventura arriba y botones para jugar desde un diálogo */
+.town-goal { position: absolute; top: 8px; right: 8px; z-index: 6; max-width: min(560px, 50%); padding: 6px 14px; border-radius: 999px; background: rgba(255,246,230,0.92); color: var(--marron-osc); border: 2px solid var(--dorado); font-weight: 700; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.town-goal:empty { display: none; }
+.td-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 2px; }
+.td-actions:empty { display: none; }
+.td-actions .td-play { padding: 7px 14px; font-size: 0.88rem; box-shadow: 0 3px 0 var(--rosa-osc); }
+@media (max-height: 460px) { .town-goal { font-size: 0.72rem; padding: 4px 10px; max-width: 46%; } }
+
+/* ---------- PARTIDOS (Pichanga 3 contra 3 y Básquet 2 contra 2; ver js/match-game.js) ---------- */
+.mt-opts { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 8px; }
+.mt-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; }
+.mt-label { width: 100%; font-size: 0.78rem; font-weight: 800; color: var(--dorado); text-transform: uppercase; letter-spacing: 0.04em; }
+.mt-row .mode-btn { flex: 1 1 0; min-width: 0; min-height: 40px; }
+.mt-info { font-size: 0.82rem !important; margin: 2px 0 0 !important; opacity: 0.9; }
+.mt-score { font-weight: 800; white-space: nowrap; max-width: 46vw; overflow: hidden; text-overflow: ellipsis; }
+.mt-hint { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 6; max-width: 86%; padding: 6px 14px; border-radius: 999px; background: rgba(255,246,230,0.94); color: var(--marron-osc); border: 2px solid var(--dorado); font-weight: 700; font-size: 0.88rem; text-align: center; pointer-events: none; }
+.mt-touch { align-items: flex-end; }
+.mt-btns { pointer-events: auto; display: grid; grid-template-columns: auto auto; grid-template-areas: "sw shoot" "pass shoot"; gap: 10px; align-items: end; }
+.mt-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; border-radius: 50%; border: 3px solid #fff; color: #fff; font-size: 1.7rem; line-height: 1; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; box-shadow: 0 4px 0 rgba(0,0,0,0.35); }
+.mt-btn small { font-size: 0.66rem; font-weight: 800; font-family: inherit; margin-top: 2px; }
+.mt-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,0.35); }
+.mt-pass { grid-area: pass; width: 84px; height: 84px; background: linear-gradient(180deg, #4fd0ff, #2f7fd0); }
+.mt-shoot { grid-area: shoot; width: 96px; height: 96px; background: linear-gradient(180deg, #ff4f9a, #d4216c); align-self: center; }
+.mt-switch { grid-area: sw; width: 62px; height: 62px; font-size: 1.3rem; background: linear-gradient(180deg, #ffd34d, #e8a400); justify-self: center; }
+@media (max-height: 420px) { .mt-pass { width: 72px; height: 72px; } .mt-shoot { width: 82px; height: 82px; } .mt-switch { width: 54px; height: 54px; } .mt-btns { gap: 6px; } }
+.mt-meter { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); z-index: 6; width: 22px; height: 150px; border-radius: 12px; background: rgba(28,15,7,0.6); border: 2px solid #fff; overflow: hidden; pointer-events: none; }
+.mt-meter b { position: absolute; left: 0; right: 0; bottom: 39%; height: 22%; background: rgba(79,208,154,0.85); }
+.mt-meter i { position: absolute; left: 3px; right: 3px; bottom: 0; height: 0; background: linear-gradient(0deg, #ffc800, #fff6a8); border-radius: 8px; }
+@media (pointer: coarse) { .mt-meter { right: auto; left: 50%; top: auto; bottom: 150px; transform: translateX(-50%) rotate(90deg); transform-origin: center; } }

@@ -206,9 +206,8 @@ export function makeStars(count = 400, radius = 120) {
 }
 
 /** Banderines de colores de marca sobre una línea (como en la web y la feria 3D). */
-export function makeBunting(from, to, { count = 14, sag = 0.7, size = 0.28 } = {}) {
+export function makeBunting(from, to, { count = 14, sag = 0.7, size = 0.28, colors = [0xd4216c, 0xffc800, 0xcfd767, 0xfff6e6, 0xf08a3c] } = {}) {
   const group = new THREE.Group();
-  const colors = [0xd4216c, 0xffc800, 0xcfd767, 0xfff6e6, 0xf08a3c];
   const geo = new THREE.ConeGeometry(size, size * 2, 3);
   geo.rotateX(Math.PI);
   const flags = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.7, side: THREE.DoubleSide }), count);

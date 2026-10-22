@@ -96,6 +96,28 @@
     </div>
   </div>
 </div>
+<!-- Aventura: elegir el estilo de un lugar del Pueblo (rincón, cancha, aro) -->
+<div id="adv-choice" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="adv-choice-title">
+  <div class="modal-card adv-card">
+    <div class="um-icon" id="adv-choice-icon">🎨</div>
+    <h2 id="adv-choice-title">Elige un estilo</h2>
+    <div id="adv-choice-options" class="adv-options"></div>
+    <button id="adv-choice-close" data-back class="btn-secondary" type="button">Elegir después</button>
+  </div>
+</div>
+<!-- Menú: "Mi personaje y mis espacios" (lleva a las pantallas de siempre) -->
+<div id="me-dialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="me-title">
+  <div class="modal-card me-card">
+    <h2 id="me-title">Mi personaje y mis espacios</h2>
+    <div class="me-options">
+      <button type="button" class="me-opt" id="me-shop"><span>👕</span><b>Vestuario y Tienda</b><small>Ropa, peinados y accesorios</small></button>
+      <button type="button" class="me-opt" id="me-house"><span>🏠</span><b>Mi Casa</b><small>Muebles y cuartos</small></button>
+      <button type="button" class="me-opt" id="me-char"><span>🔄</span><b>Cambiar de Matichico</b><small>Elige con quién juegas</small></button>
+      <button type="button" class="me-opt" id="me-town"><span>🏘️</span><b>Mis lugares del Pueblo</b><small>Lo que construiste en la aventura</small></button>
+    </div>
+    <button id="me-close" data-back class="btn-secondary" type="button">Cerrar</button>
+  </div>
+</div>
 <!--WEB--><!-- Cartel de la demo de la web: para seguir hay que bajar la app -->
 <div id="demo-wall" class="modal hidden" role="dialog" aria-modal="true">
   <div class="modal-card">
@@ -196,13 +218,20 @@
         </aside>
 
         <main class="lb-games">
+          <div id="lb-welcome" class="lb-welcome hidden" role="status"><span id="lb-welcome-text"></span><button type="button" id="lb-welcome-ok" class="btn-tiny">¡Vamos!</button></div>
+          <nav class="lb-paths" aria-label="¿Qué quieres hacer?">
+            <button id="btn-path-adventure" class="lp-btn lp-adv" type="button"><span class="lp-ico" aria-hidden="true">🎪</span><span class="lp-txt"><b>Continuar mi aventura</b><small id="lp-adv-sub">El gran festival del Pueblo</small></span></button>
+            <button id="btn-path-free" class="lp-btn lp-free" type="button"><span class="lp-ico" aria-hidden="true">🎮</span><span class="lp-txt"><b>Jugar libremente</b><small>Todos los juegos, cuando quieras</small></span></button>
+            <button id="btn-path-me" class="lp-btn lp-me" type="button"><span class="lp-ico" aria-hidden="true">🧑‍🎨</span><span class="lp-txt"><b>Mi personaje y mis espacios</b><small>Vestuario, Mi Casa y tu Matichico</small></span></button>
+          </nav>
+          <p id="lb-goal" class="lb-goal hidden"></p>
           <div id="event-banner" class="event-banner hidden"></div>
           <button id="btn-house-banner" class="house-banner" type="button">
             <span class="hb-art" aria-hidden="true">🏠<i>🛋️</i><i>🧸</i></span>
             <span class="hb-text"><b>Mi Casa <em>¡Nuevo!</em></b><span id="house-banner-sub">Arrastra muebles, decora y agranda tu casa</span></span>
             <span class="hb-go">Entrar ▶</span>
           </button>
-          <h2 class="lb-title">Elige un juego</h2>
+          <h2 class="lb-title" id="lb-games-title" tabindex="-1">Elige un juego</h2>
           <div id="game-feature" class="lb-feature"></div>
           <div id="game-grid" class="game-grid lb-grid"></div>
           <!--WEB--><nav class="site-links lb-links" aria-label="Enlaces a matichoc.cl">
@@ -212,6 +241,24 @@
           </nav><!--/WEB--><!--APP--><p class="app-credit">🍫 Un juego promovido por <b>Matichoc</b> · pasión por el cacao</p><!--/APP-->
       <p class="legal-links"><button type="button" class="legal-open" data-legal="privacy">🔒 Privacidad</button> · <button type="button" class="legal-open" data-legal="licenses">📜 Créditos y licencias</button></p>
         </main>
+      </div>
+    </div>
+  </section>
+
+  <!-- MI AVENTURA DEL FESTIVAL: capítulos, objetivo, lugares construidos, deportes, meta y reto de temporada -->
+  <section id="screen-adventure" class="screen hidden">
+    <div class="adv">
+      <header class="sh-top adv-top">
+        <button id="btn-adventure-back" class="btn-secondary">← Volver</button>
+        <h1 class="logo sh-title">El gran festival</h1>
+      </header>
+      <div class="adv-body">
+        <ol id="adv-chapters" class="adv-chapters" aria-label="Capítulos"></ol>
+        <section id="adv-now" class="adv-now" aria-live="polite"></section>
+        <section class="adv-block"><h2>🏗️ Lo que construiste</h2><div id="adv-built" class="adv-built"></div></section>
+        <section class="adv-block"><h2>🏆 Deportes del Pueblo</h2><div id="adv-sports" class="adv-sports"></div></section>
+        <section class="adv-block"><h2>🎯 Mi meta</h2><div id="adv-goals" class="adv-goals"></div></section>
+        <section id="adv-season" class="adv-block hidden"></section>
       </div>
     </div>
   </section>
@@ -373,6 +420,7 @@
         <div class="overlay-card">
           <h2 id="recolecta-intro-title">Nivel</h2>
           <p class="fps-tag">Ahora en 3D</p>
+          <button class="btn-secondary fb-newmode" id="basquet-btn-2v2" type="button">🏀 Nuevo: Básquet 2 contra 2 (partido)</button>
           <p id="recolecta-intro-text"></p>
           <details class="how"><summary>📖 Cómo se juega</summary>
           <p class="fps-hint">Mueve con el joystick (o ← ↑ ↓ → / W A S D). Salta con Espacio (o K). Impulso rápido con Shift (¡te hace inmune!). Cuidado con los guardias malvaviscos: quitan 4 segundos. Junta golosinas seguidas para hacer combo y toma ⏱ el reloj, 👟 las botas y 🧲 el imán. ¡Son 20 niveles!</p>
@@ -730,6 +778,7 @@
       <canvas id="town-canvas"></canvas>
       <div id="town-banner" class="fps-banner" aria-live="polite"></div>
       <div id="town-popups" class="fps-popups" aria-hidden="true"></div>
+      <div id="town-goal" class="town-goal" aria-live="polite"></div>
       <div id="town-dialog" class="town-dialog hidden"><b class="td-name"></b><span class="td-text"></span><small>toca para cerrar</small></div>
       <button id="town-btn-action" class="town-action hidden" type="button"></button>
       <button id="town-btn-jump" class="town-jump" type="button" aria-label="Saltar">⤴️</button>
@@ -746,6 +795,7 @@
           <details class="how"><summary>📖 Cómo se juega</summary>
           <p>Pasea por el pueblo con tu Matichico: prueba la fuente de chocolate, visita la Boutique y la Fábrica, saluda a los vecinos (¡te regalan Matipuntos!), junta alfajores dorados y entra a los juegos por las puertas brillantes del Arcade.</p>
           <p>Hay una torre y una escalera de nubes para <b>saltar</b> (parkour), y casitas con <b>puertas de juegos</b>: el Gato, el Mini Sudoku y el Cachipún.</p>
+          <p>🎪 <b>El gran festival:</b> sigue el objetivo de arriba y la flecha dorada. Los vecinos con <b>❗</b> te piden ayuda para arreglar el rincón de la plaza, la cancha y el aro.</p>
           <p class="fps-hint">Mover: WASD o flechas · Saltar: Espacio o J · Usar / hablar: E o Enter · Cámara: arrastra el mouse o Q. En el celular, joystick, botón de salto ⤴️ y botón de acción.</p>
           </details>
           <button class="btn-primary" id="town-btn-start">¡A explorar!</button>
@@ -1064,6 +1114,7 @@
         <div class="overlay-card">
           <h2>Fútbol Choco 3D</h2>
           <p class="fps-tag">Penales, tiros libres y atajapenales</p>
+          <button class="btn-secondary fb-newmode" id="futbol-btn-pichanga" type="button">⚽ Nuevo: Pichanga 3 contra 3 (partido)</button>
           <div id="futbol-modepick" class="lvl-pick"></div>
           <p id="futbol-intro-text"></p>
           <details class="how"><summary>📖 Cómo se juega</summary>
@@ -1093,6 +1144,138 @@
           <p id="futbol-gameover-text"></p>
           <button class="btn-primary" id="futbol-btn-retry">Reintentar</button>
           <button class="btn-secondary overlay-secondary-btn" id="futbol-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANTALLA DE JUEGO 3D: PICHANGA CHOCO (fútbol 3 contra 3; ver js/pichanga-game.js y js/pichanga-sim.js) -->
+  <section id="screen-pichanga" class="screen game-screen hidden">
+    <div id="pichanga-hud" class="hud">
+      <div class="hud-left">
+        <button id="pichanga-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="pichanga-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Pichanga Choco</div>
+          <div class="hud-mission" id="pichanga-hud-mode">Amistoso</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip mt-score"><span id="pichanga-hud-score">0 – 0</span></div>
+        <div class="hud-chip">⏱ <span id="pichanga-hud-clock">2:00</span></div>
+        <button id="pichanga-btn-pause" class="btn-icon" title="Pausa (P)">⏸</button>
+        <button id="pichanga-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="pichanga-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="pichanga-canvas"></canvas>
+      <div id="pichanga-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="pichanga-popups" class="fps-popups" aria-hidden="true"></div>
+      <div id="pichanga-hint" class="mt-hint hidden" aria-live="polite"></div>
+      <div class="pk-touch mt-touch" id="pichanga-touch">
+        <div class="pk-joy" id="pichanga-joy"><div class="pk-knob"></div></div>
+        <div class="mt-btns">
+          <button id="pichanga-btn-switch" class="mt-btn mt-switch" type="button" aria-label="Cambiar de jugador">🔄<small>Cambiar</small></button>
+          <button id="pichanga-btn-pass" class="mt-btn mt-pass" type="button" aria-label="Pase o quitar">👟<small id="pichanga-pass-label">Pase</small></button>
+          <button id="pichanga-btn-shoot" class="mt-btn mt-shoot" type="button" aria-label="Tiro al arco">⚽<small>Tiro</small></button>
+        </div>
+      </div>
+
+      <div id="pichanga-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Pichanga Choco ⚽</h2>
+          <p class="fps-tag">Fútbol 3 contra 3 · partidos de 2 minutos</p>
+          <div id="pichanga-intro-opts" class="mt-opts"></div>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>Cada equipo tiene <b>2 jugadores de campo y un arquero</b>. Manejas al que tiene el <b>anillo dorado</b>; tu compañero y los arqueros juegan solos.</p>
+          <p><b>Mover:</b> joystick o WASD / flechas. <b>Pase</b> (Espacio o J): pasa hacia donde apuntas; sin la pelota sirve para <b>quitarla</b> o para <b>pedírsela</b> a tu compañero. <b>Tiro</b> (K): patea al arco (apunta arriba o abajo para elegir el palo). <b>Cambiar</b> (Q): manejas al otro jugador. <b>Pausa:</b> P.</p>
+          <p>Reglas: si la pelota sale por el costado hay <b>saque de banda</b>; por el fondo, <b>saque de arco</b> o <b>córner</b>; después de cada gol, saque desde el centro. En la copa, si terminan empatados, ¡gol de oro!</p>
+          </details>
+          <button class="btn-primary" id="pichanga-btn-start">¡A la cancha!</button>
+        </div>
+      </div>
+
+      <div id="pichanga-overlay-pause" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>⏸ Pausa</h2>
+          <button class="btn-primary" id="pichanga-btn-resume" type="button">▶ Seguir jugando</button>
+          <button class="btn-secondary overlay-secondary-btn" id="pichanga-btn-quit" type="button">Salir del partido</button>
+        </div>
+      </div>
+
+      <div id="pichanga-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="pichanga-gameover-title">¡Final!</h2>
+          <p id="pichanga-gameover-text"></p>
+          <button class="btn-primary" id="pichanga-btn-retry">🔄 Jugar otra vez</button>
+          <button class="btn-secondary overlay-secondary-btn" id="pichanga-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANTALLA DE JUEGO 3D: BÁSQUET 2 CONTRA 2 (media cancha; ver js/basquet2v2-game.js y js/basquet2v2-sim.js) -->
+  <section id="screen-bq2" class="screen game-screen hidden">
+    <div id="bq2-hud" class="hud">
+      <div class="hud-left">
+        <button id="bq2-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="bq2-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level">Básquet 2 contra 2</div>
+          <div class="hud-mission" id="bq2-hud-mode">Amistoso</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip mt-score"><span id="bq2-hud-score">0 – 0</span></div>
+        <div class="hud-chip">⏱ <span id="bq2-hud-clock">3:00</span></div>
+        <button id="bq2-btn-pause" class="btn-icon" title="Pausa (P)">⏸</button>
+        <button id="bq2-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="bq2-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="bq2-canvas"></canvas>
+      <div id="bq2-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="bq2-popups" class="fps-popups" aria-hidden="true"></div>
+      <div id="bq2-hint" class="mt-hint hidden" aria-live="polite"></div>
+      <div id="bq2-meter" class="mt-meter hidden" aria-hidden="true"><b></b><i></i></div>
+      <div class="pk-touch mt-touch" id="bq2-touch">
+        <div class="pk-joy" id="bq2-joy"><div class="pk-knob"></div></div>
+        <div class="mt-btns">
+          <button id="bq2-btn-switch" class="mt-btn mt-switch" type="button" aria-label="Cambiar de jugador">🔄<small>Cambiar</small></button>
+          <button id="bq2-btn-pass" class="mt-btn mt-pass" type="button" aria-label="Pase o robar">🤾<small id="bq2-pass-label">Pase</small></button>
+          <button id="bq2-btn-shoot" class="mt-btn mt-shoot" type="button" aria-label="Tiro (mantén y suelta) o saltar">🏀<small id="bq2-shoot-label">Tiro</small></button>
+        </div>
+      </div>
+
+      <div id="bq2-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Básquet 2 contra 2 🏀</h2>
+          <p class="fps-tag">Media cancha · tú y tu compañero contra dos rivales</p>
+          <div id="bq2-intro-opts" class="mt-opts"></div>
+          <details class="how"><summary>📖 Cómo se juega (reglas simples)</summary>
+          <p>Manejas al jugador del <b>anillo dorado</b>; tu compañero juega solo. <b>Mover:</b> joystick o WASD / flechas. <b>Pase</b> (Espacio o J). <b>Tiro</b> (K): <b>mantén apretado y suelta</b> cuando la barra está en la zona verde. Sin la pelota: <b>Pase = Robar</b> y <b>Tiro = Saltar</b> (para tapar o ganar el rebote). <b>Cambiar</b> (Q) en defensa. <b>Pausa:</b> P.</p>
+          <p>Canasta = <b>2 puntos</b>; desde detrás de la línea grande, <b>3</b>. Después de una canasta o si la pelota sale, la pelota es del otro equipo y saca <b>desde arriba</b>. Si tu equipo la <b>recupera</b> (rebote o robo), hay que <b>sacarla detrás de la línea de 3</b> antes de tirar (se marca en amarillo). Gana quien llega primero a la meta de puntos o va arriba cuando se acaba el tiempo.</p>
+          </details>
+          <button class="btn-primary" id="bq2-btn-start">¡A la cancha!</button>
+        </div>
+      </div>
+
+      <div id="bq2-overlay-pause" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>⏸ Pausa</h2>
+          <button class="btn-primary" id="bq2-btn-resume" type="button">▶ Seguir jugando</button>
+          <button class="btn-secondary overlay-secondary-btn" id="bq2-btn-quit" type="button">Salir del partido</button>
+        </div>
+      </div>
+
+      <div id="bq2-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="bq2-gameover-title">¡Final!</h2>
+          <p id="bq2-gameover-text"></p>
+          <button class="btn-primary" id="bq2-btn-retry">🔄 Jugar otra vez</button>
+          <button class="btn-secondary overlay-secondary-btn" id="bq2-btn-gameover-menu">Volver al menú</button>
         </div>
       </div>
     </div>
