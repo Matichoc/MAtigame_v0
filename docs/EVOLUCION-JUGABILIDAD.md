@@ -180,7 +180,8 @@ Capturas revisadas: menú con los tres caminos, pantalla del festival, Bombi en 
 
 **Compilado para Android (A):**
 - Compilación nº 75 desde esta rama (`da3c4b6`), con `release` sin marcar, `fonts=libres` e `icono=habitual`: todos los pasos en verde (https://github.com/Matichoc/MAtigame_v0/actions/runs/39868641480).
-- Después se subió el ajuste del menú y se lanzó otra compilación con lo último (ver la bitácora). Ninguna compilación sube nada a Play.
+- **Compilación nº 76** (`edd2d0a`, con todo, incluido el ajuste del menú): en verde. APK de prueba en el artefacto `matijuego-prueba-apk` de https://github.com/Matichoc/MAtigame_v0/actions/runs/39869164512.
+- Ninguna compilación sube nada a Play.
 **Probado en un celular real (C):** pendiente, lo hace la persona dueña (guía en §11).
 
 ## 10. Cómo generar un APK con todos los cambios

@@ -26,7 +26,10 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - `scripts/qa/atras.cjs` ampliado con la pantalla de la aventura, el cuadro nuevo y un partido.
 - Resultados de esta corrida: ver "Evidencia final" en `docs/EVOLUCION-JUGABILIDAD.md`.
 - Ajuste tras revisar capturas de celular: los tres caminos del menú quedaban abajo en vertical; se movieron arriba de todo.
-- Compilación nº 75 (APK de prueba, sin `release`) desde la rama: en verde. Se lanzó otra con el ajuste del menú (número y enlace en la entrada de abajo, cuando termine).
+- Compilaciones desde la rama, con APK de prueba, sin `release`, `fonts=libres` e `icono=habitual`:
+  - Nº 75 (`da3c4b6`): en verde.
+  - **Nº 76 (`edd2d0a`, con todo, incluido el ajuste del menú): en verde.** Artefacto `matijuego-prueba-apk` en https://github.com/Matichoc/MAtigame_v0/actions/runs/39869164512.
+  - No se subió nada a Play.
 - Pendiente:
   - Compilar el APK con estos cambios y probar en el celular de la persona dueña: controles táctiles, rendimiento de los partidos y lectura de textos en pantalla chica.
   - No se puede afirmar más diversión ni más retención sin probar con personas.
