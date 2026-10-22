@@ -1988,6 +1988,8 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 #puzzle-dialog .menu-secondary-row { flex-wrap: wrap; justify-content: center; }
 
 /* ---------- AVENTURA DEL FESTIVAL (menú, pantalla y cuadros; ver js/adventure-ui.js) ---------- */
+.lb-start { flex: none; display: flex; flex-direction: column; gap: 8px; }
+.lb-start > * { margin: 0 !important; }
 .lb-paths { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 10px; }
 .lp-btn { display: flex; align-items: center; gap: 10px; min-height: 64px; padding: 10px 12px; border-radius: 18px; border: 3px solid #fff; color: #fff; font-family: inherit; text-align: left; cursor: pointer; touch-action: manipulation; box-shadow: 0 5px 0 rgba(0,0,0,0.28); }
 .lp-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.28); }
@@ -2007,7 +2009,7 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .lb-welcome .btn-tiny { background: var(--rosa); color: #fff; border: none; font-size: 0.85rem; padding: 6px 14px; }
 .character-grid.need-pick { animation: need-pick 0.8s ease-in-out 3; border-radius: 16px; }
 @keyframes need-pick { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,200,0,0); } 50% { box-shadow: 0 0 0 6px rgba(255,200,0,0.95); } }
-@media (max-width: 760px) {
+@media (max-width: 760px) and (orientation: portrait) {
   .lb-paths { grid-template-columns: 1fr; gap: 8px; }
   .lp-btn { min-height: 56px; }
 }

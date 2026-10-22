@@ -197,6 +197,16 @@
 
       <div id="demo-banner" class="demo-banner hidden">🧪 <b>Versión de prueba en la web:</b> algunos juegos traen solo 2 o 3 niveles. <b>Matijuego completo, próximamente en Google Play</b> 📲</div>
 
+      <!-- los tres caminos del menú, arriba de todo (también en el celular vertical) -->
+      <div class="lb-start">
+        <div id="lb-welcome" class="lb-welcome hidden" role="status"><span id="lb-welcome-text"></span><button type="button" id="lb-welcome-ok" class="btn-tiny">¡Vamos!</button></div>
+        <nav class="lb-paths" aria-label="¿Qué quieres hacer?">
+          <button id="btn-path-adventure" class="lp-btn lp-adv" type="button"><span class="lp-ico" aria-hidden="true">🎪</span><span class="lp-txt"><b>Continuar mi aventura</b><small id="lp-adv-sub">El gran festival del Pueblo</small></span></button>
+          <button id="btn-path-free" class="lp-btn lp-free" type="button"><span class="lp-ico" aria-hidden="true">🎮</span><span class="lp-txt"><b>Jugar libremente</b><small>Todos los juegos, cuando quieras</small></span></button>
+          <button id="btn-path-me" class="lp-btn lp-me" type="button"><span class="lp-ico" aria-hidden="true">🧑‍🎨</span><span class="lp-txt"><b>Mi personaje y mis espacios</b><small>Vestuario, Mi Casa y tu Matichico</small></span></button>
+        </nav>
+        <p id="lb-goal" class="lb-goal hidden"></p>
+      </div>
       <div class="lb-body">
         <aside class="lb-stage">
           <div class="lb-stage-view">
@@ -218,13 +228,6 @@
         </aside>
 
         <main class="lb-games">
-          <div id="lb-welcome" class="lb-welcome hidden" role="status"><span id="lb-welcome-text"></span><button type="button" id="lb-welcome-ok" class="btn-tiny">¡Vamos!</button></div>
-          <nav class="lb-paths" aria-label="¿Qué quieres hacer?">
-            <button id="btn-path-adventure" class="lp-btn lp-adv" type="button"><span class="lp-ico" aria-hidden="true">🎪</span><span class="lp-txt"><b>Continuar mi aventura</b><small id="lp-adv-sub">El gran festival del Pueblo</small></span></button>
-            <button id="btn-path-free" class="lp-btn lp-free" type="button"><span class="lp-ico" aria-hidden="true">🎮</span><span class="lp-txt"><b>Jugar libremente</b><small>Todos los juegos, cuando quieras</small></span></button>
-            <button id="btn-path-me" class="lp-btn lp-me" type="button"><span class="lp-ico" aria-hidden="true">🧑‍🎨</span><span class="lp-txt"><b>Mi personaje y mis espacios</b><small>Vestuario, Mi Casa y tu Matichico</small></span></button>
-          </nav>
-          <p id="lb-goal" class="lb-goal hidden"></p>
           <div id="event-banner" class="event-banner hidden"></div>
           <button id="btn-house-banner" class="house-banner" type="button">
             <span class="hb-art" aria-hidden="true">🏠<i>🛋️</i><i>🧸</i></span>

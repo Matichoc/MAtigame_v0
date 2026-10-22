@@ -59,7 +59,7 @@ Leyenda de estado: ⬜ pendiente · 🟨 en curso · ✅ hecho. En las pruebas: 
 
 Recorrido de un perfil nuevo: crear perfil → elegir personaje → entender qué hacer → jugar → ver una consecuencia → decidir cómo seguir.
 
-- [x] El menú muestra tres accesos grandes: **"Continuar mi aventura"**, **"Jugar libremente"** y **"Mi personaje y mis espacios"** (`app/index.template.html`, `js/adventure-ui.js`). Reutilizan lo que ya existía: el Pueblo, la grilla de juegos, Vestuario y Tienda, y Mi Casa.
+- [x] El menú muestra tres accesos grandes: **"Continuar mi aventura"**, **"Jugar libremente"** y **"Mi personaje y mis espacios"** (`app/index.template.html`, `js/adventure-ui.js`). Están arriba de todo, bajo la barra superior: en el celular vertical se ven sin desplazar la pantalla (uno bajo otro) y en horizontal, en una fila. Reutilizan lo que ya existía: el Pueblo, la grilla de juegos, Vestuario y Tienda, y Mi Casa.
 - [x] Perfil nuevo: si todavía no eliges tu Matichico, el botón de la aventura lo dice y, al tocar un juego, sale un aviso amable con la grilla de personajes destacada (antes era una alerta del navegador). Al elegirlo: "¡Hola, …! Ahora toca «Continuar mi aventura»", y el botón brilla hasta que empiezas.
 - [x] "Jugar libremente" lleva directo a la grilla de juegos (todos siguen a un toque). "Mi personaje y mis espacios" abre un cuadro con Vestuario y Tienda, Mi Casa, Cambiar de Matichico y Mis lugares del Pueblo.
 - [x] Primer objetivo en pocos minutos: "Ir al Pueblo con Bombi" te deja junto a ella. Su diálogo trae botones para jugar una partida y, al volver, eliges el estilo del rincón y lo ves cambiar en el momento.
@@ -165,7 +165,7 @@ Ver §9.
 
 | Prueba | Resultado |
 |---|---|
-| `scripts/qa/aventura.cjs` (perfil nuevo → festival completo, cerrar y reabrir, resumen al volver, perfil antiguo) | 41/41, 0 errores, 0 peticiones externas |
+| `scripts/qa/aventura.cjs` (perfil nuevo → festival completo, cerrar y reabrir, resumen al volver, perfil antiguo) | 41/41, 0 errores, 0 peticiones externas (repetida tras mover los caminos arriba: 41/41; `atras.cjs` 22/22 y `perfiles.cjs` 13/13) |
 | `scripts/qa/deportes.cjs` (los dos deportes, horizontal con teclado y vertical táctil sin red, pausa, segundo plano, final, copa guardada al reabrir, gol de oro, giro de pantalla) | 52/52, 0 errores, 0 peticiones externas |
 | `scripts/qa/atras.cjs` (con pantalla de aventura, cuadro nuevo y Pichanga) | 22/22 |
 | `scripts/qa/temporada.cjs` | 29/29 |
@@ -178,7 +178,9 @@ Ver §9.
 
 Capturas revisadas: menú con los tres caminos, pantalla del festival, Bombi en el Pueblo, rincón con guirnaldas, festival terminado, Pichanga y Básquet en horizontal y vertical.
 
-**Compilado para Android (A):** ver la bitácora (se compila desde la rama con el workflow "Compilar app Android").
+**Compilado para Android (A):**
+- Compilación nº 75 desde esta rama (`da3c4b6`), con `release` sin marcar, `fonts=libres` e `icono=habitual`: todos los pasos en verde (https://github.com/Matichoc/MAtigame_v0/actions/runs/39868641480).
+- Después se subió el ajuste del menú y se lanzó otra compilación con lo último (ver la bitácora). Ninguna compilación sube nada a Play.
 **Probado en un celular real (C):** pendiente, lo hace la persona dueña (guía en §11).
 
 ## 10. Cómo generar un APK con todos los cambios

@@ -127,7 +127,7 @@ export function initAdventureUI(ctx) {
     const btn = $("btn-path-adventure");
     const a = adventureOf(p);
     if (!ctx.getCharacter()) {
-      sub.textContent = "Primero elige tu Matichico 👈";
+      sub.textContent = "Primero elige tu Matichico";
       btn.classList.remove("lp-pulse");
     } else {
       const obj = objective(p);
