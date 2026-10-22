@@ -10,6 +10,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 - **Decisión de la persona dueña:** todo lo que se desarrolle debe funcionar en teléfonos de gama media-baja hacia arriba. Quedó como regla en `CLAUDE.md`.
 - Se midió lo nuevo. Dibujos por cuadro: Pichanga 858 (Fútbol de siempre: 302) y Básquet 2 contra 2: 548 (Lanzamientos: 209). La causa eran las sombras reales de 6 y 4 personajes.
 - Ajuste en celulares: sombras redondas simples en un solo dibujo, sin brillo de posprocesado y tablas de la cancha agrupadas. Quedó en Pichanga **413** y Básquet 2 contra 2 **286**. Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §12.
+- **Compilación nº 77** (`da7ad2c`, con este ajuste y toda la evolución): APK de prueba sin `release`, en verde. Reemplaza a la nº 76 para probar en el celular: https://github.com/Matichoc/MAtigame_v0/actions/runs/39870514932 (artefacto `matijuego-prueba-apk`).
 - Pendiente: medir en un celular real de gama media-baja.
 
 ### Evolución integral: aventura del festival, Pichanga 3 contra 3 y Básquet 2 contra 2 (rama `claude/zealous-johnson-2ryf87`)
