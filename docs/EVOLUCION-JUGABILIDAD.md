@@ -290,6 +290,22 @@ Eligió estas tres respuestas:
 - **Ciudad:** la lista de misiones es una tarjeta clara con botones «Ir» redondos, y la misión del momento es un globito claro.
 - **«Mis lugares y copas»:** tarjetas claras.
 
+**Menú en celulares** (revisión crítica de experiencia de usuario, a pedido de la persona dueña: "esa foto grande quizás molesta")
+- **Problemas encontrados** en un celular chico (360×740 de pie y 740×360 acostado):
+  - De pie, el escenario grande del personaje (una "foto" de ~560 px con el selector y dos botones) quedaba entre los tres botones principales y los juegos. «Elige un juego» recién aparecía en la tercera pantalla.
+  - Acostado, la cabecera ocupaba media pantalla (3 filas de botones) y los juegos quedaban en una ventanita con desplazamiento propio de **~70 px** de alto. Casi no se podía usar.
+  - Había botones repetidos: «Vestuario y Tienda» y «Mi Casa», más el cartel grande de «Mi Casa ¡Nuevo!», además del botón «Mi personaje y mis espacios», que lleva a lo mismo.
+  - Las tarjetas de los juegos tenían hasta 4 carteles encima de la foto ("3D", "⚡ 8 + 1 cada 12 s", "📱 Horizontal", candado). Era mucho texto para un niño.
+- **Cambios** (solo en celulares; en computador queda igual):
+  - El personaje va en una franja chica: el Matichico a la izquierda y los 4 para elegir a la derecha.
+  - Se quitaron los botones repetidos; siguen en «Mi personaje y mis espacios».
+  - La cabecera va en una o dos filas y los botones de arriba se deslizan de lado.
+  - El aviso de la temporada ocupa una sola fila.
+  - El juego destacado (la foto del Pueblo) es más bajo.
+  - Las tarjetas muestran la foto limpia y, abajo, una línea corta: "⚡ 8 · 📱 acostado".
+  - Acostado, todo el menú se desplaza junto, sin ventanitas.
+  - De pie, «Elige un juego» ahora se ve en la primera pantalla.
+
 **Pruebas nuevas:**
 - `scripts/qa/merge.cjs`:
   - Un producto 3D por casillero, en 1 o 2 pasos de dibujo, y costo bajo.

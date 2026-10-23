@@ -35,6 +35,13 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - Botones del menú redondos y con brillo.
   - Panel de Actividades del Pueblo y lista de misiones de la Ciudad claros y redondos.
   - «Mis lugares y copas» con tarjetas claras.
+- **Menú en celulares.** La persona dueña pidió revisarlo con ojo crítico: "esa foto grande quizás molesta, quisiera que sea muy buena la experiencia de usuario".
+  - **De pie:** el escenario grande del personaje ocupaba una pantalla entera antes de los juegos. Ahora es una franja chica con el Matichico y los 4 para elegir, y «Elige un juego» se ve en la primera pantalla.
+  - **Acostado:** la cabecera ocupaba media pantalla y los juegos quedaban en una ventanita de ~70 px de alto. Ahora la cabecera va en una fila y todo el menú se desplaza junto.
+  - **Botones repetidos:** se quitaron «Vestuario y Tienda», «Mi Casa» y el cartel de Mi Casa; siguen en «Mi personaje y mis espacios».
+  - **Tarjetas de juegos:** sin carteles encima de la foto; abajo, una línea corta "⚡ 8 · 📱 acostado".
+  - **Aviso de temporada:** en una fila.
+  - En computador el menú queda igual.
 - Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §14.
 - **Pruebas:** PENDIENTE_PRUEBAS
 - **Prueba de partidos (`deportes.cjs`):**

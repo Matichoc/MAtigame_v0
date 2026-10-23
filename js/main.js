@@ -1730,6 +1730,12 @@ function renderGameGrid() {
     tagline.className = "gtagline";
     tagline.textContent = entry.tagline;
     body.append(name, tagline);
+    // en celular, en vez de los carteles sobre la foto: una línea corta con la energía y si va acostado
+    const meta = document.createElement("span");
+    meta.className = "gmeta";
+    const cost = ENERGY_COST[entry.id] || 0;
+    meta.textContent = [cost > 0 ? `⚡ ${cost}` : "", entry.orient === "landscape" ? "📱 acostado" : ""].filter(Boolean).join(" · ");
+    if (meta.textContent) body.appendChild(meta);
 
     if (entry.status === "available") {
       const best = getBestScore(progress, entry.id);

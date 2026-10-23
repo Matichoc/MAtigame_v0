@@ -2254,3 +2254,69 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .joy-card .cl-tt small { color: var(--joy-ink); opacity: 0.85; }
 .joy-card .cl-go { border: 0; border-radius: 999px; color: #fff; font-weight: 900; background: linear-gradient(180deg, #ff8cc0, var(--joy-pink)); box-shadow: 0 3px 0 var(--joy-pink-osc); }
 .joy-card .cl-go:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--joy-pink-osc); }
+
+/* ---------- Menú en celulares: el personaje en una franja chica, los juegos más arriba y tarjetas limpias ----------
+   (antes, de pie, el escenario grande del personaje ocupaba una pantalla entera entre los botones y los juegos, y
+   acostado la cabecera usaba media pantalla y los juegos quedaban en una ventanita de ~70 px) */
+.gmeta { display: none; }
+@media (max-width: 720px), (max-height: 500px) and (orientation: landscape) {
+  .lb-stage-actions, .house-banner, .lb-drag-hint { display: none !important; } /* ya están en «Mi personaje y mis espacios» */
+  .game-card .gthumb .gorient { display: none; }
+  .gmeta { display: block; font-size: 0.7rem; font-weight: 800; color: #ffd34d; }
+  .lb-feature { min-height: 128px; }
+  .lb-feature .lf-tag { display: none; }
+  .lb-feature .btn-primary { font-size: 1rem; padding: 8px 22px; }
+  .lb-nameplate { bottom: 6px; }
+  .lb-nameplate span { font-size: 0.85rem; padding: 2px 10px; }
+}
+@media (max-width: 720px) {
+  /* franja «Tu Matichico»: personaje chico a la izquierda y los 4 para elegir a la derecha */
+  .lb-body { grid-template-columns: 132px 1fr; column-gap: 8px; row-gap: 10px; }
+  .lb-stage-view { order: 1; grid-column: 1; height: auto; min-height: 150px; border-radius: 18px; }
+  .lb-chars { order: 2; grid-column: 2; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 6px; align-content: center; }
+  .lb-chars .character-card canvas { max-width: 48px; }
+  .lb-games { order: 3; grid-column: 1 / -1; }
+  .lb-rename { order: 4; grid-column: 1 / -1; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  /* acostado: todo el menú se desplaza junto (sin ventanitas) y la cabecera va en una sola fila */
+  #screen-hub { padding: 6px 8px; }
+  .lobby { height: auto; min-height: 100%; overflow-y: auto; gap: 8px; }
+  .lb-top { flex-wrap: nowrap; gap: 8px; padding: 4px 8px; border-radius: 14px; }
+  .lb-top .brand-badge img { height: 26px; }
+  .lb-logo { font-size: 1.15rem; }
+  .lb-logo span { display: none; }
+  .lb-actions { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-left: auto; min-width: 0; gap: 5px; }
+  .lb-actions::-webkit-scrollbar { display: none; }
+  .lb-actions .stat-chip { flex: none; padding: 3px 8px; font-size: 0.7rem; white-space: nowrap; }
+  .lb-profile { flex: none; }
+  .lb-profile .btn-tiny { padding: 3px 8px; font-size: 0.7rem; }
+  .lb-body { flex: none; grid-template-columns: 210px 1fr; gap: 8px; }
+  .lb-stage { overflow: visible; padding: 8px; gap: 8px; border-radius: 18px; }
+  .lb-stage-view { flex: none; height: 150px; min-height: 0; }
+  .lb-chars .character-card canvas { max-width: 40px; margin: 0 auto; display: block; }
+  .lb-games { overflow: visible; }
+  .lb-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+  .lb-grid .game-card .gtagline { display: none; }
+}
+@media (max-width: 720px), (max-height: 500px) and (orientation: landscape) {
+  /* el aviso de la temporada en una sola fila, con un botón chico */
+  .event-banner { flex-wrap: nowrap; gap: 8px; padding: 6px 8px 6px 10px; }
+  .event-banner .eb-ico { font-size: 1.5rem; }
+  .event-banner .eb-body b { font-size: 0.95rem; }
+  .event-banner .eb-body small { font-size: 0.7rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .event-banner .eb-tokens { font-size: 0.85rem; padding: 2px 7px; }
+  .event-banner .eb-go { width: auto; padding: 7px 10px; font-size: 0.78rem; }
+}
+@media (max-width: 720px) {
+  /* cabecera más baja: logo y perfil en una fila; los botones de abajo se deslizan de lado en vez de ocupar 3 filas */
+  .lb-top { gap: 6px; }
+  .lb-logo { font-size: 1.25rem; }
+  .lb-top .brand-badge img { height: 28px; }
+  .lb-actions { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; gap: 6px; scrollbar-width: none; padding-bottom: 2px; }
+  .lb-actions::-webkit-scrollbar { display: none; }
+  .lb-actions .stat-chip { flex: none; white-space: nowrap; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .lb-chars { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+}

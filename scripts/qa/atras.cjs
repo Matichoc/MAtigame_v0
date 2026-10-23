@@ -81,7 +81,16 @@ const { abrir, BASE, nuevoPerfil } = require("./lib.cjs");
   await p.waitForTimeout(400);
   ok(await visible("#screen-hub") && !(await visible("#screen-tetris")), "juego: la segunda pulsación vuelve al menú");
   // pantalla de la aventura, cuadro "Mi personaje y mis espacios" y un partido nuevo (Pichanga)
+  // la primera vez, «Continuar mi aventura» abre la viñeta del festival: atrás la cierra
   await tocar("#btn-path-adventure");
+  await p.waitForTimeout(300);
+  ok(await visible("#adv-intro"), "se abrió la viñeta de la aventura");
+  await atras();
+  ok(!(await visible("#adv-intro")) && await visible("#screen-hub"), "viñeta: atrás la cierra y queda en el menú");
+  // «Mis lugares y copas» (pantalla de la aventura): atrás vuelve al menú
+  await tocar("#btn-path-me");
+  await p.waitForTimeout(200);
+  await tocar("#me-town");
   await p.waitForTimeout(300);
   ok(await visible("#screen-adventure"), "se abrió la aventura");
   await atras();
