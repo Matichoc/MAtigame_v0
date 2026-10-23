@@ -17,6 +17,8 @@ import { levelInfo } from "./progression.js";
 import { bindStick } from "./stick.js";
 import * as audio from "./audio.js";
 import { TownFun } from "./town-fun.js";
+import { TownFestival } from "./town-festival.js";
+import { talkTo, celebrateAtFountain, stepPlace, gossip } from "./adventure.js";
 
 const GAME_ID = "town";
 const SPEED = 6.4;
@@ -139,12 +141,15 @@ export class TownGame extends Game3D {
     this._buildArcade();
     this.fun = new TownFun(this); // faros llamativos, baile, trampolines, circuito, tesoros, parkour y puertas de juegos
     this.fun.buildWorld(); // casitas y recorridos de parkour van antes que los árboles, para que nada quede dentro de uno
+    this.festival = new TownFestival(this); // rincón de la plaza, cancha y aro de la aventura del festival (js/adventure.js)
+    this.festival.buildWorld();
     this._buildDecor();
     this._buildCollectibles();
     this._buildNeighbors();
     this._buildEvent();
     this._ensureHero();
     this.fun.build();
+    this.festival.build();
   }
 
   _signTexture(text, color, icon) {
@@ -685,6 +690,10 @@ export class TownGame extends Game3D {
       this.heroYaw = Math.PI;
       this.camYaw = 0;
     }
+    if (this.festival) {
+      this.festival.refresh(); // el perfil pudo cambiar, o avanzar la aventura fuera del Pueblo
+      this.festival.applyDest(); // "Ir al Pueblo" desde la aventura: aparece junto al objetivo
+    }
     this.vel.set(0, 0, 0);
     this._syncHero(0);
     this._placeCamera(true);
@@ -733,6 +742,7 @@ export class TownGame extends Game3D {
     } else {
       this._updateNeighbors(dt);
     }
+    if (this.festival) this.festival.update(dt);
     this._animateWorld(dt);
     this._syncHero(dt);
     this._updateCamera(dt);
@@ -907,9 +917,15 @@ export class TownGame extends Game3D {
         if (d < 0.6) {
           n.wait = 1.5 + Math.random() * 4;
           const a = Math.random() * Math.PI * 2;
-          const r = 6 + Math.random() * 40;
-          n.tx = Math.sin(a) * r;
-          n.tz = Math.cos(a) * r;
+          if (n.home) { // los vecinos de la aventura se quedan cerca de su lugar, para encontrarlos fácil
+            const r = Math.random() * 2.2;
+            n.tx = n.home.x + Math.sin(a) * r;
+            n.tz = n.home.z + Math.cos(a) * r;
+          } else {
+            const r = 6 + Math.random() * 40;
+            n.tx = Math.sin(a) * r;
+            n.tz = Math.cos(a) * r;
+          }
         } else {
           n.x += (tx / d) * 1.9 * dt;
           n.z += (tz / d) * 1.9 * dt;
@@ -1021,6 +1037,8 @@ export class TownGame extends Game3D {
     if (t.kind === "npc") this._talk(t.npc);
     else if (t.kind === "ring") { this.fun && this.fun.startCircuit(); }
     else if (t.kind === "puzzle") { this.fun && this.fun.openDoor(t.puzzle); }
+    else if (t.kind === "fest") { this.festival && this.festival.act(t); }
+    else if (t.kind === "fountain" && stepPlace(this.progress) === "fuente") this._celebrate(celebrateAtFountain(this.progress), { x: 0, z: 0 });
     else if (t.kind === "fountain") {
       this.popups.add(new THREE.Vector3(0, 4.6, 0), "¡Mmm, qué rico! 🍫", "combo");
       this.particles.burst(new THREE.Vector3(0, 3.6, 0), [0x64321b, 0xffc800, 0xfff6e6], 22, 4, 1, 4, 1);
@@ -1032,7 +1050,12 @@ export class TownGame extends Game3D {
   _talk(n) {
     const daily = this._daily();
     const say = n.def.say;
-    let text = say[n.said % say.length];
+    // los vecinos de la aventura hablan según tu avance (y recuerdan lo que construiste); los demás, lo de siempre
+    const adv = talkTo(this.progress, n.def.name, this.event);
+    let text = adv ? adv.text : say[n.said % say.length];
+    const news = adv ? [] : gossip(this.progress);
+    if (news.length && n.said % 2 === 1) text = news[Math.floor(n.said / 2) % news.length]; // también comentan lo que construiste
+    if (adv) saveProgress(this.progress);
     n.said++;
     n.speaking = 2.5;
     if (!daily.talked.includes(n.def.name)) {
@@ -1047,9 +1070,66 @@ export class TownGame extends Game3D {
     if (box) {
       box.querySelector(".td-name").textContent = n.def.name;
       box.querySelector(".td-text").textContent = text;
+      this._dialogButtons(adv && adv.play ? adv.play : null);
       box.classList.remove("hidden");
       this.dialogOpen = true; // se queda abierto hasta que la niña lo toque (antes se cerraba solo a los 6 segundos y no alcanzaba a leerlo)
     }
+    if (!adv) return;
+    if (adv.step && !adv.reward) window.dispatchEvent(new CustomEvent("adventure-changed", { detail: { step: adv.step } }));
+    if (adv.action === "choose") window.dispatchEvent(new CustomEvent("adventure-choose", { detail: { key: adv.choice } }));
+    if (adv.action === "celebrate") this._celebrate(adv, n);
+  }
+
+  /** Atajos para jugar desde el diálogo (cuando el vecino pide terminar una partida). */
+  _dialogButtons(games) {
+    const box = this.q("dialog");
+    let row = box.querySelector(".td-actions");
+    if (!row) {
+      row = document.createElement("div");
+      row.className = "td-actions";
+      box.insertBefore(row, box.querySelector("small"));
+    }
+    row.innerHTML = "";
+    if (!games) return;
+    const names = { pichanga: "⚽ Pichanga", basquet2v2: "🏀 2 contra 2" };
+    const pick = ["pichanga", "basquet2v2", "memoria", "salto", "basquet_tiros", "tetris", "recolecta"].filter((g) => games.includes(g)).slice(0, 3);
+    for (const id of pick) {
+      const entry = GAMES_CATALOG.find((x) => x.id === id);
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "btn-primary td-play";
+      b.textContent = names[id] || `${entry ? entry.icon : "▶"} ${entry ? entry.name : id}`;
+      b.addEventListener("pointerdown", (e) => e.stopPropagation());
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this._closeDialog();
+        window.dispatchEvent(new CustomEvent("town-action", { detail: { kind: "game", game: id } }));
+      });
+      row.appendChild(b);
+    }
+  }
+
+  /** Cierre de un capítulo: fiesta en el lugar, y el menú paga el premio (una sola vez; ver js/adventure.js). */
+  _celebrate(res, at) {
+    if (!res) return;
+    const p = new THREE.Vector3(at.x, 3, at.z);
+    this.particles.burst(p, [0xffc800, 0xd4216c, 0x4fd0ff, 0x4fd09a, 0xffffff], 40, 6, 1.4, 5, 1.3);
+    audio.playVictory();
+    this.haptic(80);
+    if (res.reward) this.popups.add(new THREE.Vector3(at.x, 4.2, at.z), `+${res.reward.coins} 🍫✨ +${res.reward.xp} XP`, "coin");
+    this.banner(res.chapter ? `🎉 ¡Capítulo ${res.chapter.n} completo!` : "🎉 ¡Festival!");
+    if (!(at && at.def)) {
+      const box = this.q("dialog");
+      if (box) {
+        box.querySelector(".td-name").textContent = "🎉 Gran festival";
+        box.querySelector(".td-text").textContent = res.text;
+        this._dialogButtons(null);
+        box.classList.remove("hidden");
+        this.dialogOpen = true;
+      }
+    }
+    window.dispatchEvent(new CustomEvent("adventure-changed", { detail: { reward: res.reward, chapter: res.chapter } }));
+    if (this.festival) this.festival.refresh();
   }
 
   _closeDialog() {
@@ -1194,8 +1274,9 @@ export class TownGame extends Game3D {
 
   _bindInput() {
     const map = { ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right", ArrowUp: "up", w: "up", W: "up", ArrowDown: "down", s: "down", S: "down" };
+    window.addEventListener("adventure-changed", () => { if (this.festival && this.ready) this.festival.refresh(); });
     window.addEventListener("keydown", (e) => {
-      if (!this.running || (this.fun && this.fun.puzzleOpen)) return;
+      if (!this.running || (this.fun && this.fun.puzzleOpen) || document.querySelector(".modal:not(.hidden)")) return;
       if (e.key === "e" || e.key === "E" || e.key === "Enter" || e.code === "Space" || e.key === "j" || e.key === "J") {
         if (this.state === "playing") {
           e.preventDefault();

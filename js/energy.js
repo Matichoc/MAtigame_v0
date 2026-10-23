@@ -28,6 +28,7 @@ export const BUY_ENERGY = { amount: 20, price: 80, perDay: 10 };
 export const ENERGY_COST = {
   memoria: 4, tetris: 6, salto: 8, autos: 8, porristas: 6, basquet_tiros: 4, recolecta: 8, parkour: 8, dulces: 4,
   futbol: 4, aventura: 8, fps3d: 5, merge: 0,
+  pichanga: 4, basquet2v2: 4, // partidos de los deportes nuevos: solo la entrada (sin gasto por acción)
   ciudad: 0, // explorar es gratis; cada misión cuesta ENERGY_MISSION
   town: 0, creador: 0,
 };

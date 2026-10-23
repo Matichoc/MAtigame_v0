@@ -4,6 +4,58 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-22
+
+### Las mejoras van siempre a la app y a la web
+- **Decisión de la persona dueña:** toda mejora va a los dos lados, la app (APK) y la web (matichoc.cl/matijuego). Quedó como regla en `CLAUDE.md`.
+- La web no se actualizaba desde el PR #46 de matiweb (antes del #37). El PR de matiweb con esta evolución lleva también todo lo acumulado:
+  - Pueblo con parkour y puertas de juegos, Ciudad con misiones diarias, Mati Merge más claro y sonido más sobrio.
+  - Arte de temporadas, "atrás" que cierra los cuadros y licencias.
+- Se genera con `MATIJUEGO_DEMO=1 node scripts/deploy-matiweb.mjs`, en modo demo como siempre. **PR de la web: [Matichoc/matiweb#47](https://github.com/Matichoc/matiweb/pull/47)** (rama `claude/zealous-johnson-2ryf87`, commit `3ed08dc`). Se publica cuando la persona dueña hace merge.
+- Pruebas contra la versión web servida en local:
+  - `aventura.cjs` 41/41, `deportes.cjs` 52/52 y `temporada.cjs` 29/29.
+  - `enlaces.cjs` y `legal.cjs`: OK. 0 peticiones externas.
+  - `juegos.cjs`: 15/16. Choco Blaster "no salió de la tarjeta de inicio", pero la misma prueba falla igual con la web publicada hoy (matiweb `6374727`) y, abierto a mano, el juego carga bien. Pendiente: arreglar la prueba de Choco Blaster.
+  - `atras.cjs` no aplica a la web: el botón es del celular, y en la demo web Fútbol no está bloqueado.
+
+### Rendimiento para teléfonos de gama media-baja (mismo PR #44)
+- **Decisión de la persona dueña:** todo lo que se desarrolle debe funcionar en teléfonos de gama media-baja hacia arriba. Quedó como regla en `CLAUDE.md`.
+- Se midió lo nuevo. Dibujos por cuadro: Pichanga 858 (Fútbol de siempre: 302) y Básquet 2 contra 2: 548 (Lanzamientos: 209). La causa eran las sombras reales de 6 y 4 personajes.
+- Ajuste en celulares: sombras redondas simples en un solo dibujo, sin brillo de posprocesado y tablas de la cancha agrupadas. Quedó en Pichanga **413** y Básquet 2 contra 2 **286**. Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §12.
+- **Compilación nº 77** (`da7ad2c`, con este ajuste y toda la evolución): APK de prueba sin `release`, en verde. Reemplaza a la nº 76 para probar en el celular: https://github.com/Matichoc/MAtigame_v0/actions/runs/39870514932 (artefacto `matijuego-prueba-apk`).
+- Pendiente: medir en un celular real de gama media-baja.
+
+### Evolución integral: aventura del festival, Pichanga 3 contra 3 y Básquet 2 contra 2 (rama `claude/zealous-johnson-2ryf87`)
+- Encargo de la persona dueña: "Evolución integral de Matijuego". Situación: la app se prueba con APK en su celular y **no está subida a Play Console**. No se preparó ninguna publicación ni se tocaron credenciales, firmas ni el identificador de la app.
+- Plan, decisiones, criterios y estado por fase: `docs/EVOLUCION-JUGABILIDAD.md`.
+- **Fase 1, menú:** tres accesos grandes: "Continuar mi aventura", "Jugar libremente" y "Mi personaje y mis espacios". Sin Matichico elegido, un aviso amable reemplaza la alerta del navegador. "Atrás" funciona en la pantalla nueva y en los cuadros nuevos.
+- **Fase 2, aventura "Preparar el gran festival del Pueblo":** 3 capítulos con Bombi (rincón de la plaza), Capi Menta (cancha) y Don Cuchufli (aro y festival).
+  - En el Pueblo: "❗" sobre quien te espera, flecha guía y objetivo escrito. Cada capítulo tiene un estilo para elegir, que transforma el Pueblo y queda para siempre.
+  - Avance en `progress.adventure` (versionado, no se reinicia cada día). Premios una sola vez. Los pasos de jugar aceptan alternativas libres; nunca se pide un juego bloqueado.
+- **Fase 3, Pichanga Choco:** fútbol 3 contra 3 con IA local, saques de todo tipo, cambio de jugador predecible, controles táctiles y de teclado, amistoso y copa de 3 partidos, y tres dificultades. Se abre en la cancha del Pueblo y desde la tarjeta de Fútbol.
+- **Fase 4, Básquet 2 contra 2:** media cancha, pases, tiros de 2 y 3 con barra de tiempo, robos, tapones y rebotes, con reglas simples (sacar desde arriba; sacarla detrás de la línea de 3 al recuperar). Amistoso, copa y dificultades. Se abre desde Lanzamientos y desde el aro del Pueblo.
+- **Fase 5, integración:**
+  - Los vecinos recuerdan y comentan lo construido. Copas y medallas visibles. 3 logros nuevos (`docs/LOGROS.md` regenerado).
+  - Al volver después de más de 3 horas, un resumen corto. Meta personal visible en el menú.
+  - En temporada: colores del evento en el festival, frase de temporada y un reto opcional que da fichas del evento, una vez por evento y año.
+- Al pasar a segundo plano, la app anota la hora de salida dentro del guardado, para el resumen al volver. Solo cambia ese dato: no reescribe el resto ni revive un perfil borrado.
+- Pruebas nuevas:
+  - `scripts/qa/aventura-logica.mjs` y `scripts/qa/deportes-logica.mjs`, en Node.
+  - `scripts/qa/aventura.cjs` y `scripts/qa/deportes.cjs`, en el navegador.
+  - `scripts/qa/atras.cjs` ampliado con la pantalla de la aventura, el cuadro nuevo y un partido.
+- Resultados de esta corrida: ver "Evidencia final" en `docs/EVOLUCION-JUGABILIDAD.md`.
+- Ajuste tras revisar capturas de celular: los tres caminos del menú quedaban abajo en vertical; se movieron arriba de todo.
+- Compilaciones desde la rama, con APK de prueba, sin `release`, `fonts=libres` e `icono=habitual`:
+  - Nº 75 (`da3c4b6`): en verde.
+  - **Nº 76 (`edd2d0a`, con todo, incluido el ajuste del menú): en verde.** Artefacto `matijuego-prueba-apk` en https://github.com/Matichoc/MAtigame_v0/actions/runs/39869164512.
+  - No se subió nada a Play.
+- Pendiente:
+  - Compilar el APK con estos cambios y probar en el celular de la persona dueña: controles táctiles, rendimiento de los partidos y lectura de textos en pantalla chica.
+  - No se puede afirmar más diversión ni más retención sin probar con personas.
+
+### PR #43 mergeado
+- La regla de la bitácora y la nota de la compilación 74 quedaron en `main`. Anotación pendiente desde el 21-oct, incluida en este PR siguiendo la regla de no abrir PRs solo para la bitácora.
+
 ## 2026-10-21
 
 ### Regla nueva: la bitácora no lleva PR propio

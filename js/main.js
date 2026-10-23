@@ -7,7 +7,7 @@ import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
-  loadProgress, saveProgress, ownsItem, getLook, equipItem, setOutfitCustom, buyItem, wearers, canWear, takeOff, wardrobeCopies,
+  loadProgress, saveProgress, storageKeyForProfile, ownsItem, getLook, equipItem, setOutfitCustom, buyItem, wearers, canWear, takeOff, wardrobeCopies,
   getBestScore, getLeaderboard, canClaimDailyReward, claimDailyReward, claimAchievement,
 } from "./storage.js";
 import {
@@ -29,6 +29,8 @@ import {
 import { rankingEnabled, fetchRanking } from "./online.js";
 import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_RULE, ENERGY_MISSION, startSleep, stopSleep, buyEnergy, buyOffer, BUY_ENERGY, REGEN_SECS, SLEEP_MULT, CHEST_EVERY, CHEST_ENERGY } from "./energy.js";
 import { monthPlan, rewardInfo, calendarOf, canClaimCalendar, claimCalendar, daysInMonth } from "./calendar.js";
+import { initAdventureUI } from "./adventure-ui.js";
+import { adventureOf } from "./adventure.js";
 
 let progress = null;
 let selectedCharacter = null;
@@ -43,6 +45,7 @@ const screenLeaderboard = document.getElementById("screen-leaderboard");
 const screenAchievements = document.getElementById("screen-achievements");
 const screenProgress = document.getElementById("screen-progress");
 const screenHouse = document.getElementById("screen-house");
+const screenAdventure = document.getElementById("screen-adventure");
 const screenFps = document.getElementById("screen-fps");
 const screen3d = {
   town: document.getElementById("screen-town"),
@@ -60,9 +63,11 @@ const screen3d = {
   aventura: document.getElementById("screen-aventura"),
   ciudad: document.getElementById("screen-ciudad"),
   creador: document.getElementById("screen-creador"),
+  pichanga: document.getElementById("screen-pichanga"),
+  basquet2v2: document.getElementById("screen-bq2"),
 };
 const ALL_SCREENS = [
-  screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements, screenProgress, screenHouse,
+  screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements, screenProgress, screenHouse, screenAdventure,
     screenFps,
   ...Object.values(screen3d),
 ].filter(Boolean); // (en la app infantil no existe la pantalla de Choco Blaster)
@@ -83,7 +88,7 @@ function goNextLevel(game) {
   game.nextLevel();
 }
 
-const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, merge: null, aventura: null, ciudad: null, creador: null };
+const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, merge: null, aventura: null, ciudad: null, creador: null, pichanga: null, basquet2v2: null };
 
 let toastTimer = null;
 function showToast(message, ms = 2600) {
@@ -441,6 +446,7 @@ function chooseProfile(id) {
   shopCharacterId = (selectedCharacter && selectedCharacter.id) || CHARACTERS[0].id;
   bootHub();
   showScreen(screenHub);
+  advUI.showWelcome(); // al volver después de un rato: resumen corto del avance y del siguiente objetivo
 }
 
 function goToProfiles() {
@@ -473,6 +479,18 @@ function bootHub() {
   refreshHubStats();
   updateDailyRewardButton();
   updateProfileChip();
+  advUI.renderPaths();
+}
+
+/** Sin Matichico elegido: se pide con un aviso amable y se muestra dónde elegirlo (antes era una alerta del navegador). */
+function needCharacter(change = false) {
+  const g = document.getElementById("character-grid");
+  showToast(change ? "🔄 Toca el Matichico con el que quieres jugar" : "👇 Primero elige tu Matichico: toca uno de estos", 3200);
+  g.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+  g.classList.remove("need-pick");
+  void g.offsetWidth;
+  g.classList.add("need-pick");
+  setTimeout(() => g.classList.remove("need-pick"), 3200);
 }
 
 // ---------- RECOMPENSA DIARIA ----------
@@ -1622,6 +1640,7 @@ function renderCharacterGrid() {
 }
 
 function selectCharacter(char) {
+  const first = !selectedCharacter;
   selectedCharacter = char;
   progress.selectedCharacterId = char.id;
   saveProgress(progress);
@@ -1630,6 +1649,8 @@ function selectCharacter(char) {
   renderGameGrid();
   updateProfileChip();
   syncLobby(true);
+  advUI.renderPaths();
+  if (first) showToast(`¡Hola, ${char.name}! Ahora toca «Continuar mi aventura» para empezar 🎪`, 4200);
 }
 
 // ---------- SELECCIÓN DE JUEGO ----------
@@ -1819,7 +1840,7 @@ document.getElementById("demo-wall-close")?.addEventListener("click", () => docu
   const hasApp = !!cap && cap.isNativePlatform?.() && typeof cap.addListener === "function" && typeof cap.nativeCallback === "function"
     && (cap.PluginHeaders || []).some((h) => h.name === "App");
   if (hasApp) {
-    const INNER_BACK = [[screenHouse, "btn-house-back"], [screenProgress, "btn-progress-back"], [screenAchievements, "btn-achievements-back"], [screenShop, "btn-shop-back"], [screenLeaderboard, "btn-leaderboard-back"]];
+    const INNER_BACK = [[screenAdventure, "btn-adventure-back"], [screenHouse, "btn-house-back"], [screenProgress, "btn-progress-back"], [screenAchievements, "btn-achievements-back"], [screenShop, "btn-shop-back"], [screenLeaderboard, "btn-leaderboard-back"]];
     const exitApp = () => cap.nativeCallback("App", "exitApp", {});
     let armedAt = 0;
     const twice = (message, action) => {
@@ -1844,7 +1865,7 @@ document.getElementById("demo-wall-close")?.addEventListener("click", () => docu
 
 function playGame(gameId) {
   if (!selectedCharacter) {
-    window.alert("Elige primero a tu Matichico.");
+    needCharacter();
     return;
   }
   const entry = GAMES_CATALOG.find((g) => g.id === gameId);
@@ -1901,6 +1922,7 @@ function goToHub() {
   renderCharacterGrid();
   renderGameGrid();
   updateDailyRewardButton();
+  advUI.renderPaths();
   showScreen(screenHub);
 }
 
@@ -2352,6 +2374,8 @@ const GAMES_3D = {
   aventura: { module: "./aventura-game.js", cls: "AventuraGame", hud: [] },
   ciudad: { module: "./ciudad-game.js", cls: "CiudadGame", hud: [] },
   creador: { module: "./creador-game.js", cls: "CreadorGame", hud: ["score", "count", "coins"] },
+  pichanga: { module: "./pichanga-game.js", cls: "PichangaGame", hud: [] },
+  basquet2v2: { module: "./basquet2v2-game.js", cls: "Basquet2v2Game", hud: [], prefix: "bq2" },
 };
 
 async function launchOrResume3d(key) {
@@ -2412,6 +2436,37 @@ async function launchOrResume3d(key) {
     goToHub();
   }
 }
+
+// ---------- AVENTURA DEL FESTIVAL (menú y pantalla; ver js/adventure-ui.js) ----------
+const advUI = initAdventureUI({
+  getProgress: () => progress,
+  getCharacter: () => selectedCharacter,
+  playGame,
+  showScreen,
+  screenHub,
+  showToast,
+  queueToast,
+  needCharacter,
+  refreshHub: () => { refreshHubStats(); advUI.renderPaths(); },
+});
+// los modos nuevos también se abren desde las tarjetas de Fútbol y de Lanzamientos
+document.getElementById("futbol-btn-pichanga")?.addEventListener("click", () => playGame("pichanga"));
+document.getElementById("basquet-btn-2v2")?.addEventListener("click", () => playGame("basquet2v2"));
+// app en segundo plano: se anota cuándo te fuiste (para el resumen al volver); al volver al menú se muestra si corresponde
+document.addEventListener("visibilitychange", () => {
+  if (!progress) return;
+  if (document.visibilityState === "hidden") {
+    // solo se anota la hora de salida dentro del guardado (no se reescribe todo: lo demás ya se guardó al cambiar)
+    const now = Date.now();
+    adventureOf(progress).lastSeen = now;
+    try {
+      const k = storageKeyForProfile(progress._profileId);
+      const saved = JSON.parse(localStorage.getItem(k) || "null");
+      if (saved && typeof saved === "object" && saved.adventure && typeof saved.adventure === "object") { saved.adventure.lastSeen = now; localStorage.setItem(k, JSON.stringify(saved)); }
+    } catch (e) { /* sin almacenamiento: no pasa nada, solo no habrá resumen al volver */ }
+  }
+  else if (!screenHub.classList.contains("hidden")) advUI.showWelcome();
+});
 
 // ---------- ARRANQUE ----------
 
