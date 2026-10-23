@@ -16,7 +16,14 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   const prog = () => p.evaluate(() => JSON.parse(JSON.stringify(window.__progress())));
   const town = () => p.evaluate(() => { const t = window.__g3d.town; return { label: t.target && t.target.label, goal: document.getElementById("town-goal").textContent, dialog: document.getElementById("town-dialog").classList.contains("hidden") ? "" : document.getElementById("town-dialog").textContent }; });
   // termina una partida "de verdad" para la lógica (la misma función que llaman todos los juegos al terminar)
-  const partida = (game) => p.evaluate(async (g) => { const m = await import("./js/progression.js"); m.recordRun(window.__progress(), g, 0); }, game);
+  // (en la web los módulos llevan "?v=…": hay que importar el mismo que usa la página, si no se carga otra copia del módulo
+  // y el menú no se entera de la partida)
+  const partida = (game) => p.evaluate(async (g) => {
+    const main = [...document.querySelectorAll("script[type=module]")].map((s) => s.src).find((u) => /main\.js/.test(u)) || "";
+    const v = main.includes("?") ? main.slice(main.indexOf("?")) : "";
+    const m = await import(`./js/progression.js${v}`);
+    m.recordRun(window.__progress(), g, 0);
+  }, game);
   const enPueblo = async () => {
     await p.waitForFunction(() => window.__g3d && window.__g3d.town && window.__g3d.town.ready && window.__g3d.town.running, null, { timeout: 40000 });
     await p.evaluate(() => { const b = document.getElementById("town-btn-start"); if (b && b.offsetParent) b.click(); });
@@ -150,7 +157,8 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   await cerrarDialogo();
   await alMenu();
   await partida("basquet_tiros");
-  ok(/fuente/.test(await p.textContent("#lp-adv-sub")), "último paso: el menú dice que vayas a la fuente");
+  const sub = await p.textContent("#lp-adv-sub");
+  ok(/fuente/.test(sub), `último paso: el menú dice que vayas a la fuente («${sub}»)`);
   await aventura();
   t = await town();
   ok(/Celebrar/.test(t.label || ""), "en la fuente aparece «Celebrar el gran festival»");

@@ -53,6 +53,9 @@ async function probarModo(p, reg, M, vertical) {
     await p.keyboard.up("k");
     await p.waitForTimeout(900);
   }
+  // el pase apretado durante el saque queda guardado y sale al terminar el saque: en el navegador de prueba sin tarjeta
+  // gráfica el juego avanza lento, así que se espera a que la jugada se registre (con un tope) en vez de un tiempo fijo
+  await p.waitForFunction((id) => { const x = window.__g3d[id]; const s = x.m.stats; return (id === "pichanga" ? s.passes[0] + s.shots[0] : s.passes[0] + s.att[0] + s.steals[0]) > 0; }, M.id, { timeout: 30000 }).catch(() => {});
   const st = await g((id) => { const x = window.__g3d[id]; return x.m.stats; }, M.id);
   const acciones = M.id === "pichanga" ? st.passes[0] + st.shots[0] : st.passes[0] + st.att[0] + st.steals[0];
   ok(acciones > 0, `${M.nombre}: tus botones hacen jugadas (pases o tiros) en los primeros segundos (${acciones})`);
