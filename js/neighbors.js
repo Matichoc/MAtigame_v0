@@ -11,6 +11,10 @@ export const NEIGHBORS = [
   { name: "Bombi", say: ["¿Has visto la fuente de chocolate? ¡Es la más rica del mundo!", "Cada sobre trae 3 figuritas. ¡Completa tu álbum! 📖", "Dicen que las figuritas brillantes son muy difíciles de conseguir ✨"] },
   { name: "Trufita", say: ["En la Fábrica puedes inventar tu propio chocolate 🏭", "Me encanta jugar Memoria Matichoc. ¡Mi mejor racha es de 6!", "Si subes de nivel, ¡te regalan cosas para vestirte!"] },
   { name: "Capi Menta", say: ["Los juegos del Arcade están allá, con puertas brillantes 🎮", "Cada día que juegas, tu racha crece 🔥", "¡Corre por la plaza, no hay prisa! 😄"] },
+  // vecinos de los barrios nuevos (más allá de la cerca; ver js/town-zones.js)
+  { name: "Guardabosque Maní", say: ["En el bosque crecen mazorcas de cacao: ¡cosecha las de hoy! 🍫", "Shhh… si escuchas bien, se oye el arroyo.", "Cuido estos árboles desde que era chiquito 🌳"] },
+  { name: "Tía Avellana", say: ["Mis gallinas esconden huevos por toda la granja 🥚", "¡Las vacas dan la leche para el chocolate! 🐄", "Ven a ver el molino cuando sople el viento 🌬️"] },
+  { name: "Capitán Almendra", say: ["¡Ahoy! En la orilla del lago aparecen conchitas cada día 🐚", "Antes salíamos a navegar todas las tardes ⛵", "Desde el agua se ve todo el pueblo 🌅"] },
 ];
 
 let cache = null;

@@ -247,12 +247,12 @@ export function recordRun(progress, gameId, score, info = {}) {
   for (const m of done) m.notified = true;
   if (done.length) emit({ type: "mission", missions: done });
   if (pack) emit({ type: "pack" });
-  // aventura del festival: si el paso actual es "jugar" y este juego es una de sus alternativas, se cumple (gane o pierda)
-  const advStep = onGamePlayed(progress, gameId);
-  if (advStep) emit({ type: "adventure", step: advStep });
+  // aventura "Renovar el Pueblo": cada partida (gane o pierda) da ⭐ para las tareas de las zonas
+  const stars = onGamePlayed(progress, gameId);
+  if (stars) emit({ type: "stars", stars });
   // reto opcional de la temporada (una vez por evento y por año): da fichas del evento de siempre, no una moneda nueva
   const seasonTokens = seasonalOnPlay(progress, ev, gameId);
   if (seasonTokens) { addEventTokens(progress, ev.id, seasonTokens); emit({ type: "season", event: ev, tokens: seasonTokens }); }
   saveProgress(progress);
-  return { xp, first, ups, pack, missionsDone: done.length, tokens, eventToken: ev ? ev.token : "" };
+  return { xp, first, ups, pack, missionsDone: done.length, tokens, eventToken: ev ? ev.token : "", stars };
 }
