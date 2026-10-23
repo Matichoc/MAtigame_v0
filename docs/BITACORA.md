@@ -43,13 +43,22 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - **Aviso de temporada:** en una fila.
   - En computador el menú queda igual.
 - Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §14.
-- **Pruebas:** PENDIENTE_PRUEBAS
+- **Pruebas:**
+  - Lógica: aventura, deportes y puzzles, en verde. `verify:app` OK.
+  - Navegador, app: aventura 43/43, deportes 52/52, merge 30/30 (prueba nueva), atrás 24/24, juegos 15/15, temporada 29/29, pueblo 24/24, perfiles 13/13, Ciudad 6/6. Legal y enlaces OK.
+  - Navegador, web (matiweb servida en local): aventura 43/43, deportes 52/52, merge 30/30, temporada 29/29, legal OK, enlaces 0 peticiones externas.
+  - `juegos.cjs` en la web: 15/16. Choco Blaster sigue con la misma falla de la prueba que ya estaba anotada el 22-oct.
+- **Pruebas que se arreglaron** (fallaban por la prueba, no por el juego):
+  - `atras.cjs`: ahora «Continuar mi aventura» abre la viñeta.
+  - `aventura.cjs`: en la web los módulos llevan `?v=…`, y la prueba cargaba otra copia de `progression.js`, así que el menú no se enteraba de la partida.
 - **Prueba de partidos (`deportes.cjs`):**
   - En pantalla grande, la prueba esperaba solo 15 s el fin del partido después de volver de segundo plano.
   - En el navegador de prueba sin tarjeta gráfica, la pausa corta de 1,6 s de juego tardó más que eso en tiempo real. Con `main` pasa lo mismo, así que no viene de este cambio.
   - Ahora espera hasta 60 s.
-- App: PR PENDIENTE_PR. APK de prueba: PENDIENTE_APK.
-- Web: PR PENDIENTE_WEB. Se publica cuando la persona dueña hace merge.
+  - También espera a que se registre la primera jugada con teclado (con un tope de 30 s): el pase apretado durante el saque sale cuando termina el saque.
+- App: PR [#46](https://github.com/Matichoc/MAtigame_v0/pull/46). **APK de prueba: compilación nº 79**, en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40023255916 (artefacto `matijuego-prueba-apk`).
+- Web: PR [Matichoc/matiweb#49](https://github.com/Matichoc/matiweb/pull/49). Se publica cuando la persona dueña hace merge.
+- **Falta probar en el celular:** la viñeta y el globito de la aventura, Mati Merge en 3D (que se vea fluido) y el menú de pie y acostado.
 
 ### PR #45 y matiweb #48 mergeados (23-oct)
 - El ajuste de dificultad quedó en `main` y en la web.
