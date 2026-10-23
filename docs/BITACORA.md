@@ -6,6 +6,18 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-22
 
+### Las mejoras van siempre a la app y a la web
+- **Decisión de la persona dueña:** toda mejora va a los dos lados, la app (APK) y la web (matichoc.cl/matijuego). Quedó como regla en `CLAUDE.md`.
+- La web no se actualizaba desde el PR #46 de matiweb (antes del #37). El PR de matiweb con esta evolución lleva también todo lo acumulado:
+  - Pueblo con parkour y puertas de juegos, Ciudad con misiones diarias, Mati Merge más claro y sonido más sobrio.
+  - Arte de temporadas, "atrás" que cierra los cuadros y licencias.
+- Se genera con `MATIJUEGO_DEMO=1 node scripts/deploy-matiweb.mjs`, en modo demo como siempre. **PR de la web: [Matichoc/matiweb#47](https://github.com/Matichoc/matiweb/pull/47)** (rama `claude/zealous-johnson-2ryf87`, commit `3ed08dc`). Se publica cuando la persona dueña hace merge.
+- Pruebas contra la versión web servida en local:
+  - `aventura.cjs` 41/41, `deportes.cjs` 52/52 y `temporada.cjs` 29/29.
+  - `enlaces.cjs` y `legal.cjs`: OK. 0 peticiones externas.
+  - `juegos.cjs`: 15/16. Choco Blaster "no salió de la tarjeta de inicio", pero la misma prueba falla igual con la web publicada hoy (matiweb `6374727`) y, abierto a mano, el juego carga bien. Pendiente: arreglar la prueba de Choco Blaster.
+  - `atras.cjs` no aplica a la web: el botón es del celular, y en la demo web Fútbol no está bloqueado.
+
 ### Rendimiento para teléfonos de gama media-baja (mismo PR #44)
 - **Decisión de la persona dueña:** todo lo que se desarrolle debe funcionar en teléfonos de gama media-baja hacia arriba. Quedó como regla en `CLAUDE.md`.
 - Se midió lo nuevo. Dibujos por cuadro: Pichanga 858 (Fútbol de siempre: 302) y Básquet 2 contra 2: 548 (Lanzamientos: 209). La causa eran las sombras reales de 6 y 4 personajes.
