@@ -226,3 +226,25 @@ Qué se hizo en los partidos nuevos, solo en celulares y tablets (pantalla táct
 Lo que queda:
 - Cada Matichico tiene 55–82 piezas. Es el mismo modelo de todos los juegos. Agruparlo es más delicado (parpadeo, ropa que cambia) y queda como mejora futura si en el celular la Pichanga se siente lenta.
 - **Falta medirlo en un teléfono real de gama media-baja.** Las cifras de arriba vienen del navegador de pruebas.
+
+## 13. Ajuste de dificultad tras la prueba en el celular (23-oct-2026)
+
+La persona dueña probó el APK nº 77. Pichanga y Básquet 2 contra 2 eran muy difíciles para aprender: cuesta coordinar pases, los rivales hacen goles fácil y quitar es muy difícil.
+
+- **Error de calibración:** la dificultad se probó con un robot perfecto, que mueve el joystick exacto y reacciona al instante, y la dificultad marcada de entrada era "normal".
+- **Nueva medición:** se hace con `scripts/qa/jugador-humano.mjs`. Este jugador decide cada ~0,45 s (el "aprendiz", cada ~0,65 s), mueve el joystick con hasta 25° de error y tarda en tirar y en quitar.
+
+| Dificultad | Pichanga antes → ahora | Básquet antes → ahora |
+|---|---|---|
+| Accesible (aprendiz) | 29/30 → 30/30 (ahora unos 7 a 1) | 26/30 → 30/30 |
+| Normal (jugador promedio) | 8/40 → 25/30 | 11/40 → 21/30 |
+| Desafío (jugador promedio) | 2/40 → 12/30 | 4/40 → 7/30 |
+
+- **Cambios:**
+  - Valores por dificultad en `DIFFICULTY` de cada simulación.
+  - Alcance para quitar o robar según la dificultad (`reach`) y menos castigo al fallar.
+  - Quitar o robar al chocar en Accesible (`autoSteal`).
+  - El compañero corre a buscar tus pases, y en básquet tus pases se cortan menos (`safePass`).
+  - Se parte en Accesible: `progress.sports` versión 2 pasa a accesible a quien estaba en "normal" sin copas.
+  - La tarjeta de inicio dice "Accesible · para aprender" y explica cómo quitar.
+- **Falta probar en el celular.** El jugador simulado ayuda a no repetir el error, pero no reemplaza a una persona.

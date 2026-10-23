@@ -205,7 +205,7 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   await p.waitForTimeout(700);
   pr = await prog();
   ok(pr.playerName === "Antiguo" && pr.coins === 321 && pr.xp === 900, "perfil antiguo: abre con sus Matipuntos y su XP");
-  ok(pr.adventure && pr.adventure.v === 1 && !pr.adventure.started && pr.sports && pr.sports.v === 1, "perfil antiguo: recibe la aventura y los deportes nuevos, sin empezar");
+  ok(pr.adventure && pr.adventure.v === 1 && !pr.adventure.started && pr.sports && pr.sports.v === 2 && pr.sports.pichanga.diff === "accesible", "perfil antiguo: recibe la aventura y los deportes nuevos, sin empezar");
   ok(/Capítulo 1 de 3/.test(await p.textContent("#lp-adv-sub")) && !(await p.isVisible("#lb-welcome")), "perfil antiguo: la aventura parte en el capítulo 1 y no hay resumen falso");
 
   // ---- "atrás" del celular en la pantalla de la aventura (se simula el puente nativo de Android) ----

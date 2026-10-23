@@ -4,6 +4,42 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-23
+
+### Partidos más fáciles de aprender (Pichanga y Básquet 2 contra 2)
+- **Prueba en el celular de la persona dueña** (APK nº 77): Pichanga y Básquet 2 contra 2 "súper difíciles de jugar al tiro". Cuesta coordinar pases y hacer goles, los rivales hacen goles mucho más fácil y quitar la pelota es muy difícil.
+- **Causa:**
+  - La dificultad se había calibrado con un robot que mueve el joystick perfecto y reacciona al instante.
+  - Además, la dificultad marcada de entrada era "normal".
+  - Con un jugador simulado que juega como persona (`scripts/qa/jugador-humano.mjs`: decide cada ~0,45 s y apunta con error), en "normal" ganaba 8 de 40 partidos de Pichanga y 11 de 40 de básquet.
+- **Cambios:**
+  - Rivales más lentos y con menos puntería.
+  - Más alcance para quitar o robar, y menos castigo si fallas.
+  - En **Accesible**, basta con chocar o pegarse al rival que lleva la pelota para intentar quitársela.
+  - El compañero va a buscar tus pases, y en básquet tus pases se cortan menos.
+  - Arquero de tu equipo un poco mejor.
+  - Todos parten en **Accesible ("para aprender")**: quien venía en "normal" sin copas pasa a accesible (migración de `progress.sports` a la versión 2).
+- **Resultado con el jugador simulado:**
+
+| Dificultad | Pichanga | Básquet |
+|---|---|---|
+| Accesible (aprendiz) | gana 30/30, unos 7 a 1 | gana 30/30, unos 10 a 3 |
+| Normal | gana 20–25/30 | gana 18–21/30 |
+| Desafío | gana 7–12/30 | gana 7–12/30 |
+
+  Quedó como prueba permanente en `scripts/qa/deportes-logica.mjs`.
+- Pruebas:
+  - Lógica: `deportes-logica.mjs` 58/58 y `aventura-logica.mjs` 64/64.
+  - Navegador, app: `deportes.cjs` 52/52 y `aventura.cjs` 41/41.
+  - Navegador, web: las mismas, también 52/52 y 41/41.
+  - `verify:app` OK.
+- App: PR #45. **APK de prueba: compilación nº 78**, en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/39893272151 (artefacto `matijuego-prueba-apk`).
+- Web: PR [Matichoc/matiweb#48](https://github.com/Matichoc/matiweb/pull/48). Se publica cuando la persona dueña hace merge.
+- Falta confirmarlo en el celular: el jugador simulado no reemplaza a una persona.
+
+### PR #44 y matiweb #47 mergeados (22-oct)
+- La evolución integral quedó en `main` y la web se publicó en matichoc.cl/matijuego: despliegue nº 46 de matiweb, en verde.
+
 ## 2026-10-22
 
 ### Las mejoras van siempre a la app y a la web

@@ -167,7 +167,7 @@ export class MatchGame extends Game3D {
     opt(r1, "🤝 Amistoso", this.mode === "amistoso", () => { this.mode = "amistoso"; });
     opt(r1, `🏆 Copa · ${rival.roundName}`, this.mode === "copa", () => { this.mode = "copa"; });
     const r2 = row("Dificultad");
-    for (const d of DIFFS) opt(r2, DIFF_NAMES[d], s.diff === d, () => setDifficulty(this.progress, this.sportId, d));
+    for (const d of DIFFS) opt(r2, d === "accesible" ? "Accesible · para aprender" : DIFF_NAMES[d], s.diff === d, () => setDifficulty(this.progress, this.sportId, d));
     const info = document.createElement("p");
     info.className = "mt-info";
     const cups = DIFFS.filter((d) => s.cups[d] > 0).map((d) => `🏆 ${DIFF_NAMES[d]} x${s.cups[d]}`).join(" · ");

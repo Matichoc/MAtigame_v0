@@ -108,6 +108,10 @@ ok(addMedal(s, "x") && !addMedal(s, "x"), "medalla una sola vez");
 // ---------- deportes ----------
 const sp = { sports: normalizeSports(undefined) };
 ok(sportsOf(sp).pichanga.cup.round === 0 && sportsOf(sp).basquet2v2.played === 0, "deportes: estado inicial");
+ok(sportsOf(sp).pichanga.diff === "accesible", "deportes: se empieza en accesible");
+const v1 = normalizeSports({ v: 1, pichanga: { diff: "normal", played: 4 }, basquet2v2: { diff: "normal", cups: { normal: 1 } } });
+ok(v1.v === 2 && v1.pichanga.diff === "accesible" && v1.pichanga.played === 4 && v1.basquet2v2.diff === "normal", "deportes v1 → v2: quien partió en normal sin copas pasa a accesible; quien ganó copas en normal se queda");
+ok(JSON.stringify(normalizeSports(v1)) === JSON.stringify(v1) && normalizeSports({ v: 2, pichanga: { diff: "normal" } }).pichanga.diff === "normal", "deportes v2: la migración no se repite y respeta lo elegido después");
 ok(JSON.stringify(normalizeSports(sp.sports)) === JSON.stringify(sp.sports), "deportes: migrar dos veces da lo mismo");
 ok(normalizeSports({ pichanga: { wins: -3, cup: { round: 99 }, diff: "loco", claimed: ["normal", "x"] } }).pichanga.cup.round === 2, "deportes: datos rotos se reparan");
 ok(recordMatch(sp, "pichanga", { mode: "amistoso", my: 3, their: 1 }).result === "win" && sp.sports.pichanga.cup.round === 0, "un amistoso no mueve la copa");
