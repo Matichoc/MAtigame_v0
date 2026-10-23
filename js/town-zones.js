@@ -174,9 +174,14 @@ export class TownZones {
         post.position.set(sx, 2.2, 0);
         arch.add(post);
       }
-      const sign = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 1.65), new THREE.MeshBasicMaterial({ map: signTexture(`${d.icon} ${d.name}`, d.sign), transparent: true, side: THREE.DoubleSide }));
-      sign.position.set(0, 4.5, 0);
-      arch.add(sign);
+      // el cartel se lee de los dos lados (al entrar y al volver al pueblo)
+      const signMat = new THREE.MeshBasicMaterial({ map: signTexture(`${d.icon} ${d.name}`, d.sign), transparent: true });
+      for (const back of [0, 1]) {
+        const sign = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 1.65), signMat);
+        sign.position.set(0, 4.5, 0);
+        sign.rotation.y = back ? Math.PI : 0;
+        arch.add(sign);
+      }
       s.add(arch);
       this.g.colliders.push(...[-GATE_HALF, GATE_HALF].map((sx) => { const w = pol(d.deg, 55); return { type: "c", x: w.x + Math.cos(a) * sx, z: w.z + Math.sin(a) * sx, r: 0.35 }; }));
     }
