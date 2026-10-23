@@ -248,3 +248,53 @@ La persona dueña probó el APK nº 77. Pichanga y Básquet 2 contra 2 eran muy 
   - Se parte en Accesible: `progress.sports` versión 2 pasa a accesible a quien estaba en "normal" sin copas.
   - La tarjeta de inicio dice "Accesible · para aprender" y explica cómo quitar.
 - **Falta probar en el celular.** El jugador simulado ayuda a no repetir el error, pero no reemplaza a una persona.
+
+## 14. Aventura que se entiende y pantallas más alegres (23-oct-2026)
+
+La persona dueña revisó la evolución en el celular. La aventura "no se entiende": no queda claro qué es ni qué hay que hacer, y las misiones son abstractas. Los cuadros nuevos se ven "muy cuadrados, muy en ventana", toscos al lado del resto del juego. Mati Merge en especial perdió la alegría de las piezas.
+
+Eligió estas tres respuestas:
+- **Aventura:** "Directo al Pueblo".
+- **Mati Merge:** "3D como Choco Match".
+- **Pantallas a revisar:** inicio de partidos, Ciudad y Pueblo, elegir estilo y botones del menú.
+
+**Aventura: directo al Pueblo, con pedidos concretos**
+- **Primera vez:** el botón «Continuar mi aventura» abre una viñeta, una sola vez. Muestra las caras de Bombi, Capi Menta y Don Cuchufli y dice en dos frases qué es el festival y cómo se ayuda. Después el botón lleva **directo al Pueblo, junto al vecino que te necesita**, sin pasar por una pantalla con listas.
+- **Globito en el Pueblo:** dice qué hacer ahora con la cara del vecino y una frase concreta, por ejemplo "Bombi necesita chocolates para decorar: gánalos jugando una partida de cualquier juego 🎮". Trae un botón que hace justo eso: «▶ Memoria», «▶ Pichanga», «▶ Básquet» o «📍 Llévame».
+- **Lo que dicen los vecinos:** piden las cosas con palabras simples ("Necesito chocolates para decorar. ¿Me los consigues?…") en vez de "consigue materiales".
+- **Menú:** el botón de la aventura muestra la cara del vecino y el pedido del momento.
+- **Pantalla de capítulos:** queda solo como «Mis lugares y copas», dentro de «Mi personaje y mis espacios».
+- **Caras iguales en todo el juego:** las caras salen del mismo modelo que los vecinos del Pueblo (`js/neighbors.js`), así se ven igual en el menú, la viñeta, el globito y los pedidos de Mati Merge.
+
+**Mati Merge en 3D, como Choco Match**
+- **Productos con volumen y brillo (26):** antes eran discos planos con una foto encima. Ahora son alfajores con relleno y glaseado, cuchuflís con espiral y puntas de chocolate, bombones con pirotín, bomba con hilos de oro, tabletas con cuadritos y envoltorio, y el ¡Mati Dubai! partido con relleno de pistacho y corona (`js/merge-models.js`).
+- **Bandeja:** de madera, con casilleros acolchados, mirada desde arriba y un poco de frente. La cámara la encuadra sola en el espacio que deja la barra, de pie o acostado, sin torcerla.
+- **Al juntar dos productos:** el nuevo salta y se estira como gelatina.
+- **Pedidos:** son un cliente (la cara de un vecino) con un globito que muestra el producto y el premio. Cuando lo tienes, el globito se pone verde y dice «¡Entregar!».
+- **Dibujos de la barra y de la lista:** son fotos del mismo modelo 3D.
+- **Juego y tablero guardado:** son los mismos de antes; no cambia nada de la lógica (`js/merge-data.js`).
+- **Costo de dibujo:** cada producto se arma una sola vez y se junta en una geometría con colores. Se dibuja en 1 paso, o 2 si lleva partes doradas, y las sombras de todos van juntas en un solo dibujo. En celulares va sin brillo de posprocesado.
+
+| Por cuadro (celular de pie) | Dibujos | Triángulos |
+|---|---|---|
+| Mati Merge antes (discos planos) | 133 | 7.800 |
+| **Mati Merge ahora (3D)** | **51** | **53.000** |
+| Choco Match (referencia que anda bien) | 835 | 106.000 |
+
+**Pantallas más alegres** (estilo claro, redondo y con rebote, como el resto del juego)
+- **Inicio de los partidos:** las opciones son fichas de color con dibujito. 🌱 Accesible "para aprender" en verde, ⭐ Normal en amarillo, 🔥 Desafío en naranja, 🤝 Amistoso en azul y 🏆 Copa en dorado. La elegida lleva un ✓.
+- **Elegir estilo:** los estilos de cada lugar son fichas grandes con el dibujo en un círculo de color. Además se arregló un error: en la tarjeta clara los nombres salían en blanco y no se leían.
+- **Mi personaje y mis espacios:** 4 fichas de colores en dos columnas.
+- **Botones del menú:** más redondos y con brillo; el dibujito va en una burbuja blanca.
+- **Pueblo:** el panel «Actividades» es una libretita clara con cada tarea en su burbuja.
+- **Ciudad:** la lista de misiones es una tarjeta clara con botones «Ir» redondos, y la misión del momento es un globito claro.
+- **«Mis lugares y copas»:** tarjetas claras.
+
+**Pruebas nuevas:**
+- `scripts/qa/merge.cjs`:
+  - Un producto 3D por casillero, en 1 o 2 pasos de dibujo, y costo bajo.
+  - Juntar arrastrando con el dedo sube de nivel y salta.
+  - Tocar la parte de arriba de un producto alto elige ese producto.
+  - Pedidos con la cara de tres clientes distintos.
+  - El tablero no queda tapado por la barra, de pie y acostado.
+- `scripts/qa/aventura.cjs`: la viñeta sale una sola vez y el globito del Pueblo trae la cara y el botón.

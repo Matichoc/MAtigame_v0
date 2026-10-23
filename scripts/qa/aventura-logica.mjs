@@ -83,7 +83,7 @@ const t0 = 1_800_000_000_000;
 ok(returnSummary(r, t0) === null, "primera visita: sin resumen");
 ok(returnSummary(r, t0 + 3600e3) === null, "al rato: sin resumen");
 const res = returnSummary(r, t0 + 3600e3 + 4 * 3600e3);
-ok(res && /0 de 3/.test(res.text) && /termina una partida/.test(res.text), "después de horas: resumen con avance y siguiente objetivo");
+ok(res && /0 de 3/.test(res.text) && /jugando una partida/.test(res.text), "después de horas: resumen con avance y siguiente objetivo");
 ok(returnSummary(nuevo(), t0) === null && returnSummary(nuevo(), t0 + 9e9) === null, "aventura sin empezar: sin resumen");
 
 // ---------- meta personal ----------

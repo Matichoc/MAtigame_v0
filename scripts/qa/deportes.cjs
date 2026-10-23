@@ -75,7 +75,9 @@ async function probarModo(p, reg, M, vertical) {
   const jugados0 = await g((id) => window.__progress().sports[id].played, M.id);
   const xp0 = await g(() => window.__progress().xp);
   await g((id) => { const x = window.__g3d[id]; x.m.score = [2, 1]; x.m.time = 0.02; }, M.id);
-  await p.waitForSelector(`#${M.pre}-overlay-gameover:not(.hidden)`, { timeout: 15000 }).catch(() => {}); // (al volver de segundo plano hay una pausa corta)
+  // (al volver de segundo plano hay una pausa corta de 1,6 s de juego; en el navegador de prueba sin tarjeta gráfica, en
+  // pantalla grande, eso puede tardar bastante más en tiempo real)
+  await p.waitForSelector(`#${M.pre}-overlay-gameover:not(.hidden)`, { timeout: 60000 }).catch(() => {});
   ok(await p.isVisible(`#${M.pre}-overlay-gameover`) && /Ganaste/.test(await p.textContent(`#${M.pre}-gameover-title`)), `${M.nombre}: termina y muestra el resultado`);
   ok(await g((id) => window.__progress().sports[id].played, M.id) === jugados0 + 1 && await g(() => window.__progress().xp) > xp0, `${M.nombre}: guarda el partido y da XP`);
   await foto(p, `${M.id}-final${vertical ? "-vertical" : ""}`);

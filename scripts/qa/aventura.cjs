@@ -17,11 +17,17 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   const town = () => p.evaluate(() => { const t = window.__g3d.town; return { label: t.target && t.target.label, goal: document.getElementById("town-goal").textContent, dialog: document.getElementById("town-dialog").classList.contains("hidden") ? "" : document.getElementById("town-dialog").textContent }; });
   // termina una partida "de verdad" para la lógica (la misma función que llaman todos los juegos al terminar)
   const partida = (game) => p.evaluate(async (g) => { const m = await import("./js/progression.js"); m.recordRun(window.__progress(), g, 0); }, game);
-  const irPueblo = async () => {
-    await p.click("#adv-now .adv-actions .btn-primary, #adv-now .adv-actions .btn-secondary");
+  const enPueblo = async () => {
     await p.waitForFunction(() => window.__g3d && window.__g3d.town && window.__g3d.town.ready && window.__g3d.town.running, null, { timeout: 40000 });
-    if (await p.isVisible("#town-btn-start")) await p.click("#town-btn-start");
+    await p.evaluate(() => { const b = document.getElementById("town-btn-start"); if (b && b.offsetParent) b.click(); });
     await p.waitForTimeout(900);
+  };
+  // "Continuar mi aventura": la primera vez sale la viñeta; después lleva directo al Pueblo, junto a quien te espera
+  const aventura = async () => {
+    await p.evaluate(() => document.getElementById("btn-path-adventure").click());
+    await p.waitForTimeout(400);
+    if (await p.isVisible("#adv-intro")) await p.evaluate(() => document.getElementById("adv-intro-go").click());
+    await enPueblo();
   };
   const usar = async () => { await p.keyboard.press("e"); await p.waitForTimeout(400); };
   const cerrarDialogo = async () => { if (!(await town()).dialog) return; await p.keyboard.press("e"); await p.waitForTimeout(250); };
@@ -46,7 +52,7 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   ok(await p.isVisible("#screen-hub"), "sin personaje no se abre un juego");
   await p.click("#character-grid .character-card:nth-child(2)");
   await p.waitForTimeout(500);
-  ok(/Capítulo 1 de 3/.test(await p.textContent("#lp-adv-sub")), "con personaje: el botón dice el capítulo y el objetivo");
+  ok(/vecinos/.test(await p.textContent("#lp-adv-sub")), "con personaje: el botón dice que los vecinos necesitan ayuda");
   ok(await p.evaluate(() => document.getElementById("btn-path-adventure").classList.contains("lp-pulse")), "aventura sin empezar: el botón llama la atención");
   await p.click("#btn-path-me");
   ok(await p.isVisible("#me-dialog"), "Mi personaje y mis espacios abre sus opciones");
@@ -57,35 +63,37 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   await foto(p, "01-menu");
 
   // ---- Capítulo 1 ----
-  await p.click("#btn-path-adventure");
-  await p.waitForTimeout(300);
-  ok(await p.isVisible("#screen-adventure") && /Bombi/.test(await p.textContent("#adv-now")), "pantalla de la aventura con el pedido de Bombi");
-  await foto(p, "02-aventura");
-  await irPueblo();
+  await p.evaluate(() => document.getElementById("btn-path-adventure").click());
+  await p.waitForTimeout(400);
+  ok(await p.isVisible("#adv-intro") && (await p.$$("#adv-intro canvas[data-npc]")).length === 3, "primera vez: viñeta que cuenta de qué se trata, con las caras de los 3 vecinos");
+  await foto(p, "02-vineta");
+  await p.evaluate(() => document.getElementById("adv-intro-go").click());
+  await enPueblo();
   let t = await town();
-  ok(/Bombi/.test(t.label || ""), `"Ir al Pueblo" te deja junto a Bombi (${t.label})`);
-  ok(/Capítulo 1\/3/.test(t.goal), "el Pueblo muestra el objetivo");
+  ok(/Bombi/.test(t.label || ""), `"¡Vamos al Pueblo!" te deja junto a Bombi (${t.label})`);
+  ok(/Bombi/.test(t.goal) && /fuente/.test(t.goal) && await p.evaluate(() => !!document.querySelector("#town-goal canvas.tq-face") && /Llévame/.test(document.querySelector("#town-goal .tq-btn").textContent)), "el Pueblo muestra arriba la cara de Bombi, qué hacer y «Llévame»");
   await foto(p, "03-pueblo-bombi");
   await usar();
   t = await town();
-  ok(/rincón/.test(t.dialog) && /termina una partida/.test(t.dialog), "Bombi cuenta su pedido y el siguiente paso");
+  ok(/rincón/.test(t.dialog) && /jugando una partida/.test(t.dialog), "Bombi cuenta su pedido y el siguiente paso");
   ok(await p.evaluate(() => document.querySelectorAll("#town-dialog .td-play").length >= 2), "el diálogo trae atajos para jugar");
   await cerrarDialogo();
   await alMenu();
   await partida("memoria");
   let pr = await prog();
   ok(pr.adventure.steps["c1.materiales"] === 1, "terminar una partida de Memoria cumple el paso");
-  await p.click("#btn-path-adventure");
-  await p.waitForTimeout(300);
-  await p.click("#adv-now .btn-primary"); // Elegir el estilo
+  await aventura(); // ya no hay viñeta: directo junto a Bombi
+  ok(!(await p.isVisible("#adv-intro")), "la viñeta sale una sola vez");
+  await usar(); // Bombi pide elegir el estilo
   await p.waitForTimeout(300);
   ok(await p.isVisible("#adv-choice") && (await p.$$("#adv-choice-options .adv-opt")).length === 3, "cuadro con 3 estilos para el rincón");
+  await p.waitForTimeout(700); // (que termine de aparecer, para la captura)
   await foto(p, "04-elegir");
   await p.click("#adv-choice-options .adv-opt:nth-child(2)");
   await p.waitForTimeout(300);
   pr = await prog();
   ok(pr.adventure.choices.plaza === "guirnaldas", "se guardó el estilo elegido");
-  await irPueblo();
+  await cerrarDialogo();
   ok(await p.evaluate(() => window.__g3d.town.festival.groups.plaza.userData.key === "plaza:guirnaldas"), "el rincón del Pueblo ya se ve con guirnaldas");
   await foto(p, "05-rincon");
   const coins0 = (await prog()).coins;
@@ -107,12 +115,10 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   await p.waitForTimeout(800);
   pr = await prog();
   ok(pr.adventure.steps["c1.inaugurar"] === 1 && pr.adventure.choices.plaza === "guirnaldas" && pr.coins === coins1, "al reabrir: avance, elección y Matipuntos iguales (sin pagar de nuevo)");
-  ok(/Capítulo 2 de 3/.test(await p.textContent("#lp-adv-sub")), "al reabrir: el menú dice el capítulo 2");
+  ok(/Capi Menta/.test(await p.textContent("#lp-adv-sub")), "al reabrir: el menú dice que ahora espera Capi Menta");
 
   // ---- Capítulo 2 ----
-  await p.click("#btn-path-adventure");
-  await p.waitForTimeout(300);
-  await irPueblo();
+  await aventura();
   t = await town();
   ok(/Capi Menta/.test(t.label || ""), "capítulo 2: te deja junto a Capi Menta");
   await usar();
@@ -128,9 +134,7 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   await partida("recolecta");
   pr = await prog();
   ok(pr.adventure.steps["c2.pichanga"] === 1, "capítulo 2: Recolecta sirve de alternativa a la pichanga");
-  await p.click("#btn-path-adventure");
-  await p.waitForTimeout(300);
-  await irPueblo();
+  await aventura();
   await usar();
   pr = await prog();
   ok(pr.adventure.claimed.includes("chapter:c2"), "capítulo 2 cerrado");
@@ -138,9 +142,7 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   await alMenu();
 
   // ---- Capítulo 3 ----
-  await p.click("#btn-path-adventure");
-  await p.waitForTimeout(300);
-  await irPueblo();
+  await aventura();
   await usar();
   await p.waitForTimeout(300);
   await p.click("#adv-choice-options .adv-opt:nth-child(3)");
@@ -148,10 +150,8 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   await cerrarDialogo();
   await alMenu();
   await partida("basquet_tiros");
-  await p.click("#btn-path-adventure");
-  await p.waitForTimeout(300);
-  ok(/fuente/.test(await p.textContent("#adv-now")), "último paso: celebrar en la fuente");
-  await irPueblo();
+  ok(/fuente/.test(await p.textContent("#lp-adv-sub")), "último paso: el menú dice que vayas a la fuente");
+  await aventura();
   t = await town();
   ok(/Celebrar/.test(t.label || ""), "en la fuente aparece «Celebrar el gran festival»");
   await usar();
@@ -166,11 +166,13 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   ok((await prog()).coins === coins2, "celebrar de nuevo no vuelve a pagar");
   await cerrarDialogo();
   await alMenu();
-  ok(/Festival listo/i.test(await p.textContent("#lp-adv-sub")), "el menú dice que el festival está listo");
+  ok(/festival está listo/i.test(await p.textContent("#lp-adv-sub")), "el menú dice que el festival está listo");
 
-  // ---- meta personal y resumen al volver ----
-  await p.click("#btn-path-adventure");
-  await p.waitForTimeout(300);
+  // ---- meta personal y resumen al volver (en "Mi personaje y mis espacios" → "Mis lugares y copas") ----
+  await p.evaluate(() => document.getElementById("btn-path-me").click());
+  await p.evaluate(() => document.getElementById("me-town").click());
+  await p.waitForTimeout(400);
+  ok(await p.isVisible("#screen-adventure"), "«Mis lugares y copas» abre lo construido, las copas y la meta");
   await p.click("#adv-goals .adv-goal:nth-of-type(4)"); // casa
   await p.click("#btn-adventure-back");
   await p.waitForTimeout(300);
@@ -206,7 +208,7 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   pr = await prog();
   ok(pr.playerName === "Antiguo" && pr.coins === 321 && pr.xp === 900, "perfil antiguo: abre con sus Matipuntos y su XP");
   ok(pr.adventure && pr.adventure.v === 1 && !pr.adventure.started && pr.sports && pr.sports.v === 2 && pr.sports.pichanga.diff === "accesible", "perfil antiguo: recibe la aventura y los deportes nuevos, sin empezar");
-  ok(/Capítulo 1 de 3/.test(await p.textContent("#lp-adv-sub")) && !(await p.isVisible("#lb-welcome")), "perfil antiguo: la aventura parte en el capítulo 1 y no hay resumen falso");
+  ok(/vecinos/.test(await p.textContent("#lp-adv-sub")) && !(await p.isVisible("#lb-welcome")), "perfil antiguo: la aventura parte desde el comienzo (con la viñeta) y no hay resumen falso");
 
   // ---- "atrás" del celular en la pantalla de la aventura (se simula el puente nativo de Android) ----
   ok(reg.externas.length === 0, `sin conexiones externas (${reg.externas.length})`);

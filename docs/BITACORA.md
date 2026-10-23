@@ -6,6 +6,47 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-23
 
+### Aventura que se entiende, Mati Merge en 3D y pantallas más alegres
+- **Prueba de la persona dueña:**
+  - La aventura "no se entiende": no queda claro qué es ni qué hay que completar, y las misiones son abstractas.
+  - Los cuadros nuevos se ven "muy cuadrados, muy en ventana", toscos al lado del resto del juego.
+  - Desde Mati Merge las piezas perdieron la alegría.
+- **Decisiones de la persona dueña** (a mis preguntas):
+  - Aventura **"Directo al Pueblo"**.
+  - Mati Merge **"3D como Choco Match"**.
+  - Revisar el **inicio de los partidos, la Ciudad y el Pueblo, elegir estilo y los botones del menú**.
+- **Aventura:**
+  - **Primera vez:** una viñeta con las caras de los 3 vecinos explica el festival, una sola vez. Después «Continuar mi aventura» lleva directo al Pueblo, junto al vecino que te necesita.
+  - **Globito en el Pueblo:** la cara del vecino, un pedido concreto ("Bombi necesita chocolates para decorar: gánalos jugando una partida de cualquier juego 🎮") y un botón que lo hace (▶ Memoria / ▶ Pichanga / ▶ Básquet / 📍 Llévame).
+  - **Lo que dicen los vecinos:** se reescribió con palabras simples.
+  - **Pantalla de capítulos:** queda solo como «Mis lugares y copas».
+  - Se agregó el campo `introSeen` al estado de la aventura, sin migración: los perfiles antiguos la reciben al abrir.
+- **Mati Merge en 3D:**
+  - Los 26 productos ahora tienen volumen y brillo (`js/merge-models.js`).
+  - **Bandeja:** de madera, en perspectiva como Choco Match.
+  - **Al juntar:** el producto nuevo salta.
+  - **Pedidos:** un vecino con un globito; se pone verde y dice «¡Entregar!» cuando lo tienes.
+  - **Juego y tablero guardado:** los mismos de antes.
+  - **Costo por cuadro:** baja de 133 a **51 dibujos**, con 53.000 triángulos. Choco Match, que anda bien en su celular, usa 835 dibujos y 106.000 triángulos.
+- **Pantallas más alegres:**
+  - Fichas de color con dibujito en el inicio de los partidos (🌱 Accesible, ⭐ Normal, 🔥 Desafío, 🤝 Amistoso, 🏆 Copa).
+  - Fichas grandes para elegir estilo. **Se arregló un error:** los nombres de los estilos salían en blanco sobre fondo claro y no se leían.
+  - Fichas de color en «Mi personaje y mis espacios».
+  - Botones del menú redondos y con brillo.
+  - Panel de Actividades del Pueblo y lista de misiones de la Ciudad claros y redondos.
+  - «Mis lugares y copas» con tarjetas claras.
+- Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §14.
+- **Pruebas:** PENDIENTE_PRUEBAS
+- **Prueba de partidos (`deportes.cjs`):**
+  - En pantalla grande, la prueba esperaba solo 15 s el fin del partido después de volver de segundo plano.
+  - En el navegador de prueba sin tarjeta gráfica, la pausa corta de 1,6 s de juego tardó más que eso en tiempo real. Con `main` pasa lo mismo, así que no viene de este cambio.
+  - Ahora espera hasta 60 s.
+- App: PR PENDIENTE_PR. APK de prueba: PENDIENTE_APK.
+- Web: PR PENDIENTE_WEB. Se publica cuando la persona dueña hace merge.
+
+### PR #45 y matiweb #48 mergeados (23-oct)
+- El ajuste de dificultad quedó en `main` y en la web.
+
 ### Partidos más fáciles de aprender (Pichanga y Básquet 2 contra 2)
 - **Prueba en el celular de la persona dueña** (APK nº 77): Pichanga y Básquet 2 contra 2 "súper difíciles de jugar al tiro". Cuesta coordinar pases y hacer goles, los rivales hacen goles mucho más fácil y quitar la pelota es muy difícil.
 - **Causa:**
