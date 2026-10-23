@@ -231,7 +231,7 @@ export class PichangaGame extends MatchGame {
   onBegin() {
     this.banner(this.mode === "copa" ? `🏆 ${this.rival().roundName}: ¡a jugar!` : "⚽ ¡A jugar!");
     audio.playCountdown(true);
-    this._hint("Tu jugador tiene el anillo dorado. ¡Pasa la pelota y busca el arco!", 3.5);
+    this._hint(this.diff === "accesible" ? "Tu jugador tiene el anillo dorado. Para quitar, ¡choca al rival que tiene la pelota!" : "Tu jugador tiene el anillo dorado. ¡Pasa la pelota y busca el arco!", 3.5);
   }
 
   update(dt) {

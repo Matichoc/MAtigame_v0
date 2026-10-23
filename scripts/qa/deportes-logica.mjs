@@ -382,5 +382,20 @@ const fin = (x) => Number.isFinite(x);
   }
 }
 
+// ======================= DIFICULTAD CON UN JUGADOR HUMANO SIMULADO =======================
+// (reacciona en ~0,45 s, apunta con error; "aprendiz" aún más lento). Los partidos deben poder aprenderse:
+// en accesible se gana casi siempre, en normal algo más de la mitad, y desafío cuesta pero se puede.
+{
+  const { medir, humanoPichanga, humanoBasquet } = await import("./jugador-humano.mjs");
+  for (const [nombre, Sim, h] of [["pichanga", PI, humanoPichanga], ["básquet", BQ, humanoBasquet]]) {
+    const acc = medir(Sim, (s) => h(s, 0.7), "accesible", 20);
+    const nor = medir(Sim, (s) => h(s, 1), "normal", 20);
+    const des = medir(Sim, (s) => h(s, 1), "desafio", 20);
+    ok(acc.gana >= 17, `${nombre}: un aprendiz gana en accesible (${acc.gana}/20, promedio ${(acc.favor / 20).toFixed(1)} a ${(acc.contra / 20).toFixed(1)})`);
+    ok(nor.gana >= 9 && nor.gana <= 18, `${nombre}: en normal se gana algo más de la mitad (${nor.gana}/20)`);
+    ok(des.gana >= 1 && des.gana <= 12, `${nombre}: desafío cuesta pero se puede (${des.gana}/20)`);
+  }
+}
+
 console.log(fallos ? `\n${fallos} prueba(s) fallaron` : "\nTodo bien");
 process.exit(fallos ? 1 : 0);
