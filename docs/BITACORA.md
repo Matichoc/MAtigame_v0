@@ -28,6 +28,13 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 | Desafío | gana 7–12/30 | gana 7–12/30 |
 
   Quedó como prueba permanente en `scripts/qa/deportes-logica.mjs`.
+- Pruebas:
+  - Lógica: `deportes-logica.mjs` 58/58 y `aventura-logica.mjs` 64/64.
+  - Navegador, app: `deportes.cjs` 52/52 y `aventura.cjs` 41/41.
+  - Navegador, web: las mismas, también 52/52 y 41/41.
+  - `verify:app` OK.
+- App: PR #45. **APK de prueba: compilación nº 78**, en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/39893272151 (artefacto `matijuego-prueba-apk`).
+- Web: PR [Matichoc/matiweb#48](https://github.com/Matichoc/matiweb/pull/48). Se publica cuando la persona dueña hace merge.
 - Falta confirmarlo en el celular: el jugador simulado no reemplaza a una persona.
 
 ### PR #44 y matiweb #47 mergeados (22-oct)
