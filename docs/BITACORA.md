@@ -6,6 +6,46 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-23
 
+### Aventura por etapas "Renovar el Pueblo", Pueblo y Ciudad más grandes y pedidos diarios en Mati Merge
+- **Prueba de la persona dueña (APK nº 79):**
+  - "Se ve un poco mejor", pero la aventura por etapas "no la estamos logrando" (como en Gossip Harbor).
+  - Pidió agrandar la Ciudad y el Pueblo "para tener más mundo, para caminar, para conocer, para hacer más misiones", y que algunas misiones se reseteen.
+  - "Hay algunas que las tengo tomadas desde ayer."
+- **Decisiones de la persona dueña** (a mis preguntas):
+  - Aventura con **"⭐ de todos los juegos"**.
+  - Misiones atascadas: **"distintos personajes pidiendo para su día a día, pueden pedir 1 o 2 productos para combinar"** (los pedidos de Mati Merge).
+  - Mundo: **"barrios nuevos en ambos"**.
+  - Encargos: **"encargos diarios, historia fija"**.
+- **Aventura "Renovar el Pueblo":**
+  - 7 zonas: plaza, cancha, aro, festival, bosque de cacao, granja y lago.
+  - Cada zona trae 4 tareas que cuestan ⭐; las ⭐ se ganan en cualquier juego, en pedidos de Merge y juntando lo de los barrios.
+  - Lista de tareas con mapa de zonas y escena con el vecino al hacer cada una; premio por zona, una sola vez.
+  - **Migración:** quien terminó el festival queda con 4 zonas hechas, sin cobrar de nuevo.
+  - El nivel ahora se ve con 🏅, para no confundirlo con las ⭐.
+- **Pueblo más grande:**
+  - Bosque de cacao, Granja y Lago, con vecinos nuevos (Guardabosque Maní, Tía Avellana y Capitán Almendra).
+  - Se ven descuidados hasta que la aventura los renueva.
+  - Cada día hay mazorcas, huevos y conchitas para juntar (3 actividades nuevas: el premio del día pide 7 de 10).
+- **Ciudad más grande:**
+  - Parque Grande, Playa con muelle y Colegio.
+  - 3 misiones nuevas que se renuevan cada día: patos, quitasoles y libros perdidos (ahora son 11).
+- **Mati Merge:**
+  - Los pedidos son de distintos vecinos para su día a día y traen 1 o 2 productos.
+  - Se renuevan cada día; los antiguos atascados se cambian al abrir.
+- **Problemas encontrados y arreglados en el camino:**
+  - El cuadro para elegir estilo se abría detrás de la lista de tareas.
+  - La entrada de la granja le quitaba su lugar a la "Escalera de Nubes" del parkour.
+  - Los carteles de los barrios se leían al revés desde adentro.
+  - Lo que se recolecta en los barrios se dibujaba aunque estuvieras lejos.
+- **Rendimiento (teléfono):**
+  - **Pueblo en la plaza:** 1.352 → 1.435 dibujos (+6%); dentro de un barrio, 1.515–1.562.
+  - **Ciudad:** los barrios suman entre 9 y 73 dibujos (antes, ~1.107 en el centro).
+  - **Pendiente aparte:** el Pueblo y la Ciudad ya eran pesados (1.300–1.800 dibujos).
+- Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §15.
+- **Pruebas:** PENDIENTE_PRUEBAS2
+- App: PR [#46](https://github.com/Matichoc/MAtigame_v0/pull/46), el mismo, todavía sin merge. APK de prueba: PENDIENTE_APK2.
+- Web: PR [Matichoc/matiweb#49](https://github.com/Matichoc/matiweb/pull/49), actualizado. Se publica cuando la persona dueña hace merge.
+
 ### Aventura que se entiende, Mati Merge en 3D y pantallas más alegres
 - **Prueba de la persona dueña:**
   - La aventura "no se entiende": no queda claro qué es ni qué hay que completar, y las misiones son abstractas.

@@ -20,7 +20,7 @@ const ZONE_DIST = 86; // distancia del centro del pueblo al centro de cada barri
 const GATE_FROM = 46;
 const GATE_TO = ZONE_DIST - ZONE_R + 3;
 const GATE_HALF = 3; // medio ancho del camino de entrada
-const SEE_DIST = 82; // a esta distancia (o menos) del centro del barrio, se dibuja
+const SEE_DIST = 66; // a esta distancia (o menos) del centro del barrio, se dibuja (desde la cerca ya se ve)
 
 /** Los barrios: dónde están, quién vive ahí y qué se recolecta cada día. */
 export const ZONE_DEFS = {
@@ -30,7 +30,7 @@ export const ZONE_DEFS = {
     spots: [[-8, 12], [9, 10], [-14, -2], [14, -6], [-6, -18], [7, -20]],
   },
   granja: {
-    deg: -62, name: "La Granja", icon: "🐄", npc: "Tía Avellana", ground: 0x9ccf5a, sign: "#b5452a",
+    deg: -84, name: "La Granja", icon: "🐄", npc: "Tía Avellana", ground: 0x9ccf5a, sign: "#b5452a",
     item: { id: "huevo", icon: "🥚", name: "huevos", text: "Junta los huevos de la Granja" },
     spots: [[-4, 14], [6, 16], [-16, 2], [-3, -4], [16, -2], [3, -16]],
   },
@@ -132,6 +132,16 @@ export class TownZones {
     return false;
   }
 
+  /** ¿(x, z) está en un camino de entrada (o a `pad` de él)? Para que no crezcan árboles encima. */
+  nearGate(x, z, pad = 0) {
+    return ZONE_IDS.some((id) => {
+      const a = (ZONE_DEFS[id].deg * Math.PI) / 180;
+      const along = x * Math.sin(a) - z * Math.cos(a);
+      const across = x * Math.cos(a) + z * Math.sin(a);
+      return along >= GATE_FROM - pad && along <= GATE_TO + pad && Math.abs(across) <= GATE_HALF + pad;
+    });
+  }
+
   /** ¿Este ángulo de la cerca del pueblo es una entrada? (ahí no van postes). */
   isGate(deg) {
     return ZONE_IDS.some((id) => {
@@ -143,7 +153,9 @@ export class TownZones {
   /** Antes de los árboles del pueblo: aparta los caminos de entrada (para que no crezca nada encima). */
   buildWorld() {
     for (const id of ZONE_IDS) {
-      for (let r = GATE_FROM - 2; r <= GATE_TO + 4; r += 4) {
+      // solo afuera de la cerca: adentro el camino puede pasar bajo las nubes del parkour (flotan), sin quitarles su lugar
+      // (los árboles igual se apartan del camino: ver nearGate)
+      for (let r = 58; r <= GATE_TO + 4; r += 4) {
         const p = pol(ZONE_DEFS[id].deg, r);
         this.g.fun.claimed.push({ x: p.x, z: p.z, r: 4.5 });
       }
@@ -552,9 +564,10 @@ export class TownZones {
         const w = toWorld(id, lx, lz);
         const mesh = this._itemMesh(d.item.id);
         mesh.position.set(w.x, 0.9, w.z);
-        mesh.visible = !st[id].includes(idx);
+        const got = st[id].includes(idx);
+        mesh.visible = false; // se muestra solo cerca de su barrio (ver update)
         this.g.scene.add(mesh);
-        this.items.push({ zone: id, idx, mesh, x: w.x, z: w.z });
+        this.items.push({ zone: id, idx, mesh, x: w.x, z: w.z, got });
       });
     }
   }
@@ -566,7 +579,7 @@ export class TownZones {
       const d = ZONE_DEFS[id];
       return {
         id: `zone-${id}`, icon: d.item.icon, text: d.item.text, cur: st[id].length, goal: d.spots.length,
-        at: () => { const left = this.items.filter((it) => it.zone === id && it.mesh.visible); return left.length ? left[0] : zoneCenter(id); },
+        at: () => { const left = this.items.filter((it) => it.zone === id && !it.got); return left.length ? left[0] : zoneCenter(id); },
       };
     });
   }
@@ -576,12 +589,13 @@ export class TownZones {
   update(dt) {
     this.t += dt;
     const P = this.g.pos;
-    // cada barrio se dibuja solo cuando estás cerca (y sus vecinos también)
+    // cada barrio se dibuja solo cuando estás cerca (y sus vecinos y lo que se recolecta, también)
+    const near = {};
     for (const id of ZONE_IDS) {
       const c = zoneCenter(id);
-      const near = Math.hypot(P.x - c.x, P.z - c.z) < SEE_DIST;
-      if (this.bases[id]) this.bases[id].visible = near;
-      if (this.groups[id]) this.groups[id].visible = near;
+      near[id] = Math.hypot(P.x - c.x, P.z - c.z) < SEE_DIST;
+      if (this.bases[id]) this.bases[id].visible = near[id];
+      if (this.groups[id]) this.groups[id].visible = near[id];
     }
     for (const n of this.g.npcs) {
       const z = ZONE_IDS.find((id) => ZONE_DEFS[id].npc === n.def.name);
@@ -610,10 +624,12 @@ export class TownZones {
     // recolectar
     const st = this.st();
     for (const it of this.items) {
+      it.mesh.visible = !it.got && near[it.zone];
       if (!it.mesh.visible) continue;
       it.mesh.rotation.y += dt * 1.8;
       it.mesh.position.y = 0.9 + Math.sin(this.t * 3 + it.idx) * 0.15;
       if (Math.hypot(P.x - it.x, P.z - it.z) > 1.6) continue;
+      it.got = true;
       it.mesh.visible = false;
       if (st[it.zone].includes(it.idx)) continue;
       st[it.zone].push(it.idx);

@@ -227,7 +227,7 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   const juntado = await p.evaluate(async () => {
     const g = window.__g3d.town;
     const items = g.zones.items.filter((it) => it.zone === "bosque");
-    for (const it of items) { g.pos.set(it.x, 0, it.z); g.vel.set(0, 0, 0); await new Promise((r) => setTimeout(r, 600)); }
+    for (const it of items) { for (let k = 0; k < 30 && !it.got; k++) { g.pos.set(it.x, 0, it.z); g.vel.set(0, 0, 0); await new Promise((r) => setTimeout(r, 150)); } }
     return g.zones.st().bosque.length;
   });
   ok(juntado === 6 && (await prog()).coins >= c0 + 12, `caminar por el bosque junta las 6 mazorcas del día (+2 🍫✨ cada una) (${juntado})`);

@@ -437,7 +437,7 @@ export class TownGame extends Game3D {
       spots.push([p.x, p.z, 0.8 + rnd() * 0.6]);
     }
     const claimed = this.fun ? this.fun.claimed : []; // casitas y recorridos de parkour: sin árboles encima
-    const good = spots.filter(([x, z]) => !this._nearStructure(x, z, 6) && !claimed.some((c) => Math.hypot(x - c.x, z - c.z) < c.r + 2.5));
+    const good = spots.filter(([x, z]) => !this._nearStructure(x, z, 6) && !claimed.some((c) => Math.hypot(x - c.x, z - c.z) < c.r + 2.5) && !(this.zones && this.zones.nearGate(x, z, 2.5)));
     const trunkGeo = new THREE.CylinderGeometry(0.28, 0.4, 2.4, 6);
     const crownGeo = new THREE.IcosahedronGeometry(1.7, 0);
     const trunks = new THREE.InstancedMesh(trunkGeo, this.m.choco, good.length);

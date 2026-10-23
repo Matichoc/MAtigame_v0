@@ -314,3 +314,89 @@ Eligió estas tres respuestas:
   - Pedidos con la cara de tres clientes distintos.
   - El tablero no queda tapado por la barra, de pie y acostado.
 - `scripts/qa/aventura.cjs`: la viñeta sale una sola vez y el globito del Pueblo trae la cara y el botón.
+
+## 15. Aventura por etapas "Renovar el Pueblo", mundo más grande y pedidos diarios (23-oct-2026)
+
+La persona dueña probó el APK nº 79. La aventura se ve mejor, pero las etapas "no las estamos logrando" (como en Gossip Harbor). También pidió que la Ciudad y el Pueblo crezcan para caminar, conocer y hacer más misiones. Además, algunas misiones quedaban tomadas desde el día anterior.
+
+Respondió 4 preguntas:
+- **Aventura:** "⭐ de todos los juegos".
+- **Misiones atascadas:** "distintos personajes pidiendo para su día a día, pueden pedir 1 o 2 productos para combinar".
+- **Mundo:** "barrios nuevos en ambos".
+- **Encargos:** "encargos diarios, historia fija".
+
+**Aventura "Renovar el Pueblo"** (`js/adventure.js`, versión 2 de `progress.adventure`)
+- **Zonas:** 7 zonas en orden: la plaza, la cancha, el aro, el gran festival, el bosque de cacao, la granja y el lago.
+- **Tareas:** cada zona tiene 4 tareas que cuestan ⭐ (de 1 a 6), 28 en total, con 94 ⭐ para completar el Pueblo entero.
+  - Ejemplos: "Sacar la maleza del rincón ⭐1", "Poner los arcos ⭐3", "Construir la casita del árbol ⭐5" y "Fuegos artificiales sobre el lago ⭐6".
+  - Algunas tareas son de elegir el estilo (los mismos estilos de antes).
+- **De dónde salen las ⭐:**
+  - Cualquier partida, gane o pierda, da ⭐1; Pichanga, Básquet 2 contra 2, misiones de la Ciudad y Aventura Choco dan ⭐2.
+  - Cada pedido entregado en Mati Merge da ⭐1.
+  - Juntar todo lo de un barrio en el día da ⭐1.
+  - La viñeta de bienvenida regala ⭐1 para la primera tarea.
+- **La lista de tareas** (como en los juegos de renovar):
+  - Muestra la zona, la barra de avance, la cara del vecino con lo que dice y las 4 tareas con su costo.
+  - "¡Hacer!" aparece cuando alcanzan las ⭐; si no, dice "faltan N" y trae "▶ Jugar".
+  - Abajo va el mapa de las 7 zonas: hechas, la actual y las que vienen (con candado).
+- **Al hacer una tarea:**
+  - La cámara va al lugar, lo nuevo aparece con un saltito y chispas, y el vecino cuenta un pedacito de la historia que lleva a lo siguiente.
+  - Al completar una zona hay premio, pagado una sola vez, y se abre la siguiente.
+- **Dónde se ve:**
+  - En el Pueblo, el globo de arriba muestra la tarea con su costo, "🔨 ¡Hacer!" o "▶ Jugar", y 📋.
+  - El chip ⭐ va arriba y el vecino de la zona tiene ❗ si ya te alcanza.
+  - En el menú, el botón dice "⭐3 · La Plaza 2/4 · ¡Ya puedes: …!" y late cuando alcanza.
+- **Migración desde la versión anterior** (idempotente y sin repetir premios):
+  - Lo que estaba terminado pasa a zonas hechas: el festival terminado equivale a 4 zonas.
+  - Los premios ya cobrados quedan marcados.
+  - Quien estaba a medias conserva lo que eligió y recibe ⭐2 para seguir.
+- **El nivel pasa a mostrarse con 🏅** para no confundirlo con las ⭐.
+
+**Pueblo más grande** (`js/town-zones.js`)
+- **Tres barrios** más allá de la cerca, cada uno con una entrada con arco y su vecino nuevo:
+  - el Bosque de cacao, con el Guardabosque Maní;
+  - la Granja, con Tía Avellana;
+  - el Lago, con el Capitán Almendra.
+- **Cómo cambian con la aventura:**
+  - **Bosque:** sendero tapado → despejado, puente caído → puente nuevo, casita en el árbol, luces.
+  - **Granja:** granero gris con agujero → rojo, molino roto → girando, huerto, corral con animales.
+  - **Lago:** muelle roto → muelle por el que se camina sobre el agua, botes dados vuelta → de colores flotando, mirador, fuegos artificiales.
+- **Cada día** hay cosas para recolectar: 6 mazorcas, 6 huevos y 6 conchitas, a +2 🍫✨ cada una y ⭐1 al juntar todo un barrio.
+- **Actividades del día:** suman 3 (quedan 10). El premio del día pide 7 de las 10, y se eligen las que más gusten.
+- Las entradas no le quitan su lugar al parkour: el camino pasa bajo las nubes, que flotan.
+
+**Ciudad más grande** (`js/ciudad-barrios.js`)
+- **Las calles del centro** siguen hasta tres barrios:
+  - el Parque Grande, con laguna, patos, juegos y árboles;
+  - la Playa Choco, con mar, muelle, torre de salvavidas, palmeras y quitasoles;
+  - el Colegio Choco, con edificio, reloj, cancha, bandera y paradero.
+- Al mar no se entra, salvo por el muelle.
+- **3 misiones nuevas** que se renuevan cada día como las demás (ahora son 11):
+  - 🦆 Pan para los patos (Don Patricio);
+  - ⛱️ Abrir los quitasoles (Salvavidas Marina);
+  - 📚 Libros perdidos (Profesora Paz), con libros repartidos entre el colegio, el parque y la playa.
+
+**Mati Merge: pedidos diarios de los vecinos** (`js/merge-data.js`)
+- **Cada pedido** es de un vecino distinto, con un motivo de su día a día ("para la once con su abuela", "para la vitrina de su almacén"…).
+- **1 o 2 productos:** trae 1 o 2 productos (40% trae 2). Los que ya tienes se marcan con ✓, y al entregar salen todos del tablero.
+- **Renovación:** los pedidos se renuevan cada día y los que no entregaste se cambian. Los pedidos del formato anterior, los que quedaban "atascados", se renuevan al abrir.
+
+**Rendimiento** (teléfono, mismo lugar y misma cámara)
+
+| Por cuadro | Antes (main) | Ahora |
+|---|---|---|
+| Pueblo, en la plaza | 1.352 dibujos | 1.435 dibujos (+6%; parte es la ropa de los vecinos) |
+| Pueblo, dentro de un barrio | — | 1.515–1.562 (el pueblo se sigue viendo detrás) |
+| Ciudad, en el centro | ~1.107 | +9 a +73 según dónde estés (cada barrio se dibuja solo de cerca) |
+
+- **Cómo se mantiene bajo el costo:**
+  - Cada barrio, con sus vecinos y lo que se recolecta, se dibuja solo cuando estás cerca.
+  - Árboles, cercas, postes y cultivos van agrupados.
+  - Las piezas nuevas no proyectan sombras reales.
+- **Pendiente aparte:** el Pueblo y la Ciudad ya eran pesados antes de este cambio (1.300–1.800 dibujos). Conviene aliviarlos en un trabajo propio, por ejemplo agrupando las piezas de los vecinos y los edificios.
+
+**Pruebas nuevas o al día**
+- `scripts/qa/aventura-logica.mjs`: zonas, ⭐, migración desde la versión anterior y premios sin duplicar.
+- `scripts/qa/merge-logica.mjs`, nueva: clientes, 1 o 2 productos, renovación diaria, entrega completa y formato antiguo.
+- `scripts/qa/aventura.cjs`: recorrido completo por las 7 zonas en el navegador, caminar al lago, el muelle sobre el agua y recolectar en el bosque.
+- `scripts/qa/ciudad-barrios.cjs`, nueva: caminar a los barrios, el mar y el muelle, y las 3 misiones de punta a punta.
