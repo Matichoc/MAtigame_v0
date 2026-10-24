@@ -42,8 +42,19 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - **Ciudad:** los barrios suman entre 9 y 73 dibujos (antes, ~1.107 en el centro).
   - **Pendiente aparte:** el Pueblo y la Ciudad ya eran pesados (1.300–1.800 dibujos).
 - Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §15.
-- **Pruebas:** PENDIENTE_PRUEBAS2
-- App: PR [#46](https://github.com/Matichoc/MAtigame_v0/pull/46), el mismo, todavía sin merge. APK de prueba: PENDIENTE_APK2.
+- **Pruebas:**
+  - Lógica: aventura, deportes, puzzles y merge-logica (nueva), en verde. `verify:app` OK.
+  - Navegador, app: aventura 57/57, deportes 52/52, merge 30/30, ciudad-barrios 20/20 (nueva), atrás 24/24, juegos 15/15, temporada 29/29, pueblo 24/24, perfiles 13/13 y ciudad-diaria 6/6. Legal y enlaces OK.
+  - Navegador, web (matiweb servida en local): aventura 57/57, deportes 52/52, merge 30/30, pueblo 24/24, temporada 29/29, legal OK y enlaces con 0 peticiones externas.
+  - `juegos.cjs` en la web: 15/16. Choco Blaster sigue con la falla de la prueba ya anotada el 22-oct.
+  - `ciudad-barrios.cjs` no corre en la web: la demo deja jugar solo las 2 primeras misiones de la Ciudad. Los barrios se pueden recorrer igual.
+  - Pruebas puestas al día: `ciudad-diaria.cjs` ahora cuenta 11 misiones; antes contaba 8.
+- App: PR [#46](https://github.com/Matichoc/MAtigame_v0/pull/46), el mismo, todavía sin merge. **APK de prueba: compilación nº 80**, en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40043895224 (artefacto `matijuego-prueba-apk`).
+- **Falta probar en el celular:**
+  - La lista de tareas y las escenas.
+  - Caminar a los barrios del Pueblo y de la Ciudad.
+  - Los pedidos de 2 productos.
+  - Que todo se vea fluido.
 - Web: PR [Matichoc/matiweb#49](https://github.com/Matichoc/matiweb/pull/49), actualizado. Se publica cuando la persona dueña hace merge.
 
 ### Aventura que se entiende, Mati Merge en 3D y pantallas más alegres
