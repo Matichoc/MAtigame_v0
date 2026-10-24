@@ -6,6 +6,114 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-23
 
+### Aventura por etapas "Renovar el Pueblo", Pueblo y Ciudad más grandes y pedidos diarios en Mati Merge
+- **Prueba de la persona dueña (APK nº 79):**
+  - "Se ve un poco mejor", pero la aventura por etapas "no la estamos logrando" (como en Gossip Harbor).
+  - Pidió agrandar la Ciudad y el Pueblo "para tener más mundo, para caminar, para conocer, para hacer más misiones", y que algunas misiones se reseteen.
+  - "Hay algunas que las tengo tomadas desde ayer."
+- **Decisiones de la persona dueña** (a mis preguntas):
+  - Aventura con **"⭐ de todos los juegos"**.
+  - Misiones atascadas: **"distintos personajes pidiendo para su día a día, pueden pedir 1 o 2 productos para combinar"** (los pedidos de Mati Merge).
+  - Mundo: **"barrios nuevos en ambos"**.
+  - Encargos: **"encargos diarios, historia fija"**.
+- **Aventura "Renovar el Pueblo":**
+  - 7 zonas: plaza, cancha, aro, festival, bosque de cacao, granja y lago.
+  - Cada zona trae 4 tareas que cuestan ⭐; las ⭐ se ganan en cualquier juego, en pedidos de Merge y juntando lo de los barrios.
+  - Lista de tareas con mapa de zonas y escena con el vecino al hacer cada una; premio por zona, una sola vez.
+  - **Migración:** quien terminó el festival queda con 4 zonas hechas, sin cobrar de nuevo.
+  - El nivel ahora se ve con 🏅, para no confundirlo con las ⭐.
+- **Pueblo más grande:**
+  - Bosque de cacao, Granja y Lago, con vecinos nuevos (Guardabosque Maní, Tía Avellana y Capitán Almendra).
+  - Se ven descuidados hasta que la aventura los renueva.
+  - Cada día hay mazorcas, huevos y conchitas para juntar (3 actividades nuevas: el premio del día pide 7 de 10).
+- **Ciudad más grande:**
+  - Parque Grande, Playa con muelle y Colegio.
+  - 3 misiones nuevas que se renuevan cada día: patos, quitasoles y libros perdidos (ahora son 11).
+- **Mati Merge:**
+  - Los pedidos son de distintos vecinos para su día a día y traen 1 o 2 productos.
+  - Se renuevan cada día; los antiguos atascados se cambian al abrir.
+- **Problemas encontrados y arreglados en el camino:**
+  - El cuadro para elegir estilo se abría detrás de la lista de tareas.
+  - La entrada de la granja le quitaba su lugar a la "Escalera de Nubes" del parkour.
+  - Los carteles de los barrios se leían al revés desde adentro.
+  - Lo que se recolecta en los barrios se dibujaba aunque estuvieras lejos.
+- **Rendimiento (teléfono):**
+  - **Pueblo en la plaza:** 1.352 → 1.435 dibujos (+6%); dentro de un barrio, 1.515–1.562.
+  - **Ciudad:** los barrios suman entre 9 y 73 dibujos (antes, ~1.107 en el centro).
+  - **Pendiente aparte:** el Pueblo y la Ciudad ya eran pesados (1.300–1.800 dibujos).
+- Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §15.
+- **Pruebas:**
+  - Lógica: aventura, deportes, puzzles y merge-logica (nueva), en verde. `verify:app` OK.
+  - Navegador, app: aventura 57/57, deportes 52/52, merge 30/30, ciudad-barrios 20/20 (nueva), atrás 24/24, juegos 15/15, temporada 29/29, pueblo 24/24, perfiles 13/13 y ciudad-diaria 6/6. Legal y enlaces OK.
+  - Navegador, web (matiweb servida en local): aventura 57/57, deportes 52/52, merge 30/30, pueblo 24/24, temporada 29/29, legal OK y enlaces con 0 peticiones externas.
+  - `juegos.cjs` en la web: 15/16. Choco Blaster sigue con la falla de la prueba ya anotada el 22-oct.
+  - `ciudad-barrios.cjs` no corre en la web: la demo deja jugar solo las 2 primeras misiones de la Ciudad. Los barrios se pueden recorrer igual.
+  - Pruebas puestas al día: `ciudad-diaria.cjs` ahora cuenta 11 misiones; antes contaba 8.
+- App: PR [#46](https://github.com/Matichoc/MAtigame_v0/pull/46), el mismo, todavía sin merge. **APK de prueba: compilación nº 80**, en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40043895224 (artefacto `matijuego-prueba-apk`).
+- **Falta probar en el celular:**
+  - La lista de tareas y las escenas.
+  - Caminar a los barrios del Pueblo y de la Ciudad.
+  - Los pedidos de 2 productos.
+  - Que todo se vea fluido.
+- Web: PR [Matichoc/matiweb#49](https://github.com/Matichoc/matiweb/pull/49), actualizado. Se publica cuando la persona dueña hace merge.
+
+### Aventura que se entiende, Mati Merge en 3D y pantallas más alegres
+- **Prueba de la persona dueña:**
+  - La aventura "no se entiende": no queda claro qué es ni qué hay que completar, y las misiones son abstractas.
+  - Los cuadros nuevos se ven "muy cuadrados, muy en ventana", toscos al lado del resto del juego.
+  - Desde Mati Merge las piezas perdieron la alegría.
+- **Decisiones de la persona dueña** (a mis preguntas):
+  - Aventura **"Directo al Pueblo"**.
+  - Mati Merge **"3D como Choco Match"**.
+  - Revisar el **inicio de los partidos, la Ciudad y el Pueblo, elegir estilo y los botones del menú**.
+- **Aventura:**
+  - **Primera vez:** una viñeta con las caras de los 3 vecinos explica el festival, una sola vez. Después «Continuar mi aventura» lleva directo al Pueblo, junto al vecino que te necesita.
+  - **Globito en el Pueblo:** la cara del vecino, un pedido concreto ("Bombi necesita chocolates para decorar: gánalos jugando una partida de cualquier juego 🎮") y un botón que lo hace (▶ Memoria / ▶ Pichanga / ▶ Básquet / 📍 Llévame).
+  - **Lo que dicen los vecinos:** se reescribió con palabras simples.
+  - **Pantalla de capítulos:** queda solo como «Mis lugares y copas».
+  - Se agregó el campo `introSeen` al estado de la aventura, sin migración: los perfiles antiguos la reciben al abrir.
+- **Mati Merge en 3D:**
+  - Los 26 productos ahora tienen volumen y brillo (`js/merge-models.js`).
+  - **Bandeja:** de madera, en perspectiva como Choco Match.
+  - **Al juntar:** el producto nuevo salta.
+  - **Pedidos:** un vecino con un globito; se pone verde y dice «¡Entregar!» cuando lo tienes.
+  - **Juego y tablero guardado:** los mismos de antes.
+  - **Costo por cuadro:** baja de 133 a **51 dibujos**, con 53.000 triángulos. Choco Match, que anda bien en su celular, usa 835 dibujos y 106.000 triángulos.
+- **Pantallas más alegres:**
+  - Fichas de color con dibujito en el inicio de los partidos (🌱 Accesible, ⭐ Normal, 🔥 Desafío, 🤝 Amistoso, 🏆 Copa).
+  - Fichas grandes para elegir estilo. **Se arregló un error:** los nombres de los estilos salían en blanco sobre fondo claro y no se leían.
+  - Fichas de color en «Mi personaje y mis espacios».
+  - Botones del menú redondos y con brillo.
+  - Panel de Actividades del Pueblo y lista de misiones de la Ciudad claros y redondos.
+  - «Mis lugares y copas» con tarjetas claras.
+- **Menú en celulares.** La persona dueña pidió revisarlo con ojo crítico: "esa foto grande quizás molesta, quisiera que sea muy buena la experiencia de usuario".
+  - **De pie:** el escenario grande del personaje ocupaba una pantalla entera antes de los juegos. Ahora es una franja chica con el Matichico y los 4 para elegir, y «Elige un juego» se ve en la primera pantalla.
+  - **Acostado:** la cabecera ocupaba media pantalla y los juegos quedaban en una ventanita de ~70 px de alto. Ahora la cabecera va en una fila y todo el menú se desplaza junto.
+  - **Botones repetidos:** se quitaron «Vestuario y Tienda», «Mi Casa» y el cartel de Mi Casa; siguen en «Mi personaje y mis espacios».
+  - **Tarjetas de juegos:** sin carteles encima de la foto; abajo, una línea corta "⚡ 8 · 📱 acostado".
+  - **Aviso de temporada:** en una fila.
+  - En computador el menú queda igual.
+- Detalle en `docs/EVOLUCION-JUGABILIDAD.md` §14.
+- **Pruebas:**
+  - Lógica: aventura, deportes y puzzles, en verde. `verify:app` OK.
+  - Navegador, app: aventura 43/43, deportes 52/52, merge 30/30 (prueba nueva), atrás 24/24, juegos 15/15, temporada 29/29, pueblo 24/24, perfiles 13/13, Ciudad 6/6. Legal y enlaces OK.
+  - Navegador, web (matiweb servida en local): aventura 43/43, deportes 52/52, merge 30/30, temporada 29/29, legal OK, enlaces 0 peticiones externas.
+  - `juegos.cjs` en la web: 15/16. Choco Blaster sigue con la misma falla de la prueba que ya estaba anotada el 22-oct.
+- **Pruebas que se arreglaron** (fallaban por la prueba, no por el juego):
+  - `atras.cjs`: ahora «Continuar mi aventura» abre la viñeta.
+  - `aventura.cjs`: en la web los módulos llevan `?v=…`, y la prueba cargaba otra copia de `progression.js`, así que el menú no se enteraba de la partida.
+- **Prueba de partidos (`deportes.cjs`):**
+  - En pantalla grande, la prueba esperaba solo 15 s el fin del partido después de volver de segundo plano.
+  - En el navegador de prueba sin tarjeta gráfica, la pausa corta de 1,6 s de juego tardó más que eso en tiempo real. Con `main` pasa lo mismo, así que no viene de este cambio.
+  - Ahora espera hasta 60 s.
+  - También espera a que se registre la primera jugada con teclado (con un tope de 30 s): el pase apretado durante el saque sale cuando termina el saque.
+- App: PR [#46](https://github.com/Matichoc/MAtigame_v0/pull/46). **APK de prueba: compilación nº 79**, en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40023255916 (artefacto `matijuego-prueba-apk`).
+- Web: PR [Matichoc/matiweb#49](https://github.com/Matichoc/matiweb/pull/49). Se publica cuando la persona dueña hace merge.
+- **Falta probar en el celular:** la viñeta y el globito de la aventura, Mati Merge en 3D (que se vea fluido) y el menú de pie y acostado.
+
+### PR #45 y matiweb #48 mergeados (23-oct)
+- El ajuste de dificultad quedó en `main` y en la web.
+
 ### Partidos más fáciles de aprender (Pichanga y Básquet 2 contra 2)
 - **Prueba en el celular de la persona dueña** (APK nº 77): Pichanga y Básquet 2 contra 2 "súper difíciles de jugar al tiro". Cuesta coordinar pases y hacer goles, los rivales hacen goles mucho más fácil y quitar la pelota es muy difícil.
 - **Causa:**

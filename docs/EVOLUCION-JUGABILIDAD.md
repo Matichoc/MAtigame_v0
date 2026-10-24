@@ -248,3 +248,155 @@ La persona dueña probó el APK nº 77. Pichanga y Básquet 2 contra 2 eran muy 
   - Se parte en Accesible: `progress.sports` versión 2 pasa a accesible a quien estaba en "normal" sin copas.
   - La tarjeta de inicio dice "Accesible · para aprender" y explica cómo quitar.
 - **Falta probar en el celular.** El jugador simulado ayuda a no repetir el error, pero no reemplaza a una persona.
+
+## 14. Aventura que se entiende y pantallas más alegres (23-oct-2026)
+
+La persona dueña revisó la evolución en el celular. La aventura "no se entiende": no queda claro qué es ni qué hay que hacer, y las misiones son abstractas. Los cuadros nuevos se ven "muy cuadrados, muy en ventana", toscos al lado del resto del juego. Mati Merge en especial perdió la alegría de las piezas.
+
+Eligió estas tres respuestas:
+- **Aventura:** "Directo al Pueblo".
+- **Mati Merge:** "3D como Choco Match".
+- **Pantallas a revisar:** inicio de partidos, Ciudad y Pueblo, elegir estilo y botones del menú.
+
+**Aventura: directo al Pueblo, con pedidos concretos**
+- **Primera vez:** el botón «Continuar mi aventura» abre una viñeta, una sola vez. Muestra las caras de Bombi, Capi Menta y Don Cuchufli y dice en dos frases qué es el festival y cómo se ayuda. Después el botón lleva **directo al Pueblo, junto al vecino que te necesita**, sin pasar por una pantalla con listas.
+- **Globito en el Pueblo:** dice qué hacer ahora con la cara del vecino y una frase concreta, por ejemplo "Bombi necesita chocolates para decorar: gánalos jugando una partida de cualquier juego 🎮". Trae un botón que hace justo eso: «▶ Memoria», «▶ Pichanga», «▶ Básquet» o «📍 Llévame».
+- **Lo que dicen los vecinos:** piden las cosas con palabras simples ("Necesito chocolates para decorar. ¿Me los consigues?…") en vez de "consigue materiales".
+- **Menú:** el botón de la aventura muestra la cara del vecino y el pedido del momento.
+- **Pantalla de capítulos:** queda solo como «Mis lugares y copas», dentro de «Mi personaje y mis espacios».
+- **Caras iguales en todo el juego:** las caras salen del mismo modelo que los vecinos del Pueblo (`js/neighbors.js`), así se ven igual en el menú, la viñeta, el globito y los pedidos de Mati Merge.
+
+**Mati Merge en 3D, como Choco Match**
+- **Productos con volumen y brillo (26):** antes eran discos planos con una foto encima. Ahora son alfajores con relleno y glaseado, cuchuflís con espiral y puntas de chocolate, bombones con pirotín, bomba con hilos de oro, tabletas con cuadritos y envoltorio, y el ¡Mati Dubai! partido con relleno de pistacho y corona (`js/merge-models.js`).
+- **Bandeja:** de madera, con casilleros acolchados, mirada desde arriba y un poco de frente. La cámara la encuadra sola en el espacio que deja la barra, de pie o acostado, sin torcerla.
+- **Al juntar dos productos:** el nuevo salta y se estira como gelatina.
+- **Pedidos:** son un cliente (la cara de un vecino) con un globito que muestra el producto y el premio. Cuando lo tienes, el globito se pone verde y dice «¡Entregar!».
+- **Dibujos de la barra y de la lista:** son fotos del mismo modelo 3D.
+- **Juego y tablero guardado:** son los mismos de antes; no cambia nada de la lógica (`js/merge-data.js`).
+- **Costo de dibujo:** cada producto se arma una sola vez y se junta en una geometría con colores. Se dibuja en 1 paso, o 2 si lleva partes doradas, y las sombras de todos van juntas en un solo dibujo. En celulares va sin brillo de posprocesado.
+
+| Por cuadro (celular de pie) | Dibujos | Triángulos |
+|---|---|---|
+| Mati Merge antes (discos planos) | 133 | 7.800 |
+| **Mati Merge ahora (3D)** | **51** | **53.000** |
+| Choco Match (referencia que anda bien) | 835 | 106.000 |
+
+**Pantallas más alegres** (estilo claro, redondo y con rebote, como el resto del juego)
+- **Inicio de los partidos:** las opciones son fichas de color con dibujito. 🌱 Accesible "para aprender" en verde, ⭐ Normal en amarillo, 🔥 Desafío en naranja, 🤝 Amistoso en azul y 🏆 Copa en dorado. La elegida lleva un ✓.
+- **Elegir estilo:** los estilos de cada lugar son fichas grandes con el dibujo en un círculo de color. Además se arregló un error: en la tarjeta clara los nombres salían en blanco y no se leían.
+- **Mi personaje y mis espacios:** 4 fichas de colores en dos columnas.
+- **Botones del menú:** más redondos y con brillo; el dibujito va en una burbuja blanca.
+- **Pueblo:** el panel «Actividades» es una libretita clara con cada tarea en su burbuja.
+- **Ciudad:** la lista de misiones es una tarjeta clara con botones «Ir» redondos, y la misión del momento es un globito claro.
+- **«Mis lugares y copas»:** tarjetas claras.
+
+**Menú en celulares** (revisión crítica de experiencia de usuario, a pedido de la persona dueña: "esa foto grande quizás molesta")
+- **Problemas encontrados** en un celular chico (360×740 de pie y 740×360 acostado):
+  - De pie, el escenario grande del personaje (una "foto" de ~560 px con el selector y dos botones) quedaba entre los tres botones principales y los juegos. «Elige un juego» recién aparecía en la tercera pantalla.
+  - Acostado, la cabecera ocupaba media pantalla (3 filas de botones) y los juegos quedaban en una ventanita con desplazamiento propio de **~70 px** de alto. Casi no se podía usar.
+  - Había botones repetidos: «Vestuario y Tienda» y «Mi Casa», más el cartel grande de «Mi Casa ¡Nuevo!», además del botón «Mi personaje y mis espacios», que lleva a lo mismo.
+  - Las tarjetas de los juegos tenían hasta 4 carteles encima de la foto ("3D", "⚡ 8 + 1 cada 12 s", "📱 Horizontal", candado). Era mucho texto para un niño.
+- **Cambios** (solo en celulares; en computador queda igual):
+  - El personaje va en una franja chica: el Matichico a la izquierda y los 4 para elegir a la derecha.
+  - Se quitaron los botones repetidos; siguen en «Mi personaje y mis espacios».
+  - La cabecera va en una o dos filas y los botones de arriba se deslizan de lado.
+  - El aviso de la temporada ocupa una sola fila.
+  - El juego destacado (la foto del Pueblo) es más bajo.
+  - Las tarjetas muestran la foto limpia y, abajo, una línea corta: "⚡ 8 · 📱 acostado".
+  - Acostado, todo el menú se desplaza junto, sin ventanitas.
+  - De pie, «Elige un juego» ahora se ve en la primera pantalla.
+
+**Pruebas nuevas:**
+- `scripts/qa/merge.cjs`:
+  - Un producto 3D por casillero, en 1 o 2 pasos de dibujo, y costo bajo.
+  - Juntar arrastrando con el dedo sube de nivel y salta.
+  - Tocar la parte de arriba de un producto alto elige ese producto.
+  - Pedidos con la cara de tres clientes distintos.
+  - El tablero no queda tapado por la barra, de pie y acostado.
+- `scripts/qa/aventura.cjs`: la viñeta sale una sola vez y el globito del Pueblo trae la cara y el botón.
+
+## 15. Aventura por etapas "Renovar el Pueblo", mundo más grande y pedidos diarios (23-oct-2026)
+
+La persona dueña probó el APK nº 79. La aventura se ve mejor, pero las etapas "no las estamos logrando" (como en Gossip Harbor). También pidió que la Ciudad y el Pueblo crezcan para caminar, conocer y hacer más misiones. Además, algunas misiones quedaban tomadas desde el día anterior.
+
+Respondió 4 preguntas:
+- **Aventura:** "⭐ de todos los juegos".
+- **Misiones atascadas:** "distintos personajes pidiendo para su día a día, pueden pedir 1 o 2 productos para combinar".
+- **Mundo:** "barrios nuevos en ambos".
+- **Encargos:** "encargos diarios, historia fija".
+
+**Aventura "Renovar el Pueblo"** (`js/adventure.js`, versión 2 de `progress.adventure`)
+- **Zonas:** 7 zonas en orden: la plaza, la cancha, el aro, el gran festival, el bosque de cacao, la granja y el lago.
+- **Tareas:** cada zona tiene 4 tareas que cuestan ⭐ (de 1 a 6), 28 en total, con 94 ⭐ para completar el Pueblo entero.
+  - Ejemplos: "Sacar la maleza del rincón ⭐1", "Poner los arcos ⭐3", "Construir la casita del árbol ⭐5" y "Fuegos artificiales sobre el lago ⭐6".
+  - Algunas tareas son de elegir el estilo (los mismos estilos de antes).
+- **De dónde salen las ⭐:**
+  - Cualquier partida, gane o pierda, da ⭐1; Pichanga, Básquet 2 contra 2, misiones de la Ciudad y Aventura Choco dan ⭐2.
+  - Cada pedido entregado en Mati Merge da ⭐1.
+  - Juntar todo lo de un barrio en el día da ⭐1.
+  - La viñeta de bienvenida regala ⭐1 para la primera tarea.
+- **La lista de tareas** (como en los juegos de renovar):
+  - Muestra la zona, la barra de avance, la cara del vecino con lo que dice y las 4 tareas con su costo.
+  - "¡Hacer!" aparece cuando alcanzan las ⭐; si no, dice "faltan N" y trae "▶ Jugar".
+  - Abajo va el mapa de las 7 zonas: hechas, la actual y las que vienen (con candado).
+- **Al hacer una tarea:**
+  - La cámara va al lugar, lo nuevo aparece con un saltito y chispas, y el vecino cuenta un pedacito de la historia que lleva a lo siguiente.
+  - Al completar una zona hay premio, pagado una sola vez, y se abre la siguiente.
+- **Dónde se ve:**
+  - En el Pueblo, el globo de arriba muestra la tarea con su costo, "🔨 ¡Hacer!" o "▶ Jugar", y 📋.
+  - El chip ⭐ va arriba y el vecino de la zona tiene ❗ si ya te alcanza.
+  - En el menú, el botón dice "⭐3 · La Plaza 2/4 · ¡Ya puedes: …!" y late cuando alcanza.
+- **Migración desde la versión anterior** (idempotente y sin repetir premios):
+  - Lo que estaba terminado pasa a zonas hechas: el festival terminado equivale a 4 zonas.
+  - Los premios ya cobrados quedan marcados.
+  - Quien estaba a medias conserva lo que eligió y recibe ⭐2 para seguir.
+- **El nivel pasa a mostrarse con 🏅** para no confundirlo con las ⭐.
+
+**Pueblo más grande** (`js/town-zones.js`)
+- **Tres barrios** más allá de la cerca, cada uno con una entrada con arco y su vecino nuevo:
+  - el Bosque de cacao, con el Guardabosque Maní;
+  - la Granja, con Tía Avellana;
+  - el Lago, con el Capitán Almendra.
+- **Cómo cambian con la aventura:**
+  - **Bosque:** sendero tapado → despejado, puente caído → puente nuevo, casita en el árbol, luces.
+  - **Granja:** granero gris con agujero → rojo, molino roto → girando, huerto, corral con animales.
+  - **Lago:** muelle roto → muelle por el que se camina sobre el agua, botes dados vuelta → de colores flotando, mirador, fuegos artificiales.
+- **Cada día** hay cosas para recolectar: 6 mazorcas, 6 huevos y 6 conchitas, a +2 🍫✨ cada una y ⭐1 al juntar todo un barrio.
+- **Actividades del día:** suman 3 (quedan 10). El premio del día pide 7 de las 10, y se eligen las que más gusten.
+- Las entradas no le quitan su lugar al parkour: el camino pasa bajo las nubes, que flotan.
+
+**Ciudad más grande** (`js/ciudad-barrios.js`)
+- **Las calles del centro** siguen hasta tres barrios:
+  - el Parque Grande, con laguna, patos, juegos y árboles;
+  - la Playa Choco, con mar, muelle, torre de salvavidas, palmeras y quitasoles;
+  - el Colegio Choco, con edificio, reloj, cancha, bandera y paradero.
+- Al mar no se entra, salvo por el muelle.
+- **3 misiones nuevas** que se renuevan cada día como las demás (ahora son 11):
+  - 🦆 Pan para los patos (Don Patricio);
+  - ⛱️ Abrir los quitasoles (Salvavidas Marina);
+  - 📚 Libros perdidos (Profesora Paz), con libros repartidos entre el colegio, el parque y la playa.
+
+**Mati Merge: pedidos diarios de los vecinos** (`js/merge-data.js`)
+- **Cada pedido** es de un vecino distinto, con un motivo de su día a día ("para la once con su abuela", "para la vitrina de su almacén"…).
+- **1 o 2 productos:** trae 1 o 2 productos (40% trae 2). Los que ya tienes se marcan con ✓, y al entregar salen todos del tablero.
+- **Renovación:** los pedidos se renuevan cada día y los que no entregaste se cambian. Los pedidos del formato anterior, los que quedaban "atascados", se renuevan al abrir.
+
+**Rendimiento** (teléfono, mismo lugar y misma cámara)
+
+| Por cuadro | Antes (main) | Ahora |
+|---|---|---|
+| Pueblo, en la plaza | 1.352 dibujos | 1.435 dibujos (+6%; parte es la ropa de los vecinos) |
+| Pueblo, dentro de un barrio | — | 1.515–1.562 (el pueblo se sigue viendo detrás) |
+| Ciudad, en el centro | ~1.107 | +9 a +73 según dónde estés (cada barrio se dibuja solo de cerca) |
+
+- **Cómo se mantiene bajo el costo:**
+  - Cada barrio, con sus vecinos y lo que se recolecta, se dibuja solo cuando estás cerca.
+  - Árboles, cercas, postes y cultivos van agrupados.
+  - Las piezas nuevas no proyectan sombras reales.
+- **Pendiente aparte:** el Pueblo y la Ciudad ya eran pesados antes de este cambio (1.300–1.800 dibujos). Conviene aliviarlos en un trabajo propio, por ejemplo agrupando las piezas de los vecinos y los edificios.
+
+**Pruebas nuevas o al día**
+- `scripts/qa/aventura-logica.mjs`: zonas, ⭐, migración desde la versión anterior y premios sin duplicar.
+- `scripts/qa/merge-logica.mjs`, nueva: clientes, 1 o 2 productos, renovación diaria, entrega completa y formato antiguo.
+- `scripts/qa/aventura.cjs`: recorrido completo por las 7 zonas en el navegador, caminar al lago, el muelle sobre el agua y recolectar en el bosque.
+- `scripts/qa/ciudad-barrios.cjs`, nueva: caminar a los barrios, el mar y el muelle, y las 3 misiones de punta a punta.

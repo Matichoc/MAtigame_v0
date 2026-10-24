@@ -97,7 +97,7 @@ Los logros de **cadena** suben por escalones (🥉 → 🥈 → 🥇 → 💎 �
 | 👋 **Amigo de los vecinos** | Saluda a los vecinos 10 veces (una por vecino y día) → Saluda a los vecinos 40 veces (una por vecino y día) → Saluda a los vecinos 100 veces (una por vecino y día) | 10 / 30 / 70 |
 | 🍫 **Diseñador de chocolates** | Guarda 3 creaciones en Crea tu Chocolate → Guarda 10 creaciones en Crea tu Chocolate → Guarda 25 creaciones en Crea tu Chocolate | 10 / 35 / 90 |
 | 🎃 **Fiestero de temporada** | Junta 10 fichas de eventos de temporada → Junta 40 fichas de eventos de temporada → Junta 100 fichas de eventos de temporada | 20 / 50 / 120 |
-| 🎪 **Organizador del festival** | Completa 1 capítulos del gran festival del Pueblo (hay 3) → Completa 2 capítulos del gran festival del Pueblo (hay 3) → Completa 3 capítulos del gran festival del Pueblo (hay 3) | 10 / 25 / 50 |
+| 🎪 **Renovador del Pueblo** | Renueva 1 zona del Pueblo → 2 zonas → 4 zonas → las 7 zonas (plaza, cancha, aro, festival, bosque de cacao, granja y lago) | 20 / 40 / 80 / 200 |
 
 ## 👕 Estilo y casa
 

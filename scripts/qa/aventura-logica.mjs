@@ -1,9 +1,10 @@
-// Prueba la lógica de la aventura del festival y del avance de los deportes, sin navegador.
+// Prueba la lógica de la aventura "Renovar el Pueblo" (zonas con tareas que cuestan ⭐ ganadas en cualquier juego) y del
+// avance de los deportes, sin navegador.
 // Uso: node scripts/qa/aventura-logica.mjs   (sale con código 1 si algo falla)
 import {
-  CHAPTERS, ALL_STEPS, normalizeAdventure, adventureOf, currentStep, onGamePlayed, choose, talkTo, celebrateAtFountain,
-  chaptersDone, adventureComplete, npcWaiting, objective, returnSummary, setGoal, goalStatus, seasonalChallenge, seasonalOnPlay,
-  placeOpen, placeBuilt, addMedal, gossip,
+  ZONES, ALL_TASKS, normalizeAdventure, adventureOf, currentTask, onGamePlayed, doTask, choose, talkTo, addStars,
+  zonesDone, adventureComplete, npcWaiting, objective, returnSummary, setGoal, goalStatus, seasonalChallenge, seasonalOnPlay,
+  placeOpen, placeBuilt, addMedal, gossip, starsOf, zoneProgress, markIntroSeen, stepPlace, zoneOpen,
 } from "../../js/adventure.js";
 import { normalizeSports, sportsOf, recordMatch, cupRival, CUP_REWARD, setDifficulty } from "../../js/sports-progress.js";
 
@@ -11,79 +12,101 @@ let fallos = 0;
 const ok = (cond, texto) => { console.log(`${cond ? "OK " : "MAL"} ${texto}`); if (!cond) fallos++; };
 const clone = (x) => JSON.parse(JSON.stringify(x));
 const nuevo = () => ({ adventure: normalizeAdventure(undefined), sports: normalizeSports(undefined) });
+/** Hace la tarea que toca dándole justo las ⭐ que cuesta. */
+const POR_DEFECTO = { plaza: "jardin", cancha: "rosa", aro: "clasico" };
+const hacer = (p, opcion = null) => { const t = currentTask(p); addStars(p, t.cost); return doTask(p, t.id, t.choice ? opcion || POR_DEFECTO[t.choice] : null); };
+
+// ---------- datos de la aventura ----------
+ok(ZONES.length === 7 && ZONES.map((z) => z.id).join() === "plaza,cancha,aro,festival,bosque,granja,lago", "7 zonas en orden: plaza, cancha, aro, festival, bosque, granja y lago");
+ok(ZONES.every((z) => z.tasks.length >= 3 && z.tasks.every((t) => t.cost > 0 && t.text && t.say)), "cada zona tiene tareas con costo en ⭐, texto y lo que cuenta el vecino");
+ok(new Set(ALL_TASKS.map((t) => t.id)).size === ALL_TASKS.length, "no hay tareas repetidas");
+ok(ALL_TASKS[0].cost === 1, "la primera tarea cuesta ⭐1 (se hace con el regalo de bienvenida)");
 
 // ---------- migración ----------
 const vacio = normalizeAdventure(undefined);
-ok(vacio.v === 1 && !vacio.started && Object.keys(vacio.steps).length === 0, "perfil antiguo sin aventura: parte sin empezar, versión 1");
+ok(vacio.v === 2 && !vacio.started && vacio.stars === 0 && Object.keys(vacio.done).length === 0, "perfil sin aventura: parte sin empezar, versión 2, sin ⭐");
 ok(JSON.stringify(normalizeAdventure(vacio)) === JSON.stringify(vacio), "migrar dos veces da lo mismo (vacío)");
-const roto = { v: 1, steps: { "c1.hablar": 1, "c1.materiales": true, "c2.hablar": 1, "inventado": 1 }, choices: { plaza: "nada", cancha: "rosa" }, claimed: "no", goal: "x", lastSeen: "ayer" };
-const rep = normalizeAdventure(roto);
-ok(rep.steps["c1.hablar"] && rep.steps["c1.materiales"] && !rep.steps["c2.hablar"] && !rep.steps.inventado, "datos rotos: pasos fuera de orden o inventados no cuentan, lo válido se conserva");
-ok(!rep.choices.plaza && rep.choices.cancha === "rosa" && Array.isArray(rep.claimed) && rep.goal === null && rep.lastSeen === 0, "datos rotos: elecciones, premios, meta y fecha se reparan");
-ok(JSON.stringify(normalizeAdventure(rep)) === JSON.stringify(rep), "migrar dos veces da lo mismo (reparado)");
 ok(JSON.stringify(normalizeAdventure("basura")) === JSON.stringify(vacio) && JSON.stringify(normalizeAdventure([1, 2])) === JSON.stringify(vacio), "basura o arreglo: estado vacío válido");
+const roto = { v: 2, stars: -5, done: { "plaza.limpiar": 1, "plaza.estilo": 1, "cancha.pasto": 1, inventada: 1 }, choices: { plaza: "nada" }, claimed: "no" };
+const rep = normalizeAdventure(roto);
+ok(rep.stars === 0 && rep.done["plaza.limpiar"] && !rep.done["plaza.estilo"] && !rep.done["cancha.pasto"] && !rep.done.inventada, "datos rotos: ⭐ negativas, tareas sin su elección, fuera de orden o inventadas se reparan");
+ok(JSON.stringify(normalizeAdventure(rep)) === JSON.stringify(rep), "migrar dos veces da lo mismo (reparado)");
+// desde la aventura anterior (3 capítulos con pasos)
+const v1fin = { v: 1, started: true, steps: Object.fromEntries(["c1.hablar", "c1.materiales", "c1.estilo", "c1.inaugurar", "c2.hablar", "c2.colores", "c2.pichanga", "c2.contar", "c3.hablar", "c3.estilo", "c3.basquet", "c3.festival"].map((k) => [k, 1])), choices: { plaza: "lectura", cancha: "verde", aro: "dorado" }, claimed: ["chapter:c1", "chapter:c2", "chapter:c3", "season:halloween:2026"], goal: "festival" };
+const m1 = { adventure: normalizeAdventure(v1fin) };
+ok(zonesDone(m1) === 4 && currentTask(m1).id === "bosque.sendero" && m1.adventure.choices.aro === "dorado", "festival terminado antes: quedan hechas plaza, cancha, aro y festival, y sigue el bosque");
+ok(["zone:plaza", "zone:cancha", "zone:aro", "zone:festival", "season:halloween:2026"].every((k) => m1.adventure.claimed.includes(k)), "los premios ya cobrados quedan marcados (no se vuelven a pagar) y se conserva el reto de temporada");
+ok(placeOpen(m1, "cancha") && placeOpen(m1, "aro"), "quien ya terminó el festival sigue con la cancha y el aro abiertos");
+ok(JSON.stringify(normalizeAdventure(clone(m1.adventure))) === JSON.stringify(m1.adventure), "migrar dos veces da lo mismo (desde la versión anterior)");
+const v1mitad = { v: 1, started: true, steps: { "c1.hablar": 1, "c1.materiales": 1, "c1.estilo": 1, "c1.inaugurar": 1, "c2.hablar": 1, "c2.colores": 1 }, choices: { plaza: "jardin", cancha: "celeste" }, claimed: ["chapter:c1"] };
+const m2 = { adventure: normalizeAdventure(v1mitad) };
+ok(zonesDone(m2) === 1 && m2.adventure.done["cancha.colores"] && currentTask(m2).id === "cancha.arcos" && starsOf(m2) === 2, "a mitad de la cancha: conserva lo hecho, sigue con los arcos y recibe ⭐2 para seguir");
+ok(!m2.adventure.claimed.includes("zone:cancha") && m2.adventure.claimed.includes("zone:plaza"), "la zona sin terminar no queda cobrada; la terminada sí");
 
-// ---------- recorrido completo ----------
+// ---------- recorrido ----------
 const p = nuevo();
-ok(currentStep(p).id === "c1.hablar" && npcWaiting(p) === "Bombi", "perfil nuevo: el primer paso es hablar con Bombi (con ❗)");
-ok(onGamePlayed(p, "memoria") === null, "jugar antes de hablar con Bombi no se salta el paso");
-const espera = talkTo(p, "Capi Menta");
-ok(espera && espera.waiting && currentStep(p).id === "c1.hablar", "Capi Menta pide esperar a terminar el capítulo de Bombi");
+ok(currentTask(p).id === "plaza.limpiar" && npcWaiting(p) === null, "perfil nuevo: la primera tarea es la de la plaza, y sin ⭐ nadie tiene ❗");
+const sin = doTask(p, "plaza.limpiar");
+ok(!sin.ok && sin.need === 1, "sin ⭐ no se puede hacer la tarea (dice cuántas faltan)");
+markIntroSeen(p);
+ok(starsOf(p) === 1 && npcWaiting(p) === "Bombi", "la viñeta de bienvenida regala ⭐1 y Bombi queda con ❗");
+markIntroSeen(p);
+ok(starsOf(p) === 1, "el regalo de bienvenida sale una sola vez");
+ok(!doTask(p, "plaza.banca").ok, "no se puede saltar a otra tarea");
+const t1 = doTask(p, "plaza.limpiar");
+ok(t1.ok && starsOf(p) === 0 && /piso/.test(t1.say), "hacer la tarea gasta las ⭐ y el vecino cuenta la historia");
+ok(onGamePlayed(p, "memoria") === 1 && onGamePlayed(p, "pichanga") === 2 && starsOf(p) === 3, "cualquier juego da ⭐ (los partidos largos dan 2)");
+const t2 = doTask(p, "plaza.estilo");
+ok(!t2.ok && t2.needChoice === "plaza", "la tarea de elegir pide la opción");
+ok(doTask(p, "plaza.estilo", "inventada").ok === false, "una opción inexistente se rechaza");
+ok(doTask(p, "plaza.estilo", "guirnaldas").ok && placeBuilt(p, "plaza") && starsOf(p) === 1, "elegir guirnaldas hace la tarea y el rincón queda construido");
+ok(talkTo(p, "Capi Menta").waiting, "Capi Menta espera a que termines la plaza");
 ok(talkTo(p, "Trufita") === null, "un vecino que no es de la aventura dice lo de siempre");
-const t1 = talkTo(p, "Bombi");
-ok(t1 && /rincón/.test(t1.text) && currentStep(p).id === "c1.materiales", "hablar con Bombi cuenta su pedido y avanza");
-ok(objective(p).where === "play", "el objetivo dice que hay que jugar");
-ok(onGamePlayed(p, "futbol") === null, "fútbol (bloqueado en perfiles nuevos) no está entre las alternativas del capítulo 1");
-ok(onGamePlayed(p, "town") === null, "pasear por el pueblo no cuenta como partida");
-ok(onGamePlayed(p, "merge") && currentStep(p).id === "c1.estilo", "una partida de Mati Merge sirve (gane o pierda)");
-ok(onGamePlayed(p, "memoria") === null, "repetir una partida no vuelve a avanzar");
-ok(!choose(p, "cancha", "rosa").ok, "no se puede elegir el estilo de un capítulo al que no has llegado");
-ok(!choose(p, "plaza", "inventado").ok, "una opción inexistente se rechaza");
-ok(choose(p, "plaza", "guirnaldas").advanced && placeBuilt(p, "plaza"), "elegir guirnaldas completa el paso y el rincón queda construido");
-ok(talkTo(p, "Bombi").action === "celebrate", "volver con Bombi cierra el capítulo 1");
-ok(chaptersDone(p) === 1 && adventureOf(p).claimed.includes("chapter:c1"), "capítulo 1 terminado y premio marcado");
-const otra = talkTo(p, "Bombi");
-ok(otra.memory && /guirnaldas/.test(otra.text) && !otra.reward, "Bombi recuerda el estilo elegido y no vuelve a pagar");
-ok(gossip(p).length === 1 && /guirnaldas/.test(gossip(p)[0]), "los demás vecinos también comentan el rincón nuevo");
+const habla = talkTo(p, "Bombi");
+ok(habla.action === "tasks" && /banca/.test(habla.text) && /faltan ⭐1/.test(habla.text), "Bombi dice lo que sigue, cuánto cuesta y cuántas ⭐ faltan");
+hacer(p);
+const fin1 = hacer(p);
+ok(fin1.zoneDone && fin1.reward && fin1.reward.coins === ZONES[0].reward.coins && zonesDone(p) === 1, "completar la plaza da el premio de la zona");
+ok(adventureOf(p).claimed.filter((c) => c === "zone:plaza").length === 1, "el premio de la plaza se marca una sola vez");
+ok(talkTo(p, "Bombi").memory && /guirnaldas/.test(talkTo(p, "Bombi").text), "Bombi recuerda el estilo elegido");
+ok(gossip(p).length === 1 && /guirnaldas/.test(gossip(p)[0]), "los demás vecinos comentan el rincón nuevo");
 ok(/Noche de Cacao/.test(talkTo(p, "Bombi", { name: "Noche de Cacao", icon: "🎃" }).text), "en temporada, los vecinos agregan una frase del evento");
-ok(choose(p, "plaza", "jardin").ok && !choose(p, "plaza", "jardin").advanced && p.adventure.choices.plaza === "jardin", "se puede cambiar el estilo después sin avanzar ni pagar");
-ok(!placeOpen(p, "cancha"), "la cancha se abre recién al hablar con Capi Menta");
-const t2 = talkTo(p, "Capi Menta");
-ok(t2.action === "choose" && t2.choice === "cancha" && placeOpen(p, "cancha"), "Capi Menta pide elegir los colores y la cancha se abre");
-choose(p, "cancha", "celeste");
-ok(onGamePlayed(p, "parkour") && currentStep(p).id === "c2.contar", "capítulo 2: Parkour sirve como alternativa a la pichanga");
-const fin2 = talkTo(p, "Capi Menta");
-ok(fin2.reward && fin2.reward.coins === CHAPTERS[1].reward.coins, "capítulo 2 cerrado con su premio");
-talkTo(p, "Don Cuchufli");
-choose(p, "aro", "dorado");
-ok(celebrateAtFountain(p) === null, "no se puede celebrar el festival antes de jugar básquet");
-ok(onGamePlayed(p, "basquet_tiros") && npcWaiting(p) === null, "capítulo 3: el concurso de lanzamientos sirve; el último cierre es en la fuente");
-const fiesta = celebrateAtFountain(p);
-ok(fiesta && fiesta.reward && adventureComplete(p) && objective(p).done, "celebrar en la fuente termina el festival");
-ok(celebrateAtFountain(p) === null, "celebrar otra vez no vuelve a pagar");
-const premios = adventureOf(p).claimed.filter((c) => c.startsWith("chapter:"));
-ok(premios.length === 3 && new Set(premios).size === 3, "tres premios de capítulo, sin duplicados");
+ok(choose(p, "plaza", "jardin").ok && p.adventure.choices.plaza === "jardin", "se puede cambiar el estilo después, gratis");
+ok(!choose(p, "cancha", "rosa").ok, "no se puede elegir el estilo de una tarea a la que no has llegado");
+ok(!placeOpen(p, "cancha") && stepPlace(p) === "cancha", "la cancha sigue cerrada y la flecha apunta a la cancha");
+hacer(p); hacer(p, "celeste");
+ok(!placeOpen(p, "cancha"), "sin arcos todavía no se juega en la cancha");
+hacer(p);
+ok(placeOpen(p, "cancha"), "con los arcos puestos se abre la pichanga del Pueblo");
+hacer(p);
+ok(zoneProgress(p, "cancha").done === 4 && zonesDone(p) === 2, "cancha completa");
+ok(!zoneOpen(p, "bosque") && zoneOpen(p, "aro"), "el bosque sigue cerrado; el aro ya está abierto");
+while (currentTask(p) && currentTask(p).zone.id !== "bosque") hacer(p, "dorado");
+ok(zonesDone(p) === 4 && placeOpen(p, "aro") && /bosque/.test(gossip(p).join(" ")), "festival terminado: el aro abierto y los vecinos hablan del bosque");
+while (currentTask(p)) hacer(p);
+ok(adventureComplete(p) && objective(p).done && zonesDone(p) === 7, "renovar las 7 zonas termina la aventura");
+const premios = adventureOf(p).claimed.filter((c) => c.startsWith("zone:"));
+ok(premios.length === 7 && new Set(premios).size === 7, "siete premios de zona, sin duplicados");
+ok(doTask(p, "lago.fuegos").ok === false, "repetir una tarea hecha no hace nada");
 
-// ---------- persistencia: guardar y volver a abrir ----------
+// ---------- persistencia ----------
 const guardado = JSON.parse(JSON.stringify(p));
 const reabierto = { adventure: normalizeAdventure(guardado.adventure) };
-ok(adventureComplete(reabierto) && reabierto.adventure.choices.aro === "dorado" && reabierto.adventure.choices.cancha === "celeste", "al reabrir se conservan avance y elecciones");
-ok(talkTo(reabierto, "Don Cuchufli").memory && celebrateAtFountain(reabierto) === null, "al reabrir no se repiten premios");
+ok(adventureComplete(reabierto) && reabierto.adventure.choices.cancha === "celeste", "al reabrir se conservan avance y elecciones");
 const mitad = nuevo();
-talkTo(mitad, "Bombi");
+markIntroSeen(mitad); doTask(mitad, "plaza.limpiar"); onGamePlayed(mitad, "salto");
 const mitadReabierta = { adventure: normalizeAdventure(clone(mitad.adventure)) };
-ok(currentStep(mitadReabierta).id === "c1.materiales", "una aventura a medias sigue donde quedó");
-// sin castigo por días sin jugar: el avance no depende de la fecha
-ok(currentStep({ adventure: normalizeAdventure({ ...clone(mitad.adventure), lastSeen: 1 }) }).id === "c1.materiales", "pasar meses sin jugar no borra nada");
+ok(currentTask(mitadReabierta).id === "plaza.estilo" && starsOf(mitadReabierta) === 1, "una aventura a medias sigue donde quedó, con sus ⭐");
+ok(currentTask({ adventure: normalizeAdventure({ ...clone(mitad.adventure), lastSeen: 1 }) }).id === "plaza.estilo", "pasar meses sin jugar no borra nada");
 
 // ---------- volver después de un rato ----------
 const r = nuevo();
-talkTo(r, "Bombi");
+markIntroSeen(r);
 const t0 = 1_800_000_000_000;
 ok(returnSummary(r, t0) === null, "primera visita: sin resumen");
 ok(returnSummary(r, t0 + 3600e3) === null, "al rato: sin resumen");
 const res = returnSummary(r, t0 + 3600e3 + 4 * 3600e3);
-ok(res && /0 de 3/.test(res.text) && /termina una partida/.test(res.text), "después de horas: resumen con avance y siguiente objetivo");
+ok(res && /0 de 7/.test(res.text) && /⭐1/.test(res.text), "después de horas: resumen con zonas, ⭐ y lo que sigue");
 ok(returnSummary(nuevo(), t0) === null && returnSummary(nuevo(), t0 + 9e9) === null, "aventura sin empezar: sin resumen");
 
 // ---------- meta personal ----------
@@ -91,6 +114,8 @@ const g = nuevo();
 ok(goalStatus(g) === null, "sin meta elegida");
 setGoal(g, "casa");
 ok(goalStatus(g, { furniture: 3 }).have === 3 && !goalStatus(g, { furniture: 3 }).done && goalStatus(g, { furniture: 9 }).done, "meta de la casa: cuenta muebles");
+setGoal(g, "pueblo");
+ok(goalStatus(g).need === 7 && goalStatus(g).have === 0, "meta del Pueblo entero: 7 zonas");
 setGoal(g, "copa_pichanga");
 ok(!goalStatus(g, { cups: { pichanga: 0 } }).done && goalStatus(g, { cups: { pichanga: 1 } }).done, "meta de la copa de pichanga");
 ok(setGoal(g, "inventada") === null, "una meta inexistente se borra");

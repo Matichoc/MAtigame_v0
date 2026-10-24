@@ -677,7 +677,7 @@ export class Game3D {
     const e = this.els;
     if (e.stars) e.stars.innerHTML = [1, 2, 3].map((n) => `<span class="${n <= stars ? "on" : "off"}">★</span>`).join("");
     if (e.winTitle) e.winTitle.textContent = title || `¡Nivel ${level} completado!`;
-    if (e.winText) e.winText.textContent = `${text} +${bonus} Matipuntos 🍫✨ +${run.xp} XP ⭐`;
+    if (e.winText) e.winText.textContent = `${text} +${bonus} Matipuntos 🍫✨ +${run.xp} XP${run.stars ? ` +${run.stars} ⭐` : ""}`;
     // al terminar el último nivel el botón pasa a ser "Nueva vuelta" (con premio) en vez de repetir el nivel 20
     const campId = this.missionId || this.gameId;
     const nb = e.q && e.q("btn-next");
@@ -720,7 +720,7 @@ export class Game3D {
     }
     const run = recordRun(this.progress, this.gameId, this.score, this.runInfo || {});
     this.runInfo = null;
-    text += ` +${run.xp} XP ⭐`;
+    text += ` +${run.xp} XP${run.stars ? ` +${run.stars} ⭐` : ""}`;
     if (run.tokens) text += ` +${run.tokens} ${run.eventToken}`;
     if (this.els.gameoverText) this.els.gameoverText.textContent = text;
     this.showOverlay("gameover");
