@@ -6,6 +6,14 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-24
 
+### PR #47 mergeado
+- La persona dueña revisó las capturas de iOS y mergeó el **PR #47** (Android + iOS: copia del progreso, vibración, proyecto iOS, plan de publicación y repositorio listo para privado).
+- **matiweb #50** (política v1.1 en la web) sigue abierto, esperando su merge.
+- **Pendientes de la persona dueña:**
+  - Probar la APK nº 81 encima de la actual: que el progreso siga, que vibre y que "atrás" funcione.
+  - Despublicar Pages y pasar este repositorio a privado.
+  - Las 6 decisiones de `docs/PLAN-ANDROID-IOS.md` §9.
+
 ### Primera compilación de iOS: en verde
 - **Workflow "Compilar app iOS"** (ejecuciones 1 y 2, Mac de GitHub con Xcode 26.3): compila para el simulador y la app abre en un **iPhone SE (3.ª gen.)** y un **iPad mini (A17 Pro)** simulados, sin cerrarse.
   - **Info.plist final:** `cl.chocojuego.matichoc`, versión 1.0.0, arm64, sin barra de estado, sin cifrado propio.
