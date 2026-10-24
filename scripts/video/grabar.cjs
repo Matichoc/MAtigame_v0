@@ -68,7 +68,7 @@ async function abrirJuego(p, nombre, inicio, id) {
   for (let k = 0; k < 6; k++) {
     if (inicio) await p.click(inicio, { timeout: 4000 }).catch(() => {});
     await p.waitForTimeout(800);
-    if (!id || (await p.evaluate((g) => window.__g3d[g].state, id)) === "playing") break;
+    if (!id || (await p.evaluate((g) => window.__g3d[g].state !== "intro", id))) break;
   }
 }
 
@@ -221,7 +221,7 @@ const ESCENAS = {
   /** Parkour (mundo infinito): corre hacia adelante y salta seguido. */
   async parkour(p) {
     await perfil(p);
-    await abrirJuego(p, "Parkour", "#parkour-btn-infinite");
+    await abrirJuego(p, "Parkour", "#parkour-btn-infinite", "parkour");
     await sinConsejos(p);
     await p.evaluate(() => {
       const g = window.__g3d.parkour;
@@ -261,7 +261,7 @@ const ESCENAS = {
   /** Mati Merge: junta productos iguales arrastrando con el dedo. */
   async merge(p) {
     await perfil(p);
-    await abrirJuego(p, "Merge", "#merge-btn-start");
+    await abrirJuego(p, "Merge", "#merge-btn-start", "merge");
     await p.evaluate(() => window.__reloj.encender());
     await calentar(p, 1);
     const enPantalla = (cell) => p.evaluate((i) => {
@@ -295,20 +295,20 @@ const ESCENAS = {
   async extras(p) {
     await perfil(p);
     const lista = [
-      ["Salto Choco", "#salto-btn-start", ["ArrowRight", "Space"]],
-      ["Saltos de Porristas", "#porristas-btn-start", ["ArrowRight"]],
-      ["Crea tu Chocolate", "#creador-btn-start", []],
-      ["Autos de Chocolate", "#autos-btn-start", ["ArrowUp"]],
+      ["Salto Choco", "#salto-btn-start", ["ArrowRight", "Space"], "salto"],
+      ["Bloques de Productos", "#tetris-btn-start", [], "tetris"],
+      ["Crea tu Chocolate", "#creador-btn-start", [], null],
+      ["Autos de Chocolate", "#autos-btn-start", ["ArrowUp"], "autos"],
     ];
     let n = 0;
-    for (const [nombre, inicio, teclas] of lista) {
+    for (const [nombre, inicio, teclas, id] of lista) {
       await p.evaluate(() => window.__reloj.apagar());
       await p.goto(BASE + "?debug3d", { waitUntil: "networkidle" });
       await p.waitForTimeout(800);
       const prof = await p.$("#profile-grid .profile-card:not(.add-profile)");
       if (prof) { await prof.click(); await p.waitForTimeout(500); }
       if (await p.$("#character-grid .character-card")) { await p.click("#character-grid .character-card:nth-child(2)"); await p.waitForTimeout(800); }
-      await abrirJuego(p, nombre, inicio);
+      await abrirJuego(p, nombre, inicio, id);
       await sinConsejos(p);
       await p.evaluate(() => window.__reloj.encender());
       for (const t of teclas) await p.keyboard.down(t);

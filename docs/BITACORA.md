@@ -17,7 +17,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
     - Ciudad con piloto automático por la avenida.
     - Parkour infinito con un piloto que salta en el borde de cada plataforma.
     - Mati Merge arrastrando productos con el dedo.
-    - Cortes rápidos de Salto, Porristas, Crea tu Chocolate y Autos.
+    - Cortes rápidos de Salto, Bloques, Crea tu Chocolate y Autos.
   - **Carteles** (`carteles.cjs`): portada, título por escena y cierre "¿Tienes Android? ¡Sé tester!" con matichoc.cl/matijuego. Usan la letra libre Fredoka y el logo.
   - **Montaje** (`montar.cjs`, ffmpeg): versión horizontal 1920×1080 (YouTube, ficha de Play) y vertical 1080×1920 (Reels, TikTok, Shorts, estados).
   - El audio va en silencio a propósito: la música se agrega en la app de cada red, con canciones que tienen permiso.
