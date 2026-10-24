@@ -6,9 +6,9 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-24
 
-### PR #47 mergeado
+### PR #47 y matiweb #50 mergeados
 - La persona dueña revisó las capturas de iOS y mergeó el **PR #47** (Android + iOS: copia del progreso, vibración, proyecto iOS, plan de publicación y repositorio listo para privado).
-- **matiweb #50** (política v1.1 en la web) sigue abierto, esperando su merge.
+- **matiweb #50** también se mergeó: la política v1.1 queda publicada en matichoc.cl/matijuego/privacy.html, la dirección que piden Google Play y el App Store.
 - **Pendientes de la persona dueña:**
   - Probar la APK nº 81 encima de la actual: que el progreso siga, que vibre y que "atrás" funcione.
   - Despublicar Pages y pasar este repositorio a privado.
