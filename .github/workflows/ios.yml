@@ -100,6 +100,20 @@ jobs:
           done
           ls -la capturas
 
+      # Copia chica de cada captura dentro del registro (JPEG en base64 entre marcas), para poder revisarlas sin descargar
+      # el artefacto (hay entornos de revisión que no llegan al almacenamiento de artefactos de GitHub).
+      - name: Capturas en el registro (versión chica)
+        if: always()
+        run: |
+          for f in capturas/*.png; do
+            [ -f "$f" ] || continue
+            sips -s format jpeg -s formatOptions 60 -Z 900 "$f" --out "${f%.png}.jpg" > /dev/null
+            echo "===CAPTURA $(basename "${f%.png}") INICIO==="
+            base64 -i "${f%.png}.jpg" | fold -w 160
+            echo "===CAPTURA $(basename "${f%.png}") FIN==="
+            rm "${f%.png}.jpg"
+          done
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
