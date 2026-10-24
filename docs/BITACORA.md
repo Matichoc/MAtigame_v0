@@ -4,6 +4,16 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-24
+
+### PR #46 y matiweb #49 mergeados
+- La persona dueña hizo merge de **PR #46** (aventura "Renovar el Pueblo", barrios nuevos en Pueblo y Ciudad, pedidos diarios de Mati Merge) y de **matiweb #49** (la misma versión en la web, matichoc.cl/matijuego).
+- APK de prueba de esta versión: **nº 80** (run 40043895224), lista para probar en el celular.
+- **Pendiente:** prueba en el celular de la APK nº 80 (lista de tareas, barrios, pedidos de 2 productos, fluidez).
+- **Pendiente opcional (no pedido aún):** aliviar el costo de dibujo del Pueblo y la Ciudad (ya rondaban 1.300–1.800 dibujos por cuadro).
+
+---
+
 ## 2026-10-23
 
 ### Aventura por etapas "Renovar el Pueblo", Pueblo y Ciudad más grandes y pedidos diarios en Mati Merge
