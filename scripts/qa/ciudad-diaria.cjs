@@ -30,7 +30,8 @@ const { abrir, nuevoPerfil } = require("./lib.cjs");
   await p.click("#ciudad-btn-start").catch(() => {});
   await p.waitForTimeout(2000);
   const bangs = () => p.evaluate(() => { const g = window.__g3d.ciudad; return Object.values(g.npcs).filter((n) => n.bang && n.bang.visible).length; });
-  ok((await bangs()) === 8, `misiones hechas ayer: los 8 vecinos vuelven a tener "!" (${await bangs()})`);
+  // (además de las 8 hechas ayer, están las 3 nuevas de los barrios —parque, playa y colegio—, nunca hechas)
+  ok((await bangs()) === 11, `misiones hechas ayer: los 8 vecinos vuelven a tener "!", y también los 3 de los barrios nuevos (${await bangs()})`);
   // se completa una (reja) "hoy": su "!" se apaga hasta mañana y paga la mitad
   const r = await p.evaluate(() => {
     const g = window.__g3d.ciudad;
@@ -40,15 +41,15 @@ const { abrir, nuevoPerfil } = require("./lib.cjs");
     return { pagado: g.progress.coins - c0, pepe: g.npcs.pepe.bang.visible, hoy: g.save.last.reja };
   });
   ok(r.pagado === 20, `repetir "Pintar la reja" paga la mitad (+${r.pagado})`);
-  ok(r.pepe === false && (await bangs()) === 7, "su vecino ya no tiene \"!\" hoy; los otros 7 sí");
+  ok(r.pepe === false && (await bangs()) === 10, "su vecino ya no tiene \"!\" hoy; los otros 10 sí");
   // la lista lo muestra
   await p.evaluate(() => window.__g3d.ciudad.openList());
   await p.waitForTimeout(300);
   const estados = await p.$$eval("#ciudad-list .cl-st", (els) => els.map((e) => e.textContent));
-  ok(estados[0].startsWith("✅") && estados.slice(1).every((x) => x === "🔔"), `lista: ✅ la de hoy, 🔔 las disponibles (${estados.join(" ")})`);
+  ok(estados[0].startsWith("✅") && estados.slice(1, 8).every((x) => x === "🔔") && estados.slice(8).every((x) => x === ""), `lista: ✅ la de hoy, 🔔 las que se repiten y sin marca las nuevas (${estados.join(" ")})`);
   // tope diario: tras 4 pedidos pagados hoy, ya no aparecen más "!"
   await p.evaluate(() => { const g = window.__g3d.ciudad; g.save.rCount = 4; g._updateBangs(); });
-  ok((await bangs()) === 0, "con el tope de 4 pedidos pagados hoy, se apagan los \"!\" hasta mañana");
+  ok((await bangs()) === 3, "con el tope de 4 pedidos pagados hoy, se apagan los \"!\" de los repetidos (quedan los 3 nuevos, nunca hechos)");
   ok(reg.errores.length === 0 && reg.externas.length === 0, `0 errores (${reg.errores[0] || ""}) y 0 peticiones externas`);
   await b.close();
   console.log(fallos.length ? `\nFALLAN ${fallos.length}` : "\nTodo OK");
