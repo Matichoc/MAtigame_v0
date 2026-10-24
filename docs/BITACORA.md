@@ -6,6 +6,47 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-24
 
+### Plan Android + iOS y primeros pasos de iOS
+- **Pedido de la persona dueña:** revisar el repositorio a fondo y armar y ejecutar un plan para que el juego esté en Android y iOS. Android debería ir a prueba y publicarse en 1–2 semanas; iOS, si le va bien.
+- **Plan:** `docs/PLAN-ANDROID-IOS.md`. Tiene el estado, el calendario (Android en prueba cerrada desde la semana del 3-nov y producción hacia fines de noviembre), las fases, los riesgos y 6 decisiones pendientes de la persona dueña.
+- **Revisión:**
+  - Android está bien encaminado: la firma ya está en GitHub y la ejecución nº 80 generó el `.aab` firmado.
+  - Riesgo nuevo encontrado: todo el progreso vivía solo en localStorage, y en iPhone iOS puede borrarlo si falta espacio.
+  - La vibración no funcionaba en ningún celular: Android exige el permiso VIBRATE e iOS no tiene `navigator.vibrate`.
+- **Hecho:**
+  - **`js/native.js`** (se carga primero en `main.js`):
+    - Copia de todas las claves `matichoc_*` en el almacenamiento propio de la app (`@capacitor/preferences`): cada 20 s si cambió algo, al pasar a segundo plano y al cerrar.
+    - Si al abrir no hay perfiles pero sí copia, se restaura antes de leer los perfiles. Una copia buena nunca se pisa con una vacía.
+    - Vibración con `@capacitor/haptics`.
+    - En la web no hace nada.
+  - **Prueba nueva `scripts/qa/respaldo-nativo.cjs`** (simula el puente de un iPhone): 13/13.
+  - **Android:**
+    - Permiso nuevo VIBRATE (normal, sin aviso).
+    - El workflow ahora exige exactamente INTERNET + VIBRATE.
+    - Política v1.1: menciona la vibración y la copia dentro del teléfono.
+    - Créditos con los plugins nuevos, todos MIT.
+    - Ficha (`store/listing-es.md`) al día.
+  - **Proyecto iOS (`ios/`):**
+    - Capacitor 8.5.3 con Swift Package Manager; bundle ID `cl.chocojuego.matichoc`, el mismo de Android; mínimo iOS 15.
+    - `Info.plist`: español, arm64, sin barra de estado, pantalla completa en iPad, sin cifrado propio.
+    - `PrivacyInfo.xcprivacy`: sin rastreo ni datos, UserDefaults con motivo CA92.1.
+    - Íconos y pantalla de inicio desde `resources/`.
+    - `capacitor.config.json`: sin rebote.
+  - **Workflow nuevo "Compilar app iOS"** (Mac de GitHub, sin cuenta de Apple): compila para el simulador, revisa el contenido, abre la app en iPhone y iPad simulados y saca capturas.
+- **Pruebas de la app (navegador):**
+
+  | Prueba | Resultado |
+  |---|---|
+  | respaldo-nativo | 13/13 |
+  | atrás | 24/24 |
+  | perfiles | 13/13 |
+  | legal | OK |
+  | enlaces | OK |
+  | lógica (aventura, merge, deportes, puzzles) | OK |
+  | `verify:app` | OK |
+
+- **Pendiente:** ver los workflows de Android e iOS en el PR, revisar las capturas del simulador, la prueba en el celular y las decisiones del plan (§8).
+
 ### Video promocional (para redes y para buscar testers)
 - **Pedido de la persona dueña:** buscar una skill o una capacidad para generar un video atractivo con capturas del juego, publicitarlo en todos lados y empezar a buscar testers.
 - **Plugins:** busqué en el catálogo y encontré `video-shotcraft` (videos con Remotion) y `ffmpeg-llm`. Le mostré la tarjeta para instalarlos, pero no hacen falta: aquí ya están ffmpeg y el navegador de pruebas.

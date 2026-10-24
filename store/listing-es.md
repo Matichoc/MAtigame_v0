@@ -71,7 +71,7 @@ Arcade, Aventura, Familia, Niños, 3D
 - Sin contenido sexual, lenguaje fuerte, drogas, apuestas, compras con dinero real, chat ni contenido de usuarios visible para otros, ni ubicación compartida.
 La clasificación final la calcula el cuestionario con tus respuestas, no esta ficha; esta lista **no determina** ni predice una clasificación por edad. Si tienes dudas de cómo responder a "violencia de fantasía", revisa las definiciones vigentes en Play Console (no se pudieron consultar desde el entorno de trabajo).
 **Público objetivo y contenido:** la decisión del dueño es público infantil (por ejemplo 5 o menos, 6-8 y 9-12), lo que incluye la app en la política "Diseñada para familias". **No cambies los rangos de edad para evitar requisitos.** Los requisitos de esa política (anuncios, SDK, privacidad, contenido y promoción) los revisa Google: lo que sí está comprobado es que no hay SDK de anuncios ni de analítica, ni enlaces externos, ni compras; lo que no se puede dar por cumplido está en la sección "Revisión humana" de la auditoría.
-**Permisos:** solo `INTERNET` (viene incluido de fábrica por Capacitor, el motor que empaqueta el juego; el juego no lo usa para enviar ni recibir datos: ver auditoría). Sin cámara, micrófono, ubicación, contactos ni archivos.
+**Permisos:** `INTERNET` (viene incluido de fábrica por Capacitor, el motor que empaqueta el juego; el juego no lo usa para enviar ni recibir datos: ver auditoría) y `VIBRATE` (vibración suave con golpes y premios; permiso normal, no muestra aviso ni da acceso a datos). Sin cámara, micrófono, ubicación, contactos ni archivos.
 
 ## Material gráfico (en esta carpeta)
 - `icon-512.png` — ícono de la app (512×512)

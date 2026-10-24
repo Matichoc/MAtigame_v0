@@ -101,7 +101,9 @@ jobs:
           # DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION lo agrega AndroidX solo (permiso propio de la app, nivel "signature")
           PERMS=$("$AAPT2" dump permissions "$APK" | grep -E "^uses-permission" | sed -E "s/.*name='([^']+)'.*/\\1/" | grep -v "\\.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION$" | sort -u)
           echo "Permisos pedidos (sin los internos de AndroidX): $PERMS"
-          if [ "$PERMS" != "android.permission.INTERNET" ]; then echo "::error::El APK pide permisos distintos de INTERNET"; exit 1; fi
+          # INTERNET (lo pide Capacitor para cargar el juego) y VIBRATE (vibración de @capacitor/haptics; permiso "normal", sin aviso)
+          ESPERADOS=$(printf 'android.permission.INTERNET\nandroid.permission.VIBRATE')
+          if [ "$PERMS" != "$ESPERADOS" ]; then echo "::error::El APK pide permisos distintos de INTERNET y VIBRATE"; exit 1; fi
           echo "== Manifest (application)"; "$AAPT2" dump xmltree --file AndroidManifest.xml "$APK" | sed -n '1,60p'
           echo "== Librerías nativas (16 KB): se espera ninguna"; unzip -l "$APK" | grep -E "\.so$" || echo "(ninguna)"
           if unzip -l "$APK" | grep -Ei "assets/public/js/fps-|fps3d"; then echo "::error::Choco Blaster dentro del APK"; exit 1; fi
