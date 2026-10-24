@@ -6,6 +6,39 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-24
 
+### Repositorio privado y autoría de los commits
+- **Pedido de la persona dueña:**
+  - Dejar privado el repositorio del juego, sin confundirlo con matiweb, que sigue público como la web con la demo.
+  - Que los commits se vean más humanos.
+- **Revisión:**
+  - MAtigame_v0 es público y no tiene forks.
+  - `deploy-pages.yml` publicaba **todo** el repositorio en GitHub Pages en cada merge a `main` (bitácora, auditoría, `admin/`, llave de pruebas), aunque la portada solo redirigía a matichoc.cl.
+  - matiweb publica matichoc.cl con Pages y debe seguir público: en el plan gratis un repositorio privado no puede usar Pages.
+- **Decisiones de la persona dueña:**
+  - Commits **a su nombre, sin marcas**.
+  - Borrar el Pages **solo de Matijuego**.
+  - Compilación de iOS **solo a mano**.
+- **Hecho:**
+  - Se borró `deploy-pages.yml`.
+  - `ios.yml` ahora corre solo a mano.
+  - `CLAUDE.md` tiene la regla de autoría y la del repositorio privado.
+  - `git config` en los dos repositorios: `Cristóbal <45877061+cristobalrocosaavedra@users.noreply.github.com>`.
+  - Plan §8 y README actualizados.
+  - Los commits antiguos no se reescriben: habría que forzar `main` y romper los PR ya mergeados.
+- **Pendiente (persona dueña, en GitHub):** MAtigame_v0 → Settings → Pages → *Unpublish site* y Settings → General → *Change visibility* → Private.
+- **Pruebas web de este PR (matiweb, demo):**
+
+  | Prueba | Resultado |
+  |---|---|
+  | perfiles | 13/13 |
+  | temporada | 29/29 |
+  | pueblo | 24/24 |
+  | legal | OK |
+  | enlaces | 0 conexiones externas |
+  | juegos | 14/16 |
+
+  En juegos, Choco Blaster es el fallo conocido de la web. Porristas falló por lentitud del navegador de prueba y sola da OK.
+
 ### Plan Android + iOS y primeros pasos de iOS
 - **Pedido de la persona dueña:** revisar el repositorio a fondo y armar y ejecutar un plan para que el juego esté en Android y iOS. Android debería ir a prueba y publicarse en 1–2 semanas; iOS, si le va bien.
 - **Plan:** `docs/PLAN-ANDROID-IOS.md`. Tiene el estado, el calendario (Android en prueba cerrada desde la semana del 3-nov y producción hacia fines de noviembre), las fases, los riesgos y 6 decisiones pendientes de la persona dueña.

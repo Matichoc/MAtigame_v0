@@ -1,6 +1,7 @@
 > **Este juego ahora se publica en https://matichoc.cl/matijuego/** y se edita en el repositorio
 > [`Matichoc/matiweb`](https://github.com/Matichoc/matiweb), carpeta `matijuego/`. Esta página solo
-> redirige a la nueva dirección (`index.html` y `404.html`); el código de abajo queda como respaldo y
+> redirigía a la nueva dirección (`index.html` y `404.html`; GitHub Pages se apagó el 24-oct-2026: este repositorio
+> pasa a privado y es el de la app de Android e iOS); el código de abajo queda como respaldo y
 > ya no se publica desde aquí (el `index.html` original está en el historial, commit `3f4d513`). No hagas cambios en este repositorio: no llegarían al sitio.
 
 # MAtigame_v0 — Matichoc: La Aventura del Cacao

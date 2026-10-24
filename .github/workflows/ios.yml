@@ -5,8 +5,8 @@ name: Compilar app iOS
 #  - abre la app en un iPhone simulado y en un iPad simulado y saca capturas (para ver que arranca y cómo se ve);
 #  - las capturas quedan como artefacto "matijuego-ios-capturas".
 # La versión firmada para TestFlight/App Store se agrega cuando exista la cuenta de Apple Developer (ver docs/PLAN-ANDROID-IOS.md).
-# Se ejecuta a mano (Actions → "Compilar app iOS" → Run workflow) y en los PR que tocan la parte nativa de iOS.
-# Ojo: en repositorios privados, cada minuto de Mac descuenta 10 minutos del plan de GitHub Actions.
+# Se ejecuta SOLO a mano (Actions → "Compilar app iOS" → Run workflow): en un repositorio privado cada minuto de Mac
+# descuenta 10 del plan gratis de GitHub Actions (~150 por corrida de los 2.000 al mes).
 
 on:
   workflow_dispatch:
@@ -14,14 +14,6 @@ on:
       version_name:
         description: "Nombre de versión que verá el público (ej. 1.0.0)"
         default: "1.0.0"
-  pull_request:
-    paths:
-      - "ios/**"
-      - "capacitor.config.json"
-      - "package.json"
-      - "package-lock.json"
-      - "js/native.js"
-      - ".github/workflows/ios.yml"
 
 permissions:
   contents: read

@@ -95,7 +95,7 @@ iOS      [C1 proyecto ✅] [C2 ajustes iPhone (simulador)   ]   [C3 cuenta] [C4 
   - Abre la app en un **iPhone y un iPad simulados** y saca capturas a los 20 y 45 s.
   - Falla si la app se cierra sola.
   - Las capturas quedan en el artefacto `matijuego-ios-capturas`.
-  - Corre a mano y en los PR que tocan `ios/` o `js/native.js`. En repositorio privado, cada minuto de Mac cuenta como 10 del plan de GitHub; una corrida toma ~15 min.
+  - Corre **solo a mano**. En repositorio privado, cada minuto de Mac cuenta como 10 del plan de GitHub; una corrida toma ~15 min.
 
 ### C2. Ajustes para iPhone (sin cuenta; con el simulador del workflow)
 - [ ] Revisar las capturas del simulador: muesca/Dynamic Island, barra inferior de inicio, botones tapados, letra.
@@ -153,7 +153,20 @@ Puntos de riesgo y cómo están cubiertos:
 | Licencias de tipografías de marca | Bajo (las libres van por defecto) | Comprobante si se quieren las de marca |
 | Costos | Bajo | Apple USD 99 al año. Minutos de Mac en GitHub: ~150 por compilación iOS en repositorio privado (el plan gratis trae 2.000 al mes) |
 
-## 8. Decisiones que necesito de la persona dueña
+## 8. Repositorio privado (decisión del 24-oct-2026)
+
+- **MAtigame_v0 pasa a privado; matiweb sigue público.** matiweb es el sitio matichoc.cl, con la demo del juego, y en el plan gratis de GitHub un repositorio privado no puede publicar con Pages.
+- **Lo que hizo Claude:** se borró `deploy-pages.yml`. Publicaba **todo** este repositorio en GitHub Pages (bitácora, auditoría, `admin/`, llave de pruebas), aunque la portada solo redirigía a matichoc.cl.
+- **Lo que hace la persona dueña, en GitHub:**
+  1. MAtigame_v0 → Settings → Pages → *Unpublish site*.
+  2. Settings → General → *Danger Zone* → *Change visibility* → **Private**.
+- **Lo que cambia y lo que no:**
+  - Los secretos de firma, los workflows y el acceso de Claude siguen igual.
+  - El plan gratis da 2.000 minutos de Actions al mes. Android usa ~4 por compilación. iOS usa ~150, porque el Mac cuenta 10×; por eso **iOS corre solo a mano**.
+- **Autoría:** desde ahora, los commits van a nombre de la persona dueña y sin líneas de coautoría (regla en `CLAUDE.md`). Los commits antiguos no se reescriben.
+- **Si algún día se abre al público:** publicar una copia nueva con la historia resumida en un commit inicial, sin documentos internos.
+
+## 9. Decisiones que necesito de la persona dueña
 
 1. **Cuenta de Google Play:** ¿personal (exige 14 días de prueba cerrada) o de organización?
 2. **Cuenta de Apple:** ¿individual u organización ("Matichoc" como vendedor, con D-U-N-S)? ¿Y cuándo pagarla?
