@@ -143,7 +143,7 @@ js/fps-world.js       Mundo 3D: feria de Matichoc
 js/fps-enemies.js     Malvaviscos enemigos del juego 3D
 js/storage.js         Progreso persistente por perfil (Matipuntos, vestuario, ranking, logros)
 js/main.js            Perfiles, hub, tienda, puntajes y navegación entre juegos
-.github/workflows/    Despliegue automático a GitHub Pages
+.github/workflows/    Compilar app Android (APK/.aab) y Compilar app iOS (simulador, a mano)
 ROADMAP.md            Plan por etapas hacia la plataforma multi-juego
 ```
 
@@ -172,9 +172,9 @@ Pruebas de navegador (Playwright + Chromium, sin dependencias nuevas en el proye
 - **Web (producción)**: `MATIJUEGO_DEMO=1 node scripts/deploy-matiweb.mjs <ruta-a-matiweb>` arma `web-www/` y la copia a
   `matijuego/` del repo `Matichoc/matiweb` (publica matichoc.cl/matijuego, incluida su página de política de privacidad
   `matijuego/privacy.html`). El despliegue lo hace quien hace merge en matiweb.
-- **GitHub Pages de este repo**: `.github/workflows/deploy-pages.yml` publica **toda la raíz** del repositorio en cada push a
-  `main` (no es la web de producción: la raíz solo redirige a matichoc.cl).
+- **GitHub Pages de este repo**: apagado desde el 24-oct-2026 (se borró `deploy-pages.yml`; el repositorio pasa a privado).
 - **Android**: workflow "Compilar app Android" (`.github/workflows/android.yml`); pasos en `docs/PLAY-STORE.md`.
+- **iOS**: workflow "Compilar app iOS" (`.github/workflows/ios.yml`, solo a mano); plan en `docs/PLAN-ANDROID-IOS.md`.
 
 ## Próximos pasos sugeridos
 
