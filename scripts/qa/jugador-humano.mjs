@@ -80,7 +80,7 @@ export function medir(Sim, crearHumano, diff, n = 40, extra = {}) {
   return res;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (typeof process !== "undefined" && import.meta.url === `file://${process.argv[1]}`) {
   for (const [nombre, Sim, h] of [["Pichanga", PI, humanoPichanga], ["Básquet 2v2", BQ, humanoBasquet]]) {
     for (const d of ["accesible", "normal", "desafio"]) {
       const r = medir(Sim, h, d);

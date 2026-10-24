@@ -6,6 +6,26 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-24
 
+### Video promocional (para redes y para buscar testers)
+- **Pedido de la persona dueña:** buscar una skill o una capacidad para generar un video atractivo con capturas del juego, publicitarlo en todos lados y empezar a buscar testers.
+- **Plugins:** busqué en el catálogo y encontré `video-shotcraft` (videos con Remotion) y `ffmpeg-llm`. Le mostré la tarjeta para instalarlos, pero no hacen falta: aquí ya están ffmpeg y el navegador de pruebas.
+- **Hecho (`scripts/video/`, guía en `docs/VIDEO-PROMOCIONAL.md`):**
+  - **Grabador cuadro a cuadro** (`reloj.cjs` + `grabar.cjs`): el tiempo del juego avanza 1/30 s por cuadro, así el video sale fluido aunque el navegador sin tarjeta gráfica tarde ~1,5 s por cuadro.
+  - **Escenas que se juegan solas, con partidas reales:**
+    - Pueblo en monopatín y Renovar el Pueblo (lista de tareas y escena del lago).
+    - Pichanga y Básquet 2v2, manejados por el "jugador humano" de las pruebas.
+    - Ciudad con piloto automático por la avenida.
+    - Parkour infinito con un piloto que salta en el borde de cada plataforma.
+    - Mati Merge arrastrando productos con el dedo.
+    - Cortes rápidos de Salto, Porristas, Crea tu Chocolate y Autos.
+  - **Carteles** (`carteles.cjs`): portada, título por escena y cierre "¿Tienes Android? ¡Sé tester!" con matichoc.cl/matijuego. Usan la letra libre Fredoka y el logo.
+  - **Montaje** (`montar.cjs`, ffmpeg): versión horizontal 1920×1080 (YouTube, ficha de Play) y vertical 1080×1920 (Reels, TikTok, Shorts, estados).
+  - El audio va en silencio a propósito: la música se agrega en la app de cada red, con canciones que tienen permiso.
+- **`scripts/qa/jugador-humano.mjs`:** ahora también se puede cargar en el navegador (no usa `process` fuera de Node).
+- **Pendiente:**
+  - La persona dueña revisa el video.
+  - Definir por dónde se inscriben los testers (sugerencia: un Grupo de Google) y poner ese enlace en la publicación.
+
 ### PR #46 y matiweb #49 mergeados
 - La persona dueña hizo merge de **PR #46** (aventura "Renovar el Pueblo", barrios nuevos en Pueblo y Ciudad, pedidos diarios de Mati Merge) y de **matiweb #49** (la misma versión en la web, matichoc.cl/matijuego).
 - APK de prueba de esta versión: **nº 80** (run 40043895224), lista para probar en el celular.
