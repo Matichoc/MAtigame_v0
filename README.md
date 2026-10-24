@@ -1,6 +1,7 @@
 > **Este juego ahora se publica en https://matichoc.cl/matijuego/** y se edita en el repositorio
 > [`Matichoc/matiweb`](https://github.com/Matichoc/matiweb), carpeta `matijuego/`. Esta página solo
-> redirige a la nueva dirección (`index.html` y `404.html`); el código de abajo queda como respaldo y
+> redirigía a la nueva dirección (`index.html` y `404.html`; GitHub Pages se apagó el 24-oct-2026: este repositorio
+> pasa a privado y es el de la app de Android e iOS); el código de abajo queda como respaldo y
 > ya no se publica desde aquí (el `index.html` original está en el historial, commit `3f4d513`). No hagas cambios en este repositorio: no llegarían al sitio.
 
 # MAtigame_v0 — Matichoc: La Aventura del Cacao
@@ -142,7 +143,7 @@ js/fps-world.js       Mundo 3D: feria de Matichoc
 js/fps-enemies.js     Malvaviscos enemigos del juego 3D
 js/storage.js         Progreso persistente por perfil (Matipuntos, vestuario, ranking, logros)
 js/main.js            Perfiles, hub, tienda, puntajes y navegación entre juegos
-.github/workflows/    Despliegue automático a GitHub Pages
+.github/workflows/    Compilar app Android (APK/.aab) y Compilar app iOS (simulador, a mano)
 ROADMAP.md            Plan por etapas hacia la plataforma multi-juego
 ```
 
@@ -171,9 +172,9 @@ Pruebas de navegador (Playwright + Chromium, sin dependencias nuevas en el proye
 - **Web (producción)**: `MATIJUEGO_DEMO=1 node scripts/deploy-matiweb.mjs <ruta-a-matiweb>` arma `web-www/` y la copia a
   `matijuego/` del repo `Matichoc/matiweb` (publica matichoc.cl/matijuego, incluida su página de política de privacidad
   `matijuego/privacy.html`). El despliegue lo hace quien hace merge en matiweb.
-- **GitHub Pages de este repo**: `.github/workflows/deploy-pages.yml` publica **toda la raíz** del repositorio en cada push a
-  `main` (no es la web de producción: la raíz solo redirige a matichoc.cl).
+- **GitHub Pages de este repo**: apagado desde el 24-oct-2026 (se borró `deploy-pages.yml`; el repositorio pasa a privado).
 - **Android**: workflow "Compilar app Android" (`.github/workflows/android.yml`); pasos en `docs/PLAY-STORE.md`.
+- **iOS**: workflow "Compilar app iOS" (`.github/workflows/ios.yml`, solo a mano); plan en `docs/PLAN-ANDROID-IOS.md`.
 
 ## Próximos pasos sugeridos
 

@@ -6,5 +6,11 @@
   "android": {
     "allowMixedContent": false,
     "webContentsDebuggingEnabled": false
+  },
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": false,
+    "backgroundColor": "#3d1f10",
+    "preferredContentMode": "mobile"
   }
 }

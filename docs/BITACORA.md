@@ -4,6 +4,119 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-24
+
+### Primera compilación de iOS: en verde
+- **Workflow "Compilar app iOS"** (ejecuciones 1 y 2, Mac de GitHub con Xcode 26.3): compila para el simulador y la app abre en un **iPhone SE (3.ª gen.)** y un **iPad mini (A17 Pro)** simulados, sin cerrarse.
+  - **Info.plist final:** `cl.chocojuego.matichoc`, versión 1.0.0, arm64, sin barra de estado, sin cifrado propio.
+  - Dentro de la app están el juego, la política y `PrivacyInfo.xcprivacy`; Choco Blaster no está.
+- **Capturas:** muestran la pantalla de perfiles con logo, letras y botones correctos, como la primera vez en Android. Las de los 20 s y los 45 s son iguales porque nadie toca la pantalla.
+- **Cómo se ven sin descargar artefactos:** el entorno de Claude no llega al almacenamiento de artefactos de GitHub, así que el workflow ahora también deja una copia chica de cada captura en su registro.
+- **Ajuste:** para la próxima corrida, el simulador elige el iPhone más nuevo (con Dynamic Island) en vez del SE, para revisar los bordes de la pantalla.
+- **Pendiente:** que el workflow entre al juego (crear perfil, abrir un juego) para revisar más pantallas; hoy solo muestra la primera.
+
+### Repositorio privado y autoría de los commits
+- **Pedido de la persona dueña:**
+  - Dejar privado el repositorio del juego, sin confundirlo con matiweb, que sigue público como la web con la demo.
+  - Que los commits se vean más humanos.
+- **Revisión:**
+  - MAtigame_v0 es público y no tiene forks.
+  - `deploy-pages.yml` publicaba **todo** el repositorio en GitHub Pages en cada merge a `main` (bitácora, auditoría, `admin/`, llave de pruebas), aunque la portada solo redirigía a matichoc.cl.
+  - matiweb publica matichoc.cl con Pages y debe seguir público: en el plan gratis un repositorio privado no puede usar Pages.
+- **Decisiones de la persona dueña:**
+  - Commits **a su nombre, sin marcas**.
+  - Borrar el Pages **solo de Matijuego**.
+  - Compilación de iOS **solo a mano**.
+- **Hecho:**
+  - Se borró `deploy-pages.yml`.
+  - `ios.yml` ahora corre solo a mano.
+  - `CLAUDE.md` tiene la regla de autoría y la del repositorio privado.
+  - `git config` en los dos repositorios: `Cristóbal <45877061+cristobalrocosaavedra@users.noreply.github.com>`.
+  - Plan §8 y README actualizados.
+  - Los commits antiguos no se reescriben: habría que forzar `main` y romper los PR ya mergeados.
+- **Pendiente (persona dueña, en GitHub):** MAtigame_v0 → Settings → Pages → *Unpublish site* y Settings → General → *Change visibility* → Private.
+- **Pruebas web de este PR (matiweb, demo):**
+
+  | Prueba | Resultado |
+  |---|---|
+  | perfiles | 13/13 |
+  | temporada | 29/29 |
+  | pueblo | 24/24 |
+  | legal | OK |
+  | enlaces | 0 conexiones externas |
+  | juegos | 14/16 |
+
+  En juegos, Choco Blaster es el fallo conocido de la web. Porristas falló por lentitud del navegador de prueba y sola da OK.
+
+### Plan Android + iOS y primeros pasos de iOS
+- **Pedido de la persona dueña:** revisar el repositorio a fondo y armar y ejecutar un plan para que el juego esté en Android y iOS. Android debería ir a prueba y publicarse en 1–2 semanas; iOS, si le va bien.
+- **Plan:** `docs/PLAN-ANDROID-IOS.md`. Tiene el estado, el calendario (Android en prueba cerrada desde la semana del 3-nov y producción hacia fines de noviembre), las fases, los riesgos y 6 decisiones pendientes de la persona dueña.
+- **Revisión:**
+  - Android está bien encaminado: la firma ya está en GitHub y la ejecución nº 80 generó el `.aab` firmado.
+  - Riesgo nuevo encontrado: todo el progreso vivía solo en localStorage, y en iPhone iOS puede borrarlo si falta espacio.
+  - La vibración no funcionaba en ningún celular: Android exige el permiso VIBRATE e iOS no tiene `navigator.vibrate`.
+- **Hecho:**
+  - **`js/native.js`** (se carga primero en `main.js`):
+    - Copia de todas las claves `matichoc_*` en el almacenamiento propio de la app (`@capacitor/preferences`): cada 20 s si cambió algo, al pasar a segundo plano y al cerrar.
+    - Si al abrir no hay perfiles pero sí copia, se restaura antes de leer los perfiles. Una copia buena nunca se pisa con una vacía.
+    - Vibración con `@capacitor/haptics`.
+    - En la web no hace nada.
+  - **Prueba nueva `scripts/qa/respaldo-nativo.cjs`** (simula el puente de un iPhone): 13/13.
+  - **Android:**
+    - Permiso nuevo VIBRATE (normal, sin aviso).
+    - El workflow ahora exige exactamente INTERNET + VIBRATE.
+    - Política v1.1: menciona la vibración y la copia dentro del teléfono.
+    - Créditos con los plugins nuevos, todos MIT.
+    - Ficha (`store/listing-es.md`) al día.
+  - **Proyecto iOS (`ios/`):**
+    - Capacitor 8.5.3 con Swift Package Manager; bundle ID `cl.chocojuego.matichoc`, el mismo de Android; mínimo iOS 15.
+    - `Info.plist`: español, arm64, sin barra de estado, pantalla completa en iPad, sin cifrado propio.
+    - `PrivacyInfo.xcprivacy`: sin rastreo ni datos, UserDefaults con motivo CA92.1.
+    - Íconos y pantalla de inicio desde `resources/`.
+    - `capacitor.config.json`: sin rebote.
+  - **Workflow nuevo "Compilar app iOS"** (Mac de GitHub, sin cuenta de Apple): compila para el simulador, revisa el contenido, abre la app en iPhone y iPad simulados y saca capturas.
+- **Pruebas de la app (navegador):**
+
+  | Prueba | Resultado |
+  |---|---|
+  | respaldo-nativo | 13/13 |
+  | atrás | 24/24 |
+  | perfiles | 13/13 |
+  | legal | OK |
+  | enlaces | OK |
+  | lógica (aventura, merge, deportes, puzzles) | OK |
+  | `verify:app` | OK |
+
+- **Pendiente:** ver los workflows de Android e iOS en el PR, revisar las capturas del simulador, la prueba en el celular y las decisiones del plan (§8).
+
+### Video promocional (para redes y para buscar testers)
+- **Pedido de la persona dueña:** buscar una skill o una capacidad para generar un video atractivo con capturas del juego, publicitarlo en todos lados y empezar a buscar testers.
+- **Plugins:** busqué en el catálogo y encontré `video-shotcraft` (videos con Remotion) y `ffmpeg-llm`. Le mostré la tarjeta para instalarlos, pero no hacen falta: aquí ya están ffmpeg y el navegador de pruebas.
+- **Hecho (`scripts/video/`, guía en `docs/VIDEO-PROMOCIONAL.md`):**
+  - **Grabador cuadro a cuadro** (`reloj.cjs` + `grabar.cjs`): el tiempo del juego avanza 1/30 s por cuadro, así el video sale fluido aunque el navegador sin tarjeta gráfica tarde ~1,5 s por cuadro.
+  - **Escenas que se juegan solas, con partidas reales:**
+    - Pueblo en monopatín y Renovar el Pueblo (lista de tareas y escena del lago).
+    - Pichanga y Básquet 2v2, manejados por el "jugador humano" de las pruebas.
+    - Ciudad con piloto automático por la avenida.
+    - Parkour infinito con un piloto que salta en el borde de cada plataforma.
+    - Mati Merge arrastrando productos con el dedo.
+    - Cortes rápidos de Salto, Bloques, Crea tu Chocolate y Autos.
+  - **Carteles** (`carteles.cjs`): portada, título por escena y cierre "¿Tienes Android? ¡Sé tester!" con matichoc.cl/matijuego. Usan la letra libre Fredoka y el logo.
+  - **Montaje** (`montar.cjs`, ffmpeg): versión horizontal 1920×1080 (YouTube, ficha de Play) y vertical 1080×1920 (Reels, TikTok, Shorts, estados).
+  - El audio va en silencio a propósito: la música se agrega en la app de cada red, con canciones que tienen permiso.
+- **`scripts/qa/jugador-humano.mjs`:** ahora también se puede cargar en el navegador (no usa `process` fuera de Node).
+- **Pendiente:**
+  - La persona dueña revisa el video.
+  - Definir por dónde se inscriben los testers (sugerencia: un Grupo de Google) y poner ese enlace en la publicación.
+
+### PR #46 y matiweb #49 mergeados
+- La persona dueña hizo merge de **PR #46** (aventura "Renovar el Pueblo", barrios nuevos en Pueblo y Ciudad, pedidos diarios de Mati Merge) y de **matiweb #49** (la misma versión en la web, matichoc.cl/matijuego).
+- APK de prueba de esta versión: **nº 80** (run 40043895224), lista para probar en el celular.
+- **Pendiente:** prueba en el celular de la APK nº 80 (lista de tareas, barrios, pedidos de 2 productos, fluidez).
+- **Pendiente opcional (no pedido aún):** aliviar el costo de dibujo del Pueblo y la Ciudad (ya rondaban 1.300–1.800 dibujos por cuadro).
+
+---
+
 ## 2026-10-23
 
 ### Aventura por etapas "Renovar el Pueblo", Pueblo y Ciudad más grandes y pedidos diarios en Mati Merge

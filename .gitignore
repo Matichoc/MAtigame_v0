@@ -10,3 +10,7 @@ android/capacitor-cordova-android-plugins/
 *.jks
 *.keystore
 !android/app/matijuego-test.keystore
+
+# videos promocionales generados (pesan; se regeneran con scripts/video/)
+/video-promocional/
+/video/

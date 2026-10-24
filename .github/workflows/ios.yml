@@ -1,0 +1,117 @@
+name: Compilar app iOS
+
+# Arma la app de Matijuego para iPhone/iPad en un Mac de GitHub, SIN cuenta de Apple ni firma:
+#  - compila el proyecto de Xcode (ios/) para el simulador de iPhone;
+#  - abre la app en un iPhone simulado y en un iPad simulado y saca capturas (para ver que arranca y cómo se ve);
+#  - las capturas quedan como artefacto "matijuego-ios-capturas".
+# La versión firmada para TestFlight/App Store se agrega cuando exista la cuenta de Apple Developer (ver docs/PLAN-ANDROID-IOS.md).
+# Se ejecuta SOLO a mano (Actions → "Compilar app iOS" → Run workflow): en un repositorio privado cada minuto de Mac
+# descuenta 10 del plan gratis de GitHub Actions (~150 por corrida de los 2.000 al mes).
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_name:
+        description: "Nombre de versión que verá el público (ej. 1.0.0)"
+        default: "1.0.0"
+
+permissions:
+  contents: read
+
+jobs:
+  simulador:
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      VERSION_NAME: ${{ inputs.version_name || '1.0.0' }}
+      BUILD_NUMBER: ${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Capacitor 8 pide un Xcode reciente: se usa el más nuevo que tenga el Mac de GitHub
+      - name: Elegir Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          XC=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          sudo xcode-select -s "$XC"
+          xcodebuild -version
+
+      - name: Instalar dependencias y preparar la carpeta de la app
+        run: |
+          npm ci
+          npm run build:app
+          npm run verify:app
+          npx cap sync ios
+
+      - name: Compilar para el simulador
+        run: |
+          set -o pipefail
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/dd" \
+            MARKETING_VERSION="$VERSION_NAME" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+            CODE_SIGNING_ALLOWED=NO build | tail -40
+          APP=$(ls -d "$RUNNER_TEMP"/dd/Build/Products/Debug-iphonesimulator/App.app)
+          echo "APP=$APP" >> "$GITHUB_ENV"
+          echo "== Info.plist final"; plutil -p "$APP/Info.plist" | grep -E "CFBundleIdentifier|CFBundleShortVersionString|CFBundleVersion|CFBundleDisplayName|UIStatusBarHidden|ITSAppUsesNonExemptEncryption|UIRequiredDeviceCapabilities" -A1
+          echo "== Tamaño"; du -sh "$APP"
+          test -f "$APP/PrivacyInfo.xcprivacy" || { echo "::error::Falta PrivacyInfo.xcprivacy dentro de la app"; exit 1; }
+          test -f "$APP/public/index.html" || { echo "::error::Falta el juego (public/index.html) dentro de la app"; exit 1; }
+          test -f "$APP/public/privacy.html" || { echo "::error::Falta privacy.html dentro de la app"; exit 1; }
+          if ls "$APP"/public/js | grep -Ei "^fps-"; then echo "::error::Choco Blaster dentro de la app"; exit 1; fi
+
+      # Abre la app en un iPhone y un iPad simulados (los más nuevos disponibles) y saca capturas a los 20 y 45 segundos.
+      - name: Abrir en el simulador y sacar capturas
+        run: |
+          mkdir -p capturas
+          for TIPO in iPhone iPad; do
+            UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)['devices']
+          import re
+          # el modelo más nuevo (para iPhone: con Dynamic Island, no el SE), en el iOS más reciente
+          c=[(rt,x) for rt,l in d.items() if 'iOS' in rt for x in l if x['name'].startswith('$TIPO') and ' SE' not in x['name']]
+          num=lambda n:int((re.findall(r'\\d+',n) or ['0'])[0])
+          c.sort(key=lambda t:(t[0],num(t[1]['name']),'Pro' in t[1]['name'],t[1]['name']))
+          print(c[-1][1]['udid'] if c else '')")
+            [ -n "$UDID" ] || { echo "::warning::No hay simulador de $TIPO"; continue; }
+            echo "== $TIPO: $(xcrun simctl list devices | grep "$UDID")"
+            xcrun simctl boot "$UDID"
+            xcrun simctl bootstatus "$UDID" -b
+            xcrun simctl install "$UDID" "$APP"
+            xcrun simctl launch "$UDID" cl.chocojuego.matichoc
+            sleep 20
+            xcrun simctl io "$UDID" screenshot "capturas/$TIPO-1-inicio.png"
+            sleep 25
+            xcrun simctl io "$UDID" screenshot "capturas/$TIPO-2-despues.png"
+            # sigue abierta (no se cerró sola)
+            xcrun simctl spawn "$UDID" launchctl list | grep -q "cl.chocojuego.matichoc" || { echo "::error::La app se cerró sola en $TIPO"; exit 1; }
+            xcrun simctl shutdown "$UDID"
+          done
+          ls -la capturas
+
+      # Copia chica de cada captura dentro del registro (JPEG en base64 entre marcas), para poder revisarlas sin descargar
+      # el artefacto (hay entornos de revisión que no llegan al almacenamiento de artefactos de GitHub).
+      - name: Capturas en el registro (versión chica)
+        if: always()
+        run: |
+          for f in capturas/*.png; do
+            [ -f "$f" ] || continue
+            sips -s format jpeg -s formatOptions 60 -Z 900 "$f" --out "${f%.png}.jpg" > /dev/null
+            echo "===CAPTURA $(basename "${f%.png}") INICIO==="
+            base64 -i "${f%.png}.jpg" | fold -w 160
+            echo "===CAPTURA $(basename "${f%.png}") FIN==="
+            rm "${f%.png}.jpg"
+          done
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: matijuego-ios-capturas
+          path: capturas/
+          if-no-files-found: ignore

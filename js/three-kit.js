@@ -12,6 +12,7 @@ import { recordRun, runBonus } from "./progression.js";
 import { campaignWin, campaignMode, campaignLevel, campaign, campaignComplete, campaignStartOver, lapReward, LEVELS_PER_GAME } from "./campaign.js";
 import { missionFor } from "./missions.js";
 import { costOf, spendEnergy, energyOf } from "./energy.js";
+import { vibrate } from "./native.js";
 
 export { THREE };
 
@@ -635,7 +636,7 @@ export class Game3D {
 
   /** Vibración corta en el celular (golpes, premios). */
   haptic(ms = 30) {
-    try { navigator.vibrate?.(ms); } catch (e) { /* no disponible */ }
+    vibrate(ms); // en la app: vibración nativa (también en iPhone); en la web: navigator.vibrate si existe
   }
 
   retry() {

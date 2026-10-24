@@ -1,3 +1,5 @@
+// primero: si el navegador interno de la app perdió los datos, native.js restaura la copia antes de leer los perfiles
+import "./native.js";
 import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot, lockReason, CUSTOM_COLORS, CUSTOM_EMBLEMS, customizeOutfit, isHexColor } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
