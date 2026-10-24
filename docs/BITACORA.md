@@ -6,6 +6,15 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-24
 
+### Primera compilación de iOS: en verde
+- **Workflow "Compilar app iOS"** (ejecuciones 1 y 2, Mac de GitHub con Xcode 26.3): compila para el simulador y la app abre en un **iPhone SE (3.ª gen.)** y un **iPad mini (A17 Pro)** simulados, sin cerrarse.
+  - **Info.plist final:** `cl.chocojuego.matichoc`, versión 1.0.0, arm64, sin barra de estado, sin cifrado propio.
+  - Dentro de la app están el juego, la política y `PrivacyInfo.xcprivacy`; Choco Blaster no está.
+- **Capturas:** muestran la pantalla de perfiles con logo, letras y botones correctos, como la primera vez en Android. Las de los 20 s y los 45 s son iguales porque nadie toca la pantalla.
+- **Cómo se ven sin descargar artefactos:** el entorno de Claude no llega al almacenamiento de artefactos de GitHub, así que el workflow ahora también deja una copia chica de cada captura en su registro.
+- **Ajuste:** para la próxima corrida, el simulador elige el iPhone más nuevo (con Dynamic Island) en vez del SE, para revisar los bordes de la pantalla.
+- **Pendiente:** que el workflow entre al juego (crear perfil, abrir un juego) para revisar más pantallas; hoy solo muestra la primera.
+
 ### Repositorio privado y autoría de los commits
 - **Pedido de la persona dueña:**
   - Dejar privado el repositorio del juego, sin confundirlo con matiweb, que sigue público como la web con la demo.

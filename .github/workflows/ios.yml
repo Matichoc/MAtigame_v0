@@ -73,8 +73,11 @@ jobs:
             UDID=$(xcrun simctl list devices available -j | python3 -c "
           import json,sys
           d=json.load(sys.stdin)['devices']
-          c=[(rt,x) for rt,l in d.items() if 'iOS' in rt for x in l if x['name'].startswith('$TIPO')]
-          c.sort(key=lambda t:(t[0],t[1]['name']))
+          import re
+          # el modelo más nuevo (para iPhone: con Dynamic Island, no el SE), en el iOS más reciente
+          c=[(rt,x) for rt,l in d.items() if 'iOS' in rt for x in l if x['name'].startswith('$TIPO') and ' SE' not in x['name']]
+          num=lambda n:int((re.findall(r'\\d+',n) or ['0'])[0])
+          c.sort(key=lambda t:(t[0],num(t[1]['name']),'Pro' in t[1]['name'],t[1]['name']))
           print(c[-1][1]['udid'] if c else '')")
             [ -n "$UDID" ] || { echo "::warning::No hay simulador de $TIPO"; continue; }
             echo "== $TIPO: $(xcrun simctl list devices | grep "$UDID")"
