@@ -4,6 +4,62 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-26
+
+### Tirones en la Ciudad (playa) y en la bandera de Aventura; fuego → chocolate
+- **Prueba de la persona dueña, en su celular de gama alta:**
+  - En la Ciudad, al pasar hacia la playa, "se empieza a tildar la pantalla muchísimo… el mapa como que se pone en negro".
+  - Lo mismo pasa al llegar a la bandera de Aventura.
+  - Además, la flor sale poco. Pidió "camuflar" todo lo que sea fuego con chocolate, para que el chocolate cubra a los malvaviscos.
+- **Causas encontradas (medidas en el navegador de prueba):**
+  1. **Cosas que se preparaban recién al aparecer en pantalla.** El celular arma los efectos y las imágenes de cada objeto la primera vez que lo ve: el castillo y la bandera de la meta, los barrios de la Ciudad y los premios de los bloques ?.
+     - Medido: al llegar a la bandera aparecían +2 efectos y +2 imágenes en un solo cuadro, de **516 ms** (lo normal son ~115).
+     - Al cruzar hacia la playa aparecían efectos e imágenes nuevos entre los 50 y 60 m.
+  2. **La calidad se ajustaba solo en los primeros ~3 s.** Si el comienzo era liviano, el juego decidía que el celular aguantaba todo y no volvía a mirar, aunque después llegara una zona pesada como la playa (mar y arena enormes).
+  3. **El juego activo podía ser el "más viejo" para el sistema que suelta contextos 3D:** anotaba su uso solo al empezar. Es un riesgo de pantalla negra si se abre otro motor 3D a mitad de partida.
+  4. **Cada disparo de la flor creaba una esfera y un brillo nuevos:** tirón en el primer disparo y memoria que se acumulaba.
+- **Arreglos:**
+  - **`Game3D.warmUp()`** (`js/three-kit.js`): con la tarjeta de inicio en pantalla, prepara todos los efectos e imágenes de la escena, también lo escondido, y dibuja un cuadro con todo. En Aventura se repite al pasar de nivel o elegir otro.
+    - Después del arreglo: en la bandera, 0 efectos y 0 imágenes nuevos y el peor cuadro baja de 516 a **217 ms**. Camino a la playa no aparece nada nuevo.
+  - **Calidad continua:** después de la calibración inicial sigue mirando durante el juego. Con ~6 s seguidos bajo 24 cuadros por segundo, baja otro escalón (brillo → resolución → sombras).
+  - **El juego en uso anota que está activo en cada cuadro**, para que nunca sea el que se suelta.
+- **Aventura, de fuego a chocolate:**
+  - **Flor de cacao:** pétalos crema y caramelo con el corazón de chocolate.
+  - **Disparos:** bolitas de chocolate brillante con una gotita. Hay 2 listas en el nivel, así que no se crea nada al disparar.
+  - **Malvaviscos:** quedan **bañados en chocolate** y se derriten despacio ("¡Bañado! +150 🍫").
+  - **Salpicadura y brillo:** la salpicadura es de chocolate y el brillo del personaje, crema.
+  - **Botón y textos:** el botón es 🍫 color cacao y los textos y la ayuda hablan de chocolate.
+  - **La flor sale más:** hay más bloques de poder (38 % en vez de 30 %). Si eres chico, la mitad de las veces sale directo la flor (antes solo el hongo); el primer bloque sigue dando el hongo, para aprender.
+  - **Documentos al día:** ficha, auditoría y guía legal ya no hablan de fuego.
+- **Pruebas (navegador, app):**
+
+  | Prueba | Resultado |
+  |---|---|
+  | juegos | 15/15 |
+  | aventura | 57 |
+  | pueblo | 24 |
+  | ciudad-barrios | 20 |
+  | ciudad-diaria | 6 |
+  | merge | 30 |
+  | deportes | 52 |
+  | atrás | 24 |
+  | temporada | 29 |
+  | perfiles | 13 |
+  | respaldo-nativo | 13 |
+  | lógica | OK |
+
+  - Prueba directa del chocolate: el malvavisco queda café (`5a2d16`) y cada disparo crea 0 efectos y 0 piezas nuevas.
+
+### Propuesta visual: 5 maquetas aprobadas
+- La persona dueña pidió ser "altamente minucioso" con cómo se ve el juego, y mockups para idearlo juntos.
+- **Maquetas** (en la carpeta local `maquetas/`, fuera de git): cada una tiene la captura real y la propuesta, hecha con la letra, los colores y las imágenes del juego.
+  1. Juego a pantalla completa (Ciudad).
+  2. Pueblo con un solo objetivo.
+  3. Tarjeta de inicio con modos en dibujos.
+  4. Menú con barra abajo.
+  5. Juego bloqueado con barra de avance.
+- **Decisión de la persona dueña:** aprobó **las 5** y el botón de **pausa ⏸** (seguir · sonido · salir) en vez de 🏠. Se construyen en orden, cada una con su APK.
+
 ## 2026-10-24
 
 ### PR #47 y matiweb #50 mergeados

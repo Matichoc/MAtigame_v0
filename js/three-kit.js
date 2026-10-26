@@ -478,9 +478,35 @@ export class Game3D {
     if (this.kawaii) this._kawaiiScene();
     this.showOverlay("intro");
     this.onIntro?.();
+    this.warmUp();
     this.running = true;
     this.lastTs = null;
     requestAnimationFrame(this._loop);
+  }
+
+  /** Prepara de una vez, con la tarjeta de inicio en pantalla, todos los sombreadores y texturas de la escena, también lo
+   * que todavía no se ve (barrios lejanos, el castillo de la meta, premios escondidos). Si no, el celular los prepara la
+   * primera vez que aparecen y el juego se congela un momento justo ahí (medido: +2 programas y +2 texturas al llegar a la
+   * bandera de Aventura; lo mismo al cruzar a la playa de la Ciudad). Se dibuja un cuadro con todo y luego el normal. */
+  warmUp() {
+    if (!this.renderer || !this.scene || !this.camera) return;
+    const shown = [];
+    const culled = [];
+    this.scene.traverse((o) => {
+      if (!o.visible) { o.visible = true; shown.push(o); }
+      if (o.frustumCulled) { o.frustumCulled = false; culled.push(o); }
+    });
+    try {
+      this.renderer.compile(this.scene, this.camera);
+      if (this.composer) this.composer.render(0);
+      else this.renderer.render(this.scene, this.camera);
+    } catch (e) { /* si algo falla, se prepara solo la primera vez que aparezca, como antes */ }
+    for (const o of shown) o.visible = false;
+    for (const o of culled) o.frustumCulled = true;
+    try {
+      if (this.composer) this.composer.render(0);
+      else this.renderer.render(this.scene, this.camera);
+    } catch (e) { /* el próximo cuadro dibuja igual */ }
   }
 
   /** Estilo kawaii del escenario: sombreado por tonos (no a los personajes) y pétalos/estrellitas flotando. */
@@ -729,6 +755,7 @@ export class Game3D {
 
   _loop(ts) {
     if (!this.running) return;
+    this.renderer.__glUse = ts; // es el juego en uso: si hace falta soltar un contexto, que sea otro (ver glEvict)
     if (this.lastTs == null) this.lastTs = ts;
     const dt = Math.min(0.05, (ts - this.lastTs) / 1000);
     this.lastTs = ts;
@@ -766,15 +793,27 @@ export class Game3D {
   }
 
   _adaptQuality(dt) {
-    if (this.qualityDone) return;
+    if (this.qualityStep >= 3) return; // ya está en lo mínimo (sin brillo, menos resolución y sin sombras)
+    if (this.qualityDone && this.state !== "playing") return;
     this.frameTimes.push(dt);
     if (this.frameTimes.length < 90) return;
     const avg = this.frameTimes.reduce((a, b) => a + b, 0) / this.frameTimes.length;
     this.frameTimes = [];
-    if (avg <= 0.034) {
-      this.qualityDone = true;
+    if (!this.qualityDone) {
+      // calibración al empezar: baja un escalón cada ~3 s mientras vaya lento
+      if (avg <= 0.034) this.qualityDone = true;
+      else this._qualityDown();
       return;
     }
+    // y después sigue mirando: si el juego se pone pesado más adelante (otra zona del mapa, el final de un nivel),
+    // con dos tramos lentos seguidos (~6 s bajo 24 cuadros por segundo) baja otro escalón
+    if (avg > 0.042) {
+      this._slowSpans = (this._slowSpans || 0) + 1;
+      if (this._slowSpans >= 2) { this._slowSpans = 0; this._qualityDown(); }
+    } else this._slowSpans = 0;
+  }
+
+  _qualityDown() {
     this.qualityStep++;
     if (this.qualityStep === 1 && this.composer) {
       this.composer = null; // 1) sin brillo
@@ -785,6 +824,7 @@ export class Game3D {
       this._onResize();
     } else {
       this.onLowQuality?.(); // 3) sin sombras
+      this.qualityStep = 3;
       this.qualityDone = true;
     }
   }

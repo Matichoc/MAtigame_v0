@@ -14,3 +14,4 @@ android/capacitor-cordova-android-plugins/
 # videos promocionales generados (pesan; se regeneran con scripts/video/)
 /video-promocional/
 /video/
+/maquetas/

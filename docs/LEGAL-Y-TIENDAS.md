@@ -66,7 +66,7 @@ Leyenda: ✅ ya está resuelto en el repositorio · ⚠️ hay que decidir o hac
 
 ### Formularios de Play Console
 - ⚠️ **Público objetivo y contenido**: elige rangos de edad (incluyendo menores de 13) → activa la revisión de **Diseñada para familias**. Responde que **no hay anuncios**.
-- ⚠️ **Clasificación de contenido (IARC)**: cuestionario que se responde pregunta por pregunta. Ojo: Aventura Choco tiene **combate de fantasía** (bolas de fuego que eliminan enemigos de caricatura, pisotones y jefes), así que no corresponde responder "sin violencia" por defecto; el detalle está en `store/listing-es.md`. No se puede asegurar de antemano qué clasificación resultará.
+- ⚠️ **Clasificación de contenido (IARC)**: cuestionario que se responde pregunta por pregunta. Ojo: Aventura Choco tiene **combate de fantasía** (bolitas de chocolate que bañan a los malvaviscos de caricatura, pisotones y jefes), así que no corresponde responder "sin violencia" por defecto; el detalle está en `store/listing-es.md`. No se puede asegurar de antemano qué clasificación resultará.
 - ⚠️ **Seguridad de los datos**: "no recopila ni comparte datos" **mientras el ranking esté apagado**. Si lo enciendes: declarar apodo + identificador + puntajes.
 - ⚠️ **Declaración de anuncios**: "No contiene anuncios".
 - ⚠️ **Política de privacidad**: URL pública `https://matichoc.cl/matijuego/privacy.html` (preparada en matiweb, **aún no publicada**: ábrela en un navegador sin sesión antes de pegarla en Play Console).
