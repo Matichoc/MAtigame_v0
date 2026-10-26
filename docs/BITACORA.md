@@ -6,6 +6,37 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-26
 
+### Rediseño aprobado, construido: pantalla completa, pausa, tarjetas de inicio, menú con pestañas y juego bloqueado
+- Construido en este mismo PR (#48), sobre las 5 maquetas aprobadas. Todo lo nuevo de pantalla y menú es **solo para pantallas táctiles**; en el computador la web queda como antes.
+- **1 y 2 · Juegos a pantalla completa** (estilos comunes para los 15 juegos; `css/style.css` "CELULAR: JUEGOS A PANTALLA COMPLETA"):
+  - El escenario 3D ocupa toda la pantalla, también bajo la muesca, sin marco ni barra de título.
+  - Arriba flotan píldoras semitransparentes y botones redondos de 44 px, sin desenfoques: en celulares modestos obligan a recomponer la pantalla en cada cuadro.
+  - En los minijuegos se esconde la píldora del total de Matipuntos, que no se usa al jugar; así no se apilan píldoras.
+  - **Pueblo:** arriba solo ⭐, Matipuntos y el evento; el objetivo del vecino arriba al centro; Actividades bajo la pausa.
+  - **Ciudad:** la misión arriba al centro; el minimapa y la brújula bajo los botones.
+- **Pausa ⏸** (decisión de la persona dueña: pausa en vez de 🏠):
+  - Cuadro "Pausa" con Seguir jugando, Sonido y Salir al menú.
+  - El juego queda quieto: `Game3D.setPaused` congela el bucle. No se llama `hold` porque Bloques ya usa `hold` para la pieza guardada; se detectó con la prueba de "atrás".
+  - El "atrás" del celular dentro de un juego ahora abre la pausa (antes avisaba "toca otra vez"); con la pausa abierta, la cierra.
+  - El botón de sonido de cada juego pasó dentro de la pausa.
+- **3 · Tarjeta de inicio** (`decorateIntro` en `js/main.js`, para todas las tarjetas):
+  - Imagen del juego con su nombre a la izquierda (arriba en el celular de pie); a la derecha solo lo que se toca: modos, nivel y un botón grande.
+  - "Cómo se juega" pasa a un botón **?** que abre las reglas encima. Las descripciones largas quedan dentro del "?".
+- **4 · Menú en el celular:**
+  - Barra de abajo: 🏠 Inicio · 🎮 Juegos · 🏘️ Pueblo (entra directo) · 👕 Mi Matichico.
+  - Cabecera corta: tú, Matipuntos, energía, nivel y 🎁.
+  - "Continuar mi aventura" es la tarjeta principal, con la imagen del Pueblo.
+  - Juegos en cuadrícula de 2, con su imagen entera y el candado con el precio.
+  - En "Mi Matichico" van el escenario del personaje, Vestuario, Mi Casa, Mis lugares, Nivel y álbum, Logros, Puntajes y Joystick.
+  - Con un perfil nuevo sin Matichico, el menú abre en "Mi Matichico" para elegirlo; al elegirlo, vuelve a Inicio.
+- **5 · Juego bloqueado:**
+  - Imagen del juego, barra "1.240 / 2.000 🍫 · te faltan 760".
+  - Si no alcanza, **"🎮 Ganar Matipuntos"** lleva al último juego jugado o al Pueblo; antes era un botón gris deshabilitado.
+- **Error de antes, corregido:** el botón "Nuevo: Básquet 2 contra 2" estaba en la tarjeta de **Recolecta y Corre**; ahora está en la de **Lanzamientos de Básquet**.
+- **Costo de dibujo:** el lienzo ocupa toda la pantalla, así que dibuja ~15–20 % más de píxeles; no hay efectos nuevos ni desenfoques. Lo compensa el ajuste de calidad continuo, pero hay que mirarlo en el celular modesto.
+- **Pruebas actualizadas:** `atras.cjs` (pausa con atrás y con ⏸, Salir al menú), `aventura.cjs` y `deportes.cjs` (salen por la pausa).
+- **Pendiente:** probarlo en el celular, en especial muescas, el "?" y la barra de abajo.
+
 ### Tirones en la Ciudad (playa) y en la bandera de Aventura; fuego → chocolate
 - **Prueba de la persona dueña, en su celular de gama alta:**
   - En la Ciudad, al pasar hacia la playa, "se empieza a tildar la pantalla muchísimo… el mapa como que se pone en negro".

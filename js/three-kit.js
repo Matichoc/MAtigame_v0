@@ -479,6 +479,7 @@ export class Game3D {
     this.showOverlay("intro");
     this.onIntro?.();
     this.warmUp();
+    this._held = false;
     this.running = true;
     this.lastTs = null;
     requestAnimationFrame(this._loop);
@@ -665,6 +666,11 @@ export class Game3D {
     vibrate(ms); // en la app: vibración nativa (también en iPhone); en la web: navigator.vibrate si existe
   }
 
+  /** Pausa del cuadro ⏸: el juego queda quieto (no avanza el tiempo ni la física) hasta que se suelte. */
+  setPaused(on) {
+    this._held = !!on;
+  }
+
   retry() {
     this.particles.clear();
     this.popups.clear();
@@ -676,6 +682,7 @@ export class Game3D {
   pauseForMenu() {
     audio.stopMusic();
     if (this.running) reportScore(this.progress, this.gameId, this.score || 0);
+    this._held = false;
     this.running = false;
     this.state = "paused";
   }
@@ -756,6 +763,7 @@ export class Game3D {
   _loop(ts) {
     if (!this.running) return;
     this.renderer.__glUse = ts; // es el juego en uso: si hace falta soltar un contexto, que sea otro (ver glEvict)
+    if (this._held) { this.lastTs = null; requestAnimationFrame(this._loop); return; } // en pausa: quieto, sin gastar
     if (this.lastTs == null) this.lastTs = ts;
     const dt = Math.min(0.05, (ts - this.lastTs) / 1000);
     this.lastTs = ts;
