@@ -26,6 +26,7 @@ Pedido de la persona dueña: que el Pueblo y la Ciudad sean interactivos (sentar
   - `lago.cjs` ampliada con el arroyo y los pisos del puente y el muelle: 9/9.
   - `puertas-toque.cjs` ahora espera el botón en vez de un tiempo fijo: con dos pruebas a la vez a veces no alcanzaba.
   - Además: juegos 15/15, ciudad-barrios 20, ciudad-diaria 6, pueblo 24, aventura 57, deportes 52, atras 26, contraste 36, album 15, puertas-toque 12.
+- **APK y web:** APK de prueba en la compilación 89, en verde (https://github.com/Matichoc/MAtigame_v0/actions/runs/40585405873). Copia web en matiweb #53 (`9f9a1ac`): interactivo 20/20, juegos 15/16 (Choco Blaster, fallo conocido; Porristas falló una vez y al repetirla pasó).
 
 ### Grupo de mejoras (un solo PR): lago, Recolecta, playa y álbum
 **Decisión de la persona dueña:** juntar las mejoras en grupos y abrir un solo PR por grupo. Este grupo se suma al PR #50, que sigue abierto, y a su copia web matiweb #53.
