@@ -1520,7 +1520,7 @@ document.getElementById("pack-close").addEventListener("click", () => packOverla
 // En el celular las secciones secundarias empiezan plegadas (más espacio); en el computador, abiertas.
 function foldSecondary() {
   const touch = window.matchMedia("(pointer: coarse)").matches;
-  document.querySelectorAll("details.how").forEach((d) => { d.open = !touch; });
+  document.querySelectorAll("details.how").forEach((d) => { d.open = !touch && !d.closest(".ic-play"); });
   const album = document.getElementById("pg-album-fold");
   if (album) album.open = !touch;
 }
@@ -2020,6 +2020,8 @@ function decorateIntro(key, pre) {
   if (how) for (const p of loose.reverse()) how.querySelector("summary").after(p);
   const start = body.querySelector(':scope > .btn-primary[id$="-btn-start"], :scope > [data-action="begin"]');
   if (how) {
+    // en la tarjeta la ayuda es un panel que tapa las opciones: empieza cerrada (se abre con el "?")
+    how.open = false;
     const sum = how.querySelector("summary");
     sum.setAttribute("aria-label", "Cómo se juega");
     sum.textContent = "?";

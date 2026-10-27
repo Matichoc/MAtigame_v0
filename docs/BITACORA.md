@@ -4,6 +4,13 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-27
+
+### Tarjeta de inicio: la ayuda "?" empieza cerrada
+- En el computador la web abría sola todas las secciones "Cómo se juega". En la tarjeta nueva esa ayuda es un panel que tapa las opciones, así que no se podía elegir dificultad (Pichanga, Básquet 2v2) ni nivel (Parkour). Lo detectaron `deportes.cjs` y `juegos.cjs`.
+- Ahora en la tarjeta la ayuda empieza cerrada y se abre con el "?" (`decorateIntro` y `foldSecondary` en `js/main.js`).
+- Pruebas: deportes 52/52, juegos 15/15. El resto ya había pasado con el rediseño: aventura 57, pueblo 24, ciudad-barrios 20, ciudad-diaria 6, merge 30, atras 26, temporada 29, perfiles 13, respaldo-nativo 13, legal y enlaces OK.
+
 ## 2026-10-26
 
 ### Rediseño aprobado, construido: pantalla completa, pausa, tarjetas de inicio, menú con pestañas y juego bloqueado
