@@ -30,6 +30,7 @@ Decisiones de la persona dueña sobre la propuesta: casas **«Visitar por dentro
   - `scripts/qa/mascota.cjs`: 23/23, con lógica, Pueblo y Mi Casa.
   - Se revisó también que los 8 escondites posibles se alcancen. Uno quedaba sobre la cama y no se podía recoger; se movió.
 - **Pruebas de siempre, todas en verde:** interactivo 20, pueblo, lago, puertas-toque, ciudad-barrios, ciudad-diaria, aventura, temporada, contraste 36, juegos 15/15, perfiles 13 y album 15.
+- **APK:** la compilación 90 falló en la revisión de privacidad de la app (`verificar-app.mjs`): la palabra `fetch` (el juego de ir a buscar la pelota) se confundía con una conexión a internet. Se renombró a `chase` en `js/pet-buddy.js`; la revisión queda igual de estricta y ahora pasa.
 
 ### Mundos más interactivos (mismo grupo de mejoras, PR #50)
 Pedido de la persona dueña: que el Pueblo y la Ciudad sean interactivos (sentarse en bancas, puentes que se cruzan solo por el puente, binoculares para mirar el horizonte, publicidades bien puestas, entrar a casas con misiones y mascotas con más vida). En este grupo va lo primero; lo de casas y mascotas queda como propuesta para elegir.

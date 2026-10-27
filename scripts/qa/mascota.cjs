@@ -67,10 +67,10 @@ const foto = (p, n) => p.screenshot({ path: path.join(__dirname, "..", "..", "ma
   const j1 = await p.evaluate(() => ({ joy: window.__progress().petCare.pet_bombi.joy, fx: window.__g3d.town.pet.fx.length }));
   ok(j1.joy > j0 && j1.fx >= 3, `Pueblo: acariciarla sube el ánimo y suelta corazones (${j1.fx})`);
   await p.click('#town-petcard [data-a="ball"]');
-  ok(await p.evaluate(() => !!window.__g3d.town.pet.fetch && window.__g3d.town.pet.fetch.holder.parent === window.__g3d.town.scene), "Pueblo: al tirar la pelota la mascota sale a buscarla");
-  await esperar(p, () => { const f = window.__g3d.town.pet.fetch; return f && f.phase === "back"; }, null, 15000);
+  ok(await p.evaluate(() => !!window.__g3d.town.pet.chase && window.__g3d.town.pet.chase.holder.parent === window.__g3d.town.scene), "Pueblo: al tirar la pelota la mascota sale a buscarla");
+  await esperar(p, () => { const f = window.__g3d.town.pet.chase; return f && f.phase === "back"; }, null, 15000);
   await foto(p, "pueblo-pelota");
-  ok(await esperar(p, () => !window.__g3d.town.pet.fetch, null, 20000), "Pueblo: la mascota trae la pelota de vuelta");
+  ok(await esperar(p, () => !window.__g3d.town.pet.chase, null, 20000), "Pueblo: la mascota trae la pelota de vuelta");
   const vuelta = await p.evaluate(() => { const g = window.__g3d.town; const h = g.hero.group.children.find((c) => c.userData.pet); return { ok: !!h && Math.abs(h.position.x - 0.95) < 0.01, plays: window.__progress().petCare.pet_bombi.plays, balls: g.scene.children.filter((o) => o.isMesh && o.geometry.type === "SphereGeometry" && o.material.color && o.material.color.getHex() === 0xff3b6b).length }; });
   ok(vuelta.ok && vuelta.plays === 1 && vuelta.balls === 0, `Pueblo: vuelve a su lugar junto al Matichico, cuenta el juego y la pelota se guarda (${JSON.stringify(vuelta)})`);
   // feliz: baila
@@ -92,10 +92,10 @@ const foto = (p, n) => p.screenshot({ path: path.join(__dirname, "..", "..", "ma
   const casa = await p.textContent("#house-grid .pet-card");
   ok(/Quiere jugar/.test(casa), `Mi Casa: aburrida, la tarjeta dice que quiere jugar («${casa.slice(0, 50)}…»)`);
   await p.click('#house-grid .pet-card [data-a="ball"]');
-  ok(await p.evaluate(() => !!window.__house.pet.fetch), "Mi Casa: tirarle la pelota");
+  ok(await p.evaluate(() => !!window.__house.pet.chase), "Mi Casa: tirarle la pelota");
   await p.waitForTimeout(700);
   await foto(p, "casa-pelota");
-  ok(await esperar(p, () => !window.__house.pet.fetch, null, 20000), "Mi Casa: la trae de vuelta");
+  ok(await esperar(p, () => !window.__house.pet.chase, null, 20000), "Mi Casa: la trae de vuelta");
   const bola = await p.evaluate(() => { const v = window.__house; return Math.abs(v.hero.group.children.find((c) => c.userData.pet).position.x - 0.95) < 0.01; });
   ok(bola, "Mi Casa: la mascota vuelve a su lugar");
   await foto(p, "casa-tarjeta");
