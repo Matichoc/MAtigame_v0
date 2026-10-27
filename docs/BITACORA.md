@@ -6,6 +6,31 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-27
 
+### Grupo de mejoras (un solo PR): lago, Recolecta, playa y álbum
+**Decisión de la persona dueña:** juntar las mejoras en grupos y abrir un solo PR por grupo. Este grupo se suma al PR #50, que sigue abierto, y a su copia web matiweb #53.
+- **Pueblo, lago:** se podía caminar sobre el agua.
+  - Causa: con el muelle arreglado, la franja por la que se puede pisar seguía 6,5 m más allá de la punta del muelle.
+  - Ahora termina en la punta (`DOCK`/`DOCK_END` en `js/town-zones.js`).
+  - Prueba nueva `scripts/qa/lago.cjs`: antes había 73 puntos de agua pisables, ahora 0. Caminando por el muelle, ahora se detiene en la punta (antes llegaba a z −9,9).
+- **Recolecta y Corre:** al empujar contra una pared sonaba un zumbido en cada cuadro (unas 60 veces por segundo).
+  - Contra paredes ya no suena nada: el personaje solo se detiene o se desliza.
+  - El rebote con obstáculos que se mueven suena a lo más 2 veces por segundo.
+- **Ciudad, playa:** 3 de las lomas de pasto decorativas que rodean la ciudad asomaban sobre la arena, y una junto al mar.
+  - Ahora no se ponen sobre la playa, el parque, el colegio ni el mar.
+  - Hay menos lomas que dibujar.
+- **Álbum de figuritas** (análisis medido con simulación, decisiones de la persona dueña: kiosco, taller visible y página de temporada):
+  - **Antes:** completar el álbum (96) costaba unos 300 sobres a pura suerte, o 130 usando el taller. Faltando 2 figuritas, se necesitaban unos 40 sobres si eran normales y unos 120 si eran brillantes (hasta 240). El taller existía, pero casi no se veía, y el botón «Vender repetidas» se llevaba las repetidas que servían para cambiar.
+  - **Kiosco:** tocar una figurita que falta abre su cuadro. Se puede cambiar por repetidas (12 por una normal, 36 por una brillante) o comprar con Matipuntos (400 una normal, 1.200 una brillante).
+  - **Taller visible:** las que se pueden cambiar dicen «🔄 ¡Cámbiala!». Antes de vender repetidas, el juego avisa cuántas faltan y cuántas se podrían cambiar.
+  - **Página de temporada:** cada evento (San Valentín, Pascua, Fiestas Patrias, Día del Niño, Halloween, Navidad) tiene 12 figuritas + 2 brillantes.
+    - Mientras dura el evento, el 40 % de las figuritas de los sobres son de su página.
+    - Completarla da +300 Matipuntos y +30 fichas del evento.
+    - Fuera de su temporada se ve al final del álbum con «vuelve en su temporada»: no se puede comprar ni cambiar.
+    - El contador del álbum base (96) y sus premios no cambian.
+    - Simulación: completar la página de temporada toma ~28 sobres (45 en el 10 % de peor suerte), alcanzable dentro de un evento.
+  - Prueba nueva `scripts/qa/album.cjs` (15 revisiones).
+- **Pruebas:** lago 5/5, puertas-toque 12/12, album 15/15, atras 26, contraste 36, perfiles 13, temporada 29, pueblo 24 (corriendo junto a otra prueba falló el robot del parkour por lentitud del equipo; sola pasó).
+
 ### Minijuegos del Pueblo (Gato, Sudoku, Cachipún): se abrían y se cerraban solos
 - **Prueba en el celular de la persona dueña:** con un toque corto en «Entrar», el minijuego no se quedaba abierto; había que mantener el dedo apretado unos segundos.
 - **Causa:**

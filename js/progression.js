@@ -199,7 +199,7 @@ export function hasPending(progress) {
 
 // ---------- álbum ----------
 // Las figuritas, los sobres y las repetidas viven en js/album.js (aquí se re-exportan para el resto de la app).
-export { STICKERS, PAGES, TOTAL as ALBUM_TOTAL, albumCount, pageStatus, ALBUM_MILESTONES, openPack, spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, spareOf, SELL_NORMAL, SELL_FOIL, TRADE_NORMAL, TRADE_FOIL } from "./album.js";
+export { STICKERS, PAGES, TOTAL as ALBUM_TOTAL, albumCount, pageStatus, ALBUM_MILESTONES, openPack, spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, spareOf, SELL_NORMAL, SELL_FOIL, TRADE_NORMAL, TRADE_FOIL, SEASON_PAGES, SEASON_STICKERS, activeSeasonPage, obtainable, buySticker, buyCost } from "./album.js";
 
 // ---------- el gancho que se llama al terminar una partida ----------
 
