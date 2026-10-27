@@ -341,6 +341,31 @@ export class Popups {
 }
 
 /**
+ * Botones de juego que actúan al apoyar el dedo (pointerdown): si abren algo (un cuadro, la tienda, otro juego), el clic
+ * que el celular envía al levantar el dedo cae sobre lo recién abierto y lo toca sin querer. Esto descarta ese clic.
+ * Se sigue a ese mismo dedo (y no un plazo fijo: abrir la tienda puede tardar más de un segundo en un celular modesto).
+ */
+let ghost = 0; // 0: nada · 1: esperando que se levante ese dedo · 2: el próximo clic es el fantasma
+let ghostPointer = null;
+let ghostArmed = false;
+export function eatGhostClick(e) {
+  ghost = 1;
+  ghostPointer = e ? e.pointerId : null;
+  if (ghostArmed) return;
+  ghostArmed = true;
+  const same = (ev) => ghostPointer === null || ev.pointerId === ghostPointer;
+  document.addEventListener("pointerup", (ev) => { if (ghost === 1 && same(ev)) ghost = 2; }, true);
+  document.addEventListener("pointercancel", (ev) => { if (same(ev)) ghost = 0; }, true);
+  document.addEventListener("pointerdown", () => { if (ghost === 2) ghost = 0; }, true); // un toque nuevo: ya no viene el fantasma
+  document.addEventListener("click", (ev) => {
+    if (ghost !== 2 || !ev.isTrusted) return; // los clics que genera el propio juego (el.click()) pasan
+    ghost = 0;
+    ev.stopPropagation();
+    ev.preventDefault();
+  }, true);
+}
+
+/**
  * Base de los juegos 3D. Ciclo de vida igual al de los demás juegos
  * (startRun / beginPlaying / retry / pauseForMenu) para que main.js los trate igual.
  * Subclases: build() crea la escena, reset() prepara una partida, update(dt) la avanza.

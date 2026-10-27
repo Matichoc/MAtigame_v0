@@ -6,6 +6,19 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-27
 
+### Minijuegos del Pueblo (Gato, Sudoku, Cachipún): se abrían y se cerraban solos
+- **Prueba en el celular de la persona dueña:** con un toque corto en «Entrar», el minijuego no se quedaba abierto; había que mantener el dedo apretado unos segundos.
+- **Causa:**
+  - El botón de acción del Pueblo actúa al apoyar el dedo (para que responda rápido mientras se usa el joystick).
+  - Al levantar el dedo, el celular envía además un "clic". Ese clic caía sobre el fondo del cuadro recién abierto, y tocar el fondo cierra el cuadro.
+  - Con el dedo apretado varios segundos el celular no envía ese clic; por eso así sí funcionaba.
+- **Arreglo:**
+  - El fondo de los cuadros (minijuegos, pausa y privacidad) solo cierra si el toque empezó en el fondo (`closeOnBackdrop` en `js/main.js` y lo mismo en `js/town-puzzles.js`).
+  - Nueva `eatGhostClick` en `js/three-kit.js`: los botones de acción del Pueblo y de la Ciudad descartan el clic que llega al levantar ese mismo dedo. Sigue al dedo y no usa un plazo fijo, porque abrir la tienda puede tardar más de un segundo.
+  - Se encontró el mismo problema al entrar a la Boutique desde el Pueblo: el clic caía dentro de la tienda recién abierta. Ahora no toca nada.
+- **Prueba nueva:** `scripts/qa/puertas-toque.cjs` toca como un dedo real. Antes del arreglo fallaba en las 3 puertas; ahora pasa 12/12 (las 3 puertas se quedan abiertas, el fondo las cierra, y la Boutique se abre sin tocar nada adentro).
+- **Otras pruebas:** pueblo 24, ciudad-barrios 20, ciudad-diaria 6, atras 26, legal OK, deportes 52, juegos 15/15. Porristas falló una vez al correr junto a deportes; sola pasó.
+
 ### PR #49 y matiweb #52 mergeados
 - La persona dueña hizo merge de #49 (rayas en la Ciudad y el Pueblo, y contraste de textos) y de su copia web Matichoc/matiweb#52: quedan publicados en matichoc.cl. Último APK de prueba: compilación 85.
 

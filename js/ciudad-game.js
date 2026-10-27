@@ -9,7 +9,7 @@
 // Controles: joystick o WASD/flechas. En auto, el joystick gira (←→) y acelera/frena (↑↓). Botón de acción (E o Enter):
 // hablar, subir/bajar del auto, regar. H = bocina. Arrastra para mover la cámara cuando vas a pie.
 
-import { THREE, Game3D, clamp, lerp, rand, canvasTexture, roundedBox, makeLogo, goldCoinTexture } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, rand, canvasTexture, roundedBox, makeLogo, goldCoinTexture, eatGhostClick } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { CHARACTERS, getOutfit } from "./characters.js";
 import { ITEMS, OUTFITS } from "./wardrobe-data.js";
@@ -2135,7 +2135,7 @@ export class CiudadGame extends Game3D {
     cv.addEventListener("pointerup", end);
     cv.addEventListener("pointercancel", end);
 
-    const on = (id, fn) => { const b = this.q(id); if (b) b.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); fn(); }); };
+    const on = (id, fn) => { const b = this.q(id); if (b) b.addEventListener("pointerdown", (e) => { e.preventDefault(); e.stopPropagation(); eatGhostClick(e); fn(); }); };
     on("btn-action", () => this.act());
     on("btn-horn", () => this.horn());
     on("btn-missions", () => (this.listOpen ? this._closeList() : this.openList()));

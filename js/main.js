@@ -154,6 +154,14 @@ window.addEventListener("resize", checkOrientation);
 window.addEventListener("orientationchange", checkOrientation);
 try { screen.orientation?.lock?.("landscape").catch(() => {}); } catch (e) { /* solo funciona en pantalla completa / app */ }
 
+/** Tocar el fondo de un cuadro lo cierra, pero solo si el toque empezó en el fondo: un botón que abre el cuadro al apoyar
+ *  el dedo recibe el clic al levantarlo sobre el fondo ya abierto, y lo cerraría al instante. */
+function closeOnBackdrop(dialog, close) {
+  let downOnBack = false;
+  dialog.addEventListener("pointerdown", (e) => { downOnBack = e.target === dialog; });
+  dialog.addEventListener("click", (e) => { const ok = downOnBack; downOnBack = false; if (e.target === dialog && ok) close(); });
+}
+
 function showScreen(target) {
   // sin Matichico elegido (perfil nuevo), el menú del celular abre en "Mi Matichico", donde se elige
   if (target === screenHub && !selectedCharacter) setLobbyTab("me");
@@ -1879,7 +1887,7 @@ document.getElementById("demo-wall-close")?.addEventListener("click", () => docu
   document.querySelectorAll(".legal-open").forEach((b) => b.addEventListener("click", () => show(b.dataset.legal)));
   swap.addEventListener("click", () => show(PAGES[current][3]));
   document.getElementById("legal-close").addEventListener("click", close);
-  dialog.addEventListener("click", (e) => { if (e.target === dialog) close(); });
+  closeOnBackdrop(dialog, close);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !dialog.classList.contains("hidden")) close(); });
 }
 
@@ -1987,7 +1995,7 @@ function closePause() {
 document.getElementById("pause-resume").addEventListener("click", closePause);
 pauseSound.addEventListener("click", () => { audio.setMuted(!audio.isMuted()); syncSoundLabels(); });
 document.getElementById("pause-exit").addEventListener("click", () => { closePause(); goToHub(); });
-pauseDialog.addEventListener("click", (e) => { if (e.target === pauseDialog) closePause(); });
+closeOnBackdrop(pauseDialog, closePause);
 let activeGame = null; // el juego 3D en pantalla (para que el "atrás" del celular abra su pausa)
 
 // ---------- TARJETA DE INICIO DE CADA JUEGO (rediseño, maqueta 3) ----------

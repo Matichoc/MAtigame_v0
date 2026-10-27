@@ -6,7 +6,7 @@
 // ahí. Cada vez que algo se puede "usar" aparece un botón; el menú escucha el evento
 // "town-action" y abre lo que corresponda.
 
-import { THREE, Game3D, clamp, lerp, canvasTexture, loadTexture, roundedBox, makeStars } from "./three-kit.js";
+import { THREE, Game3D, clamp, lerp, canvasTexture, loadTexture, roundedBox, makeStars, eatGhostClick } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { getOutfit } from "./characters.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
@@ -1340,7 +1340,7 @@ export class TownGame extends Game3D {
     const spd = document.getElementById("town-btn-speed");
     if (spd) spd.addEventListener("pointerdown", (e) => { e.preventDefault(); this.cycleMove(); });
     const act = document.getElementById("town-btn-action");
-    if (act) act.addEventListener("pointerdown", (e) => { e.preventDefault(); this.act(); });
+    if (act) act.addEventListener("pointerdown", (e) => { e.preventDefault(); eatGhostClick(e); this.act(); });
     document.getElementById("town-dialog")?.addEventListener("pointerdown", () => this._closeDialog());
   }
 }
