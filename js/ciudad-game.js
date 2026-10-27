@@ -403,11 +403,18 @@ export class CiudadGame extends Game3D {
     }
     s.add(zebra);
     // grandes manchas de pasto más claro afuera, para no ver un plano liso
+    // (nunca sobre la playa, el parque ni el colegio, ni en el mar: antes asomaban sobre la arena)
+    const hillMat = new THREE.MeshStandardMaterial({ color: 0x74c262, roughness: 1 });
     for (let i = 0; i < 14; i++) {
       const a = (i / 14) * Math.PI * 2;
-      const hill = new THREE.Mesh(new THREE.SphereGeometry(rand(9, 16), 14, 10), new THREE.MeshStandardMaterial({ color: 0x74c262, roughness: 1 }));
+      const r = rand(9, 16);
+      const x = Math.cos(a) * rand(112, 130);
+      const z = Math.sin(a) * rand(112, 130);
+      const m = r + 4;
+      if (x > 62 - m || AREAS.some((b) => x > b.x0 - m && x < b.x1 + m && z > b.z0 - m && z < b.z1 + m)) continue;
+      const hill = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 10), hillMat);
       hill.scale.y = rand(0.25, 0.45);
-      hill.position.set(Math.cos(a) * rand(112, 130), -1, Math.sin(a) * rand(112, 130));
+      hill.position.set(x, -1, z);
       s.add(hill);
     }
   }
