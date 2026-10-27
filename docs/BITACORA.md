@@ -9,6 +9,9 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 ### Tarjeta de inicio: la ayuda "?" empieza cerrada
 - En el computador la web abría sola todas las secciones "Cómo se juega". En la tarjeta nueva esa ayuda es un panel que tapa las opciones, así que no se podía elegir dificultad (Pichanga, Básquet 2v2) ni nivel (Parkour). Lo detectaron `deportes.cjs` y `juegos.cjs`.
 - Ahora en la tarjeta la ayuda empieza cerrada y se abre con el "?" (`decorateIntro` y `foldSecondary` en `js/main.js`).
+- APK de prueba: compilación 83 en verde sobre `adb6e01` (https://github.com/Matichoc/MAtigame_v0/actions/runs/40423543477).
+- Copia web en Matichoc/matiweb#51 (`6d69611`). Probada contra la demo: juegos 15/16 (Choco Blaster, fallo conocido de la web), aventura 57, pueblo 24, deportes 52, legal y enlaces OK. `atras.cjs` es solo para la app: en la demo Fútbol viene desbloqueado y no aparece el cuadro de canje.
+- Descripciones de #48 y matiweb#51 al día con el rediseño.
 - Pruebas: deportes 52/52, juegos 15/15. El resto ya había pasado con el rediseño: aventura 57, pueblo 24, ciudad-barrios 20, ciudad-diaria 6, merge 30, atras 26, temporada 29, perfiles 13, respaldo-nativo 13, legal y enlaces OK.
 
 ## 2026-10-26
