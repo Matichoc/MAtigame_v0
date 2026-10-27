@@ -43,6 +43,28 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
     El candidato del revisor (sobre `fdac606`) tenía 16. La diferencia de 2 todavía no está explicada: el detalle de cada advertencia se imprime desde la compilación siguiente, y el informe no se pudo descargar desde este entorno. Ninguna es un error ni el motivo del fallo original.
   - `bundleRelease` firmado con la llave de subida. Huella SHA-256 `47:FE:F7:A3:…:3A:E7:9F`, distinta de la llave pública de pruebas. Sin librerías nativas.
   - versionCode 92.
+- **Compilación 93: la final de esta entrega.** Commit `fb23416`, modo tienda (`release=true`: falla si falta la llave de firma), todo en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40600386147
+  - **Artefactos:**
+    - `matijuego-prueba-apk`: APK de prueba con la llave fija de pruebas, que se instala encima del anterior.
+    - `matijuego-play-store-aab`: **AAB firmado con la llave de subida**, versionCode **93** (mayor que cualquiera anterior) y versionName 1.0.0. Huella SHA-256 `47:FE:F7:A3:07:7F:4C:40:C3:0A:4F:33:A9:1C:D9:BA:F1:A0:E7:EF:79:F1:5F:62:86:5D:A9:87:89:3A:E7:9F`, distinta de la de pruebas. Sin librerías nativas.
+    - `matijuego-lint`: el informe completo.
+  - El de la compilación 92 también salió firmado, pero el que corresponde subir es el **93**.
+  - **`lintRelease`: 0 errores y las mismas 18 advertencias, ahora con detalle:**
+
+    | Regla | Advertencias | Qué marca |
+    |---|---|---|
+    | UnusedResources | 8 | `activity_main`, `config.xml`, `ic_launcher_background` (drawable y color), `ic_launcher_foreground`, `package_name`, `custom_url_scheme` y `AppTheme_NoActionBar` (Capacitor lo usa por su nombre desde el código, por eso lint no lo ve) |
+    | MonochromeLauncherIcon | 2 | Íconos adaptables sin versión monocromática |
+    | IconDuplicatesConfig | 2 | `splash.png` repetido en carpetas |
+    | ObsoleteSdkInt | 1 | Carpeta `drawable-v24` innecesaria con mínimo 24 |
+    | ManifestOrder | 1 | `<uses-permission>` después de `<application>` |
+    | AndroidGradlePluginVersion | 1 | Gradle 8.14.6 disponible (se usa 8.14.3) |
+    | GradleDependency | 1 | appcompat 1.8.0 disponible (se usa 1.7.1) |
+    | IconDipSize | 1 | `splash.png` |
+    | IconLocation | 1 | `splash.png` |
+
+    Ninguna se ocultó y ninguna es un error. Probable causa de que el revisor contara 16: las 2 de «hay una versión más nueva» (Gradle y appcompat) dependen de lo que lint sabe de las versiones publicadas el día que corre. Es una suposición, no está comprobada.
+  - No se cambiaron versiones ni recursos para bajar las advertencias (fuera del alcance de esta corrección).
 - **Capturas de la ficha:** las 8 de `store/screenshots/` y `store/feature-graphic.png` se regeneraron desde la variante app de esta rama.
   - **Cómo se tomaron:** con los mismos archivos que lleva el APK, en el navegador a tamaño de teléfono y sin retoques.
   - **Formato comprobado:** menú, Bloques, Crea tu Chocolate y Salto en vertical, 1080×1920 JPEG; Parkour, Básquet, Recolecta y Porristas en horizontal, 1920×1080; el gráfico en 1024×500.
