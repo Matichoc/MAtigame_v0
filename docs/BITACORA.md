@@ -6,6 +6,29 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-27
 
+### Rayas que parpadean en la Ciudad y el Pueblo; textos que no se leían
+- **Prueba en el celular de la persona dueña:**
+  - En la entrada de la Playa Choco, el suelo se veía "tildado": rayas que parpadean entre la calle y la arena.
+  - En «Renovar el Pueblo», los botones de Pichanga y Básquet y los «Cambiar estilo» no se leían.
+  - La bandera de Aventura ya se ve bien (con la M y el logo).
+- **Causa de las rayas:** pisos superpuestos exactamente a la misma altura. El celular no sabe cuál va encima y alterna, cuadro a cuadro, entre uno y otro. Medido con un detector de pisos superpuestos (en el navegador, recorriendo la escena):
+  - **Ciudad:** la arena de la playa, el pasto del parque y el patio del colegio estaban a 0,03, igual que el tope de las calles. El pasto de las manzanas quedaba a 0,005 de la vereda.
+  - **Pueblo:** los suelos de la Granja y el Lago se tocaban a 0,02, y dos parches de la cancha estaban a 0,04.
+- **Arreglo:**
+  - Los suelos de los barrios de la Ciudad pasan a 0,015, bajo la calle; el pasto de las manzanas, a 0,075.
+  - Cada barrio del Pueblo tiene su altura: bosque 0,02, granja 0,035 y lago 0,05, con la arena y el agua del lago por encima.
+  - El plano cercano de la cámara sube de 0,1 a 0,3 en la Ciudad y el Pueblo. Así la cámara distingue tres veces mejor qué piso va encima.
+  - Ahora ningún par de pisos superpuestos queda a menos de 0,015. El costo de dibujo no cambia: no se agregó nada que dibujar.
+- **Textos:** prueba nueva `scripts/qa/contraste.cjs`. Recorre el menú (sus pestañas), los cuadros, las pantallas internas, las tarjetas de inicio, los juegos y la pausa, y mide el contraste de cada texto contra su fondo real. Se arregló todo lo que quedaba bajo 3:1:
+  - **«Renovar el Pueblo»:** los botones claros sobre tarjetas claras tenían letra crema (1,0:1); ahora tienen letra oscura.
+  - **Títulos:** el rosado de las cabeceras pasó de 2,8:1 a un rosado más claro.
+  - **Barra de energía:** su fondo pasa a claro; con poca energía, el número oscuro caía sobre la parte vacía.
+  - **Accesos del menú en el computador:** degradados más profundos bajo la letra blanca (antes 2,1:1).
+  - **Pueblo:** «Actividades» y el botón del pedido del vecino con un rosado más profundo.
+- **Pruebas:**
+  - Bien: contraste (todo se lee), ciudad-barrios 20, ciudad-diaria 6, pueblo 24, juegos 15/15, merge 30, atras 26, deportes 52, aventura 57.
+  - Pueblo, corriendo junto a otras 3 pruebas, dio 6 fallos del robot del parkour por lentitud del equipo. Sola pasó 24/24.
+
 ### PR #48 y matiweb #51 mergeados
 - La persona dueña hizo merge de #48 (tirones, flor de chocolate y rediseño en el celular) y de su copia web Matichoc/matiweb#51: el rediseño queda publicado en matichoc.cl. Último APK de prueba: compilación 84.
 - La rama `claude/zealous-johnson-2ryf87` se reinició desde `main`.
