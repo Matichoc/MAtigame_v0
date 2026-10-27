@@ -28,6 +28,11 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 - **Pruebas:**
   - Bien: contraste (todo se lee), ciudad-barrios 20, ciudad-diaria 6, pueblo 24, juegos 15/15, merge 30, atras 26, deportes 52, aventura 57.
   - Pueblo, corriendo junto a otras 3 pruebas, dio 6 fallos del robot del parkour por lentitud del equipo. Sola pasó 24/24.
+- **PR y compilación:** PR #49; APK de prueba: compilación 85 en verde (https://github.com/Matichoc/MAtigame_v0/actions/runs/40515591226).
+- **Copia web:** Matichoc/matiweb#52. Probada contra la demo: juegos 15/16 (Choco Blaster, fallo conocido de la web), contraste 36 revisiones sin fallos, legal y enlaces OK.
+- **Pregunta de la persona dueña:** cómo instalarlo en el iPhone de un amigo.
+  - Hoy, con la demo web en Safari: Compartir → «Agregar a pantalla de inicio».
+  - La app de verdad en iPhone necesita la cuenta de Apple Developer (USD 99 al año) y TestFlight (fases C3 y C4 de `docs/PLAN-ANDROID-IOS.md`). La compilación de iOS actual solo sirve para el simulador.
 
 ### PR #48 y matiweb #51 mergeados
 - La persona dueña hizo merge de #48 (tirones, flor de chocolate y rediseño en el celular) y de su copia web Matichoc/matiweb#51: el rediseño queda publicado en matichoc.cl. Último APK de prueba: compilación 84.
