@@ -542,6 +542,7 @@ export class TownFun {
   jump() {
     const g = this.g;
     if (g.state !== "playing" || this.puzzleOpen) return;
+    if (g.sitting) { g._standUp(); return; } // sentado, saltar primero te levanta
     if (this.vy <= 0 && g.pos.y <= this.groundY + 0.08) {
       this.vy = JUMP_WALK;
       g.pos.y = this.groundY + 0.05;

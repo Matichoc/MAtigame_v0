@@ -285,6 +285,54 @@ export class TownGame extends Game3D {
     this.scene.add(g);
     this.colliders.push({ type: "c", x: 0, z: 0, r: 4.9 });
     this.interact.push({ kind: "fountain", x: 0, z: 0, radius: 7.5, label: "🍫 Probar el chocolate de la fuente" });
+    // bancas alrededor de la fuente, mirándola (para sentarse)
+    const wood = new THREE.MeshStandardMaterial({ color: 0x7a3f22, roughness: 0.6 });
+    const leg = new THREE.MeshStandardMaterial({ color: 0x4b2e1e, roughness: 0.7 });
+    for (const deg of [70, 250, 290]) {
+      const p = pol(deg, 7.6);
+      const yaw = Math.atan2(-p.x, -p.z); // mira hacia la fuente
+      const b = new THREE.Group();
+      b.position.set(p.x, 0, p.z);
+      b.rotation.y = yaw;
+      const seat = new THREE.Mesh(roundedBox(1.9, 0.14, 0.6, 0.05), wood);
+      seat.position.y = 0.5;
+      const back = new THREE.Mesh(roundedBox(1.9, 0.5, 0.1, 0.04), wood);
+      back.position.set(0, 0.85, -0.28);
+      b.add(seat, back);
+      for (const sx of [-0.8, 0.8]) { const l = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.5, 0.5), leg); l.position.set(sx, 0.25, 0); b.add(l); }
+      b.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+      this.scene.add(b);
+      this.addBench({ x: p.x, z: p.z, yaw, seat: 0.57 });
+    }
+  }
+
+  /** Una banca para sentarse (también las del Rincón de Bombi, desde la aventura). */
+  addBench(b) {
+    (this.benches = this.benches || []).push(b);
+    return b;
+  }
+
+  removeBench(b) {
+    if (!b || !this.benches) return;
+    const i = this.benches.indexOf(b);
+    if (i >= 0) this.benches.splice(i, 1);
+    if (this.sitting === b) this.sitting = null;
+  }
+
+  /** Sentarse: el personaje se queda quieto mirando hacia adelante hasta que mueves el joystick. */
+  _sitDown(b) {
+    this.sitting = b;
+    this.vel.set(0, 0, 0);
+    this.heroYaw = b.yaw;
+    this._standLock = 0.4; // no se levanta por el mismo toque con que se sentó
+  }
+
+  _standUp() {
+    const b = this.sitting;
+    if (!b) return;
+    this.sitting = null;
+    this.pos.x = b.x + Math.sin(b.yaw) * 0.9; // queda de pie frente a la banca
+    this.pos.z = b.z + Math.cos(b.yaw) * 0.9;
   }
 
   _addBuilding({ deg, r, w, d, h, color, roof, name, icon, signColor, kind, label, extra }) {
@@ -689,6 +737,7 @@ export class TownGame extends Game3D {
   // ---------- partida ----------
 
   reset() {
+    this.sitting = null;
     this._ensureHero();
     this._daily();
     this.hudCache = "";
@@ -774,6 +823,11 @@ export class TownGame extends Game3D {
 
   _move(dt) {
     const inp = this._input();
+    if (this.sitting) {
+      this._standLock = Math.max(0, (this._standLock || 0) - dt);
+      if (inp.mag > 0.35 && this._standLock <= 0) this._standUp(); // moverte te levanta
+      else { this.vel.set(0, 0, 0); return; }
+    }
     const mv = this._move_();
     let top = mv.speed * (this.keys.sprint ? 1.35 : 1);
     if (this.fun && this.fun.airborne) top = Math.min(top, 7); // en el aire se controla mejor: los saltos de parkour no se pasan de largo
@@ -1023,6 +1077,13 @@ export class TownGame extends Game3D {
     let best = null;
     let bestD = Infinity;
     const P = this.pos;
+    if (this.sitting) {
+      best = { kind: "stand", label: "🚶 Levantarse" };
+      bestD = -1;
+    } else for (const b of this.benches || []) {
+      const d = Math.hypot(b.x - P.x, b.z - P.z);
+      if (d < 1.9 && d < bestD) { best = { kind: "bench", bench: b, label: "🪑 Sentarse" }; bestD = d; }
+    }
     for (const it of this.interact) {
       const d = Math.hypot(it.x - P.x, it.z - P.z);
       if (d < it.radius && d < bestD) { best = it; bestD = d; }
@@ -1050,6 +1111,8 @@ export class TownGame extends Game3D {
     if (!t) return;
     audio.playPurchase();
     if (t.kind === "npc") this._talk(t.npc);
+    else if (t.kind === "bench") this._sitDown(t.bench);
+    else if (t.kind === "stand") this._standUp();
     else if (t.kind === "ring") { this.fun && this.fun.startCircuit(); }
     else if (t.kind === "puzzle") { this.fun && this.fun.openDoor(t.puzzle); }
     else if (t.kind === "fest") { this.festival && this.festival.act(t); }
@@ -1234,6 +1297,17 @@ export class TownGame extends Game3D {
 
   _syncHero(dt) {
     const g = this.hero.group;
+    if (this.sitting) {
+      // sentado: la cadera sobre la tabla (en la pose "sit" la cadera queda a 0.42 del suelo del personaje)
+      const b = this.sitting;
+      g.position.set(b.x + Math.sin(b.yaw) * 0.04, b.seat - 0.42 * g.scale.y, b.z + Math.cos(b.yaw) * 0.04);
+      g.rotation.y = b.yaw;
+      this.pos.x = b.x;
+      this.pos.z = b.z;
+      this.hero.animate(this.time, "sit", 1);
+      this._syncRide(dt);
+      return;
+    }
     g.position.copy(this.pos);
     g.rotation.y = lerp(g.rotation.y, this.heroYaw, 1 - Math.exp(-16 * Math.max(dt, 0.016)));
     const sp = Math.hypot(this.vel.x, this.vel.z);
