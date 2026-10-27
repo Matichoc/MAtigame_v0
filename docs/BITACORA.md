@@ -6,6 +6,10 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-27
 
+### PR #49 mergeado
+- La persona dueña hizo merge de #49 (rayas en la Ciudad y el Pueblo, y contraste de textos). Último APK de prueba: compilación 85.
+- La copia web Matichoc/matiweb#52 sigue esperando su merge.
+
 ### Rayas que parpadean en la Ciudad y el Pueblo; textos que no se leían
 - **Prueba en el celular de la persona dueña:**
   - En la entrada de la Playa Choco, el suelo se veía "tildado": rayas que parpadean entre la calle y la arena.
