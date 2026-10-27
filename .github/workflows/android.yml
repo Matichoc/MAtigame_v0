@@ -3,6 +3,7 @@ name: Compilar app Android
 # Arma la app de Matijuego para Android:
 #  - siempre: un APK de prueba (se instala directo en un celular, para probar antes de subir a Play Store).
 #    Va firmado con una llave fija y su número de versión sube solo, así se instala ENCIMA del anterior sin perder el progreso.
+#  - siempre: el análisis de Android (lintRelease); si encuentra un error, la compilación falla
 #  - si están cargados los secretos de firma: el paquete .aab firmado para subir a Google Play
 # Se ejecuta a mano (pestaña Actions → "Compilar app Android" → Run workflow) y en los PR que tocan la app.
 
@@ -108,6 +109,27 @@ jobs:
           echo "== Librerías nativas (16 KB): se espera ninguna"; unzip -l "$APK" | grep -E "\.so$" || echo "(ninguna)"
           if unzip -l "$APK" | grep -Ei "assets/public/js/fps-|fps3d"; then echo "::error::Choco Blaster dentro del APK"; exit 1; fi
           unzip -l "$APK" | grep -E "assets/public/(privacy|licenses)\.html" | wc -l | grep -qx 2 || { echo "::error::Faltan privacy.html o licenses.html en el APK"; exit 1; }
+
+      # Análisis de Android (lint) de la versión de tienda. Falla si encuentra un ERROR (por ejemplo, una opción que no
+      # existe en el mínimo de la app, Android 7 / API 24). Sin baseline ni reglas apagadas: las advertencias quedan a la
+      # vista en el resumen y en el informe completo (artefacto matijuego-lint), aunque no detienen la compilación.
+      - name: Análisis de Android (lintRelease)
+        working-directory: android
+        run: |
+          ./gradlew :app:lintRelease --no-daemon
+          R=app/build/reports/lint-results-release
+          if [ -f "$R.xml" ]; then
+            echo "== Resultado del análisis"
+            grep -o 'severity="[A-Za-z]*"' "$R.xml" | sort | uniq -c || echo "(sin observaciones)"
+            grep -o 'id="[A-Za-z0-9]*"' "$R.xml" | sort | uniq -c || true
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: matijuego-lint
+          path: android/app/build/reports/lint-results-release.*
+          if-no-files-found: ignore
 
       - name: Falta la llave de firma (solo si se pidió una compilación de tienda)
         if: inputs.release == true && env.HAS_KEYSTORE != 'true'

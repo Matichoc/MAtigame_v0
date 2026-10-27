@@ -13,9 +13,9 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
-        <!-- Juego a pantalla completa, también bajo la muesca de la cámara -->
+        <!-- Juego a pantalla completa. Bajo la muesca de la cámara solo desde Android 9 (API 28):
+             esa opción no existe en el mínimo de la app (API 24) y va en values-v28/styles.xml -->
         <item name="android:windowFullscreen">true</item>
-        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 
 
