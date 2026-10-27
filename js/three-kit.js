@@ -118,9 +118,15 @@ export function logoTexture() {
  */
 export function makeLogo(size = 2, { lit = true } = {}) {
   const mat = lit
-    ? new THREE.MeshBasicMaterial({ map: logoTexture(), transparent: true, side: THREE.DoubleSide })
-    : new THREE.MeshStandardMaterial({ map: logoTexture(), transparent: true, side: THREE.DoubleSide, roughness: 0.6 });
-  return new THREE.Mesh(new THREE.PlaneGeometry(size, size), mat);
+    ? new THREE.MeshBasicMaterial({ map: logoTexture(), transparent: true })
+    : new THREE.MeshStandardMaterial({ map: logoTexture(), transparent: true, roughness: 0.6 });
+  // dos caras de un solo lado (no una con DoubleSide): por detrás el logo se leería al revés, como en un espejo
+  const geo = new THREE.PlaneGeometry(size, size);
+  const g = new THREE.Group();
+  const back = new THREE.Mesh(geo, mat);
+  back.rotation.y = Math.PI;
+  g.add(new THREE.Mesh(geo, mat), back);
+  return g;
 }
 
 let coinTex = null;

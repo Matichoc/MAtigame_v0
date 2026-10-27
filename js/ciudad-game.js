@@ -514,7 +514,13 @@ export class CiudadGame extends Game3D {
   }
 
   _sign(text, x, y, z, w, h, bg, font = 70, ry = 0) {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: signTexture(text, bg, "#FFF6E6", 512, Math.round(512 * h / w), font), side: THREE.DoubleSide }));
+    // dos caras de un solo lado: con DoubleSide el letrero se leía espejado desde atrás
+    const geo = new THREE.PlaneGeometry(w, h);
+    const mat = new THREE.MeshBasicMaterial({ map: signTexture(text, bg, "#FFF6E6", 512, Math.round(512 * h / w), font) });
+    const m = new THREE.Group();
+    const back = new THREE.Mesh(geo, mat);
+    back.rotation.y = Math.PI;
+    m.add(new THREE.Mesh(geo, mat), back);
     m.position.set(x, y, z);
     m.rotation.y = ry;
     this.scene.add(m);
@@ -537,6 +543,7 @@ export class CiudadGame extends Game3D {
     g.position.set(x, Y0, z);
     g.rotation.y = yaw;
     g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+    (this.benches = this.benches || []).push({ x, z, yaw, seat: 0.61 }); // para sentarse (la tabla llega a 0.61)
     this.scene.add(g);
     this.colliders.push({ type: "c", x, z, r: 0.8 });
   }
@@ -1016,6 +1023,7 @@ export class CiudadGame extends Game3D {
   // ---------- partida ----------
 
   reset() {
+    this.sitting = null;
     this._ensureHero();
     if (this.inCar) this._leaveCar(true);
     this.car = { x: 4.2, z: 8, heading: Math.PI, speed: 0, steer: 0 };
@@ -1145,9 +1153,31 @@ export class CiudadGame extends Game3D {
     this.joy.y = y;
   }
 
+  /** Sentarse en una banca: el personaje se queda quieto mirando hacia adelante hasta que mueves el joystick. */
+  _sitDown(b) {
+    this.sitting = b;
+    this.vel.set(0, 0, 0);
+    this.heroYaw = b.yaw;
+    this._standLock = 0.4; // no se levanta por el mismo toque con que se sentó
+  }
+
+  _standUp() {
+    const b = this.sitting;
+    if (!b) return;
+    this.sitting = null;
+    // queda de pie frente a la banca
+    this.pos.x = b.x + Math.sin(b.yaw) * 0.9;
+    this.pos.z = b.z + Math.cos(b.yaw) * 0.9;
+  }
+
   _walk(dt) {
     if (this.dialog) { this.vel.multiplyScalar(0.8); return; }
     const inp = this._input();
+    if (this.sitting) {
+      this._standLock = Math.max(0, (this._standLock || 0) - dt);
+      if (inp.mag > 0.35 && this._standLock <= 0) this._standUp(); // moverte te levanta
+      else return;
+    }
     const yaw = this.camYaw;
     const dx = -Math.sin(yaw) * inp.iy + Math.cos(yaw) * inp.ix;
     const dz = -Math.cos(yaw) * inp.iy - Math.sin(yaw) * inp.ix;
@@ -1523,10 +1553,19 @@ export class CiudadGame extends Game3D {
       return;
     }
     const g = this.hero.group;
-    g.position.copy(this.pos);
-    g.rotation.y = lerp(g.rotation.y, this.heroYaw, 1 - Math.exp(-16 * Math.max(dt, 0.016)));
-    const sp = Math.hypot(this.vel.x, this.vel.z);
-    this.hero.animate(this.time, sp > 0.8 ? "run" : "idle", clamp(sp / 5.2, 0.4, 1.6));
+    if (this.sitting) {
+      // sentado en la banca: la cadera sobre la tabla (en la pose "sit" la cadera queda a 0.42 del suelo del personaje)
+      const b = this.sitting;
+      g.position.set(b.x + Math.sin(b.yaw) * 0.04, Y0 + b.seat - 0.42 * g.scale.y, b.z + Math.cos(b.yaw) * 0.04);
+      g.rotation.y = b.yaw;
+      this.pos.set(b.x, this.pos.y, b.z);
+      this.hero.animate(this.time, "sit", 1);
+    } else {
+      g.position.copy(this.pos);
+      g.rotation.y = lerp(g.rotation.y, this.heroYaw, 1 - Math.exp(-16 * Math.max(dt, 0.016)));
+      const sp = Math.hypot(this.vel.x, this.vel.z);
+      this.hero.animate(this.time, sp > 0.8 ? "run" : "idle", clamp(sp / 5.2, 0.4, 1.6));
+    }
     // el auto estacionado
     const c = this.car;
     const cg = this.heroCar.group;
@@ -1870,7 +1909,8 @@ export class CiudadGame extends Game3D {
     const pl = this._playerXZ();
     let t = null;
     if (this.dialog) { this.actionTarget = { label: "Seguir ▶", icon: "▶", short: "Seguir", fn: () => this._advanceDialog() }; this._updateActionBtn(); return; }
-    if (this.inCar) {
+    if (this.sitting) t = { label: "🚶 Levantarse", icon: "🚶", short: "Pararse", fn: () => this._standUp() };
+    else if (this.inCar) {
       if (Math.abs(this.car.speed) < 7) t = { label: "🚪 Bajar del auto", icon: "🚪", short: "Bajar", fn: () => this._leaveCar() };
     } else {
       const a = this.active;
@@ -1891,6 +1931,10 @@ export class CiudadGame extends Game3D {
       if (!t && Math.hypot(pl.x - this.car.x, pl.z - this.car.z) < 3.8) t = { label: "🚗 Subir al auto", icon: "🚗", short: "Subir", fn: () => this._enterCar() };
       if (!t) {
         for (const p of this.peds) if (Math.hypot(pl.x - p.x, pl.z - p.z) < 2.6) { t = { label: "👋 Saludar", icon: "👋", short: "Saludar", fn: () => this._pedSay(p) }; break; }
+      }
+      if (!t) {
+        const b = (this.benches || []).find((q) => Math.hypot(pl.x - q.x, pl.z - q.z) < 1.9);
+        if (b) t = { label: "🪑 Sentarse", icon: "🪑", short: "Sentarse", fn: () => this._sitDown(b) };
       }
     }
     this.actionTarget = t;
