@@ -6,6 +6,11 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-27
 
+### PR #48 y matiweb #51 mergeados
+- La persona dueña hizo merge de #48 (tirones, flor de chocolate y rediseño en el celular) y de su copia web Matichoc/matiweb#51: el rediseño queda publicado en matichoc.cl. Último APK de prueba: compilación 84.
+- La rama `claude/zealous-johnson-2ryf87` se reinició desde `main`.
+- Sigue pendiente: probar el APK en el celular, dejar privado el repositorio y apagar Pages.
+
 ### Juego bloqueado: el aviso de bienvenida ya no tapa los botones
 - En la captura acostada, el aviso "¡Hola…! Ahora toca «Continuar mi aventura»" quedaba encima de «Ahora no». Además se tragaba los toques: los avisos van sobre los cuadros y no dejaban pasar el dedo.
 - Ahora los avisos dejan pasar los toques (`pointer-events: none` en `.toast`) y se esconden al abrir un juego bloqueado (`openUnlockDialog`).
