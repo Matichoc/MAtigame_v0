@@ -233,7 +233,7 @@ function buildCar({ body = 0xd4216c, roof = 0x64321b, trim = 0xffc800, logo = tr
 
 export class CiudadGame extends Game3D {
   constructor(character, progress, els) {
-    super(GAME_ID, character, progress, els, { fov: 55 });
+    super(GAME_ID, character, progress, els, { fov: 55, near: 0.3 });
     this.musicTheme = "chill";
     this.kawaii = true;
     this.ambientOpts = { petals: 34, hearts: 6, stars: 18, radius: 22, height: 11 };
@@ -422,7 +422,7 @@ export class CiudadGame extends Game3D {
       this.scene.add(pad);
       const lawn = new THREE.Mesh(new THREE.PlaneGeometry(45, 45), this.m.lawn);
       lawn.rotation.x = -Math.PI / 2;
-      lawn.position.set(sx * 30, 0.055, sz * 30);
+      lawn.position.set(sx * 30, 0.075, sz * 30); // 0.025 sobre la vereda (0.05): con menos, el celular dibuja rayas
       lawn.receiveShadow = true;
       this.scene.add(lawn);
     }

@@ -59,7 +59,7 @@ const pol = (deg, r) => {
 
 export class TownGame extends Game3D {
   constructor(character, progress, els) {
-    super(GAME_ID, character, progress, els, { fov: 56 });
+    super(GAME_ID, character, progress, els, { fov: 56, near: 0.3 });
     this.musicTheme = "chill";
     this.kawaii = true; // ambiente kawaii: tonos pastel, sombreado por tonos, pétalos y estrellitas
     this.ambientOpts = { petals: 38, hearts: 8, stars: 24, radius: 20, height: 10 };

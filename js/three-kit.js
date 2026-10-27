@@ -346,7 +346,7 @@ export class Popups {
  * Subclases: build() crea la escena, reset() prepara una partida, update(dt) la avanza.
  */
 export class Game3D {
-  constructor(gameId, character, progress, els, { fov = 50, bloom = true } = {}) {
+  constructor(gameId, character, progress, els, { fov = 50, bloom = true, near = 0.1 } = {}) {
     this.gameId = gameId;
     this.bloom = bloom === true ? LOOK.bloom : bloom;
     this.kawaii = false; // los mundos con estilo kawaii lo encienden en su constructor (ver kawaiiStyle)
@@ -355,6 +355,7 @@ export class Game3D {
     this.progress = progress;
     this.els = els;
     this.fov = fov;
+    this.near = near; // mundos abiertos: más alto = el celular distingue mejor los pisos casi a la misma altura
     this.ready = false;
     this.running = false;
     this.state = "intro"; // intro | playing | gameover | paused
@@ -385,7 +386,7 @@ export class Game3D {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(this.fov, 1.6, 0.1, 600);
+    this.camera = new THREE.PerspectiveCamera(this.fov, 1.6, this.near, 600);
     this.scene.add(this.camera);
     this.particles = new Particles(this.scene);
     this.popups = new Popups(this.els.popups, wrap, this.camera);
