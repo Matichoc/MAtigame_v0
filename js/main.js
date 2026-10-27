@@ -1791,6 +1791,7 @@ let unlockTarget = null;
 const fmtN = (n) => Math.round(n).toLocaleString("es-CL");
 function openUnlockDialog(entry) {
   unlockTarget = entry;
+  toastEl.classList.add("hidden"); // que el aviso de bienvenida no tape los botones del cuadro
   const cost = UNLOCK_COST[entry.id];
   const missing = cost - progress.coins;
   document.getElementById("um-art").style.backgroundImage = `url("assets/games/${entry.id}.jpg")`;

@@ -6,6 +6,13 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-27
 
+### Juego bloqueado: el aviso de bienvenida ya no tapa los botones
+- En la captura acostada, el aviso "¡Hola…! Ahora toca «Continuar mi aventura»" quedaba encima de «Ahora no». Además se tragaba los toques: los avisos van sobre los cuadros y no dejaban pasar el dedo.
+- Ahora los avisos dejan pasar los toques (`pointer-events: none` en `.toast`) y se esconden al abrir un juego bloqueado (`openUnlockDialog`).
+- Medido: el cuadro cabe entero en 915×412, 740×360, 412×915 y 360×640.
+- `temporada.cjs` tenía la línea `clock.pauseAt` repetida: con el equipo cargado fallaba al "volver atrás" el reloj. Se quitó la repetida (29/29).
+- Pruebas: atras 26, perfiles 13, juegos 15/15, temporada 29.
+
 ### Tarjeta de inicio: la ayuda "?" empieza cerrada
 - En el computador la web abría sola todas las secciones "Cómo se juega". En la tarjeta nueva esa ayuda es un panel que tapa las opciones, así que no se podía elegir dificultad (Pichanga, Básquet 2v2) ni nivel (Parkour). Lo detectaron `deportes.cjs` y `juegos.cjs`.
 - Ahora en la tarjeta la ayuda empieza cerrada y se abre con el "?" (`decorateIntro` y `foldSecondary` en `js/main.js`).
