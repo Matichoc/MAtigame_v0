@@ -764,10 +764,11 @@ export class RecolectaGame extends Game3D {
       const ny = clamp(this.p.y + (dy / len) * 14, 26, CANVAS_H - 26);
       if (!this._hits(nx, this.p.y, false)) this.p.x = nx;
       if (!this._hits(this.p.x, ny, false)) this.p.y = ny;
-      audio.playBounce();
-    } else {
-      audio.playBump();
+      // rebote suave, a lo más dos veces por segundo
+      const now = performance.now();
+      if (!(this._bounceAt > now - 500)) { this._bounceAt = now; audio.playBounce(); }
     }
+    // contra una pared fija no suena nada: solo se detiene o se desliza (antes zumbaba en cada cuadro mientras se empujaba)
   }
 
   update(dt) {
