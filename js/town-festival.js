@@ -347,7 +347,7 @@ export class TownFestival {
     for (const c of this.colliders) { const i = this.g.colliders.indexOf(c); if (i >= 0) this.g.colliders.splice(i, 1); }
     this.colliders = [];
     if (!f.floor) {
-      this._mesh(grp, new THREE.PlaneGeometry(9, 8).rotateX(-Math.PI / 2), std(0xb59466, 1), 0, 0.04, 0);
+      this._mesh(grp, new THREE.PlaneGeometry(9, 8).rotateX(-Math.PI / 2), std(0xb59466, 1), 0, 0.055, 0); // un poco más alto que el pasto de la cancha, que lo toca
       this._weeds(grp, 12, 8, 7, 37);
       const pole = this._mesh(grp, new THREE.CylinderGeometry(0.1, 0.1, 3, 8), std(0x777777, 0.5), 1, 0.12, -2);
       pole.rotation.z = Math.PI / 2;
