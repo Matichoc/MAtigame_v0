@@ -12,6 +12,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 - Medido: el cuadro cabe entero en 915×412, 740×360, 412×915 y 360×640.
 - `temporada.cjs` tenía la línea `clock.pauseAt` repetida: con el equipo cargado fallaba al "volver atrás" el reloj. Se quitó la repetida (29/29).
 - Pruebas: atras 26, perfiles 13, juegos 15/15, temporada 29.
+- APK de prueba: compilación 84 en verde sobre `d4b7140` (https://github.com/Matichoc/MAtigame_v0/actions/runs/40425424084). Copia web en Matichoc/matiweb#51 (`63080a9`): juegos 15/16 (Choco Blaster, conocido), perfiles 13, enlaces OK.
 
 ### Tarjeta de inicio: la ayuda "?" empieza cerrada
 - En el computador la web abría sola todas las secciones "Cómo se juega". En la tarjeta nueva esa ayuda es un panel que tapa las opciones, así que no se podía elegir dificultad (Pichanga, Básquet 2v2) ni nivel (Parkour). Lo detectaron `deportes.cjs` y `juegos.cjs`.
