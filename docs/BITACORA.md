@@ -30,6 +30,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
     - El contador del álbum base (96) y sus premios no cambian.
     - Simulación: completar la página de temporada toma ~28 sobres (45 en el 10 % de peor suerte), alcanzable dentro de un evento.
   - Prueba nueva `scripts/qa/album.cjs` (15 revisiones).
+- **APK de prueba:** compilación 87 (álbum, lago, Recolecta) y compilación 88 con todo el grupo, incluida la orilla (https://github.com/Matichoc/MAtigame_v0/actions/runs/40543820615), ambas en verde. Copia web en matiweb #53; en la demo, `ciudad-barrios` no pasa porque la demo solo deja las primeras misiones de la Ciudad (`DEMO_LIMITS.ciudad`), como es de esperar.
 - **Pruebas:** lago 5/5, puertas-toque 12/12, album 15/15, atras 26, contraste 36, perfiles 13, temporada 29, pueblo 24 (corriendo junto a otra prueba falló el robot del parkour por lentitud del equipo; sola pasó).
 
 ### Minijuegos del Pueblo (Gato, Sudoku, Cachipún): se abrían y se cerraban solos
