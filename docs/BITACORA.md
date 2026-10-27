@@ -6,6 +6,69 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-27
 
+### Revisión de publicación de `fdac606`: correcciones para la prueba cerrada (PR #50)
+**Revisión independiente** (informe VEREDICTO.md) de `fdac606`, el merge del PR 49:
+- **Lo que pasó:**
+  - 21 ejecuciones de pruebas aprobadas.
+  - Recorrido de los 15 minijuegos sin conexiones externas.
+  - APK de prueba y AAB generados e inspeccionados.
+- **Por qué no dio la aprobación técnica:** `lintRelease` fallaba con un error NewApi en el tema de recorte de pantalla (mínimo Android 7, API 24).
+- **Qué más pidió:** renovar las capturas de la ficha, que eran anteriores al rediseño, y revisar la nota de la política pública.
+- **Qué no es:** no es una aprobación de Google ni autoriza producción.
+- **Decisión de la persona dueña:** sumar estas correcciones al PR #50. Por eso el APK y el AAB de esta entrega incluyen también todo el grupo del PR #50 (casas por dentro, mascotas y el resto), que la revisión no cubrió.
+- **Qué se corrigió:**
+  - **Tema Android (NewApi):** `android:windowLayoutInDisplayCutoutMode` salió de `values/styles.xml` y quedó en `values-v28/styles.xml`. Ahí se repite el mismo tema del juego (`AppTheme.NoActionBar`) con esa opción (`shortEdges`).
+    - Desde Android 9 se ve igual que antes, también bajo la muesca. En Android 7 y 8 el tema ya no usa una opción que no existe.
+    - No se subió el mínimo (sigue API 24), no se apagó la regla y no hay baseline.
+    - El parche `correccion-compatibilidad-android.patch` que menciona el pedido no venía adjunto. La corrección se escribió siguiendo lo que describe el informe.
+  - **`lintRelease` en el workflow «Compilar app Android»:** hasta ahora el workflow solo compilaba, sin el análisis completo.
+    - Ahora `:app:lintRelease` corre en cada compilación y, si encuentra un error, la compilación falla.
+    - Las advertencias se muestran en el registro, con la cantidad por regla y desde ahora también el detalle (regla, archivo, línea y mensaje). El informe completo queda como artefacto `matijuego-lint`.
+- **Compilación 92** (commit `17c2259`, solo el tema y el paso nuevo), en verde:
+  - `assembleDebug` correcto. La comprobación del APK (permisos INTERNET y VIBRATE, sin librerías nativas, sin Choco Blaster, con privacidad y licencias) también pasó.
+  - **`lintRelease`: 0 errores y 18 advertencias:**
+
+    | Regla | Advertencias |
+    |---|---|
+    | UnusedResources | 8 |
+    | IconDuplicatesConfig | 2 |
+    | MonochromeLauncherIcon | 2 |
+    | AndroidGradlePluginVersion | 1 |
+    | GradleDependency | 1 |
+    | IconDipSize | 1 |
+    | IconLocation | 1 |
+    | ManifestOrder | 1 |
+    | ObsoleteSdkInt | 1 |
+
+    El candidato del revisor (sobre `fdac606`) tenía 16. La diferencia de 2 todavía no está explicada: el detalle de cada advertencia se imprime desde la compilación siguiente, y el informe no se pudo descargar desde este entorno. Ninguna es un error ni el motivo del fallo original.
+  - `bundleRelease` firmado con la llave de subida. Huella SHA-256 `47:FE:F7:A3:…:3A:E7:9F`, distinta de la llave pública de pruebas. Sin librerías nativas.
+  - versionCode 92.
+- **Capturas de la ficha:** las 8 de `store/screenshots/` y `store/feature-graphic.png` se regeneraron desde la variante app de esta rama.
+  - **Cómo se tomaron:** con los mismos archivos que lleva el APK, en el navegador a tamaño de teléfono y sin retoques.
+  - **Formato comprobado:** menú, Bloques, Crea tu Chocolate y Salto en vertical, 1080×1920 JPEG; Parkour, Básquet, Recolecta y Porristas en horizontal, 1920×1080; el gráfico en 1024×500.
+  - **Contenido revisado una por una:** el menú nuevo con pestañas y «Continuar mi aventura», y cada juego ya empezado.
+  - **Fecha:** se tomaron con la fecha del aparato en junio (`QA_FECHA`), para que no salga la decoración de Halloween, que termina el 2/11. No se tocó el juego.
+  - **Script:** `scripts/qa/capturas.cjs` seguía pensado para el menú anterior y apretaba los botones de inicio antes de que aparecieran, así que el primer intento salió con la tarjeta de inicio encima. Ahora espera el botón, comprueba que el juego empezó y espera a que se vaya el aviso de bienvenida.
+  - **Errores registrados:** 0 conexiones externas. Los 11 «errores» son un mismo aviso del navegador (un marco vacío sin permiso de scripts), no del juego.
+  - Se corrigió en `store/listing-es.md` la descripción de las capturas: decía que todas eran 1080×1920.
+- **Política pública:** desde este entorno no se pudo abrir `https://matichoc.cl/matijuego/privacy.html`; la red de la sesión no permite ese dominio.
+  - **Lo comprobado:** en matiweb `main` (`7469fcb`), `matijuego/privacy.html` es idéntico byte a byte a `app/privacy.html`. GitHub Pages desplegó ese commit con éxito (27-oct, 14:10) con el dominio matichoc.cl.
+  - **La nota de la ficha no se cambió**, porque no se pudo comprobar el estado real de la URL. Para cerrarla hay dos caminos: abrirla en un navegador sin sesión (persona dueña) o permitir matichoc.cl en la red de la sesión.
+- **Web:** estos cambios no tocan la web (tema Android, workflow, ficha, documentación y script de capturas): no hay copia en matiweb que actualizar.
+- **Qué probar en el celular** con el APK de esta entrega:
+  1. Que abra sin cerrarse.
+  2. Que se vea a pantalla completa, sin barras.
+  3. En un celular con muesca o cámara en la pantalla (Android 9 o más), que el juego llegue bajo la muesca igual que antes.
+  4. Si hay un Android 7 u 8 a mano, que abra y se vea a pantalla completa.
+  5. Pausa ⏸ y botón atrás.
+  6. Modo avión.
+  7. Que el progreso siga ahí al cerrar y abrir, y al instalar el APK encima del anterior.
+- **Pendiente de la persona dueña** (nada de esto se hizo desde aquí: no hubo publicación, merge ni despliegue):
+  - Crear o completar la app en Play Console y subir el AAB firmado de la compilación final de esta entrega a la prueba cerrada.
+  - Resolver los avisos que muestre la consola.
+  - Reclutar a los 15 voluntarios. El requisito conocido para cuentas personales nuevas es al menos 12 inscritos durante 14 días seguidos; hay que confirmarlo en la consola.
+  - Comprobar la URL de la política.
+
 ### Casas por dentro y mascotas con vida (mismo grupo de mejoras, PR #50)
 Decisiones de la persona dueña sobre la propuesta: casas **«Visitar por dentro»** y mascotas con **«Comida y ánimo»** y **«Jugar con ella»** («Adornarla» quedó fuera).
 - **Visitas a las casas** (`js/interiors.js`), al estilo de las casas de Pokémon:
@@ -31,6 +94,7 @@ Decisiones de la persona dueña sobre la propuesta: casas **«Visitar por dentro
   - Se revisó también que los 8 escondites posibles se alcancen. Uno quedaba sobre la cama y no se podía recoger; se movió.
 - **Pruebas de siempre, todas en verde:** interactivo 20, pueblo, lago, puertas-toque, ciudad-barrios, ciudad-diaria, aventura, temporada, contraste 36, juegos 15/15, perfiles 13 y album 15.
 - **APK:** la compilación 90 falló en la revisión de privacidad de la app (`verificar-app.mjs`): la palabra `fetch` (el juego de ir a buscar la pelota) se confundía con una conexión a internet. Se renombró a `chase` en `js/pet-buddy.js`; la revisión queda igual de estricta y ahora pasa.
+  La compilación 91 (`e106c40`) pasó en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40595103683 . Copia web en matiweb #53 (`34632ba`): visitas 37/37, mascota 23/23, interactivo 20/20, juegos 15/16 (Choco Blaster, fallo conocido).
 
 ### Mundos más interactivos (mismo grupo de mejoras, PR #50)
 Pedido de la persona dueña: que el Pueblo y la Ciudad sean interactivos (sentarse en bancas, puentes que se cruzan solo por el puente, binoculares para mirar el horizonte, publicidades bien puestas, entrar a casas con misiones y mascotas con más vida). En este grupo va lo primero; lo de casas y mascotas queda como propuesta para elegir.

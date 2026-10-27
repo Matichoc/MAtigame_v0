@@ -122,6 +122,14 @@ jobs:
             echo "== Resultado del análisis"
             grep -o 'severity="[A-Za-z]*"' "$R.xml" | sort | uniq -c || echo "(sin observaciones)"
             grep -o 'id="[A-Za-z0-9]*"' "$R.xml" | sort | uniq -c || true
+            echo "== Detalle (regla · archivo:línea · mensaje)"
+            python3 - "$R.xml" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          for i in ET.parse(sys.argv[1]).getroot().findall("issue"):
+              loc = i.find("location")
+              f = (loc.get("file") or "").split("/android/")[-1] if loc is not None else ""
+              print(f'{i.get("severity")} {i.get("id")} · {f}:{loc.get("line") if loc is not None else ""} · {i.get("message")}')
+          PY
           fi
 
       - uses: actions/upload-artifact@v4

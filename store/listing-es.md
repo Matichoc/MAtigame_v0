@@ -76,4 +76,4 @@ La clasificación final la calcula el cuestionario con tus respuestas, no esta f
 ## Material gráfico (en esta carpeta)
 - `icon-512.png` — ícono de la app (512×512)
 - `feature-graphic.png` — gráfico de funciones (1024×500)
-- `screenshots/` — capturas de teléfono (1080×1920) tomadas de la variante Android actual con `scripts/qa/capturas.cjs` (ver la auditoría). Si cambia la interfaz o los juegos, hay que volver a generarlas.
+- `screenshots/` — 8 capturas de teléfono: menú, Bloques, Crea tu Chocolate y Salto en vertical (1080×1920); Parkour, Básquet, Recolecta y Porristas en horizontal (1920×1080), como se juegan. Las genera `scripts/qa/capturas.cjs` con los mismos archivos que lleva el APK (variante app, tipografías libres), en el navegador a tamaño de teléfono y sin retoques. Las actuales son del 27-oct-2026, con el menú con pestañas, y se tomaron con la fecha del aparato en junio para que no salga la decoración de un evento de temporada. Si cambia la interfaz o los juegos, hay que volver a generarlas.
