@@ -697,6 +697,7 @@ async function openHousePreview() {
     refreshNeighbors();
     house3d.setSelected(houseSel);
     house3d.freezeOnSel = true;
+    if (!house3d.pet) house3d.setPetCare(() => progress, () => { if (houseMode === "live") renderPetCardHouse(); document.getElementById("house-coins").textContent = String(progress.coins); }, (t) => showToast(t));
     if (!house3d._lifeBound) {
       house3d._lifeBound = true;
       house3d.onLife((ev) => {
@@ -1102,6 +1103,19 @@ function renderHouseRooms() {
 const LIVE_ICONS = { sleep: "😴", sit: "🛋️", type: "💻", arcade: "🕹️", piano: "🎹", hop: "🤸", admire: "👀", fridge: "🧊", cook: "🍳", wash: "🚰", eat: "🍽️", bath: "🛁", wardrobe: "👗", watch: "📺" };
 const LIVE_NAMES = { sleep: "Dormir", sit: "Sentarse", type: "Usar el computador", arcade: "Jugar a la arcade", piano: "Tocar el piano", hop: "Saltar", admire: "Mirar", fridge: "Abrir la heladera", cook: "Cocinar", wash: "Lavar", eat: "Comer", bath: "Darse un baño", wardrobe: "Mirar el ropero", watch: "Ver tele" };
 /** Modo "Vivir": el Matichico camina por la casa y usa los muebles. */
+/** La tarjeta "Mi mascota" arriba de las cosas para hacer (solo si el Matichico lleva una mascota puesta). */
+function renderPetCardHouse() {
+  if (!house3d || !house3d.pet) return;
+  let card = houseGridEl.querySelector(".pet-card");
+  if (!house3d.pet.item) { card?.remove(); return; }
+  if (!card) {
+    card = document.createElement("div");
+    card.className = "pet-card";
+    houseGridEl.prepend(card);
+  }
+  house3d.petCard(card, (msg) => showToast(msg));
+}
+
 function renderHouseLive() {
   const i = energyInfo(progress);
   houseBarEl.innerHTML = `<div class="sh-bar-txt">Tu Matichico vive aquí: <b>toca un mueble</b> y irá a usarlo, o <b>toca el piso</b> para que camine. ${i.v < i.max ? `Si duerme en su cama, ¡la energía vuelve 3 veces más rápido! (⚡ ${i.v}/${i.max})` : ""}</div>`;
@@ -1119,6 +1133,7 @@ function renderHouseLive() {
   };
   for (const act of ACTS) for (const f of cats[act]) mk(act, f);
   if (!spots.length) houseGridEl.innerHTML = `<div class="sh-empty">Aún no hay muebles para usar. ¡Pon una cama, un sillón o un computador en <b>Decorar</b>!</div>`;
+  renderPetCardHouse();
 }
 
 function renderHouseDecor() {

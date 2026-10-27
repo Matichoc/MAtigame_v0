@@ -6,6 +6,31 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-27
 
+### Casas por dentro y mascotas con vida (mismo grupo de mejoras, PR #50)
+Decisiones de la persona dueña sobre la propuesta: casas **«Visitar por dentro»** y mascotas con **«Comida y ánimo»** y **«Jugar con ella»** («Adornarla» quedó fuera).
+- **Visitas a las casas** (`js/interiors.js`), al estilo de las casas de Pokémon:
+  - **Pueblo:** 3 casitas nuevas (Casa de Bombi, Casa de Capi y Don Cuchufli), ubicadas después de los rincones de la aventura y antes que los árboles, para que nada quede encima.
+  - **Ciudad:** se entra por la puerta de Doña Rosa y de Don Pepe. Frente a Rosa sigue apareciendo «Hablar»; «Visitar» solo sale estando más cerca de la puerta que de ella.
+  - En la puerta aparece «🚪 Visitar a …». Adentro hay una pieza 3D (vista de casa de muñecas, con el frente abierto) con el vecino, un sillón para sentarse, una mesa, una repisa, una cama y plantas; los muebles no se atraviesan.
+  - **Misión del día:** el vecino perdió 3 cosas (libros, pelotas, cuchuflís, semillas o pinceles), que quedan en lugares que cambian cada día. Al encontrarlas y volver a hablarle da **+40 Matipuntos y una ⭐** (sirve para renovar el Pueblo). Una vez al día por casa; la segunda vez solo saluda.
+  - El diálogo del Pueblo ahora pasa frase por frase («toca para seguir ▶»).
+  - Al salir se vuelve frente a la puerta, con la cámara de frente y en diagonal (detrás del personaje quedaba dentro de la pared, y en la Ciudad el globito de Don Pepe la tapaba).
+  - La pieza se arma lejos del mundo solo mientras dura la visita y se desarma al salir. Mientras tanto, las misiones de la Ciudad esperan.
+  - **Costo de dibujo:** adentro se dibuja menos de la mitad que afuera (768 contra 1.989 dibujos en dos cuadros, Pueblo). Afuera se suman 3 casitas (unas 24 piezas).
+- **Mascotas con vida** (`js/pet-care.js` y `js/pet-buddy.js`), para la mascota que lleva puesta el Matichico:
+  - Tiene **🍗 pancita y 💖 ánimo**, que bajan solos con las horas (hambre en ~19 h, aburrida en ~14 h sin jugar).
+  - Cuando necesita algo, aparece un globito sobre ella: 🍪 si tiene hambre, ⚽ si quiere jugar.
+  - **Golosinas** con Matipuntos: Galletita (15, +30 de pancita) y Bombón (35, +60 y algo de ánimo). Llena, no come más.
+  - **Acariciar:** salta y suelta corazones; sube el ánimo (hasta 10 caricias al día cuentan).
+  - **Tirar la pelota:** la mascota se suelta del Matichico, va a buscarla, te la trae en la boca y vuelve a su lugar (hasta 8 juegos al día suben el ánimo; jugar da un poco de hambre).
+  - **Feliz** (bien comida y contenta) baila cada tanto y a veces encuentra 10 a 20 Matipuntos, hasta 3 veces al día.
+  - **Dónde:** en el Pueblo, con el botón 🐾 (solo si lleva una mascota puesta), que abre la tarjeta «Mi mascota»; en Mi Casa, la misma tarjeta arriba de la lista de Vivir. La pausa ⏸ cierra la tarjeta.
+- **Pruebas nuevas:**
+  - `scripts/qa/visitas.cjs`: 37/37, Pueblo y Ciudad.
+  - `scripts/qa/mascota.cjs`: 23/23, con lógica, Pueblo y Mi Casa.
+  - Se revisó también que los 8 escondites posibles se alcancen. Uno quedaba sobre la cama y no se podía recoger; se movió.
+- **Pruebas de siempre, todas en verde:** interactivo 20, pueblo, lago, puertas-toque, ciudad-barrios, ciudad-diaria, aventura, temporada, contraste 36, juegos 15/15, perfiles 13 y album 15.
+
 ### Mundos más interactivos (mismo grupo de mejoras, PR #50)
 Pedido de la persona dueña: que el Pueblo y la Ciudad sean interactivos (sentarse en bancas, puentes que se cruzan solo por el puente, binoculares para mirar el horizonte, publicidades bien puestas, entrar a casas con misiones y mascotas con más vida). En este grupo va lo primero; lo de casas y mascotas queda como propuesta para elegir.
 - **Carteles al revés:** el logo de Matichoc (`makeLogo`, usado en la fábrica, la fuente, los autos y casi todos los juegos) y los letreros de las tiendas de la Ciudad eran una lámina de doble cara. Por detrás se leían espejados. Ahora son dos caras de un solo lado: cuesta un dibujo más por logo y se lee derecho por los dos lados.

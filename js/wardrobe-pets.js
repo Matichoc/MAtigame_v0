@@ -362,9 +362,11 @@ export function buildPet(p, ticks) {
   // flota a la derecha del Matichico, subiendo y bajando un poco
   const holder = new THREE.Group();
   holder.position.set(0.95, 1.35, 0.05);
+  holder.userData.pet = true; // js/pet-buddy.js la encuentra así (y la suelta para ir a buscar la pelota)
   holder.add(g);
   const baseY = holder.position.y;
   ticks.push((t, mode) => {
+    if (holder.userData.free) return; // está jugando lejos del Matichico
     holder.position.y = baseY + Math.sin(t * 2.2) * 0.07 + (mode === "jump" ? 0.12 : 0);
     g.rotation.y = Math.sin(t * 1.3) * 0.25;
   });

@@ -166,6 +166,20 @@ export function canvasTexture(w, h, draw) {
   return tex;
 }
 
+/** Un emoji dibujado en un sprite (globitos, cosas para recoger, corazones). */
+export function emojiSprite(emoji, size = 0.8) {
+  const tex = canvasTexture(128, 128, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    g.font = "96px sans-serif";
+    g.textAlign = "center";
+    g.textBaseline = "middle";
+    g.fillText(emoji, w / 2, h / 2 + 6);
+  });
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+  s.scale.set(size, size, 1);
+  return s;
+}
+
 export function roundedRectShape(w, h, r) {
   const s = new THREE.Shape();
   const x = -w / 2;
