@@ -18,6 +18,8 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - Se encontró el mismo problema al entrar a la Boutique desde el Pueblo: el clic caía dentro de la tienda recién abierta. Ahora no toca nada.
 - **Prueba nueva:** `scripts/qa/puertas-toque.cjs` toca como un dedo real. Antes del arreglo fallaba en las 3 puertas; ahora pasa 12/12 (las 3 puertas se quedan abiertas, el fondo las cierra, y la Boutique se abre sin tocar nada adentro).
 - **Otras pruebas:** pueblo 24, ciudad-barrios 20, ciudad-diaria 6, atras 26, legal OK, deportes 52, juegos 15/15. Porristas falló una vez al correr junto a deportes; sola pasó.
+- **PR y compilación:** PR #50; APK de prueba: compilación 86 en verde (https://github.com/Matichoc/MAtigame_v0/actions/runs/40522360058).
+- **Copia web:** Matichoc/matiweb#53. Probada contra la demo: puertas-toque 12/12, juegos 15/16 (Choco Blaster, fallo conocido de la web), legal y enlaces OK.
 
 ### PR #49 y matiweb #52 mergeados
 - La persona dueña hizo merge de #49 (rayas en la Ciudad y el Pueblo, y contraste de textos) y de su copia web Matichoc/matiweb#52: quedan publicados en matichoc.cl. Último APK de prueba: compilación 85.
