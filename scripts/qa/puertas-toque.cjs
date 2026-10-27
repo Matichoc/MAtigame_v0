@@ -19,7 +19,8 @@ const ok = (c, t) => { console.log(`${c ? "OK " : "MAL"} ${t}`); if (!c) fallos+
   const abierto = () => p.evaluate(() => !document.getElementById("puzzle-dialog").classList.contains("hidden"));
   for (const d of puertas) {
     await p.evaluate((d) => { const g = window.__g3d.town; g.pos.set(d.x, 0, d.z); g.fun.vy = 0; }, d);
-    await p.waitForTimeout(600);
+    // con el equipo cargado el juego va lento: se espera a que aparezca el botón (con tope) en vez de un tiempo fijo
+    await p.waitForFunction((id) => { const t = window.__g3d.town.target; const b = document.getElementById("town-btn-action"); return t && t.puzzle === id && b && !b.classList.contains("hidden"); }, d.id, { timeout: 15000 }).catch(() => {});
     const box = await p.locator("#town-btn-action").boundingBox();
     ok(!!box, `${d.id}: aparece el botón para entrar`);
     if (!box) continue;

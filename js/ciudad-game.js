@@ -19,6 +19,7 @@ import { recordRun } from "./progression.js";
 import { IS_DEMO, DEMO_LIMITS, showDemoWall } from "./demo.js";
 import * as audio from "./audio.js";
 import { CiudadBarrios, BARRIO_MISSIONS, BARRIO_GIVERS, BARRIO_SAY, EXTRA_ROADS, AREAS } from "./ciudad-barrios.js";
+import { Binoculars } from "./binoculars.js";
 
 const GAME_ID = "ciudad";
 const HALF = 60; // el anillo de calles va de -60 a 60
@@ -1024,6 +1025,7 @@ export class CiudadGame extends Game3D {
 
   reset() {
     this.sitting = null;
+    if (this.binoc) this.binoc.close();
     this._ensureHero();
     if (this.inCar) this._leaveCar(true);
     this.car = { x: 4.2, z: 8, heading: Math.PI, speed: 0, steer: 0 };
@@ -1172,6 +1174,7 @@ export class CiudadGame extends Game3D {
 
   _walk(dt) {
     if (this.dialog) { this.vel.multiplyScalar(0.8); return; }
+    if (this.binoc && this.binoc.on) { this.vel.set(0, 0, 0); return; } // mirando por los binoculares no se camina
     const inp = this._input();
     if (this.sitting) {
       this._standLock = Math.max(0, (this._standLock || 0) - dt);
@@ -1600,6 +1603,7 @@ export class CiudadGame extends Game3D {
   }
 
   _updateCamera(dt) {
+    if (this.binoc && this.binoc.on) { this.binoc.apply(this.camera, dt); return; }
     const k = 1 - Math.exp(-(this.inCar ? 14 : 9) * Math.max(dt, 0.001));
     const t = this.inCar ? new THREE.Vector3(this.car.x, 1.2, this.car.z) : new THREE.Vector3(this.pos.x, 1.4, this.pos.z);
     if (!this.camFocus) this.camFocus = t.clone();
@@ -1909,7 +1913,8 @@ export class CiudadGame extends Game3D {
     const pl = this._playerXZ();
     let t = null;
     if (this.dialog) { this.actionTarget = { label: "Seguir ▶", icon: "▶", short: "Seguir", fn: () => this._advanceDialog() }; this._updateActionBtn(); return; }
-    if (this.sitting) t = { label: "🚶 Levantarse", icon: "🚶", short: "Pararse", fn: () => this._standUp() };
+    if (this.binoc && this.binoc.on) t = { label: "🔭 Dejar de mirar", icon: "🔭", short: "Salir", fn: () => this.binoc.close() };
+    else if (this.sitting) t = { label: "🚶 Levantarse", icon: "🚶", short: "Pararse", fn: () => this._standUp() };
     else if (this.inCar) {
       if (Math.abs(this.car.speed) < 7) t = { label: "🚪 Bajar del auto", icon: "🚪", short: "Bajar", fn: () => this._leaveCar() };
     } else {
@@ -1935,6 +1940,10 @@ export class CiudadGame extends Game3D {
       if (!t) {
         const b = (this.benches || []).find((q) => Math.hypot(pl.x - q.x, pl.z - q.z) < 1.9);
         if (b) t = { label: "🪑 Sentarse", icon: "🪑", short: "Sentarse", fn: () => this._sitDown(b) };
+      }
+      if (!t) {
+        const s = (this.binocSpots || []).find((q) => Math.hypot(pl.x - q.x, pl.z - q.z) < 2.4);
+        if (s) t = { label: "🔭 Mirar el horizonte", icon: "🔭", short: "Mirar", fn: () => (this.binoc = this.binoc || new Binoculars(this)).open(s.eye) };
       }
     }
     this.actionTarget = t;

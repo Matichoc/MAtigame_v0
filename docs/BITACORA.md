@@ -6,6 +6,27 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-27
 
+### Mundos más interactivos (mismo grupo de mejoras, PR #50)
+Pedido de la persona dueña: que el Pueblo y la Ciudad sean interactivos (sentarse en bancas, puentes que se cruzan solo por el puente, binoculares para mirar el horizonte, publicidades bien puestas, entrar a casas con misiones y mascotas con más vida). En este grupo va lo primero; lo de casas y mascotas queda como propuesta para elegir.
+- **Carteles al revés:** el logo de Matichoc (`makeLogo`, usado en la fábrica, la fuente, los autos y casi todos los juegos) y los letreros de las tiendas de la Ciudad eran una lámina de doble cara. Por detrás se leían espejados. Ahora son dos caras de un solo lado: cuesta un dibujo más por logo y se lee derecho por los dos lados.
+- **Sentarse en las bancas:**
+  - **Ciudad:** las 7 bancas.
+  - **Pueblo:** 3 bancas nuevas junto a la fuente, y la del Rincón de Bombi cuando está arreglada.
+  - Junto a una banca aparece «🪑 Sentarse». El personaje queda sentado sobre la tabla (pose "sit" de Mi Casa) y se levanta con «Levantarse», moviendo el joystick o saltando.
+- **Puente del bosque:**
+  - El arroyo ya no se cruza por cualquier parte: solo por el puente (o, antes de arreglarlo, por los tablones del mismo lugar).
+  - Sobre el puente y el muelle del lago se camina por encima: son pisos de 0,48 de altura que se suben sin saltar.
+- **Binoculares** (`js/binoculars.js`), en la punta del muelle de la playa (Ciudad), en la punta del muelle del lago y arriba del mirador (Pueblo; ambos cuando están arreglados):
+  - Con «🔭 Mirar el horizonte», la cámara sube al binocular con zoom.
+  - El joystick o arrastrar el dedo giran la vista; − y + cambian el zoom; «Dejar de mirar» vuelve.
+  - Mientras se mira, se esconden los paneles del juego.
+- **Costo de dibujo:** se agregan 3 bancas y 3 binoculares (unas 40 piezas, siempre dibujadas solo en su zona) y una cara más por logo. No hay efectos nuevos.
+- **Pruebas:**
+  - Nueva `scripts/qa/interactivo.cjs`: 20/20.
+  - `lago.cjs` ampliada con el arroyo y los pisos del puente y el muelle: 9/9.
+  - `puertas-toque.cjs` ahora espera el botón en vez de un tiempo fijo: con dos pruebas a la vez a veces no alcanzaba.
+  - Además: juegos 15/15, ciudad-barrios 20, ciudad-diaria 6, pueblo 24, aventura 57, deportes 52, atras 26, contraste 36, album 15, puertas-toque 12.
+
 ### Grupo de mejoras (un solo PR): lago, Recolecta, playa y álbum
 **Decisión de la persona dueña:** juntar las mejoras en grupos y abrir un solo PR por grupo. Este grupo se suma al PR #50, que sigue abierto, y a su copia web matiweb #53.
 - **Pueblo, lago:** se podía caminar sobre el agua.

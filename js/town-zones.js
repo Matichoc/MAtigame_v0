@@ -9,6 +9,7 @@ import { THREE, canvasTexture, roundedBox, makeBunting, toonify, disposeTree } f
 import { taskDone, addStars } from "./adventure.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
+import { binocularStand } from "./binoculars.js";
 
 const pol = (deg, r) => {
   const a = (deg * Math.PI) / 180;
@@ -323,6 +324,24 @@ export class TownZones {
     return Object.values(this._decks || {}).flat();
   }
 
+  /** Lugares con binoculares: { x, z, eye: { x, y, z, yaw } } en coordenadas del mundo. */
+  get binocSpots() {
+    return Object.values(this._binoc || {}).flat();
+  }
+
+  _setBinoc(id, list) {
+    this._binoc = this._binoc || {};
+    const a = (ZONE_DEFS[id].deg * Math.PI) / 180;
+    this._binoc[id] = list.map(({ at, eye, y, look }) => {
+      const w = toWorld(id, at[0], at[1]);
+      const e = toWorld(id, eye[0], eye[1]);
+      // la dirección local (look) girada como el barrio
+      const dx = look[0] * Math.cos(a) - look[1] * Math.sin(a);
+      const dz = look[0] * Math.sin(a) + look[1] * Math.cos(a);
+      return { x: w.x, z: w.z, eye: { x: e.x, y, z: e.z, yaw: Math.atan2(dx, dz) } };
+    });
+  }
+
   _setDecks(id, list) {
     this._decks = this._decks || {};
     this._decks[id] = list.map(([lx, lz, r]) => ({ ...toWorld(id, lx, lz), top: DECK_TOP, r }));
@@ -357,6 +376,11 @@ export class TownZones {
     // se camina por encima del puente y del muelle (círculos que cubren la tabla)
     if (id === "bosque") this._setDecks(id, f.puente ? [0.4, 1.47, 2.53, 3.6].map((z) => [0, z, 1.2]) : []);
     if (id === "lago") this._setDecks(id, f.muelle ? [-2.8, -1.6, -0.4, 0.8, 2, 3.2, 4.4].map((z) => [0, z, 1.25]) : []);
+    // binoculares: en la punta del muelle (mirando el lago) y desde arriba del mirador
+    if (id === "lago") this._setBinoc(id, [
+      ...(f.muelle ? [{ at: [0, DOCK_END + 1.2], eye: [0, DOCK_END - 0.2], y: 2.2, look: [0, -1] }] : []),
+      ...(f.mirador ? [{ at: [-17 + 2.6, 2], eye: [-17, 2], y: 6.4, look: [17, -10] }] : []),
+    ]);
     if (this.g.kawaii) toonify(grp);
     this.g.scene.add(grp);
     this.groups[id] = grp;
@@ -502,6 +526,10 @@ export class TownZones {
     const dock = new THREE.Group();
     if (f.muelle) {
       this._mesh(dock, roundedBox(DOCK.half * 2, 0.2, DOCK.len, 0.05), std(0xa8743a, 0.7), 0, 0.45, DOCK.z);
+      const stand = binocularStand(); // binoculares en la punta, mirando el lago
+      stand.position.set(0, 0.55, DOCK_END + 0.1);
+      stand.rotation.y = Math.PI;
+      dock.add(stand);
       for (const z of [-1, 1.6, 4.2]) for (const sx of [-1.2, 1.2]) this._mesh(dock, new THREE.CylinderGeometry(0.12, 0.12, 1, 6), std(0x6b3a1e), sx, 0.3, DOCK.z + z);
     } else {
       for (const [x, z] of [[-1, 4], [1.1, 3], [-0.9, 1.5]]) this._mesh(dock, new THREE.CylinderGeometry(0.12, 0.12, 0.9, 6), std(0x6b3a1e), x, 0.3, z);

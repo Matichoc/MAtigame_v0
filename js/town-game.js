@@ -8,6 +8,7 @@
 
 import { THREE, Game3D, clamp, lerp, canvasTexture, loadTexture, roundedBox, makeStars, eatGhostClick } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
+import { Binoculars } from "./binoculars.js";
 import { getOutfit } from "./characters.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import { earnCoins, saveProgress, todayKey } from "./storage.js";
@@ -738,6 +739,7 @@ export class TownGame extends Game3D {
 
   reset() {
     this.sitting = null;
+    if (this.binoc) this.binoc.close();
     this._ensureHero();
     this._daily();
     this.hudCache = "";
@@ -822,6 +824,7 @@ export class TownGame extends Game3D {
   }
 
   _move(dt) {
+    if (this.binoc && this.binoc.on) { this.vel.set(0, 0, 0); return; } // mirando por los binoculares no se camina
     const inp = this._input();
     if (this.sitting) {
       this._standLock = Math.max(0, (this._standLock || 0) - dt);
@@ -1077,12 +1080,21 @@ export class TownGame extends Game3D {
     let best = null;
     let bestD = Infinity;
     const P = this.pos;
-    if (this.sitting) {
+    if (this.binoc && this.binoc.on) {
+      best = { kind: "binoc-exit", label: "🔭 Dejar de mirar" };
+      bestD = -1;
+    } else if (this.sitting) {
       best = { kind: "stand", label: "🚶 Levantarse" };
       bestD = -1;
-    } else for (const b of this.benches || []) {
-      const d = Math.hypot(b.x - P.x, b.z - P.z);
-      if (d < 1.9 && d < bestD) { best = { kind: "bench", bench: b, label: "🪑 Sentarse" }; bestD = d; }
+    } else {
+      for (const b of this.benches || []) {
+        const d = Math.hypot(b.x - P.x, b.z - P.z);
+        if (d < 1.9 && d < bestD) { best = { kind: "bench", bench: b, label: "🪑 Sentarse" }; bestD = d; }
+      }
+      for (const s of (this.zones && this.zones.binocSpots) || []) {
+        const d = Math.hypot(s.x - P.x, s.z - P.z);
+        if (d < 2.4 && d < bestD) { best = { kind: "binoc", spot: s, label: "🔭 Mirar el horizonte" }; bestD = d; }
+      }
     }
     for (const it of this.interact) {
       const d = Math.hypot(it.x - P.x, it.z - P.z);
@@ -1112,6 +1124,8 @@ export class TownGame extends Game3D {
     audio.playPurchase();
     if (t.kind === "npc") this._talk(t.npc);
     else if (t.kind === "bench") this._sitDown(t.bench);
+    else if (t.kind === "binoc") (this.binoc = this.binoc || new Binoculars(this)).open(t.spot.eye);
+    else if (t.kind === "binoc-exit") this.binoc && this.binoc.close();
     else if (t.kind === "stand") this._standUp();
     else if (t.kind === "ring") { this.fun && this.fun.startCircuit(); }
     else if (t.kind === "puzzle") { this.fun && this.fun.openDoor(t.puzzle); }
@@ -1333,6 +1347,7 @@ export class TownGame extends Game3D {
   }
 
   _updateCamera(dt) {
+    if (this.binoc && this.binoc.on) { this.binoc.apply(this.camera, dt); return; }
     const k = 1 - Math.exp(-9 * Math.max(dt, 0.001));
     const t = new THREE.Vector3(this.pos.x, 1.4 + this.pos.y * 0.75, this.pos.z);
     if (!this.camFocus) this.camFocus = t.clone();
