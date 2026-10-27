@@ -18,6 +18,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 - **Ciudad, playa:** 3 de las lomas de pasto decorativas que rodean la ciudad asomaban sobre la arena, y una junto al mar.
   - Ahora no se ponen sobre la playa, el parque, el colegio ni el mar.
   - Hay menos lomas que dibujar.
+  - Al revisar la orilla completa (pedido de la persona dueña: nada de pasto entre la playa y el mar), fuera de la playa el pasto llegaba directo al agua. Ahora una franja de arena con espuma sigue por toda la orilla.
 - **Álbum de figuritas** (análisis medido con simulación, decisiones de la persona dueña: kiosco, taller visible y página de temporada):
   - **Antes:** completar el álbum (96) costaba unos 300 sobres a pura suerte, o 130 usando el taller. Faltando 2 figuritas, se necesitaban unos 40 sobres si eran normales y unos 120 si eran brillantes (hasta 240). El taller existía, pero casi no se veía, y el botón «Vender repetidas» se llevaba las repetidas que servían para cambiar.
   - **Kiosco:** tocar una figurita que falta abre su cuadro. Se puede cambiar por repetidas (12 por una normal, 36 por una brillante) o comprar con Matipuntos (400 una normal, 1.200 una brillante).

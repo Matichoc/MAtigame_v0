@@ -223,7 +223,12 @@ export class CiudadBarrios {
     sea.rotation.x = -Math.PI / 2;
     this.sea = sea;
     // espuma en la orilla
-    const foam = this._mesh(g, new THREE.PlaneGeometry(2, 96), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 }), SEA_X + 0.6, 0.05, 0);
+    // franja de arena por toda la orilla (fuera de la playa el pasto llegaba directo al agua)
+    for (const sz of [-1, 1]) {
+      const strip = this._mesh(g, new THREE.PlaneGeometry(SEA_X - 100, 130 - 48), sand.material, (100 + SEA_X) / 2, GROUND_Y, sz * (48 + 130) / 2);
+      strip.rotation.x = -Math.PI / 2;
+    }
+    const foam = this._mesh(g, new THREE.PlaneGeometry(2, 260), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 }), SEA_X + 0.6, 0.05, 0);
     foam.rotation.x = -Math.PI / 2;
     this.foam = foam;
     // el muelle
