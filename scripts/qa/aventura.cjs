@@ -40,7 +40,7 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   };
   const usar = async () => { await p.keyboard.press("e"); await p.waitForTimeout(400); };
   const cerrarDialogo = async () => { if (!(await town()).dialog) return; await p.keyboard.press("e"); await p.waitForTimeout(250); };
-  const alMenu = async () => { await p.click("#town-btn-menu"); await p.waitForTimeout(500); };
+  const alMenu = async () => { await p.click("#town-btn-menu"); await p.click("#pause-exit"); await p.waitForTimeout(500); }; // ⏸ → "Salir al menú"
   const estrellas = async () => (await prog()).adventure.stars;
   // abre la lista de tareas con el botón 📋 del globo y aprieta "¡Hacer!" (si la tarea es de elegir, elige la opción `k`)
   const hacerTarea = async (k = 1) => {

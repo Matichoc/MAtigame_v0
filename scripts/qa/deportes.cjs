@@ -112,7 +112,8 @@ async function probarModo(p, reg, M, vertical) {
     await p.evaluate(() => { const x = window.__g3d.pichanga; x.m.score = [1, 1]; x.m.time = 0.02; });
     await p.waitForTimeout(800);
     ok(await p.evaluate(() => window.__g3d.pichanga.m.goldenOn && window.__g3d.pichanga.state === "playing"), "copa: empate → gol de oro, el partido sigue");
-    await p.click("#pichanga-btn-menu");
+    await p.click("#pichanga-btn-menu"); // ⏸ abre la pausa; "Salir al menú" vuelve al menú
+    await p.click("#pause-exit");
     await p.waitForTimeout(500);
     await p.reload({ waitUntil: "networkidle" });
     await p.waitForTimeout(600);

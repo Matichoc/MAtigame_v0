@@ -4,7 +4,120 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-27
+
+### Juego bloqueado: el aviso de bienvenida ya no tapa los botones
+- En la captura acostada, el aviso "¡Hola…! Ahora toca «Continuar mi aventura»" quedaba encima de «Ahora no». Además se tragaba los toques: los avisos van sobre los cuadros y no dejaban pasar el dedo.
+- Ahora los avisos dejan pasar los toques (`pointer-events: none` en `.toast`) y se esconden al abrir un juego bloqueado (`openUnlockDialog`).
+- Medido: el cuadro cabe entero en 915×412, 740×360, 412×915 y 360×640.
+- `temporada.cjs` tenía la línea `clock.pauseAt` repetida: con el equipo cargado fallaba al "volver atrás" el reloj. Se quitó la repetida (29/29).
+- Pruebas: atras 26, perfiles 13, juegos 15/15, temporada 29.
+- APK de prueba: compilación 84 en verde sobre `d4b7140` (https://github.com/Matichoc/MAtigame_v0/actions/runs/40425424084). Copia web en Matichoc/matiweb#51 (`63080a9`): juegos 15/16 (Choco Blaster, conocido), perfiles 13, enlaces OK.
+
+### Tarjeta de inicio: la ayuda "?" empieza cerrada
+- En el computador la web abría sola todas las secciones "Cómo se juega". En la tarjeta nueva esa ayuda es un panel que tapa las opciones, así que no se podía elegir dificultad (Pichanga, Básquet 2v2) ni nivel (Parkour). Lo detectaron `deportes.cjs` y `juegos.cjs`.
+- Ahora en la tarjeta la ayuda empieza cerrada y se abre con el "?" (`decorateIntro` y `foldSecondary` en `js/main.js`).
+- APK de prueba: compilación 83 en verde sobre `adb6e01` (https://github.com/Matichoc/MAtigame_v0/actions/runs/40423543477).
+- Copia web en Matichoc/matiweb#51 (`6d69611`). Probada contra la demo: juegos 15/16 (Choco Blaster, fallo conocido de la web), aventura 57, pueblo 24, deportes 52, legal y enlaces OK. `atras.cjs` es solo para la app: en la demo Fútbol viene desbloqueado y no aparece el cuadro de canje.
+- Descripciones de #48 y matiweb#51 al día con el rediseño.
+- Pruebas: deportes 52/52, juegos 15/15. El resto ya había pasado con el rediseño: aventura 57, pueblo 24, ciudad-barrios 20, ciudad-diaria 6, merge 30, atras 26, temporada 29, perfiles 13, respaldo-nativo 13, legal y enlaces OK.
+
+## 2026-10-26
+
+### Rediseño aprobado, construido: pantalla completa, pausa, tarjetas de inicio, menú con pestañas y juego bloqueado
+- Construido en este mismo PR (#48), sobre las 5 maquetas aprobadas. Todo lo nuevo de pantalla y menú es **solo para pantallas táctiles**; en el computador la web queda como antes.
+- **1 y 2 · Juegos a pantalla completa** (estilos comunes para los 15 juegos; `css/style.css` "CELULAR: JUEGOS A PANTALLA COMPLETA"):
+  - El escenario 3D ocupa toda la pantalla, también bajo la muesca, sin marco ni barra de título.
+  - Arriba flotan píldoras semitransparentes y botones redondos de 44 px, sin desenfoques: en celulares modestos obligan a recomponer la pantalla en cada cuadro.
+  - En los minijuegos se esconde la píldora del total de Matipuntos, que no se usa al jugar; así no se apilan píldoras.
+  - **Pueblo:** arriba solo ⭐, Matipuntos y el evento; el objetivo del vecino arriba al centro; Actividades bajo la pausa.
+  - **Ciudad:** la misión arriba al centro; el minimapa y la brújula bajo los botones.
+- **Pausa ⏸** (decisión de la persona dueña: pausa en vez de 🏠):
+  - Cuadro "Pausa" con Seguir jugando, Sonido y Salir al menú.
+  - El juego queda quieto: `Game3D.setPaused` congela el bucle. No se llama `hold` porque Bloques ya usa `hold` para la pieza guardada; se detectó con la prueba de "atrás".
+  - El "atrás" del celular dentro de un juego ahora abre la pausa (antes avisaba "toca otra vez"); con la pausa abierta, la cierra.
+  - El botón de sonido de cada juego pasó dentro de la pausa.
+- **3 · Tarjeta de inicio** (`decorateIntro` en `js/main.js`, para todas las tarjetas):
+  - Imagen del juego con su nombre a la izquierda (arriba en el celular de pie); a la derecha solo lo que se toca: modos, nivel y un botón grande.
+  - "Cómo se juega" pasa a un botón **?** que abre las reglas encima. Las descripciones largas quedan dentro del "?".
+- **4 · Menú en el celular:**
+  - Barra de abajo: 🏠 Inicio · 🎮 Juegos · 🏘️ Pueblo (entra directo) · 👕 Mi Matichico.
+  - Cabecera corta: tú, Matipuntos, energía, nivel y 🎁.
+  - "Continuar mi aventura" es la tarjeta principal, con la imagen del Pueblo.
+  - Juegos en cuadrícula de 2, con su imagen entera y el candado con el precio.
+  - En "Mi Matichico" van el escenario del personaje, Vestuario, Mi Casa, Mis lugares, Nivel y álbum, Logros, Puntajes y Joystick.
+  - Con un perfil nuevo sin Matichico, el menú abre en "Mi Matichico" para elegirlo; al elegirlo, vuelve a Inicio.
+- **5 · Juego bloqueado:**
+  - Imagen del juego, barra "1.240 / 2.000 🍫 · te faltan 760".
+  - Si no alcanza, **"🎮 Ganar Matipuntos"** lleva al último juego jugado o al Pueblo; antes era un botón gris deshabilitado.
+- **Error de antes, corregido:** el botón "Nuevo: Básquet 2 contra 2" estaba en la tarjeta de **Recolecta y Corre**; ahora está en la de **Lanzamientos de Básquet**.
+- **Costo de dibujo:** el lienzo ocupa toda la pantalla, así que dibuja ~15–20 % más de píxeles; no hay efectos nuevos ni desenfoques. Lo compensa el ajuste de calidad continuo, pero hay que mirarlo en el celular modesto.
+- **Pruebas actualizadas:** `atras.cjs` (pausa con atrás y con ⏸, Salir al menú), `aventura.cjs` y `deportes.cjs` (salen por la pausa).
+- **Pendiente:** probarlo en el celular, en especial muescas, el "?" y la barra de abajo.
+
+### Tirones en la Ciudad (playa) y en la bandera de Aventura; fuego → chocolate
+- **Prueba de la persona dueña, en su celular de gama alta:**
+  - En la Ciudad, al pasar hacia la playa, "se empieza a tildar la pantalla muchísimo… el mapa como que se pone en negro".
+  - Lo mismo pasa al llegar a la bandera de Aventura.
+  - Además, la flor sale poco. Pidió "camuflar" todo lo que sea fuego con chocolate, para que el chocolate cubra a los malvaviscos.
+- **Causas encontradas (medidas en el navegador de prueba):**
+  1. **Cosas que se preparaban recién al aparecer en pantalla.** El celular arma los efectos y las imágenes de cada objeto la primera vez que lo ve: el castillo y la bandera de la meta, los barrios de la Ciudad y los premios de los bloques ?.
+     - Medido: al llegar a la bandera aparecían +2 efectos y +2 imágenes en un solo cuadro, de **516 ms** (lo normal son ~115).
+     - Al cruzar hacia la playa aparecían efectos e imágenes nuevos entre los 50 y 60 m.
+  2. **La calidad se ajustaba solo en los primeros ~3 s.** Si el comienzo era liviano, el juego decidía que el celular aguantaba todo y no volvía a mirar, aunque después llegara una zona pesada como la playa (mar y arena enormes).
+  3. **El juego activo podía ser el "más viejo" para el sistema que suelta contextos 3D:** anotaba su uso solo al empezar. Es un riesgo de pantalla negra si se abre otro motor 3D a mitad de partida.
+  4. **Cada disparo de la flor creaba una esfera y un brillo nuevos:** tirón en el primer disparo y memoria que se acumulaba.
+- **Arreglos:**
+  - **`Game3D.warmUp()`** (`js/three-kit.js`): con la tarjeta de inicio en pantalla, prepara todos los efectos e imágenes de la escena, también lo escondido, y dibuja un cuadro con todo. En Aventura se repite al pasar de nivel o elegir otro.
+    - Después del arreglo: en la bandera, 0 efectos y 0 imágenes nuevos y el peor cuadro baja de 516 a **217 ms**. Camino a la playa no aparece nada nuevo.
+  - **Calidad continua:** después de la calibración inicial sigue mirando durante el juego. Con ~6 s seguidos bajo 24 cuadros por segundo, baja otro escalón (brillo → resolución → sombras).
+  - **El juego en uso anota que está activo en cada cuadro**, para que nunca sea el que se suelta.
+- **Aventura, de fuego a chocolate:**
+  - **Flor de cacao:** pétalos crema y caramelo con el corazón de chocolate.
+  - **Disparos:** bolitas de chocolate brillante con una gotita. Hay 2 listas en el nivel, así que no se crea nada al disparar.
+  - **Malvaviscos:** quedan **bañados en chocolate** y se derriten despacio ("¡Bañado! +150 🍫").
+  - **Salpicadura y brillo:** la salpicadura es de chocolate y el brillo del personaje, crema.
+  - **Botón y textos:** el botón es 🍫 color cacao y los textos y la ayuda hablan de chocolate.
+  - **La flor sale más:** hay más bloques de poder (38 % en vez de 30 %). Si eres chico, la mitad de las veces sale directo la flor (antes solo el hongo); el primer bloque sigue dando el hongo, para aprender.
+  - **Documentos al día:** ficha, auditoría y guía legal ya no hablan de fuego.
+- **Pruebas (navegador, app):**
+
+  | Prueba | Resultado |
+  |---|---|
+  | juegos | 15/15 |
+  | aventura | 57 |
+  | pueblo | 24 |
+  | ciudad-barrios | 20 |
+  | ciudad-diaria | 6 |
+  | merge | 30 |
+  | deportes | 52 |
+  | atrás | 24 |
+  | temporada | 29 |
+  | perfiles | 13 |
+  | respaldo-nativo | 13 |
+  | lógica | OK |
+
+  - Prueba directa del chocolate: el malvavisco queda café (`5a2d16`) y cada disparo crea 0 efectos y 0 piezas nuevas.
+
+### Propuesta visual: 5 maquetas aprobadas
+- La persona dueña pidió ser "altamente minucioso" con cómo se ve el juego, y mockups para idearlo juntos.
+- **Maquetas** (en la carpeta local `maquetas/`, fuera de git): cada una tiene la captura real y la propuesta, hecha con la letra, los colores y las imágenes del juego.
+  1. Juego a pantalla completa (Ciudad).
+  2. Pueblo con un solo objetivo.
+  3. Tarjeta de inicio con modos en dibujos.
+  4. Menú con barra abajo.
+  5. Juego bloqueado con barra de avance.
+- **Decisión de la persona dueña:** aprobó **las 5** y el botón de **pausa ⏸** (seguir · sonido · salir) en vez de 🏠. Se construyen en orden, cada una con su APK.
+
 ## 2026-10-24
+
+### PR #47 y matiweb #50 mergeados
+- La persona dueña revisó las capturas de iOS y mergeó el **PR #47** (Android + iOS: copia del progreso, vibración, proyecto iOS, plan de publicación y repositorio listo para privado).
+- **matiweb #50** también se mergeó: la política v1.1 queda publicada en matichoc.cl/matijuego/privacy.html, la dirección que piden Google Play y el App Store.
+- **Pendientes de la persona dueña:**
+  - Probar la APK nº 81 encima de la actual: que el progreso siga, que vibre y que "atrás" funcione.
+  - Despublicar Pages y pasar este repositorio a privado.
+  - Las 6 decisiones de `docs/PLAN-ANDROID-IOS.md` §9.
 
 ### Primera compilación de iOS: en verde
 - **Workflow "Compilar app iOS"** (ejecuciones 1 y 2, Mac de GitHub con Xcode 26.3): compila para el simulador y la app abre en un **iPhone SE (3.ª gen.)** y un **iPad mini (A17 Pro)** simulados, sin cerrarse.

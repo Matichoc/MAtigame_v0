@@ -70,16 +70,20 @@ const { abrir, BASE, nuevoPerfil } = require("./lib.cjs");
     await p.waitForTimeout(200);
     ok(abierto && cerrado && reabre && !(await visible(cuadro)) && await visible("#screen-hub") && (await salidas()) === 1, `${nombre}: atrás cierra el cuadro, se puede volver a abrir y no sale de la app`);
   }
-  // juego: avisa, y con otra pulsación vuelve al menú
+  // juego: "atrás" abre la pausa (el juego queda quieto); otra vez la cierra y sigue; "Salir al menú" vuelve al menú
   await p.locator(".game-card", { hasText: "Bloques" }).first().click();
   await p.waitForTimeout(1500);
   ok(await visible("#screen-tetris"), "se abrió Bloques");
   await p.waitForTimeout(2300);
   await atras();
-  ok(/volver al menú/i.test(await toast()) && await visible("#screen-tetris"), "juego: la primera pulsación avisa y sigue en el juego");
+  ok(await visible("#pause-dialog") && await visible("#screen-tetris") && await p.evaluate(() => !window.__g3d || !window.__g3d.tetris || window.__g3d.tetris._held === true), "juego: atrás abre la pausa y el juego queda quieto");
   await atras();
+  ok(!(await visible("#pause-dialog")) && await visible("#screen-tetris") && await p.evaluate(() => !window.__g3d || !window.__g3d.tetris || !window.__g3d.tetris._held), "juego: atrás otra vez cierra la pausa y sigue el juego");
+  await tocar("#tetris-btn-menu");
+  ok(await visible("#pause-dialog"), "juego: el botón ⏸ de arriba abre la misma pausa");
+  await tocar("#pause-exit");
   await p.waitForTimeout(400);
-  ok(await visible("#screen-hub") && !(await visible("#screen-tetris")), "juego: la segunda pulsación vuelve al menú");
+  ok(await visible("#screen-hub") && !(await visible("#screen-tetris")) && !(await visible("#pause-dialog")), "juego: «Salir al menú» vuelve al menú");
   // pantalla de la aventura, cuadro "Mi personaje y mis espacios" y un partido nuevo (Pichanga)
   // la primera vez, «Continuar mi aventura» abre la viñeta del festival: atrás la cierra
   await tocar("#btn-path-adventure");
@@ -103,10 +107,10 @@ const { abrir, BASE, nuevoPerfil } = require("./lib.cjs");
   await p.waitForFunction(() => document.getElementById("screen-pichanga") && !document.getElementById("screen-pichanga").classList.contains("hidden"), null, { timeout: 30000 });
   await p.waitForTimeout(2300);
   await atras();
-  ok(/volver al menú/i.test(await toast()) && await visible("#screen-pichanga"), "pichanga: la primera pulsación avisa y sigue en el partido");
-  await atras();
+  ok(await visible("#pause-dialog") && await visible("#screen-pichanga"), "pichanga: atrás abre la pausa y sigue en el partido");
+  await tocar("#pause-exit");
   await p.waitForTimeout(400);
-  ok(await visible("#screen-hub") && !(await visible("#screen-pichanga")), "pichanga: la segunda pulsación vuelve al menú");
+  ok(await visible("#screen-hub") && !(await visible("#screen-pichanga")), "pichanga: «Salir al menú» vuelve al menú");
   ok((await salidas()) === 1, "ninguna pulsación en juego o pantallas internas cerró la app");
   ok(reg.errores.length === 0 && reg.externas.length === 0, `0 errores de consola (${reg.errores.length}) y 0 peticiones externas (${reg.externas.length})`);
   await b.close();
