@@ -515,8 +515,8 @@ export class TownFun {
   /** Altura del piso bajo (x, z): la plataforma más alta que está a los pies (o hasta 0,5 sobre ellos, como un escalón). */
   _groundAt(x, z, y) {
     let top = 0;
-    for (const p of this.platforms) {
-      if (p.top <= y + 0.5 && p.top > top && Math.hypot(x - p.x, z - p.z) < p.r) top = p.top;
+    for (const list of [this.platforms, this.g.zones ? this.g.zones.decks : []]) {
+      for (const p of list) if (p.top <= y + 0.5 && p.top > top && Math.hypot(x - p.x, z - p.z) < p.r) top = p.top;
     }
     return top;
   }

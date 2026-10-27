@@ -1,5 +1,6 @@
 // Pueblo: no se camina sobre el agua del lago. Recorre el lago punto por punto (con el muelle sin arreglar y arreglado)
-// y además camina de verdad por el muelle hacia el agua: debe detenerse en la punta.
+// y además camina de verdad por el muelle hacia el agua: debe detenerse en la punta. El arroyo del bosque solo se cruza
+// por el puente (o por los tablones del mismo lugar antes de arreglarlo), y sobre el puente y el muelle se camina encima.
 // Uso: NODE_PATH=$(npm root -g) node scripts/qa/lago.cjs [url]
 const { abrir, nuevoPerfil } = require("./lib.cjs");
 
@@ -55,6 +56,30 @@ const ok = (c, t) => { console.log(`${c ? "OK " : "MAL"} ${t}`); if (!c) fallos+
     return toLocal(g.pos.x, g.pos.z).z;
   });
   ok(fin > -3.6 && fin < -2.5, `caminando por el muelle se detiene en la punta (z local ${fin.toFixed(1)}; la punta está en -3.4)`);
+  // el arroyo del bosque: solo por el puente; sobre el puente y el muelle se camina por encima
+  const arroyo = await p.evaluate(async () => {
+    const g = window.__g3d.town;
+    const src = [...document.scripts].map((x) => x.src).find((u) => /\/js\/main\.js/.test(u));
+    const Z = await import(new URL("town-zones.js", src).href);
+    const A = await import(new URL("adventure.js", src).href);
+    const out = {};
+    for (const zona of ["bosque", "lago"]) {
+      const a = (Z.ZONE_DEFS[zona].deg * Math.PI) / 180, c = Z.zoneCenter(zona);
+      const W = (lx, lz) => ({ x: c.x + lx * Math.cos(a) - lz * Math.sin(a), z: c.z + lx * Math.sin(a) + lz * Math.cos(a) });
+      for (const done of [false, true]) {
+        A.adventureOf(g.progress).done[zona === "bosque" ? "bosque.puente" : "lago.muelle"] = done;
+        g.zones.refresh();
+        const cruza = (lx) => { const s = W(lx, 8), e = W(lx, -4); for (let i = 1; i <= 120; i++) { const q = { x: s.x + (e.x - s.x) * i / 120, z: s.z + (e.z - s.z) * i / 120 }; if (!g.zones.inside(q.x, q.z, 52)) return false; } return true; };
+        const sobre = zona === "bosque" ? W(0, 2) : W(0, 1);
+        out[`${zona}-${done ? "con" : "sin"}`] = { fuera: zona === "bosque" ? cruza(6) : null, puente: zona === "bosque" ? cruza(0) : null, alto: g.fun._groundAt(sobre.x, sobre.z, 0) };
+      }
+    }
+    return out;
+  });
+  ok(!arroyo["bosque-sin"].fuera && !arroyo["bosque-con"].fuera, "el arroyo del bosque no se cruza por fuera del puente");
+  ok(arroyo["bosque-sin"].puente && arroyo["bosque-con"].puente, "el arroyo se cruza por el puente (y antes de arreglarlo, por sus tablones)");
+  ok(arroyo["bosque-con"].alto > 0.4 && arroyo["bosque-sin"].alto === 0, `sobre el puente arreglado se camina encima (altura ${arroyo["bosque-con"].alto})`);
+  ok(arroyo["lago-con"].alto > 0.4 && arroyo["lago-sin"].alto === 0, `sobre el muelle arreglado se camina encima (altura ${arroyo["lago-con"].alto})`);
   ok(reg.errores.length === 0, `sin errores (${reg.errores.join(" | ")})`);
   await b.close();
   console.log(fallos ? `\n${fallos} fallos` : "\nTodo bien");

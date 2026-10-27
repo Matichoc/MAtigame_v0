@@ -45,6 +45,9 @@ const ZONE_Y = { bosque: 0.02, granja: 0.035, lago: 0.05 };
 const LAKE = { x: 0, z: -8, r: 12.6 }; // el agua del lago (coordenadas del barrio)
 const DOCK = { half: 1.3, z: LAKE.z + LAKE.r - 3.5, len: 9 }; // el muelle: ancho 2.6, entra desde la orilla hacia el agua
 const DOCK_END = DOCK.z - DOCK.len / 2 + 0.4; // la punta del muelle (más allá es agua)
+const CREEK = { z: 2, half: 1.75 }; // el arroyo del bosque (coordenadas del barrio): de lado a lado
+const BRIDGE_HALF = 1.5; // el arroyo solo se cruza por el puente (o, antes de arreglarlo, por los tablones del mismo lugar)
+const DECK_TOP = 0.48; // sobre el puente y el muelle se camina por encima (bajo 0,5: se sube sin saltar)
 const HOME = { x: 3, z: 17 }; // dónde espera el vecino de cada barrio (a la entrada, junto al camino)
 
 /** Centro de un barrio en el mundo. */
@@ -124,6 +127,7 @@ export class TownZones {
           // al agua no se entra; por el muelle sí (cuando está arreglado)
           return taskDone(this.progress, "lago.muelle") && Math.abs(l.x) < DOCK.half && l.z > DOCK_END; // antes llegaba 6 m más allá de la punta
         }
+        if (id === "bosque" && Math.abs(l.z - CREEK.z) < CREEK.half && Math.abs(l.x) >= BRIDGE_HALF) return false; // al arroyo no se entra
         return true;
       }
       // el camino de entrada: de la cerca del pueblo hasta el barrio
@@ -314,6 +318,16 @@ export class TownZones {
     for (const id of ZONE_IDS) this._zone(id);
   }
 
+  /** Pisos elevados (puente y muelle) para la gravedad del Pueblo: { x, z, top, r } como las plataformas de parkour. */
+  get decks() {
+    return Object.values(this._decks || {}).flat();
+  }
+
+  _setDecks(id, list) {
+    this._decks = this._decks || {};
+    this._decks[id] = list.map(([lx, lz, r]) => ({ ...toWorld(id, lx, lz), top: DECK_TOP, r }));
+  }
+
   _flags(id) {
     const t = (k) => (taskDone(this.progress, `${id}.${k}`) ? 1 : 0);
     if (id === "bosque") return { sendero: t("sendero"), puente: t("puente"), casita: t("casita"), luces: t("luces") };
@@ -340,6 +354,9 @@ export class TownZones {
     if (id === "bosque") this._bosque(grp, f, mark, col);
     else if (id === "granja") this._granja(grp, f, mark, col);
     else this._lago(grp, f, mark, col);
+    // se camina por encima del puente y del muelle (círculos que cubren la tabla)
+    if (id === "bosque") this._setDecks(id, f.puente ? [0.4, 1.47, 2.53, 3.6].map((z) => [0, z, 1.2]) : []);
+    if (id === "lago") this._setDecks(id, f.muelle ? [-2.8, -1.6, -0.4, 0.8, 2, 3.2, 4.4].map((z) => [0, z, 1.25]) : []);
     if (this.g.kawaii) toonify(grp);
     this.g.scene.add(grp);
     this.groups[id] = grp;
