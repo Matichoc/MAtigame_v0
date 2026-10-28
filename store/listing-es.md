@@ -54,7 +54,11 @@ Arcade, Aventura, Familia, Niños, 3D
 ## Contacto (obligatorio en la consola)
 - Correo: i.saavedra.nu@gmail.com  (confirmar que es el que quieres mostrar públicamente)
 - Política de privacidad (URL): **https://matichoc.cl/matijuego/privacy.html**
-  ⚠️ Ruta preparada, **NO publicada ni verificada**: sale del despliegue de la versión web (ver `docs/AUDITORIA-PREPUBLICACION.md`, sección 1). No la pegues en Play Console hasta abrirla en un navegador sin sesión y comprobar que carga y que dice lo mismo que `app/privacy.html`. (Las URLs anteriores de esta ficha, `matichoc.cl/MAtigame_v0/app/privacy.html` y `matichoc.github.io/MAtigame_v0/app/privacy.html`, eran suposiciones sin verificar y servían la versión antigua de la política, que ya no es válida.)
+  ✅ **Publicada y comprobada.** El 28-oct-2026 la persona dueña la abrió en su celular desde matichoc.cl.
+  - **Qué se comparó:** su captura muestra el mismo título que `app/privacy.html`, la misma versión («Versión 1.1 · última actualización: 24 de octubre de 2026») y las mismas 10 secciones en el mismo orden. Además, el archivo publicado en matiweb (`main`, `7469fcb`) es idéntico al de la app.
+  - **Lo que no se vio:** la barra del navegador muestra solo el dominio, no la ruta completa.
+  - **Si se cambia la política en la app:** hay que volver a publicarla en la web (matiweb) antes de actualizar la ficha.
+  - Las URLs anteriores de esta ficha (`matichoc.cl/MAtigame_v0/app/privacy.html` y `matichoc.github.io/MAtigame_v0/app/privacy.html`) no se usan: servían la versión antigua de la política.
 
 ## Respuestas sugeridas para los formularios de la consola
 (Son sugerencias basadas en lo que se comprobó en el código; **tú eres quien responde ante Google** y debes contrastarlas con las definiciones vigentes de Play Console. Detalle y evidencia en `docs/AUDITORIA-PREPUBLICACION.md`.)
