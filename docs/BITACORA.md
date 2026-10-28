@@ -4,6 +4,17 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-28
+
+### Prueba en el celular: APK de la compilación 93
+- La persona dueña instaló el APK de la compilación 93 (commit `fb23416`, con la corrección del tema Android, las casas por dentro y las mascotas) y contó que **todo funciona correctamente**.
+- No se anotaron el modelo del celular ni la versión de Android, ni si se probó cada punto de la lista (muesca, pausa/atrás, modo avión y progreso al instalar encima).
+- **Lo que sigue (persona dueña):**
+  - Subir a la prueba cerrada en Play Console el AAB firmado de la compilación 93 (versionCode 93) y resolver los avisos de la consola.
+  - Abrir la URL de la política sin sesión para cerrar la nota de la ficha.
+  - Reclutar a los testers.
+  - Hacer merge del PR #50 y de matiweb #53 cuando lo decida.
+
 ## 2026-10-27
 
 ### Revisión de publicación de `fdac606`: correcciones para la prueba cerrada (PR #50)
