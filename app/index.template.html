@@ -36,6 +36,18 @@
   </div>
 </div>
 
+<!-- Figurita que falta: cambiarla por repetidas (taller) o comprarla con Matipuntos (kiosco) -->
+<div id="sticker-dialog" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-card um-card sk-card">
+    <div id="sk-art" class="um-art sk-art" aria-hidden="true"></div>
+    <h2 id="sk-title"></h2>
+    <p id="sk-text"></p>
+    <button id="sk-trade" class="btn-primary" type="button"></button>
+    <button id="sk-buy" class="btn-primary sk-buy" type="button"></button>
+    <button id="sk-close" data-back class="btn-secondary" type="button">Ahora no</button>
+  </div>
+</div>
+
 <!-- Calendario de recompensas del mes -->
 <div id="calendar-dialog" class="modal hidden" role="dialog" aria-modal="true">
   <div class="modal-card cal-card">
@@ -844,6 +856,8 @@
       <button id="town-btn-action" class="town-action hidden" type="button"></button>
       <button id="town-btn-jump" class="town-jump" type="button" aria-label="Saltar">⤴️</button>
       <button id="town-btn-speed" class="town-speed" type="button" aria-label="Cambiar cómo te mueves (correr, patines…)">🏃</button>
+      <button id="town-btn-pet" class="town-pet hidden" type="button" aria-label="Mi mascota">🐾</button>
+      <div id="town-petcard" class="pet-card town-petcard hidden"></div>
       <span id="town-speed-hint" class="town-speed-hint"></span>
       <div class="pk-touch" id="town-touch">
         <div class="pk-joy" id="town-joy"><div class="pk-knob" id="town-knob"></div></div>

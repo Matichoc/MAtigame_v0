@@ -54,7 +54,11 @@ Arcade, Aventura, Familia, Niños, 3D
 ## Contacto (obligatorio en la consola)
 - Correo: i.saavedra.nu@gmail.com  (confirmar que es el que quieres mostrar públicamente)
 - Política de privacidad (URL): **https://matichoc.cl/matijuego/privacy.html**
-  ⚠️ Ruta preparada, **NO publicada ni verificada**: sale del despliegue de la versión web (ver `docs/AUDITORIA-PREPUBLICACION.md`, sección 1). No la pegues en Play Console hasta abrirla en un navegador sin sesión y comprobar que carga y que dice lo mismo que `app/privacy.html`. (Las URLs anteriores de esta ficha, `matichoc.cl/MAtigame_v0/app/privacy.html` y `matichoc.github.io/MAtigame_v0/app/privacy.html`, eran suposiciones sin verificar y servían la versión antigua de la política, que ya no es válida.)
+  ✅ **Publicada y comprobada.** El 28-oct-2026 la persona dueña la abrió en su celular desde matichoc.cl.
+  - **Qué se comparó:** su captura muestra el mismo título que `app/privacy.html`, la misma versión («Versión 1.1 · última actualización: 24 de octubre de 2026») y las mismas 10 secciones en el mismo orden. Además, el archivo publicado en matiweb (`main`, `7469fcb`) es idéntico al de la app.
+  - **Lo que no se vio:** la barra del navegador muestra solo el dominio, no la ruta completa.
+  - **Si se cambia la política en la app:** hay que volver a publicarla en la web (matiweb) antes de actualizar la ficha.
+  - Las URLs anteriores de esta ficha (`matichoc.cl/MAtigame_v0/app/privacy.html` y `matichoc.github.io/MAtigame_v0/app/privacy.html`) no se usan: servían la versión antigua de la política.
 
 ## Respuestas sugeridas para los formularios de la consola
 (Son sugerencias basadas en lo que se comprobó en el código; **tú eres quien responde ante Google** y debes contrastarlas con las definiciones vigentes de Play Console. Detalle y evidencia en `docs/AUDITORIA-PREPUBLICACION.md`.)
@@ -76,4 +80,4 @@ La clasificación final la calcula el cuestionario con tus respuestas, no esta f
 ## Material gráfico (en esta carpeta)
 - `icon-512.png` — ícono de la app (512×512)
 - `feature-graphic.png` — gráfico de funciones (1024×500)
-- `screenshots/` — capturas de teléfono (1080×1920) tomadas de la variante Android actual con `scripts/qa/capturas.cjs` (ver la auditoría). Si cambia la interfaz o los juegos, hay que volver a generarlas.
+- `screenshots/` — 8 capturas de teléfono: menú, Bloques, Crea tu Chocolate y Salto en vertical (1080×1920); Parkour, Básquet, Recolecta y Porristas en horizontal (1920×1080), como se juegan. Las genera `scripts/qa/capturas.cjs` con los mismos archivos que lleva el APK (variante app, tipografías libres), en el navegador a tamaño de teléfono y sin retoques. Las actuales son del 27-oct-2026, con el menú con pestañas, y se tomaron con la fecha del aparato en junio para que no salga la decoración de un evento de temporada. Si cambia la interfaz o los juegos, hay que volver a generarlas.

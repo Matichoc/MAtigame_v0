@@ -1,6 +1,6 @@
 // Genera las capturas de la ficha de Play Store (1080×1920) y el gráfico de funciones (1024×500) a partir de la variante que se sirve
 // (para la ficha: la variante app). NO retoca nada: son capturas reales de la pantalla; el gráfico solo las compone con el texto.
-// Uso: NODE_PATH=$(npm root -g) QA_OUT=store node scripts/qa/capturas.cjs [url-base]
+// Uso: NODE_PATH=$(npm root -g) QA_OUT=store [QA_FECHA=…] node scripts/qa/capturas.cjs [url-base]
 const fs = require("fs");
 const path = require("path");
 const { abrir, nuevoPerfil, BASE } = require("./lib.cjs");
@@ -23,29 +23,46 @@ const JUEGOS = [
 async function alMenu(p) {
   await p.goto(BASE + "?debug3d", { waitUntil: "networkidle" });
   await p.waitForTimeout(700);
-  const prof = await p.$("#profile-grid .profile-card:not(.add-profile)");
-  if (prof) { await prof.click(); await p.waitForTimeout(500); }
-  if (await p.$("#character-grid .character-card")) { await p.click("#character-grid .character-card:nth-child(2)"); await p.waitForTimeout(800); }
+  // con el menú nuevo, al volver a entrar se llega directo al inicio: perfil y personaje solo si se ven
+  const prof = p.locator("#profile-grid .profile-card:not(.add-profile)").first();
+  if (await prof.isVisible().catch(() => false)) { await prof.click(); await p.waitForTimeout(500); }
+  const ch = p.locator("#character-grid .character-card").nth(1);
+  if (await ch.isVisible().catch(() => false)) { await ch.click(); await p.waitForTimeout(800); }
 }
-const foto = (p, nombre) => p.screenshot({ path: path.join(SH, `${nombre}.jpg`), type: "jpeg", quality: 84 });
+// el aviso de bienvenida tapa la barra de abajo: se espera a que se vaya solo (no se esconde a mano)
+const sinAviso = (p) => p.waitForFunction(() => { const t = document.querySelector("#toast, .toast"); return !t || t.classList.contains("hidden") || getComputedStyle(t).opacity === "0"; }, null, { timeout: 20000 }).catch(() => {});
+const foto = (p, nombre) => p.screenshot({ path: path.join(SH, `${nombre}.jpg`), type: "jpeg", quality: 84, timeout: 120000 }); // los juegos 3D tardan en este equipo sin GPU
 
 const SOLO_GRAFICO = process.argv.includes("--solo-grafico"); // reutiliza las capturas ya tomadas
 (async () => {
   const V = await abrir({ viewport: { width: 540, height: 960 }, touch: true, dsf: 2 });
   const H = await abrir({ viewport: { width: 960, height: 540 }, touch: true, dsf: 2 });
+  // QA_FECHA (ej. 2026-06-15T12:00:00-04:00): la fecha del aparato, para que la ficha no salga con la decoración de una
+  // temporada (Halloween, Navidad...) que dura solo unos días. No cambia el juego: es la misma fecha que tendría el celular.
+  if (process.env.QA_FECHA) for (const { p } of [V, H]) await p.clock.install({ time: new Date(process.env.QA_FECHA) });
   if (!SOLO_GRAFICO) {
     await nuevoPerfil(V.p, "Tina");
     await nuevoPerfil(H.p, "Tina");
     await V.p.waitForTimeout(2500);
+    await sinAviso(V.p);
+    await V.p.waitForTimeout(600);
     await foto(V.p, "01-hub");
   }
   for (const [archivo, nombre, inicio, o] of SOLO_GRAFICO ? [] : JUEGOS) {
     const { p } = o === "h" ? H : V;
     await alMenu(p);
     await p.locator(".game-card, #game-feature", { hasText: nombre }).first().click({ timeout: 8000 });
-    await p.waitForTimeout(1500);
-    if (await p.$(inicio)) await p.click(inicio, { timeout: 5000 }).catch(() => {});
+    // la tarjeta de inicio aparece cuando el mundo 3D terminó de cargar: se espera el botón y se comprueba que el juego empezó
+    const btn = p.locator(inicio).first();
+    await btn.waitFor({ state: "visible", timeout: 60000 });
+    await p.waitForTimeout(500);
+    // se toca con click() dentro de la página: aquí, sin tarjeta de video, cada cuadro 3D tarda tanto que el clic simulado de
+    // Playwright no alcanza a completarse (el botón hace lo mismo con un toque de verdad)
+    await btn.evaluate((el) => el.click());
+    const empezo = await p.waitForFunction((sel) => { const b = document.querySelector(sel); return !b || !b.offsetParent; }, inicio, { timeout: 20000 }).then(() => true).catch(() => false);
+    if (!empezo) throw new Error(`${archivo}: el juego no empezó (sigue la tarjeta de inicio)`);
     await p.waitForTimeout(4500);
+    await sinAviso(p);
     await foto(p, archivo);
     console.log("captura", archivo, o === "h" ? "(horizontal)" : "(vertical)");
   }
@@ -79,6 +96,7 @@ const SOLO_GRAFICO = process.argv.includes("--solo-grafico"); // reutiliza las c
   await g.waitForTimeout(500);
   await g.screenshot({ path: path.join(OUT, "feature-graphic.png"), type: "png" });
   console.log("externas:", reg.externas.length, "errores:", reg.errores.length);
+  for (const e of [...new Set(reg.errores)]) console.log("  error:", String(e).slice(0, 200));
   await b.close();
   await H.b.close();
 })();

@@ -246,8 +246,15 @@ export class TownFestival {
     }
     // la banca: rota y ladeada hasta que la arreglas (del color del estilo elegido)
     const benchCol = { jardin: 0x7a3f22, guirnaldas: 0xff6fb0, lectura: 0xffc800 }[style] || 0x7a3f22;
-    if (f.bench) this._bench(grp, 0, style === "lectura" ? 1.9 : 0.5, benchCol, Math.PI);
-    else { const b = this._bench(grp, 0.4, -1.2, 0x8a7a6a, 0.1); b.rotation.z = 0.18; }
+    this.g.removeBench(this.plazaBench);
+    this.plazaBench = null;
+    if (f.bench) {
+      const bz = style === "lectura" ? 1.9 : 0.5;
+      this._bench(grp, 0, bz, benchCol, Math.PI);
+      // arreglada, se puede usar: su lugar en el mundo (el grupo está girado hacia la fuente)
+      const a = grp.rotation.y;
+      this.plazaBench = this.g.addBench({ x: grp.position.x + Math.sin(a) * bz, z: grp.position.z + Math.cos(a) * bz, yaw: a + Math.PI, seat: 0.57 });
+    } else { const b = this._bench(grp, 0.4, -1.2, 0x8a7a6a, 0.1); b.rotation.z = 0.18; }
     // faroles de colores alrededor
     if (f.lamps) {
       const cols = [0xff3b6b, 0xffe14a, 0x4fd0ff, 0x9a5cff];

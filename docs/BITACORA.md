@@ -4,7 +4,205 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-28
+
+### Política pública comprobada
+- La persona dueña abrió en su celular la política publicada en matichoc.cl y mandó la captura.
+- **Coincide con `app/privacy.html`:**
+  - el título «Política de privacidad de Matijuego»;
+  - «Versión 1.1 · última actualización: 24 de octubre de 2026»;
+  - las 10 secciones, en el mismo orden: Quiénes somos, En resumen, Qué guarda el juego en tu dispositivo, Dónde queda y cómo borrarlo, Conexión a internet y permisos, Niñas y niños, Uso de inteligencia artificial, Software y licencias, Tus derechos y Cambios a esta política.
+- La barra del navegador muestra solo el dominio, no la ruta completa.
+- Con esto se actualizó la nota de `store/listing-es.md`: decía «NO publicada ni verificada» y ahora dice «publicada y comprobada», con lo que se comparó.
+
+### Prueba en el celular: APK de la compilación 93
+- La persona dueña instaló el APK de la compilación 93 (commit `fb23416`, con la corrección del tema Android, las casas por dentro y las mascotas) y contó que **todo funciona correctamente**.
+- No se anotaron el modelo del celular ni la versión de Android, ni si se probó cada punto de la lista (muesca, pausa/atrás, modo avión y progreso al instalar encima).
+- **Lo que sigue (persona dueña):**
+  - Subir a la prueba cerrada en Play Console el AAB firmado de la compilación 93 (versionCode 93) y resolver los avisos de la consola.
+  - Reclutar a los testers.
+  - Hacer merge del PR #50 y de matiweb #53 cuando lo decida.
+
 ## 2026-10-27
+
+### Revisión de publicación de `fdac606`: correcciones para la prueba cerrada (PR #50)
+**Revisión independiente** (informe VEREDICTO.md) de `fdac606`, el merge del PR 49:
+- **Lo que pasó:**
+  - 21 ejecuciones de pruebas aprobadas.
+  - Recorrido de los 15 minijuegos sin conexiones externas.
+  - APK de prueba y AAB generados e inspeccionados.
+- **Por qué no dio la aprobación técnica:** `lintRelease` fallaba con un error NewApi en el tema de recorte de pantalla (mínimo Android 7, API 24).
+- **Qué más pidió:** renovar las capturas de la ficha, que eran anteriores al rediseño, y revisar la nota de la política pública.
+- **Qué no es:** no es una aprobación de Google ni autoriza producción.
+- **Decisión de la persona dueña:** sumar estas correcciones al PR #50. Por eso el APK y el AAB de esta entrega incluyen también todo el grupo del PR #50 (casas por dentro, mascotas y el resto), que la revisión no cubrió.
+- **Qué se corrigió:**
+  - **Tema Android (NewApi):** `android:windowLayoutInDisplayCutoutMode` salió de `values/styles.xml` y quedó en `values-v28/styles.xml`. Ahí se repite el mismo tema del juego (`AppTheme.NoActionBar`) con esa opción (`shortEdges`).
+    - Desde Android 9 se ve igual que antes, también bajo la muesca. En Android 7 y 8 el tema ya no usa una opción que no existe.
+    - No se subió el mínimo (sigue API 24), no se apagó la regla y no hay baseline.
+    - El parche `correccion-compatibilidad-android.patch` que menciona el pedido no venía adjunto. La corrección se escribió siguiendo lo que describe el informe.
+  - **`lintRelease` en el workflow «Compilar app Android»:** hasta ahora el workflow solo compilaba, sin el análisis completo.
+    - Ahora `:app:lintRelease` corre en cada compilación y, si encuentra un error, la compilación falla.
+    - Las advertencias se muestran en el registro, con la cantidad por regla y desde ahora también el detalle (regla, archivo, línea y mensaje). El informe completo queda como artefacto `matijuego-lint`.
+- **Compilación 92** (commit `17c2259`, solo el tema y el paso nuevo), en verde:
+  - `assembleDebug` correcto. La comprobación del APK (permisos INTERNET y VIBRATE, sin librerías nativas, sin Choco Blaster, con privacidad y licencias) también pasó.
+  - **`lintRelease`: 0 errores y 18 advertencias:**
+
+    | Regla | Advertencias |
+    |---|---|
+    | UnusedResources | 8 |
+    | IconDuplicatesConfig | 2 |
+    | MonochromeLauncherIcon | 2 |
+    | AndroidGradlePluginVersion | 1 |
+    | GradleDependency | 1 |
+    | IconDipSize | 1 |
+    | IconLocation | 1 |
+    | ManifestOrder | 1 |
+    | ObsoleteSdkInt | 1 |
+
+    El candidato del revisor (sobre `fdac606`) tenía 16. La diferencia de 2 todavía no está explicada: el detalle de cada advertencia se imprime desde la compilación siguiente, y el informe no se pudo descargar desde este entorno. Ninguna es un error ni el motivo del fallo original.
+  - `bundleRelease` firmado con la llave de subida. Huella SHA-256 `47:FE:F7:A3:…:3A:E7:9F`, distinta de la llave pública de pruebas. Sin librerías nativas.
+  - versionCode 92.
+- **Compilación 93: la final de esta entrega.** Commit `fb23416`, modo tienda (`release=true`: falla si falta la llave de firma), todo en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40600386147
+  - **Artefactos:**
+    - `matijuego-prueba-apk`: APK de prueba con la llave fija de pruebas, que se instala encima del anterior.
+    - `matijuego-play-store-aab`: **AAB firmado con la llave de subida**, versionCode **93** (mayor que cualquiera anterior) y versionName 1.0.0. Huella SHA-256 `47:FE:F7:A3:07:7F:4C:40:C3:0A:4F:33:A9:1C:D9:BA:F1:A0:E7:EF:79:F1:5F:62:86:5D:A9:87:89:3A:E7:9F`, distinta de la de pruebas. Sin librerías nativas.
+    - `matijuego-lint`: el informe completo.
+  - El de la compilación 92 también salió firmado, pero el que corresponde subir es el **93**.
+  - **`lintRelease`: 0 errores y las mismas 18 advertencias, ahora con detalle:**
+
+    | Regla | Advertencias | Qué marca |
+    |---|---|---|
+    | UnusedResources | 8 | `activity_main`, `config.xml`, `ic_launcher_background` (drawable y color), `ic_launcher_foreground`, `package_name`, `custom_url_scheme` y `AppTheme_NoActionBar` (Capacitor lo usa por su nombre desde el código, por eso lint no lo ve) |
+    | MonochromeLauncherIcon | 2 | Íconos adaptables sin versión monocromática |
+    | IconDuplicatesConfig | 2 | `splash.png` repetido en carpetas |
+    | ObsoleteSdkInt | 1 | Carpeta `drawable-v24` innecesaria con mínimo 24 |
+    | ManifestOrder | 1 | `<uses-permission>` después de `<application>` |
+    | AndroidGradlePluginVersion | 1 | Gradle 8.14.6 disponible (se usa 8.14.3) |
+    | GradleDependency | 1 | appcompat 1.8.0 disponible (se usa 1.7.1) |
+    | IconDipSize | 1 | `splash.png` |
+    | IconLocation | 1 | `splash.png` |
+
+    Ninguna se ocultó y ninguna es un error. Probable causa de que el revisor contara 16: las 2 de «hay una versión más nueva» (Gradle y appcompat) dependen de lo que lint sabe de las versiones publicadas el día que corre. Es una suposición, no está comprobada.
+  - No se cambiaron versiones ni recursos para bajar las advertencias (fuera del alcance de esta corrección).
+- **Capturas de la ficha:** las 8 de `store/screenshots/` y `store/feature-graphic.png` se regeneraron desde la variante app de esta rama.
+  - **Cómo se tomaron:** con los mismos archivos que lleva el APK, en el navegador a tamaño de teléfono y sin retoques.
+  - **Formato comprobado:** menú, Bloques, Crea tu Chocolate y Salto en vertical, 1080×1920 JPEG; Parkour, Básquet, Recolecta y Porristas en horizontal, 1920×1080; el gráfico en 1024×500.
+  - **Contenido revisado una por una:** el menú nuevo con pestañas y «Continuar mi aventura», y cada juego ya empezado.
+  - **Fecha:** se tomaron con la fecha del aparato en junio (`QA_FECHA`), para que no salga la decoración de Halloween, que termina el 2/11. No se tocó el juego.
+  - **Script:** `scripts/qa/capturas.cjs` seguía pensado para el menú anterior y apretaba los botones de inicio antes de que aparecieran, así que el primer intento salió con la tarjeta de inicio encima. Ahora espera el botón, comprueba que el juego empezó y espera a que se vaya el aviso de bienvenida.
+  - **Errores registrados:** 0 conexiones externas. Los 11 «errores» son un mismo aviso del navegador (un marco vacío sin permiso de scripts), no del juego.
+  - Se corrigió en `store/listing-es.md` la descripción de las capturas: decía que todas eran 1080×1920.
+- **Política pública:** desde este entorno no se pudo abrir `https://matichoc.cl/matijuego/privacy.html`; la red de la sesión no permite ese dominio.
+  - **Lo comprobado:** en matiweb `main` (`7469fcb`), `matijuego/privacy.html` es idéntico byte a byte a `app/privacy.html`. GitHub Pages desplegó ese commit con éxito (27-oct, 14:10) con el dominio matichoc.cl.
+  - **La nota de la ficha no se cambió**, porque no se pudo comprobar el estado real de la URL. Para cerrarla hay dos caminos: abrirla en un navegador sin sesión (persona dueña) o permitir matichoc.cl en la red de la sesión.
+- **Web:** estos cambios no tocan la web (tema Android, workflow, ficha, documentación y script de capturas): no hay copia en matiweb que actualizar.
+- **Qué probar en el celular** con el APK de esta entrega:
+  1. Que abra sin cerrarse.
+  2. Que se vea a pantalla completa, sin barras.
+  3. En un celular con muesca o cámara en la pantalla (Android 9 o más), que el juego llegue bajo la muesca igual que antes.
+  4. Si hay un Android 7 u 8 a mano, que abra y se vea a pantalla completa.
+  5. Pausa ⏸ y botón atrás.
+  6. Modo avión.
+  7. Que el progreso siga ahí al cerrar y abrir, y al instalar el APK encima del anterior.
+- **Pendiente de la persona dueña** (nada de esto se hizo desde aquí: no hubo publicación, merge ni despliegue):
+  - Crear o completar la app en Play Console y subir el AAB firmado de la compilación final de esta entrega a la prueba cerrada.
+  - Resolver los avisos que muestre la consola.
+  - Reclutar a los 15 voluntarios. El requisito conocido para cuentas personales nuevas es al menos 12 inscritos durante 14 días seguidos; hay que confirmarlo en la consola.
+  - Comprobar la URL de la política.
+
+### Casas por dentro y mascotas con vida (mismo grupo de mejoras, PR #50)
+Decisiones de la persona dueña sobre la propuesta: casas **«Visitar por dentro»** y mascotas con **«Comida y ánimo»** y **«Jugar con ella»** («Adornarla» quedó fuera).
+- **Visitas a las casas** (`js/interiors.js`), al estilo de las casas de Pokémon:
+  - **Pueblo:** 3 casitas nuevas (Casa de Bombi, Casa de Capi y Don Cuchufli), ubicadas después de los rincones de la aventura y antes que los árboles, para que nada quede encima.
+  - **Ciudad:** se entra por la puerta de Doña Rosa y de Don Pepe. Frente a Rosa sigue apareciendo «Hablar»; «Visitar» solo sale estando más cerca de la puerta que de ella.
+  - En la puerta aparece «🚪 Visitar a …». Adentro hay una pieza 3D (vista de casa de muñecas, con el frente abierto) con el vecino, un sillón para sentarse, una mesa, una repisa, una cama y plantas; los muebles no se atraviesan.
+  - **Misión del día:** el vecino perdió 3 cosas (libros, pelotas, cuchuflís, semillas o pinceles), que quedan en lugares que cambian cada día. Al encontrarlas y volver a hablarle da **+40 Matipuntos y una ⭐** (sirve para renovar el Pueblo). Una vez al día por casa; la segunda vez solo saluda.
+  - El diálogo del Pueblo ahora pasa frase por frase («toca para seguir ▶»).
+  - Al salir se vuelve frente a la puerta, con la cámara de frente y en diagonal (detrás del personaje quedaba dentro de la pared, y en la Ciudad el globito de Don Pepe la tapaba).
+  - La pieza se arma lejos del mundo solo mientras dura la visita y se desarma al salir. Mientras tanto, las misiones de la Ciudad esperan.
+  - **Costo de dibujo:** adentro se dibuja menos de la mitad que afuera (768 contra 1.989 dibujos en dos cuadros, Pueblo). Afuera se suman 3 casitas (unas 24 piezas).
+- **Mascotas con vida** (`js/pet-care.js` y `js/pet-buddy.js`), para la mascota que lleva puesta el Matichico:
+  - Tiene **🍗 pancita y 💖 ánimo**, que bajan solos con las horas (hambre en ~19 h, aburrida en ~14 h sin jugar).
+  - Cuando necesita algo, aparece un globito sobre ella: 🍪 si tiene hambre, ⚽ si quiere jugar.
+  - **Golosinas** con Matipuntos: Galletita (15, +30 de pancita) y Bombón (35, +60 y algo de ánimo). Llena, no come más.
+  - **Acariciar:** salta y suelta corazones; sube el ánimo (hasta 10 caricias al día cuentan).
+  - **Tirar la pelota:** la mascota se suelta del Matichico, va a buscarla, te la trae en la boca y vuelve a su lugar (hasta 8 juegos al día suben el ánimo; jugar da un poco de hambre).
+  - **Feliz** (bien comida y contenta) baila cada tanto y a veces encuentra 10 a 20 Matipuntos, hasta 3 veces al día.
+  - **Dónde:** en el Pueblo, con el botón 🐾 (solo si lleva una mascota puesta), que abre la tarjeta «Mi mascota»; en Mi Casa, la misma tarjeta arriba de la lista de Vivir. La pausa ⏸ cierra la tarjeta.
+- **Pruebas nuevas:**
+  - `scripts/qa/visitas.cjs`: 37/37, Pueblo y Ciudad.
+  - `scripts/qa/mascota.cjs`: 23/23, con lógica, Pueblo y Mi Casa.
+  - Se revisó también que los 8 escondites posibles se alcancen. Uno quedaba sobre la cama y no se podía recoger; se movió.
+- **Pruebas de siempre, todas en verde:** interactivo 20, pueblo, lago, puertas-toque, ciudad-barrios, ciudad-diaria, aventura, temporada, contraste 36, juegos 15/15, perfiles 13 y album 15.
+- **APK:** la compilación 90 falló en la revisión de privacidad de la app (`verificar-app.mjs`): la palabra `fetch` (el juego de ir a buscar la pelota) se confundía con una conexión a internet. Se renombró a `chase` en `js/pet-buddy.js`; la revisión queda igual de estricta y ahora pasa.
+  La compilación 91 (`e106c40`) pasó en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40595103683 . Copia web en matiweb #53 (`34632ba`): visitas 37/37, mascota 23/23, interactivo 20/20, juegos 15/16 (Choco Blaster, fallo conocido).
+
+### Mundos más interactivos (mismo grupo de mejoras, PR #50)
+Pedido de la persona dueña: que el Pueblo y la Ciudad sean interactivos (sentarse en bancas, puentes que se cruzan solo por el puente, binoculares para mirar el horizonte, publicidades bien puestas, entrar a casas con misiones y mascotas con más vida). En este grupo va lo primero; lo de casas y mascotas queda como propuesta para elegir.
+- **Carteles al revés:** el logo de Matichoc (`makeLogo`, usado en la fábrica, la fuente, los autos y casi todos los juegos) y los letreros de las tiendas de la Ciudad eran una lámina de doble cara. Por detrás se leían espejados. Ahora son dos caras de un solo lado: cuesta un dibujo más por logo y se lee derecho por los dos lados.
+- **Sentarse en las bancas:**
+  - **Ciudad:** las 7 bancas.
+  - **Pueblo:** 3 bancas nuevas junto a la fuente, y la del Rincón de Bombi cuando está arreglada.
+  - Junto a una banca aparece «🪑 Sentarse». El personaje queda sentado sobre la tabla (pose "sit" de Mi Casa) y se levanta con «Levantarse», moviendo el joystick o saltando.
+- **Puente del bosque:**
+  - El arroyo ya no se cruza por cualquier parte: solo por el puente (o, antes de arreglarlo, por los tablones del mismo lugar).
+  - Sobre el puente y el muelle del lago se camina por encima: son pisos de 0,48 de altura que se suben sin saltar.
+- **Binoculares** (`js/binoculars.js`), en la punta del muelle de la playa (Ciudad), en la punta del muelle del lago y arriba del mirador (Pueblo; ambos cuando están arreglados):
+  - Con «🔭 Mirar el horizonte», la cámara sube al binocular con zoom.
+  - El joystick o arrastrar el dedo giran la vista; − y + cambian el zoom; «Dejar de mirar» vuelve.
+  - Mientras se mira, se esconden los paneles del juego.
+- **Costo de dibujo:** se agregan 3 bancas y 3 binoculares (unas 40 piezas, siempre dibujadas solo en su zona) y una cara más por logo. No hay efectos nuevos.
+- **Pruebas:**
+  - Nueva `scripts/qa/interactivo.cjs`: 20/20.
+  - `lago.cjs` ampliada con el arroyo y los pisos del puente y el muelle: 9/9.
+  - `puertas-toque.cjs` ahora espera el botón en vez de un tiempo fijo: con dos pruebas a la vez a veces no alcanzaba.
+  - Además: juegos 15/15, ciudad-barrios 20, ciudad-diaria 6, pueblo 24, aventura 57, deportes 52, atras 26, contraste 36, album 15, puertas-toque 12.
+- **APK y web:** APK de prueba en la compilación 89, en verde (https://github.com/Matichoc/MAtigame_v0/actions/runs/40585405873). Copia web en matiweb #53 (`9f9a1ac`): interactivo 20/20, juegos 15/16 (Choco Blaster, fallo conocido; Porristas falló una vez y al repetirla pasó).
+
+### Grupo de mejoras (un solo PR): lago, Recolecta, playa y álbum
+**Decisión de la persona dueña:** juntar las mejoras en grupos y abrir un solo PR por grupo. Este grupo se suma al PR #50, que sigue abierto, y a su copia web matiweb #53.
+- **Pueblo, lago:** se podía caminar sobre el agua.
+  - Causa: con el muelle arreglado, la franja por la que se puede pisar seguía 6,5 m más allá de la punta del muelle.
+  - Ahora termina en la punta (`DOCK`/`DOCK_END` en `js/town-zones.js`).
+  - Prueba nueva `scripts/qa/lago.cjs`: antes había 73 puntos de agua pisables, ahora 0. Caminando por el muelle, ahora se detiene en la punta (antes llegaba a z −9,9).
+- **Recolecta y Corre:** al empujar contra una pared sonaba un zumbido en cada cuadro (unas 60 veces por segundo).
+  - Contra paredes ya no suena nada: el personaje solo se detiene o se desliza.
+  - El rebote con obstáculos que se mueven suena a lo más 2 veces por segundo.
+- **Ciudad, playa:** 3 de las lomas de pasto decorativas que rodean la ciudad asomaban sobre la arena, y una junto al mar.
+  - Ahora no se ponen sobre la playa, el parque, el colegio ni el mar.
+  - Hay menos lomas que dibujar.
+  - Al revisar la orilla completa (pedido de la persona dueña: nada de pasto entre la playa y el mar), fuera de la playa el pasto llegaba directo al agua. Ahora una franja de arena con espuma sigue por toda la orilla.
+- **Álbum de figuritas** (análisis medido con simulación, decisiones de la persona dueña: kiosco, taller visible y página de temporada):
+  - **Antes:** completar el álbum (96) costaba unos 300 sobres a pura suerte, o 130 usando el taller. Faltando 2 figuritas, se necesitaban unos 40 sobres si eran normales y unos 120 si eran brillantes (hasta 240). El taller existía, pero casi no se veía, y el botón «Vender repetidas» se llevaba las repetidas que servían para cambiar.
+  - **Kiosco:** tocar una figurita que falta abre su cuadro. Se puede cambiar por repetidas (12 por una normal, 36 por una brillante) o comprar con Matipuntos (400 una normal, 1.200 una brillante).
+  - **Taller visible:** las que se pueden cambiar dicen «🔄 ¡Cámbiala!». Antes de vender repetidas, el juego avisa cuántas faltan y cuántas se podrían cambiar.
+  - **Página de temporada:** cada evento (San Valentín, Pascua, Fiestas Patrias, Día del Niño, Halloween, Navidad) tiene 12 figuritas + 2 brillantes.
+    - Mientras dura el evento, el 40 % de las figuritas de los sobres son de su página.
+    - Completarla da +300 Matipuntos y +30 fichas del evento.
+    - Fuera de su temporada se ve al final del álbum con «vuelve en su temporada»: no se puede comprar ni cambiar.
+    - El contador del álbum base (96) y sus premios no cambian.
+    - Simulación: completar la página de temporada toma ~28 sobres (45 en el 10 % de peor suerte), alcanzable dentro de un evento.
+  - Prueba nueva `scripts/qa/album.cjs` (15 revisiones).
+- **APK de prueba:** compilación 87 (álbum, lago, Recolecta) y compilación 88 con todo el grupo, incluida la orilla (https://github.com/Matichoc/MAtigame_v0/actions/runs/40543820615), ambas en verde. Copia web en matiweb #53; en la demo, `ciudad-barrios` no pasa porque la demo solo deja las primeras misiones de la Ciudad (`DEMO_LIMITS.ciudad`), como es de esperar.
+- **Pruebas:** lago 5/5, puertas-toque 12/12, album 15/15, atras 26, contraste 36, perfiles 13, temporada 29, pueblo 24 (corriendo junto a otra prueba falló el robot del parkour por lentitud del equipo; sola pasó).
+
+### Minijuegos del Pueblo (Gato, Sudoku, Cachipún): se abrían y se cerraban solos
+- **Prueba en el celular de la persona dueña:** con un toque corto en «Entrar», el minijuego no se quedaba abierto; había que mantener el dedo apretado unos segundos.
+- **Causa:**
+  - El botón de acción del Pueblo actúa al apoyar el dedo (para que responda rápido mientras se usa el joystick).
+  - Al levantar el dedo, el celular envía además un "clic". Ese clic caía sobre el fondo del cuadro recién abierto, y tocar el fondo cierra el cuadro.
+  - Con el dedo apretado varios segundos el celular no envía ese clic; por eso así sí funcionaba.
+- **Arreglo:**
+  - El fondo de los cuadros (minijuegos, pausa y privacidad) solo cierra si el toque empezó en el fondo (`closeOnBackdrop` en `js/main.js` y lo mismo en `js/town-puzzles.js`).
+  - Nueva `eatGhostClick` en `js/three-kit.js`: los botones de acción del Pueblo y de la Ciudad descartan el clic que llega al levantar ese mismo dedo. Sigue al dedo y no usa un plazo fijo, porque abrir la tienda puede tardar más de un segundo.
+  - Se encontró el mismo problema al entrar a la Boutique desde el Pueblo: el clic caía dentro de la tienda recién abierta. Ahora no toca nada.
+- **Prueba nueva:** `scripts/qa/puertas-toque.cjs` toca como un dedo real. Antes del arreglo fallaba en las 3 puertas; ahora pasa 12/12 (las 3 puertas se quedan abiertas, el fondo las cierra, y la Boutique se abre sin tocar nada adentro).
+- **Otras pruebas:** pueblo 24, ciudad-barrios 20, ciudad-diaria 6, atras 26, legal OK, deportes 52, juegos 15/15. Porristas falló una vez al correr junto a deportes; sola pasó.
+- **PR y compilación:** PR #50; APK de prueba: compilación 86 en verde (https://github.com/Matichoc/MAtigame_v0/actions/runs/40522360058).
+- **Copia web:** Matichoc/matiweb#53. Probada contra la demo: puertas-toque 12/12, juegos 15/16 (Choco Blaster, fallo conocido de la web), legal y enlaces OK.
+
+### PR #49 y matiweb #52 mergeados
+- La persona dueña hizo merge de #49 (rayas en la Ciudad y el Pueblo, y contraste de textos) y de su copia web Matichoc/matiweb#52: quedan publicados en matichoc.cl. Último APK de prueba: compilación 85.
 
 ### Rayas que parpadean en la Ciudad y el Pueblo; textos que no se leían
 - **Prueba en el celular de la persona dueña:**

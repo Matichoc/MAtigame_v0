@@ -27,6 +27,7 @@ import {
   levelInfo, LEVEL_GIFTS, ensureDaily, missionLabel, missionProgress, missionDone, claimMission,
   canClaimChest, claimChest, hasPending, STICKERS, PAGES, ALBUM_TOTAL, albumCount, pageStatus, ALBUM_MILESTONES, openPack, onProgressEvent, GAME_NAMES,
   spareCount, sparePoints, sellValue, sellSpares, tradeFor, tradeCost, TRADE_NORMAL, TRADE_FOIL,
+  SEASON_PAGES, SEASON_STICKERS, activeSeasonPage, obtainable, buySticker, buyCost,
 } from "./progression.js";
 import { rankingEnabled, fetchRanking } from "./online.js";
 import { energyInfo, claimEnergyChest, fmtSecs, ENERGY_COST, ENERGY_RULE, ENERGY_MISSION, startSleep, stopSleep, buyEnergy, buyOffer, BUY_ENERGY, REGEN_SECS, SLEEP_MULT, CHEST_EVERY, CHEST_ENERGY } from "./energy.js";
@@ -153,6 +154,14 @@ function checkOrientation() {
 window.addEventListener("resize", checkOrientation);
 window.addEventListener("orientationchange", checkOrientation);
 try { screen.orientation?.lock?.("landscape").catch(() => {}); } catch (e) { /* solo funciona en pantalla completa / app */ }
+
+/** Tocar el fondo de un cuadro lo cierra, pero solo si el toque empezó en el fondo: un botón que abre el cuadro al apoyar
+ *  el dedo recibe el clic al levantarlo sobre el fondo ya abierto, y lo cerraría al instante. */
+function closeOnBackdrop(dialog, close) {
+  let downOnBack = false;
+  dialog.addEventListener("pointerdown", (e) => { downOnBack = e.target === dialog; });
+  dialog.addEventListener("click", (e) => { const ok = downOnBack; downOnBack = false; if (e.target === dialog && ok) close(); });
+}
 
 function showScreen(target) {
   // sin Matichico elegido (perfil nuevo), el menú del celular abre en "Mi Matichico", donde se elige
@@ -688,6 +697,7 @@ async function openHousePreview() {
     refreshNeighbors();
     house3d.setSelected(houseSel);
     house3d.freezeOnSel = true;
+    if (!house3d.pet) house3d.setPetCare(() => progress, () => { if (houseMode === "live") renderPetCardHouse(); document.getElementById("house-coins").textContent = String(progress.coins); }, (t) => showToast(t));
     if (!house3d._lifeBound) {
       house3d._lifeBound = true;
       house3d.onLife((ev) => {
@@ -1093,6 +1103,19 @@ function renderHouseRooms() {
 const LIVE_ICONS = { sleep: "😴", sit: "🛋️", type: "💻", arcade: "🕹️", piano: "🎹", hop: "🤸", admire: "👀", fridge: "🧊", cook: "🍳", wash: "🚰", eat: "🍽️", bath: "🛁", wardrobe: "👗", watch: "📺" };
 const LIVE_NAMES = { sleep: "Dormir", sit: "Sentarse", type: "Usar el computador", arcade: "Jugar a la arcade", piano: "Tocar el piano", hop: "Saltar", admire: "Mirar", fridge: "Abrir la heladera", cook: "Cocinar", wash: "Lavar", eat: "Comer", bath: "Darse un baño", wardrobe: "Mirar el ropero", watch: "Ver tele" };
 /** Modo "Vivir": el Matichico camina por la casa y usa los muebles. */
+/** La tarjeta "Mi mascota" arriba de las cosas para hacer (solo si el Matichico lleva una mascota puesta). */
+function renderPetCardHouse() {
+  if (!house3d || !house3d.pet) return;
+  let card = houseGridEl.querySelector(".pet-card");
+  if (!house3d.pet.item) { card?.remove(); return; }
+  if (!card) {
+    card = document.createElement("div");
+    card.className = "pet-card";
+    houseGridEl.prepend(card);
+  }
+  house3d.petCard(card, (msg) => showToast(msg));
+}
+
 function renderHouseLive() {
   const i = energyInfo(progress);
   houseBarEl.innerHTML = `<div class="sh-bar-txt">Tu Matichico vive aquí: <b>toca un mueble</b> y irá a usarlo, o <b>toca el piso</b> para que camine. ${i.v < i.max ? `Si duerme en su cama, ¡la energía vuelve 3 veces más rápido! (⚡ ${i.v}/${i.max})` : ""}</div>`;
@@ -1110,6 +1133,7 @@ function renderHouseLive() {
   };
   for (const act of ACTS) for (const f of cats[act]) mk(act, f);
   if (!spots.length) houseGridEl.innerHTML = `<div class="sh-empty">Aún no hay muebles para usar. ¡Pon una cama, un sillón o un computador en <b>Decorar</b>!</div>`;
+  renderPetCardHouse();
 }
 
 function renderHouseDecor() {
@@ -1408,38 +1432,42 @@ function renderProgress() {
   const packs = progress.packs || 0;
   pgOpenPackBtn.disabled = packs <= 0;
   pgOpenPackBtn.textContent = packs > 0 ? `📦 Abrir sobre (${packs})` : "📦 Sin sobres";
-  document.getElementById("pg-packs-text").textContent = "Ganas sobres al subir de nivel, cada 5 partidas y con el cofre del día. Cada sobre trae 3 figuritas al azar.";
+  document.getElementById("pg-packs-text").textContent = "Ganas sobres al subir de nivel, cada 5 partidas y con el cofre del día. Cada sobre trae 3 figuritas al azar. ¿Te falta una? Tócala: la puedes cambiar por repetidas o comprar con Matipuntos.";
   const albumEl = document.getElementById("pg-album");
   albumEl.innerHTML = "";
   const pts = sparePoints(progress);
-  for (const pg of PAGES) {
+  const season = activeSeasonPage();
+  const drawPage = (pg, list, extra = "") => {
     const st = pageStatus(progress, pg);
-    albumEl.appendChild(el("h3", "pg-page-title" + (st.have >= st.total ? " ok" : ""), `${pg.icon} ${pg.title} · ${st.have}/${st.total}${st.have >= st.total ? " ✅" : ` (premio: +${pg.reward} 🍫✨)`}`));
+    albumEl.appendChild(el("h3", "pg-page-title" + (st.have >= st.total ? " ok" : "") + (pg.event ? " season" : ""), `${pg.icon} ${pg.title} · ${st.have}/${st.total}${st.have >= st.total ? " ✅" : ` (premio: +${pg.reward} 🍫✨)`}${extra}`));
     const grid = el("div", "pg-album-grid");
-    STICKERS.filter((x) => x.page === pg.id).forEach((st2) => {
+    list.forEach((st2) => {
       const n = (progress.album || {})[st2.id] || 0;
-      const canTrade = !n && pts >= tradeCost(st2);
-      const card = el("div", "pg-sticker" + (n ? " got" : "") + (st2.foil ? " foil" : "") + (canTrade ? " tradable" : ""));
+      const can = !n && obtainable(st2);
+      const canTrade = can && pts >= tradeCost(st2);
+      const card = el("div", "pg-sticker" + (n ? " got" : "") + (st2.foil ? " foil" : "") + (canTrade ? " tradable" : "") + (can ? " missing" : ""));
       if (n) {
         card.appendChild(stickerArt(st2));
         if (n > 1) card.appendChild(el("b", "pg-s-n", `x${n}`));
       } else card.appendChild(el("span", "pg-s-q", st2.foil ? "✨?" : "?"));
-      card.appendChild(el("span", "pg-s-name", n ? st2.name : st2.foil ? "Brillante" : "Sin descubrir"));
-      if (canTrade) {
-        card.title = `Cambiar ${tradeCost(st2)} repetidas por esta figurita`;
-        card.addEventListener("click", () => {
-          if (!window.confirm(`¿Cambiar ${tradeCost(st2)} repetidas por «${st2.name}»?`)) return;
-          const r = tradeFor(progress, st2.id);
-          if (!r) return;
-          audio.playBonusCollect();
-          showToast(`🔄 ¡Conseguiste «${st2.name}»!${r.rewards.length ? " " + r.rewards.map((m) => `🏆 ${m.text}: +${m.coins} 🍫✨`).join(" · ") : ""}`);
-          refreshHubStats();
-          renderProgress();
-        });
+      card.appendChild(el("span", "pg-s-name", n ? st2.name : !can ? "Vuelve en su temporada" : canTrade ? "🔄 ¡Cámbiala!" : st2.foil ? "Brillante" : "Sin descubrir"));
+      if (can) {
+        card.setAttribute("role", "button");
+        card.tabIndex = 0;
+        card.title = "Cambiarla por repetidas o comprarla";
+        card.addEventListener("click", () => openStickerDialog(st2));
       }
       grid.appendChild(card);
     });
     albumEl.appendChild(grid);
+  };
+  // la página del evento activo va primero; las de otras temporadas, al final (si ya tienes alguna)
+  if (season) drawPage(season, SEASON_STICKERS.filter((x) => x.page === season.id), ` · solo hasta el ${fmtDay(eventEnd(activeEvent()))}`);
+  for (const pg of PAGES) drawPage(pg, STICKERS.filter((x) => x.page === pg.id));
+  for (const pg of SEASON_PAGES) {
+    if (season && pg.id === season.id) continue;
+    const list = SEASON_STICKERS.filter((x) => x.page === pg.id);
+    if (list.some((x) => (progress.album || {})[x.id] > 0)) drawPage(pg, list, " · vuelve en su temporada");
   }
   const tools = document.getElementById("pg-album-tools");
   if (tools) {
@@ -1450,7 +1478,10 @@ function renderProgress() {
     sell.type = "button";
     sell.disabled = spare <= 0;
     sell.addEventListener("click", () => {
-      if (!window.confirm(`¿Vender ${spare} repetidas por ${sellValue(progress)} Matipuntos? (Te quedas con una de cada figurita)`)) return;
+      // si todavía faltan figuritas, las repetidas sirven para cambiarlas: se avisa antes de venderlas
+      const faltan = [...STICKERS, ...SEASON_STICKERS].filter((x) => !((progress.album || {})[x.id] > 0) && obtainable(x)).length;
+      const ojo = faltan && pts >= TRADE_NORMAL ? `\n\nOjo: te faltan ${faltan} figuritas y con estas repetidas puedes cambiar ${Math.floor(pts / TRADE_NORMAL)} de ellas (toca la que te falta).` : "";
+      if (!window.confirm(`¿Vender ${spare} repetidas por ${sellValue(progress)} Matipuntos? (Te quedas con una de cada figurita)${ojo}`)) return;
       const r = sellSpares(progress);
       if (!r) return;
       audio.playPurchase();
@@ -1493,6 +1524,43 @@ function stickerArt(s) {
   } else d.textContent = s.emoji || "⭐";
   return d;
 }
+
+// ---- figurita que falta: taller (repetidas) o kiosco (Matipuntos) ----
+const stickerDialog = document.getElementById("sticker-dialog");
+let stickerTarget = null;
+function fmtDay(d) { return d.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit" }); }
+function openStickerDialog(s) {
+  stickerTarget = s;
+  const art = document.getElementById("sk-art");
+  art.replaceChildren(stickerArt(s));
+  art.classList.toggle("foil", !!s.foil);
+  document.getElementById("sk-title").textContent = s.name;
+  const pts = sparePoints(progress);
+  const tc = tradeCost(s);
+  const bc = buyCost(s);
+  document.getElementById("sk-text").textContent = s.event
+    ? "Figurita de temporada: se consigue solo mientras dura el evento."
+    : s.foil ? "Una brillante: sale poco en los sobres." : "Te falta esta figurita.";
+  const trade = document.getElementById("sk-trade");
+  trade.disabled = pts < tc;
+  trade.textContent = pts >= tc ? `🔄 Cambiar por ${tc} repetidas` : `🔄 Cambiar: tienes ${pts} de ${tc} repetidas`;
+  const buy = document.getElementById("sk-buy");
+  buy.disabled = progress.coins < bc;
+  buy.textContent = progress.coins >= bc ? `🛒 Comprar por ${bc.toLocaleString("es-CL")} 🍫` : `🛒 ${bc.toLocaleString("es-CL")} 🍫 · te faltan ${(bc - progress.coins).toLocaleString("es-CL")}`;
+  stickerDialog.classList.remove("hidden");
+}
+function stickerGot(r, how) {
+  stickerDialog.classList.add("hidden");
+  if (!r) return;
+  audio.playBonusCollect();
+  showToast(`${how} ¡Conseguiste «${r.sticker.name}»!${r.rewards.length ? " " + r.rewards.map((m) => `🏆 ${m.text}: +${m.coins} 🍫✨`).join(" · ") : ""}`);
+  refreshHubStats();
+  renderProgress();
+}
+document.getElementById("sk-trade").addEventListener("click", () => stickerTarget && stickerGot(tradeFor(progress, stickerTarget.id), "🔄"));
+document.getElementById("sk-buy").addEventListener("click", () => stickerTarget && stickerGot(buySticker(progress, stickerTarget.id), "🛒"));
+document.getElementById("sk-close").addEventListener("click", () => stickerDialog.classList.add("hidden"));
+closeOnBackdrop(stickerDialog, () => stickerDialog.classList.add("hidden"));
 
 pgOpenPackBtn.addEventListener("click", () => {
   const r = openPack(progress);
@@ -1879,7 +1947,7 @@ document.getElementById("demo-wall-close")?.addEventListener("click", () => docu
   document.querySelectorAll(".legal-open").forEach((b) => b.addEventListener("click", () => show(b.dataset.legal)));
   swap.addEventListener("click", () => show(PAGES[current][3]));
   document.getElementById("legal-close").addEventListener("click", close);
-  dialog.addEventListener("click", (e) => { if (e.target === dialog) close(); });
+  closeOnBackdrop(dialog, close);
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !dialog.classList.contains("hidden")) close(); });
 }
 
@@ -1987,7 +2055,7 @@ function closePause() {
 document.getElementById("pause-resume").addEventListener("click", closePause);
 pauseSound.addEventListener("click", () => { audio.setMuted(!audio.isMuted()); syncSoundLabels(); });
 document.getElementById("pause-exit").addEventListener("click", () => { closePause(); goToHub(); });
-pauseDialog.addEventListener("click", (e) => { if (e.target === pauseDialog) closePause(); });
+closeOnBackdrop(pauseDialog, closePause);
 let activeGame = null; // el juego 3D en pantalla (para que el "atrás" del celular abra su pausa)
 
 // ---------- TARJETA DE INICIO DE CADA JUEGO (rediseño, maqueta 3) ----------

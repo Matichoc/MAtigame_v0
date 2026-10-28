@@ -33,7 +33,11 @@ function ensureDom() {
   statusEl = document.getElementById("puzzle-status");
   againBtn = document.getElementById("puzzle-again");
   document.getElementById("puzzle-close").addEventListener("click", closePuzzle);
-  dialog.addEventListener("click", (e) => { if (e.target === dialog) closePuzzle(); });
+  // el fondo cierra solo si el toque empezó en el fondo: el botón "Entrar" abre al apoyar el dedo, y el clic que llega al
+  // levantarlo cae sobre el fondo del cuadro recién abierto (antes lo cerraba y había que mantener apretado)
+  let downOnBack = false;
+  dialog.addEventListener("pointerdown", (e) => { downOnBack = e.target === dialog; });
+  dialog.addEventListener("click", (e) => { const ok = downOnBack; downOnBack = false; if (e.target === dialog && ok) closePuzzle(); });
   againBtn.addEventListener("click", () => current && current.start());
   return true;
 }
