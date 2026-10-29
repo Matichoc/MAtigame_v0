@@ -6,6 +6,25 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-29
 
+### Porristas: ritmo ajustado a cada celular
+- **Qué notó la persona dueña:** en el APK 94, Saltos de Porristas «se pueden hacer las cosas», pero los tiempos se sienten «medio desfasados».
+- **Causa más probable:** en el celular, el sonido sale con atraso (una o dos décimas de segundo, según el aparato) y el toque también tarda un poco en llegar. El juego medía el tiempo justo según cuándo mandaba el sonido, no según cuándo se oye. Además, cada golpe de la música salía recién en el cuadro siguiente, con saltitos si el celular se atrasaba.
+- **Qué se cambió:**
+  - Los golpes de la música se programan un poco antes con el reloj del audio y se adelantan lo que el celular informa que tarda su parlante. Así se oyen justo cuando el aro se cierra.
+  - El juego aprende con los toques cuánto se atrasa cada persona en su celular (hasta 0,3 s) y lo descuenta. Queda guardado en el perfil para la próxima vez.
+  - Un arreglo en `audio.js`: un sonido programado para más adelante empezaba más bajito (el volumen ya venía bajando). Ahora parte con su volumen.
+- **Prueba:** `porristas-rutina.cjs` simula a alguien que toca siempre 0,15 s tarde; a los pocos toques todo sale «¡Perfecto!» y el ajuste queda guardado.
+
+### Prueba en el celular: APK 94
+- La persona dueña descargó el APK de la compilación 94 y probó:
+  - **Saltos de Porristas:** se puede jugar, pero los tiempos se sienten desfasados. Se corrigió arriba.
+  - **Crea tu Chocolate:** «mucho mejor»; ahora se ve cuáles ingredientes hay que ocupar.
+- No se anotó el modelo del celular.
+
+### Merges de la persona dueña
+- Hizo merge del PR #51 (grupo del 29-oct) y de su copia web matiweb #54: queda publicado en matichoc.cl.
+- La rama `claude/zealous-johnson-2ryf87` se rehízo desde `main` (`7b7889c`) para lo que sigue.
+
 ### Merges de la persona dueña
 - Hizo merge del **PR #50** (casas por dentro, mascotas, corrección del tema Android, `lintRelease` y capturas nuevas) y de su copia web **matiweb #53**: quedan publicados en matichoc.cl. `main` queda en `23e7355`.
 - Como ese PR ya está cerrado, la rama `claude/zealous-johnson-2ryf87` se rehízo desde `main` para el grupo nuevo.
