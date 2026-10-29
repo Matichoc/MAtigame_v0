@@ -21,7 +21,9 @@ const { abrir, nuevoPerfil, BASE } = require("./lib.cjs");
   await p.waitForTimeout(1500);
   await p.click("#creador-btn-start").catch(() => {});
   await p.waitForTimeout(2500);
-  await p.evaluate(() => window.__g3d.creador._create());
+  // se salta la cocina (se termina al tiro) para llegar al resultado, que es donde la web ofrece WhatsApp
+  await p.evaluate(() => { const g = window.__g3d.creador; g._create(); g.kitchen._finish(); });
+  r.resultado = await p.evaluate(() => window.__g3d.creador.view);
   await p.waitForTimeout(800);
   r.botonWhatsapp = await p.evaluate(() => document.querySelectorAll(".btn-whatsapp").length);
   r.windowOpen = await p.evaluate(() => window.__abiertas);
