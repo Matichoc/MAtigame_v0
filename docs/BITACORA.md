@@ -81,6 +81,13 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 - Pasaron porristas-rutina, creador-cocina, aventura-3d, visitas, fichas, parkour-escalar, mascota, interactivo, puertas-toque, legal y enlaces.
 - juegos: 15 de 16. Falla Choco Blaster, el mismo fallo conocido de la web.
 
+**APK de prueba: compilación 94** (commit `a7deb8b`), en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40930386014
+- Se compiló con la llave fija de pruebas, así que se instala encima del anterior.
+- Pasaron la comprobación de la app (sin uso de red) y `lintRelease`.
+
+**PR del grupo:** #51. Copia web: matiweb #54. Los dos esperan la revisión y el merge de la persona dueña.
+- **Qué probar en el celular:** la rutina de Porristas (tocar al ritmo y la pirámide), la cocina de Crea tu Chocolate (arrastrar a la olla y mantener apretado para calentar y verter), Aventura Choco (cámara y animación), las puertas de la Ciudad y las metas de la semana.
+
 ## 2026-10-28
 
 ### Política pública comprobada
