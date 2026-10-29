@@ -240,11 +240,35 @@ const foto = async (p, n) => { if (CAPTURAS) { fs.mkdirSync(CAPTURAS, { recursiv
   await p.evaluate(() => document.getElementById("btn-path-me").click());
   await p.evaluate(() => document.getElementById("me-town").click());
   await p.waitForTimeout(400);
-  ok(await p.isVisible("#screen-adventure"), "«Mis lugares y copas» abre lo construido, las copas y la meta");
-  await p.click("#adv-goals .adv-goal:nth-of-type(5)"); // casa
+  ok(await p.isVisible("#screen-adventure"), "«Mis lugares y copas» abre lo construido, las copas y las metas de la semana");
+  ok((await p.$$("#adv-goals .wk-goal")).length === 3, "hay 3 metas de la semana");
+  // se cumple una (se suben a mano los contadores que miden) y se cobra
+  const wk = await p.evaluate(() => {
+    const pr = window.__progress();
+    const st = pr.weekly;
+    const g = st.goals[0];
+    const c0 = pr.coins;
+    const bump = { runs: ["totalRuns", 15], coins: ["totalCoinsEarned", 600], visits: ["visits", 4], treats: ["petTreats", 4], petplay: ["petPlays", 5], packs: ["packsOpened", 3], hello: ["townTalks", 10], alfajores: ["townItems", 20], missions: ["missionsClaimed", 6], gold: ["ciudadGold", 15], parkour: ["parkourFinishes", 3] }[g.id];
+    if (bump) pr.stats[bump[0]] = (pr.stats[bump[0]] || 0) + bump[1];
+    else if (g.id === "stars") pr.adventure.starsEarned += 8;
+    else if (g.id === "wins") pr.sports.pichanga.wins += 2;
+    return { id: g.id, c0 };
+  });
   await p.click("#btn-adventure-back");
   await p.waitForTimeout(300);
-  ok(/Mi meta/.test(await p.textContent("#lb-goal")) && await p.isVisible("#lb-goal"), "la meta elegida se ve en el menú");
+  ok(/premios de las metas de la semana/.test(await p.textContent("#lb-goal")) && await p.isVisible("#lb-goal"), `el menú avisa que hay un premio para cobrar (meta «${wk.id}»)`);
+  await p.evaluate(() => document.getElementById("btn-path-me").click());
+  await p.evaluate(() => document.getElementById("me-town").click());
+  await p.waitForTimeout(400);
+  await p.click("#adv-goals .wk-claim");
+  const cobro = await p.evaluate((c0) => window.__progress().coins - c0, wk.c0);
+  ok(cobro >= 80 && (await p.$$("#adv-goals .wk-goal.claimed")).length === 1, `se cobra la meta: +${cobro} Matipuntos y queda marcada`);
+  // la aventura de esta prueba también sube otros contadores (⭐, Matipuntos): se cobra todo lo que esté listo
+  for (let i = 0; i < 3 && (await p.$("#adv-goals .wk-claim")); i++) await p.click("#adv-goals .wk-claim");
+  if (await p.$("#adv-goals .wk-chest")) await p.click("#adv-goals .wk-chest");
+  await p.click("#btn-adventure-back");
+  await p.waitForTimeout(300);
+  ok(/Metas de la semana: \d\/3|Metas de la semana listas/.test(await p.textContent("#lb-goal")), `con todo cobrado, el menú muestra el avance («${await p.textContent("#lb-goal")}»)`);
   // simula haber cerrado la app hace 5 horas (al salir, la app anota la hora; aquí se corrige justo antes de abrir)
   await p.addInitScript(() => {
     try { if (sessionStorage.getItem("qaAway") !== "1") return; } catch (e) { return; } // (el iframe de privacidad no tiene almacenamiento)

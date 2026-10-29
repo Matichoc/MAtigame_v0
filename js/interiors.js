@@ -564,6 +564,7 @@ export class Interiors {
     const coins = a.def.reward ?? REWARD;
     pr.visits = pr.visits || {};
     pr.visits[a.key] = todayKey();
+    pr.stats.visits = (pr.stats.visits || 0) + 1; // para las metas de la semana (js/weekly.js)
     earnCoins(pr, coins);
     addStars(pr, 1);
     saveProgress(pr);
