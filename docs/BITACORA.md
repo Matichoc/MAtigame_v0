@@ -69,6 +69,18 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 - La cocina de Crea tu Chocolate: **44 dibujos** y 6.000 triángulos (menos que la vista de diseño, que usa 197).
 - Como referencia, Choco Match, que anda bien en su celular, usa 835 dibujos y 106.000 triángulos.
 
+**Pruebas** (todas contra la variante app, salvo que se diga):
+- **Nuevas:** `porristas-rutina.cjs` (una jugadora perfecta gana con 3 estrellas y la pirámide; sin tocar se pierden los 3 ❤️; tocar sin parar no sirve), `creador-cocina.cjs` (la cocina completa con el mouse; se desbloquea el chocolate rosa; no se gastan Matipuntos), `aventura-3d.cjs` (cámara, tres cuartos, estirarse, aplastarse y girar), `semanal-logica.mjs` (17), `parkour-escalar.cjs` y `fichas.cjs`. `visitas.cjs` se amplió a 85 revisiones.
+- **Regresión completa, todo en verde (30 de 30):**
+  - Lógica: aventura, deportes, merge, puzzles y semanal.
+  - Navegador: juegos (15/15, sin conexiones externas), pueblo, contraste, interactivo, lago, puertas-toque, ciudad-barrios, ciudad-diaria, aventura, temporada, album, perfiles, visitas, mascota, fichas, parkour-escalar, porristas-rutina, creador-cocina, aventura-3d, deportes, merge, atras, legal, enlaces y respaldo-nativo.
+- `enlaces.cjs` ahora termina la cocina para llegar al resultado de Crea tu Chocolate (en la app no hay botón de WhatsApp; en la web sí).
+- **Capturas de la ficha renovadas** (`store/screenshots/*` y `store/feature-graphic.png`), porque Porristas y Crea tu Chocolate cambiaron. Se tomaron desde la variante app con la fecha del aparato en junio (`QA_FECHA`), para que no salga la decoración de Halloween. El único aviso de consola es el del reloj simulado de las pruebas, que no es del juego.
+
+**Copia web:** Matichoc/matiweb#54 (`1d2ddad`), probada contra la demo:
+- Pasaron porristas-rutina, creador-cocina, aventura-3d, visitas, fichas, parkour-escalar, mascota, interactivo, puertas-toque, legal y enlaces.
+- juegos: 15 de 16. Falla Choco Blaster, el mismo fallo conocido de la web.
+
 ## 2026-10-28
 
 ### Política pública comprobada
