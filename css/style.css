@@ -2636,3 +2636,29 @@ body:has(#screen-merge:not(.hidden)) .game-energy { top: auto; bottom: 168px; }
 .wk-claim { padding: 8px 12px; font-size: 0.85rem; white-space: nowrap; }
 .wk-ok { font-size: 1.3rem; }
 .wk-chest { width: 100%; }
+
+/* Saltos de Porristas: barrita del ritmo (los 8 tiempos del tramo, el que suena y en cuáles hay que tocar) */
+.pr-rhythm {
+  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); z-index: 5;
+  display: flex; align-items: center; gap: 10px; pointer-events: none; max-width: calc(100% - 120px);
+  background: rgba(30, 15, 42, 0.62); border: 2px solid rgba(255, 200, 0, 0.55); border-radius: 999px; padding: 4px 12px;
+}
+.pr-rhythm.hidden { display: none; }
+.pr-cue { color: #fff6e6; font-weight: 800; font-size: 0.85rem; text-shadow: 0 1px 2px #000; white-space: nowrap; min-width: 9.5em; text-align: right; }
+.pr-beats { display: flex; gap: 5px; }
+.pr-beat {
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 0.72rem; font-weight: 800;
+  color: #fff6e6; background: rgba(255, 255, 255, 0.12); border: 2px solid rgba(255, 255, 255, 0.25); transition: transform 0.08s;
+}
+.pr-beat.hit { background: rgba(255, 200, 0, 0.25); border-color: #ffc800; font-size: 0.9rem; }
+.pr-beat.now { transform: scale(1.25); border-color: #fff; background: rgba(255, 255, 255, 0.35); }
+.pr-beat.perfect { background: #ffc800; border-color: #fff6e6; }
+.pr-beat.good { background: #7ddc4a; border-color: #fff6e6; }
+.pr-beat.miss { background: #6b5a66; border-color: #9a8a94; opacity: 0.8; }
+.pr-hearts { font-size: 0.8rem; letter-spacing: 1px; white-space: nowrap; }
+@media (max-width: 560px) { .pr-cue { display: none; } }
+#porristas-touch-controls { justify-content: flex-end; }
+.pr-tap { width: 74px; height: 74px; font-size: 2rem; border-radius: 50%; }
+@media (pointer: coarse) and (orientation: landscape) {
+  #porristas-touch-controls { justify-content: flex-end; }
+}
