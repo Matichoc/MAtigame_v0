@@ -27,7 +27,7 @@ Elige a tu Matichico, cámbiale peinado, ropa, sombreros y mucho más en la tien
 
 🏀 LANZAMIENTOS DE BÁSQUET — Fija puntería y potencia, encesta con el aro dorado y escucha a la hinchada.
 
-🤸 SALTOS DE PORRISTAS — Mueve la rebotadora, haz volteretas y junta pompones.
+🤸 SALTOS DE PORRISTAS — Toca al ritmo con tu equipo: lanzamientos, figuras en el aire y la pirámide final.
 
 🦘 SALTO CHOCO · 🏎️ AUTOS DE CHOCOLATE · 🧠 MEMORIA MATICHOC — Más aventuras: sube sin parar, esquiva en la ruta y encuentra las parejas de golosinas.
 

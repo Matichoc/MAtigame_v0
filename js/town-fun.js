@@ -392,6 +392,8 @@ export class TownFun {
   buildHomes() {
     const g = this.g;
     const SPACING = 14;
+    // los aros del circuito se arman después (build): se apartan sus lugares para que ninguna casita quede encima de uno
+    for (let i = 0; i < RING_COUNT; i++) this.claimed.push({ ...pol(10 + i * 45, 26), r: 2.5 });
     const spot = this._findSpot((deg, r) => HOMES.map((_, k) => pol(deg + k * SPACING, r)), 7.5, [30, 44, 34, 40]);
     if (!spot) return;
     HOMES.forEach((def, k) => {

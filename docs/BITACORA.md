@@ -4,6 +4,90 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-29
+
+### Merges de la persona dueña
+- Hizo merge del **PR #50** (casas por dentro, mascotas, corrección del tema Android, `lintRelease` y capturas nuevas) y de su copia web **matiweb #53**: quedan publicados en matichoc.cl. `main` queda en `23e7355`.
+- Como ese PR ya está cerrado, la rama `claude/zealous-johnson-2ryf87` se rehízo desde `main` para el grupo nuevo.
+
+### Grupo de mejoras del 29-oct (rama `claude/zealous-johnson-2ryf87`, un solo PR al final)
+**Pedidos de la persona dueña** (después de probar el APK 93):
+1. Recolecta y Corre: las cintas se mezclan con el piso.
+2. Las metas («Mi meta») ya las completó y no se renuevan.
+3. Le sobran casi 500 calabazas y no tiene qué más comprar.
+4. Pueblo: las casitas de visita quedaron encima de un aro.
+5. Las casas que quería por dentro eran las de la **Ciudad** (las cerradas y la Fábrica), para entrar y mirar «como en Pokémon».
+6. Parkour: aparecen árboles en los espacios (parece que se puede pasar por entremedio); faltan muros para escalar; casi no salen la casa ni la bajada.
+7. Saltos de Porristas necesita un refresh: que la levanten, la lancen, la reciban.
+8. Crea tu Chocolate más manual: revolver, llevar los ingredientes, conseguirlos dentro del juego.
+9. Aventura Choco: más 3D que 2D y que el monito se vea mejor al avanzar.
+
+**Decisiones de la persona dueña** (preguntas con opciones):
+- Fichas que sobran: «Que haya más cosas, pero que al terminar el evento se devuelvan como Matipuntos».
+- Metas: «Metas de la semana».
+- Porristas: «Rutina de porristas» (equipo que la lanza, figuras en el aire, pirámide; se juega tocando al ritmo).
+- Crea tu Chocolate: los ingredientes «se recogen jugando» (no se gastan Matipuntos).
+
+**Qué se hizo** (un commit por tema):
+- **`fffec85` Ciudad por dentro, temporada, Recolecta y Pueblo:**
+  - Ciudad: 11 puertas se pueden abrir (7 casas, el Kiosco, la Panadería, la Fábrica y la sala del Colegio). Adentro hay muebles, escondites y cosas para «👀 Mirar»; la Fábrica tiene sus máquinas y una misión. Se entra con «🚪 Entrar» o «🚪 Visitar», como en Pokémon.
+  - Temporadas: por evento, 5 prendas y 2 decoraciones de Mi Casa más (todas con fichas). Al terminar el evento, las fichas que sobran se cambian **una sola vez** por 2 Matipuntos cada una, con aviso. El cartel del evento ya lo dice.
+  - Recolecta y Corre: las cintas van sobre un marco un poco más alto, así no se mezclan con el piso ni con el logo.
+  - Pueblo: las casitas de visita respetan los aros del circuito.
+- **`c46a31e` Metas de la semana** (reemplazan a «Mi meta», que eran 5 fijas y sin premio):
+  - Cada lunes salen 3 metas sacadas de 13 (partidas, Matipuntos, ⭐, visitas, mascota, sobres, vecinos, alfajores, misiones, monedas de la Ciudad, partidos, Parkour). Las de la mascota solo salen si tiene una, y no se repiten las de la semana anterior.
+  - Cada meta da +80 Matipuntos y una ⭐; con las 3 cobradas se abre el cofre de la semana (+150 Matipuntos y un sobre).
+  - Miden lo que subió cada contador desde el lunes, así no hubo que tocar cada juego.
+- **`92b513f` Parkour:**
+  - **Los árboles:** eran adornos que flotaban muy cerca del camino, por eso parecía que se podía pasar entremedio. Ahora quedan lejos y más abajo, y no tapan la vista.
+  - Muros para escalar (tablas con agarres de colores): empujando hacia el muro, la Matichica trepa con una animación nueva. En la Aventura están en las etapas 1, 4 y 7; en el Mundo infinito salen seguido.
+  - Mundo infinito: hay una figura especial cada 6 tramos (45 %), con la casa por los balcones, la bajada y el muro mucho más presentes.
+- **`357e5e4` Saltos de Porristas, rutina de equipo:**
+  - Las bases cargan a la Matichica y la lanzan; en lo más alto hace una figura (estrella, giro, split; desde el nivel 5 el doble giro y desde el 8 el mortal) y la reciben. Al final del nivel arman una **pirámide** (base, suben, a la cima, ¡ta-dá!).
+  - Se juega tocando al ritmo (la pantalla, el botón 👏 o la barra espaciadora) cuando el aro dorado se cierra: «¡Arriba!», la figura y «¡Atrapa!». Abajo, una barrita muestra los 8 tiempos y en cuáles tocar.
+  - Si no la reciben a tiempo se pierde un ❤️ (hay 3). Tocar sin parar no sirve: cuenta como «¡Muy pronto!».
+  - La música la marca el juego tiempo a tiempo (bombo, aplausos, bajo y una campanita cuando hay que tocar).
+  - Se mantienen los 20 niveles (4 a 11 figuras y la pirámide; el ritmo sube de 88 a 132 por minuto), el modo infinito (se apura cada 2 figuras y hay pirámide cada 5), las estrellas (según la precisión) y la energía (1 ⚡ cada 2 figuras). La pirámide sin errores da 10 Matipuntos, como el pompón dorado de antes.
+  - Las compañeras se dibujan con piezas agrupadas (InstancedMesh): 13 dibujos para las 5.
+- **`7e0f22f` Crea tu Chocolate, cocina a mano:** después de diseñarlo, «👩‍🍳 ¡A la cocina!»:
+  1. **Juntar:** en la despensa van apareciendo ingredientes; se tocan los de la receta. Tocar la cebolla, el queso o el pescado avisa «¡Eso no va en un chocolate!».
+  2. **Llevar:** se arrastran del canasto a la olla.
+  3. **Derretir:** se mantiene apretado para calentar, con el termómetro en lo verde (si se pasa, se quema).
+  4. **Revolver:** 4 vueltas con el dedo alrededor de la olla; el relleno se va mezclando.
+  5. **Al molde:** se mantiene apretado para verter y se suelta en la raya verde (si no, se rebalsa).
+  6. **Decorar:** se toca el molde para espolvorear los toppings.
+  - Nada se paga con Matipuntos. Lo hecho a mano suma hasta 150 puntos a la creación.
+  - Ingredientes especiales que se **desbloquean cocinando:** el chocolate rosa y la frambuesa liofilizada (al cocinar el primero), el maracuyá y el kataifi (2 cocinados), el pistacho (3) y las hojuelas doradas (4). Las creaciones guardadas de antes cuentan. El reto del día solo pide ingredientes que todos tienen.
+- **`de2ecb5` Aventura Choco más 3D:**
+  - La cámara mira un poco desde arriba y de lado: se ve el borde de arriba del camino.
+  - El camino tiene el doble de fondo, con pastito y florcitas en los bordes, y detrás hay un prado más bajo con árboles (estalagmitas en la cueva y motitas en el cielo de algodón, para que no se confundan con los pinchos).
+  - La Matichica corre de tres cuartos (se le ve la cara), gira suave al darse vuelta, quieta mira hacia la cámara, se estira al saltar, se aplasta al caer y levanta polvito al correr y al aterrizar.
+
+**Costo de dibujo** (un cuadro, con sombras; navegador de pruebas, antes → después):
+- Saltos de Porristas: 239 → **228 dibujos**; 35.000 → 58.000 triángulos.
+- Aventura Choco: 210 → **213 dibujos**; 46.000 → 80.000 triángulos (pastito, flores y árboles agrupados).
+- La cocina de Crea tu Chocolate: **44 dibujos** y 6.000 triángulos (menos que la vista de diseño, que usa 197).
+- Como referencia, Choco Match, que anda bien en su celular, usa 835 dibujos y 106.000 triángulos.
+
+**Pruebas** (todas contra la variante app, salvo que se diga):
+- **Nuevas:** `porristas-rutina.cjs` (una jugadora perfecta gana con 3 estrellas y la pirámide; sin tocar se pierden los 3 ❤️; tocar sin parar no sirve), `creador-cocina.cjs` (la cocina completa con el mouse; se desbloquea el chocolate rosa; no se gastan Matipuntos), `aventura-3d.cjs` (cámara, tres cuartos, estirarse, aplastarse y girar), `semanal-logica.mjs` (17), `parkour-escalar.cjs` y `fichas.cjs`. `visitas.cjs` se amplió a 85 revisiones.
+- **Regresión completa, todo en verde (30 de 30):**
+  - Lógica: aventura, deportes, merge, puzzles y semanal.
+  - Navegador: juegos (15/15, sin conexiones externas), pueblo, contraste, interactivo, lago, puertas-toque, ciudad-barrios, ciudad-diaria, aventura, temporada, album, perfiles, visitas, mascota, fichas, parkour-escalar, porristas-rutina, creador-cocina, aventura-3d, deportes, merge, atras, legal, enlaces y respaldo-nativo.
+- `enlaces.cjs` ahora termina la cocina para llegar al resultado de Crea tu Chocolate (en la app no hay botón de WhatsApp; en la web sí).
+- **Capturas de la ficha renovadas** (`store/screenshots/*` y `store/feature-graphic.png`), porque Porristas y Crea tu Chocolate cambiaron. Se tomaron desde la variante app con la fecha del aparato en junio (`QA_FECHA`), para que no salga la decoración de Halloween. El único aviso de consola es el del reloj simulado de las pruebas, que no es del juego.
+
+**Copia web:** Matichoc/matiweb#54 (`1d2ddad`), probada contra la demo:
+- Pasaron porristas-rutina, creador-cocina, aventura-3d, visitas, fichas, parkour-escalar, mascota, interactivo, puertas-toque, legal y enlaces.
+- juegos: 15 de 16. Falla Choco Blaster, el mismo fallo conocido de la web.
+
+**APK de prueba: compilación 94** (commit `a7deb8b`), en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40930386014
+- Se compiló con la llave fija de pruebas, así que se instala encima del anterior.
+- Pasaron la comprobación de la app (sin uso de red) y `lintRelease`.
+
+**PR del grupo:** #51. Copia web: matiweb #54. Los dos esperan la revisión y el merge de la persona dueña.
+- **Qué probar en el celular:** la rutina de Porristas (tocar al ritmo y la pirámide), la cocina de Crea tu Chocolate (arrastrar a la olla y mantener apretado para calentar y verter), Aventura Choco (cámara y animación), las puertas de la Ciudad y las metas de la semana.
+
 ## 2026-10-28
 
 ### Política pública comprobada

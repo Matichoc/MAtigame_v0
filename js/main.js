@@ -17,7 +17,7 @@ import {
   getLastActiveProfileId, setLastActiveProfileId, MAX_PROFILES,
 } from "./profiles.js";
 import { ACHIEVEMENTS, ACHIEVEMENT_CHAINS, CATEGORIES as ACH_CATEGORIES, achievementProgress } from "./achievements.js";
-import { activeEvent, eventById, eventEnd, nextEvent, eventTokens, eventItemAvailable, buyEventItem } from "./events.js";
+import { activeEvent, eventById, eventEnd, nextEvent, eventTokens, eventItemAvailable, buyEventItem, settleEventTokens } from "./events.js";
 import {
   HOUSE_SPOTS, houseItemsOfSpot, getHouseItem, ownsHouseItem, buyHouseItem, placeHouseItem, placedWithDefaults,
   FURN_CATEGORIES, furnitureOf, isWallItem, houseLayout, layoutAdd, layoutRemove, buyFurniture, copiesOf, placedCount, HOUSE_SIZES, houseSize, roomSizeLevel, houseSizeCost, buyHouseSize, moveRoom,
@@ -239,7 +239,7 @@ function renderEventBanner() {
   const e = activeEvent();
   if (e) {
     const end = eventEnd(e);
-    el.innerHTML = `<span class="eb-ico">${e.icon}</span><span class="eb-body"><b>${e.name}</b><small>${e.blurb} Hasta el ${String(end.getDate()).padStart(2, "0")}/${String(end.getMonth() + 1).padStart(2, "0")}.</small></span><span class="eb-tokens">${e.token} ${eventTokens(progress, e.id)}</span><button class="btn-primary eb-go" type="button">Ir al pueblo</button>`;
+    el.innerHTML = `<span class="eb-ico">${e.icon}</span><span class="eb-body"><b>${e.name}</b><small>${e.blurb} Hasta el ${String(end.getDate()).padStart(2, "0")}/${String(end.getMonth() + 1).padStart(2, "0")}. Las fichas que no uses vuelven como Matipuntos.</small></span><span class="eb-tokens">${e.token} ${eventTokens(progress, e.id)}</span><button class="btn-primary eb-go" type="button">Ir al pueblo</button>`;
     el.querySelector(".eb-go").onclick = () => playGame("town");
     el.classList.remove("hidden", "soon");
     el.style.setProperty("--ev", "#" + e.colors[0].toString(16).padStart(6, "0"));
@@ -481,8 +481,12 @@ function chooseProfile(id) {
   if (meta && meta.name && progress.playerName !== meta.name) progress.playerName = meta.name;
   selectedCharacter = CHARACTERS.find((c) => c.id === progress.selectedCharacterId) || null;
   shopCharacterId = (selectedCharacter && selectedCharacter.id) || CHARACTERS[0].id;
+  // terminó un evento: las fichas que sobraron vuelven como Matipuntos
+  const refunds = settleEventTokens(progress);
+  if (refunds.length) saveProgress(progress);
   bootHub();
   showScreen(screenHub);
+  if (refunds.length) setTimeout(() => showToast(refunds.map((r) => `${r.event.icon} Terminó ${r.event.name}: tus ${r.tokens} ${r.event.token} se cambiaron por ${r.coins} Matipuntos 🍫✨`).join(" · ")), 900);
   advUI.showWelcome(); // al volver después de un rato: resumen corto del avance y del siguiente objetivo
 }
 
@@ -1224,7 +1228,7 @@ function renderHouseStyle() {
     card.className = "sh-card" + (equipped ? " equipped" : "") + (trying ? " trying" : "") + (!owned ? " locked" : "");
     if (item) card.style.setProperty("--rar", RARITIES[item.rarity].color);
     card.innerHTML = `<span class="sh-ico">${item ? item.icon : "🚫"}</span><span class="sh-name">${item ? item.name : "Nada"}</span>` +
-      `<span class="sh-price">${equipped ? "✓ Puesto" : owned ? (item && item.price ? "Tuyo" : "Gratis") : `🍫✨ ${item.price}`}</span>`;
+      `<span class="sh-price">${equipped ? "✓ Puesto" : owned ? (item && item.price ? "Tuyo" : "Gratis") : priceLabel(item)}</span>`;
     card.addEventListener("click", () => {
       if (owned) {
         placeHouseItem(progress, houseSpot, id);
@@ -1244,14 +1248,17 @@ function renderHouseStyle() {
   const tid = houseTrial[houseSpot];
   const titem = tid ? getHouseItem(tid) : null;
   if (titem) {
-    const need = titem.price - progress.coins;
+    // de temporada: se paga con las fichas del evento y solo mientras dura
+    const evt = titem.event ? eventById(titem.event) : null;
+    const need = evt ? titem.tokens - eventTokens(progress, evt.id) : titem.price - progress.coins;
     const txt = document.createElement("div");
     txt.className = "sh-bar-txt";
     txt.innerHTML = `<b>${titem.icon} ${titem.name}</b> <i style="color:${RARITIES[titem.rarity].color}">${RARITIES[titem.rarity].name}</i>`;
     const buy = document.createElement("button");
     buy.className = "btn-primary";
-    buy.textContent = need > 0 ? `Te faltan ${need} Matipuntos` : `Comprar · 🍫✨ ${titem.price}`;
-    buy.disabled = need > 0;
+    if (evt && !eventItemAvailable(titem)) { buy.textContent = `🔒 Solo en ${evt.icon} ${evt.name}`; buy.disabled = true; }
+    else if (evt) { buy.textContent = need > 0 ? `Te faltan ${need} ${evt.token}` : `Comprar · ${evt.token} ${titem.tokens}`; buy.disabled = need > 0; }
+    else { buy.textContent = need > 0 ? `Te faltan ${need} Matipuntos` : `Comprar · 🍫✨ ${titem.price}`; buy.disabled = need > 0; }
     buy.addEventListener("click", () => {
       const had = ownsHouseItem(progress, titem.id);
       if (!buyHouseItem(progress, titem.id)) return;

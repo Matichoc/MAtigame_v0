@@ -42,7 +42,7 @@ const ENTRADAS = {
   dulces: { clics: [[0.4, 0.5], [0.5, 0.5], [0.6, 0.5]] },
   merge: { clics: [[0.4, 0.5], [0.5, 0.55]], arrastres: [[[0.3, 0.5], [0.5, 0.5]]] },
   creador: { arrastres: [[[0.3, 0.5], [0.6, 0.5]]], teclas: [] },
-  porristas: { teclas: ["ArrowRight", "ArrowRight", "ArrowRight", "ArrowRight"] },
+  porristas: { teclas: ["Space", "Space", "Space", "Space"] },
   tetris: { teclas: ["ArrowLeft", "ArrowUp", "ArrowRight", "Space"] },
   basquet_tiros: { teclas: ["Space", "Space"] },
   futbol: { teclas: ["ArrowLeft", "Space", "ArrowRight"] },
