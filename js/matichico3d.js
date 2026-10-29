@@ -299,6 +299,15 @@ export function createMatichico(character, outfit, look = null) {
       armL = [0.6 * k, 0, -0.5];
       armR = [-0.6 * k, 0, 0.5];
       lean = -0.12 * k;
+    } else if (mode === "climb") {
+      // escalar un muro: brazos arriba que se turnan para agarrarse y piernas que empujan
+      const c = Math.sin(t * 9 * speed);
+      armL = [-2.7 + c * 0.45, 0, -0.25];
+      armR = [-2.7 - c * 0.45, 0, 0.25];
+      legL = -0.5 + c * 0.6;
+      legR = -0.5 - c * 0.6;
+      bob = Math.abs(c) * 0.04;
+      lean = -0.08;
     } else if (mode === "drive") {
       armL = [-1.25, 0, -0.35];
       armR = [-1.25, 0, 0.35];
