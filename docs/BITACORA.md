@@ -14,6 +14,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - El juego aprende con los toques cuánto se atrasa cada persona en su celular (hasta 0,3 s) y lo descuenta. Queda guardado en el perfil para la próxima vez.
   - Un arreglo en `audio.js`: un sonido programado para más adelante empezaba más bajito (el volumen ya venía bajando). Ahora parte con su volumen.
 - **Prueba:** `porristas-rutina.cjs` simula a alguien que toca siempre 0,15 s tarde; a los pocos toques todo sale «¡Perfecto!» y el ajuste queda guardado.
+- **APK de prueba:** compilación 95 (commit `228c561`), en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40974899214. PR #52 y su copia web matiweb #57.
 
 ### Prueba en el celular: APK 94
 - La persona dueña descargó el APK de la compilación 94 y probó:
