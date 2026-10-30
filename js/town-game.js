@@ -343,6 +343,7 @@ export class TownGame extends Game3D {
       b.traverse((o) => { if (o.isMesh) o.castShadow = true; });
       this.scene.add(b);
       this.addBench({ x: p.x, z: p.z, yaw, seat: 0.57 });
+      this.colliders.push({ type: "b", x: p.x, z: p.z, yaw, hw: 0.95, hd: 0.32 }); // la banca no se atraviesa
     }
   }
 
@@ -476,6 +477,9 @@ export class TownGame extends Game3D {
         pillar.position.set(sx * 2.2, 2.5, 0);
         pillar.castShadow = true;
         g.add(pillar);
+        // los pilares chocan; se puede pasar por el medio del portal
+        const yaw = Math.atan2(-p.x, -p.z);
+        this.colliders.push({ type: "c", x: p.x + Math.cos(yaw) * sx * 2.2, z: p.z - Math.sin(yaw) * sx * 2.2, r: 0.55 });
       }
       const beam = new THREE.Mesh(roundedBox(5.6, 1, 0.9, 0.3, 0.06), m);
       beam.position.set(0, 5.2, 0);
@@ -509,6 +513,7 @@ export class TownGame extends Game3D {
       const bulb = new THREE.Mesh(bulbGeo, this.m.lamp);
       bulb.position.set(p.x, 4.1, p.z);
       s.add(pole, bulb);
+      this.colliders.push({ type: "c", x: p.x, z: p.z, r: 0.2 });
     }
     // árboles (instanciados, livianos) en el borde y entre las zonas
     let seed = 7;
@@ -536,6 +541,7 @@ export class TownGame extends Game3D {
     good.forEach(([x, z, sc], i) => {
       mat.makeScale(sc, sc, sc).setPosition(x, 1.2 * sc, z);
       trunks.setMatrixAt(i, mat);
+      this.colliders.push({ type: "c", x, z, r: 0.4 * sc }); // el tronco
       mat.makeScale(sc, sc * 0.9, sc).setPosition(x, 3.4 * sc, z);
       crowns.setMatrixAt(i, mat);
       crowns.setColorAt(i, col.setHex(palette[Math.floor(rnd() * (i % 9 === 0 ? 5 : 3))]));

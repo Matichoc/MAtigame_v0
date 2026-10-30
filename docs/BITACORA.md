@@ -6,6 +6,25 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-30
 
+### Nada se atraviesa en el Pueblo ni en la Ciudad
+- **Pedido de la persona dueña:** «no debo atravesar nada»: pasaba a través de bancas y rejas.
+- **Cómo se buscó:** una revisión automática recorrió todos los objetos con altura de cada mundo, donde se alcanza a caminar, y anotó cuáles no tenían choque.
+  - Pueblo: 74 objetos sin choque.
+  - Ciudad: 147 objetos sin choque.
+- **Qué se arregló:**
+  - **Pueblo:**
+    - Las 3 bancas de la fuente (se sigue pudiendo sentarse en ellas).
+    - Los 12 faroles de la plaza.
+    - Los pilares de las puertas del Arcade. Por el medio de cada puerta se sigue pasando.
+    - Los 2 parlantes de la pista de baile.
+    - Los troncos de los árboles de adentro.
+  - **Ciudad:**
+    - Todas las rejas: la de Don Pepe, que se sigue pintando al pasar junto a ella, las de los vecinos y la del huerto de Doña Rosa. La del huerto ahora tiene una entrada al medio, frente al cartel.
+    - Los árboles del borde, hasta donde se puede caminar.
+- **Lo que queda sin choque, a propósito:** los trampolines (se salta encima), los cofres del tesoro y las manzanas (se recogen al tocarlos) y los vecinos. Queda además un adorno amarillo al norte del Pueblo que no se alcanzó a identificar.
+- **Prueba nueva:** `scripts/qa/solidos.cjs`. Camina derecho contra cada una de estas cosas y revisa que choca, y que por el medio de las puertas del Arcade y por la entrada del huerto sí se pasa.
+- **Video:** la toma del Pueblo se regrabó con la vuelta en patineta por dentro del escenario (8 m de la fuente), para que no se vea atravesándolo ni con la cámara metida en los letreros.
+
 ### Revisión del video y escenario del Pueblo (lo que vio la persona dueña)
 - **Voces que no calzaban:**
   - Lo que vio: en el corto se habla de básquet mientras se ve fútbol; en el largo se habla de la Ciudad mientras se ve básquet.

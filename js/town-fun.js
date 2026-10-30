@@ -240,6 +240,12 @@ export class TownFun {
       grp.add(sp, cone);
       (this.speakers ||= []).push(cone);
     }
+    // los parlantes no se atraviesan
+    grp.updateMatrixWorld(true);
+    for (const sx of [-1, 1]) {
+      const w = grp.localToWorld(new THREE.Vector3(sx * 5.6, 0, -1.5));
+      g.colliders.push({ type: "b", x: w.x, z: w.z, yaw: grp.rotation.y, hw: 0.6, hd: 0.5 });
+    }
     g.scene.add(grp);
     this.danceGrp = grp;
   }

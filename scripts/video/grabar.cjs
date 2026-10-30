@@ -108,12 +108,14 @@ const ESCENAS = {
       const g = window.__g3d.town;
       g.moveIdx = 99; // la forma de moverse más rápida que tenga desbloqueada
       g._updateMoveBtn?.();
-      // una vuelta en monopatín alrededor de la fuente de chocolate (centro 0,0), con la cámara detrás
-      g.pos.set(0, 0, 13);
+      // una vuelta en monopatín alrededor de la fuente de chocolate (centro 0,0), con la cámara detrás; por dentro del
+      // escenario del festival (que ahora es sólido y empieza a 9,3 m de la fuente) y sin meter la cámara en los letreros
+      const R = 8;
+      g.pos.set(0, 0, R);
       g.camPitch = 0.62;
       g._input = () => {
         const a = Math.atan2(g.pos.x, g.pos.z) + 0.45;
-        const tx = Math.sin(a) * 13, tz = Math.cos(a) * 13;
+        const tx = Math.sin(a) * R, tz = Math.cos(a) * R;
         const dx = tx - g.pos.x, dz = tz - g.pos.z, d = Math.hypot(dx, dz) || 1;
         let dy = Math.atan2(-dx, -dz) + 0.5 - g.camYaw; // cámara detrás y un poco hacia afuera de la vuelta
         dy = Math.atan2(Math.sin(dy), Math.cos(dy));
