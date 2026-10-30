@@ -685,8 +685,11 @@ export class TownGame extends Game3D {
     const d = (p) => Math.hypot(P.x - p.x, P.z - p.z);
     if (P.y < 0.8 && d(T.foot) < 1.9) return { kind: "fn", label: "🪜 Subir a la casita", fn: () => this._climb(true), d: d(T.foot) };
     if (P.y > T.porchTop - 0.3) {
-      if (d(T.door) < 1.3) return { kind: "fn", label: "🚪 Entrar a la casita", fn: () => this._enterTree(), d: d(T.door) };
-      if (d(T.top) < 1.4) return { kind: "fn", label: "🪜 Bajar", fn: () => this._climb(false), d: d(T.top) };
+      // la puerta o la escalera: la que esté más cerca
+      const door = d(T.door) < 1.3 ? { kind: "fn", label: "🚪 Entrar a la casita", fn: () => this._enterTree(), d: d(T.door) } : null;
+      const down = d(T.top) < 1.4 ? { kind: "fn", label: "🪜 Bajar", fn: () => this._climb(false), d: d(T.top) } : null;
+      if (door && down) return door.d <= down.d ? door : down;
+      return door || down;
     }
     return null;
   }
