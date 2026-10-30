@@ -28,6 +28,16 @@ const GUION = {
   6: ["¡Entra a la Fábrica Matichoc!", 2],
   7: ["¡Ven a jugar con nosotros y sé parte de la historia de Matichoc! Gratis, sin anuncios. ¡Te esperamos!", 4],
   8: ["¿Tienes Android? ¡Únete como tester en matichoc.cl!", 2.5],
+  // para reemplazar las voces del video anterior (no seguían el orden de sus imágenes: no se sabe bien qué dice cada una)
+  9: ["¡Esto es Matijuego!", 1.8],
+  10: ["¡Explora tu propio pueblo y conoce a todos los vecinos!", 3.5],
+  11: ["¡Junta estrellas y renueva el Pueblo!", 2.2],
+  12: ["¡Pichanga de tres contra tres!", 1.8],
+  13: ["¡Y básquet de dos contra dos!", 1.8],
+  14: ["¡Maneja por la Ciudad Choco!", 2.5],
+  15: ["¡Corre, salta y escala!", 1.8],
+  16: ["¡Junta dulces y entrega pedidos!", 2.2],
+  17: ["¡Y más de catorce juegos en 3D!", 2.2],
 };
 
 // Qué parte de cada grabación (1920×1080) se ve en la ventana: centro y alto del recorte; "caja" muestra un rectángulo
@@ -57,36 +67,37 @@ const CARTEL = {
 const GANCHO = ["¿LISTOS", "PARA", "JUGAR?", "¡VAMOS!"];
 
 // Escenas: [id, tomas [[carpeta, primer cuadro, tiempos]], voz]. Los cortes caen siempre en un tiempo de la música.
+// Una voz puede ser una lista: se usa la primera que exista (la frase nueva y, si falta, la del video anterior).
+// Del video anterior solo se usan las que se sabe qué dicen (la 4 habla del básquet y la 6 de la Ciudad, según la dueña;
+// la 1 y la 2 acompañaban la portada y el Pueblo sin reclamos). Las demás (3, 5, 7, 8 y 9) no se usan hasta saberlo.
 const PLANES = {
   largo: [
     ["gancho", [["pichanga", 60, 1], ["porristas", 300, 1], ["parkour", 60, 1], ["aventura", 60, 1]], "nueva-1"],
-    ["logo", 4, "original-1"],
-    ["pueblo", [["pueblo", 5, 9]], "original-2"],
+    ["logo", 4, "nueva-9"],
+    ["pueblo", [["pueblo", 5, 9]], ["nueva-10", "original-2"]],
     ["casita", [["casita", 20, 3], ["casita", 99, 3]], "nueva-3"],
-    ["renovar", [["renovar", 60, 5]], "original-3"],
+    ["renovar", [["renovar", 60, 5]], "nueva-11"],
     ["porristas", [["porristas", 0, 2], ["porristas", 150, 3], ["porristas", 285, 3]], "nueva-2"],
-    ["pichanga", [["pichanga", 40, 4]], "original-4"],
-    ["basquet", [["basquet", 40, 4]], "original-6"],
-    ["ciudad", [["ciudad", 30, 6]], "original-5"],
+    ["pichanga", [["pichanga", 40, 4]], "nueva-12"],
+    ["basquet", [["basquet", 40, 4]], ["nueva-13", "original-4"]],
+    ["ciudad", [["ciudad", 30, 6]], ["nueva-14", "original-6"]],
     ["fabrica", [["fabrica", 20, 4]], "nueva-6"],
     ["cocina", [["cocina", 10, 2], ["cocina", 70, 1], ["cocina", 125, 1], ["cocina", 160, 1], ["cocina", 205, 2]], "nueva-4"],
-    ["parkour", [["parkour", 40, 4]], "original-7"],
+    ["parkour", [["parkour", 40, 4]], "nueva-15"],
     ["aventura", [["aventura", 30, 5]], "nueva-5"],
-    ["merge", [["merge", 40, 5]], "original-8"],
-    ["extras", [["extras", 5, 1], ["extras", 44, 1], ["extras", 83, 1], ["extras", 122, 2]], "original-9"],
+    ["merge", [["merge", 40, 5]], "nueva-16"],
+    ["extras", [["extras", 5, 1], ["extras", 44, 1], ["extras", 83, 1], ["extras", 122, 2]], "nueva-17"],
     ["final", 14, "nueva-7", "nueva-8"],
   ],
   corto: [
     ["gancho", [["pichanga", 60, 1], ["porristas", 300, 1], ["parkour", 60, 1], ["aventura", 60, 1]], "nueva-1"],
-    ["logo", 4, "original-1"],
-    ["pueblo", [["pueblo", 5, 9]], "original-2"],
-    ["casita", [["casita", 20, 2], ["casita", 99, 2]], null],
+    ["logo", 4, "nueva-9"],
+    ["pueblo", [["pueblo", 5, 9]], ["nueva-10", "original-2"]],
+    ["casita", [["casita", 20, 2], ["casita", 99, 2]], "nueva-3"],
     ["porristas", [["porristas", 150, 3], ["porristas", 285, 3]], "nueva-2"],
-    ["pichanga", [["pichanga", 40, 4]], "original-4"],
-    ["ciudad", [["ciudad", 30, 6]], "original-5"],
-    ["cocina", [["cocina", 10, 2], ["cocina", 125, 1], ["cocina", 205, 2]], null],
-    ["aventura", [["aventura", 30, 4]], null],
-    ["extras", [["extras", 5, 1], ["extras", 44, 1], ["extras", 83, 1], ["extras", 122, 2]], "original-9"],
+    ["ciudad", [["ciudad", 30, 6]], ["nueva-14", "original-6"]],
+    ["cocina", [["cocina", 10, 2], ["cocina", 125, 1], ["cocina", 205, 2]], "nueva-4"],
+    ["aventura", [["aventura", 30, 4]], "nueva-5"],
     ["final", 10, "nueva-7"],
   ],
 };
@@ -230,20 +241,38 @@ function montar() {
   const partes = [];
   const voces = [];
   let beat = 0;
+  let libre = 0; // cuándo termina la última voz: dos voces nunca se pisan
   const cuadro = (b) => Math.round(b * BEAT * FPS);
+  const existe = (v) => fs.existsSync(path.join(OUT, "voces", `${v}.wav`));
+  const largoVoz = (v) => Number(execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path.join(OUT, "voces", `${v}.wav`)]).toString());
   for (const [id, tomas, ...vs] of plan) {
     const t0 = beat * BEAT;
+    // voces de la escena (la primera alternativa que exista), una detrás de otra; la escena se alarga, en tiempos
+    // enteros de la música, hasta que termine de hablar (menos el gancho, que son cuatro golpes justos)
+    let fin = t0;
+    for (const [k, alt] of vs.entries()) {
+      if (!alt) continue;
+      const v = [].concat(alt).find(existe);
+      if (!v) { voces.push([alt, 0]); continue; } // queda anotada como faltante
+      const ini = Math.max(t0 + (id === "logo" || id === "final" ? 0.12 : 0.15), libre + (k ? 0.3 : 0.15));
+      voces.push([v, ini]);
+      libre = ini + largoVoz(v);
+      fin = Math.max(fin, libre + 0.2);
+    }
+    const base = typeof tomas === "number" ? tomas : tomas.reduce((a, t) => a + t[2], 0);
+    const mas = id === "gancho" ? 0 : Math.max(0, Math.ceil((fin - t0) / BEAT - 1e-6) - base);
     if (id === "logo" || id === "final") {
-      const n = cuadro(beat + tomas) - cuadro(beat);
+      const total = tomas + mas;
+      const n = cuadro(beat + total) - cuadro(beat);
       const sal = path.join(TMP, `p${String(partes.length).padStart(2, "0")}-${id}.mp4`);
       (id === "logo" ? tarjetaLogo : tarjetaFinal)(sal, n);
       partes.push(sal);
-      vs.forEach((v, k) => v && voces.push([v, t0 + (k ? 7 * BEAT : 0.12)]));
-      beat += tomas;
+      beat += total;
       continue;
     }
     let off = 0;
     tomas.forEach(([dir, desde, b], k) => {
+      if (k === tomas.length - 1) b += mas; // la última toma dura lo que falte para que termine la voz
       const n = cuadro(beat + b) - cuadro(beat);
       const sal = path.join(TMP, `p${String(partes.length).padStart(2, "0")}-${id}-${k}.mp4`);
       let extra = null;
@@ -261,7 +290,6 @@ function montar() {
       off += n / FPS;
       beat += b;
     });
-    vs.forEach((v) => v && voces.push([v, t0 + 0.15]));
   }
   const dur = beat * BEAT;
   console.log(`${VERSION}: ${beat} tiempos = ${dur.toFixed(1)} s, ${partes.length} partes`);
@@ -275,8 +303,8 @@ function montar() {
   // música a la medida y voces encima: la música baja sola cuando alguien habla
   const musica = path.join(TMP, `musica-${VERSION}.wav`);
   execFileSync("node", [path.join(__dirname, "musica.cjs"), musica, (dur + 0.05).toFixed(3)], { stdio: "inherit" });
-  const presentes = voces.filter(([v]) => fs.existsSync(path.join(OUT, "voces", `${v}.wav`)));
-  const faltan = voces.filter(([v]) => !fs.existsSync(path.join(OUT, "voces", `${v}.wav`))).map(([v]) => v);
+  const presentes = voces.filter(([v]) => typeof v === "string" && existe(v));
+  const faltan = voces.filter(([v]) => !(typeof v === "string" && existe(v))).map(([v]) => [].concat(v)[0]);
   if (faltan.length) console.log("voces que faltan (van solo con cartel):", faltan.join(", "));
   const ent = ["-i", video, "-i", musica];
   let f = "";

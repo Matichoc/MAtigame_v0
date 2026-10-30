@@ -1250,6 +1250,8 @@ export class TownGame extends Game3D {
     const outside = !(this.visits && this.visits.active);
     const tree = outside ? this._treeTarget(P) : null;
     if (tree && tree.d < bestD + 0.5) { best = tree; bestD = tree.d - 0.5; } // la escalera y la puerta ganan a lo que haya cerca
+    const stage = outside && this.festival ? this.festival.stageTarget(P) : null;
+    if (stage && stage.d < bestD) { best = stage; bestD = stage.d; }
     for (const it of outside ? this.interact : []) {
       const d = Math.hypot(it.x - P.x, it.z - P.z);
       if (d < it.radius && d < bestD) { best = it; bestD = d; }

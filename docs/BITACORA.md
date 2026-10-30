@@ -6,6 +6,27 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-30
 
+### Revisión del video y escenario del Pueblo (lo que vio la persona dueña)
+- **Voces que no calzaban:**
+  - Lo que vio: en el corto se habla de básquet mientras se ve fútbol; en el largo se habla de la Ciudad mientras se ve básquet.
+  - Por qué: el video anterior no tenía básquet y su voz no seguía el orden de sus imágenes. Las voces se habían repartido según la imagen que acompañaban, así que quedaron corridas.
+  - Qué se sabe ahora: por lo que dijo la dueña, la voz 4 es del básquet y la 6 de la Ciudad, y se movieron a esas escenas.
+  - Las voces 3, 5, 7, 8 y 9 no se usan hasta saber qué dicen. Se armó un archivo para escucharlas y decirlo (`voces-por-identificar.mp4`).
+  - El guion suma 9 frases (9 a 17) para las escenas de siempre. Si la dueña las graba, reemplazan a las voces viejas: cada escena usa primero la frase nueva y, si falta, la vieja que sí calza.
+- **Voces nuevas de la persona dueña** (8 audios, del 00 al 07): el gancho, porristas, la casita, la cocina, la Aventura, la Fábrica y las dos invitaciones del final.
+  - Se recortaron los silencios y se dejaron al mismo volumen. Quedan como `voces/nueva-1..8.wav`.
+  - Varias duran más que su escena (la cocina 3,5 s; el cierre 5,4 s + 2,8 s). Ahora el montaje alarga cada escena en tiempos enteros de la música hasta que termine su voz, y dos voces nunca se pisan.
+  - El gancho sigue con sus cuatro golpes y su voz continúa sobre el logo.
+  - La versión corta dejó fuera la pichanga y «14 juegos», que no tenían voz, para quedar en 31 s. La larga quedó en 50 s.
+- **Escenario del festival (Pueblo):**
+  - Lo que vio: en patineta se atravesaba el escenario «como si fuera transparente», y la imagen se descuadraba.
+  - Qué se cambió:
+    - El escenario ahora es sólido: por los costados y por atrás se choca.
+    - Se sube por un escalón amarillo nuevo al frente, el lado que mira a la fuente. Arriba chocan los parlantes y las columnas.
+    - Arriba aparece «🎤 Dar un show»: la Matichica baila unos segundos con papel picado y al final la aplauden («👏 ¡Bravo!»). Da +1 🍫✨, con el mismo tope diario que la pista de baile.
+  - Cómo se hizo: el Pueblo ahora tiene «bloques con techo» (`fun.blocks`). Un bloque se puede pisar si su altura queda a un escalón (0,5) de los pies. Si es más alto, es una pared. Pisar el borde del escalón ya cuenta, para que en patineta (21 m/s) no se lo salte.
+  - Prueba nueva: `scripts/qa/escenario.cjs`. Revisa que en patineta choca por los costados y por atrás, que se sube por el escalón, que aparece el botón y se baila, y que se baja por el costado. En el navegador de prueba la subida se hace corriendo: ahí van pocos cuadros por segundo y la patineta se salta el escalón; en un celular, a 30 cuadros, avanza 0,7 m por cuadro.
+
 ### Video promocional con más energía (vertical, 45 s y 30 s)
 - **Pedido de la persona dueña:** rearmar el video con lo nuevo del juego, que no se sienta «pasivo», con tono de «ven, prueba con nosotros… quédate para que seas parte de la historia de Matichoc», usando las voces del video anterior.
 - **Decisión de la persona dueña:** las frases nuevas las graba ella. Aquí no se pudo generar voz (los programas de voz sintética quedaron bloqueados en este entorno).
