@@ -25,7 +25,14 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
     - En la terraza: «🚪 Entrar a la casita» y «🪜 Bajar».
     - Adentro hay una pieza de madera: ventana redonda entre las hojas, cojines para sentarse, un catalejo, un mapa del bosque, un baúl y lucecitas.
     - Ahí vive la **Ardilla Nuez**, con su misión del día: encontrar 3 bellotas 🌰 (30 Matipuntos y una ⭐, como las otras visitas). Al salir se vuelve a la terraza.
-- **Prueba nueva:** `scripts/qa/casita-muelle.cjs`.
+- **Prueba nueva:** `scripts/qa/casita-muelle.cjs`. Pasa contra la app y contra la copia web.
+  - Mientras se hacía, mostró dos detalles que se corrigieron:
+    - Al llegar arriba, un aviso abría un diálogo que había que cerrar antes de poder entrar. Ahora es un aviso flotante.
+    - Junto a la escalera, el botón ofrecía la puerta en vez de «Bajar». Ahora ofrece lo que está más cerca.
+  - `visitas.cjs` mostró que la ardilla tapaba «Mirar» en el mapa. Ahora espera al fondo de la pieza.
+- **Regresión:** pasan visitas, lago, ciudad-barrios, pueblo, interactivo y puertas-toque.
+- **APK de prueba:** la compilación 96 salió en verde, pero se lanzó antes del último ajuste de la ardilla. La que corresponde probar es la siguiente.
+- PR #52 (junto con el ritmo de Porristas) y su copia web matiweb #57.
 
 ## 2026-10-29
 
