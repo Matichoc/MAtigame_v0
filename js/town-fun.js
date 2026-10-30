@@ -550,6 +550,7 @@ export class TownFun {
   /** Gravedad: el Matichico cae al piso o a la plataforma que tenga abajo (las plataformas se atraviesan al subir). */
   _physics(dt) {
     const P = this.g.pos;
+    if (this.g.climbing) { this.vy = 0; this.groundY = P.y; return; } // trepando la escalera de la casita: sin gravedad
     for (const c of this.pillars) {
       if (P.y >= c.top - 0.2) continue;
       const dx = P.x - c.x, dz = P.z - c.z, d = Math.hypot(dx, dz), min = c.r + 0.45;

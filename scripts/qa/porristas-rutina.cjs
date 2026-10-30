@@ -70,6 +70,28 @@ const foto = (p, n) => p.screenshot({ path: path.join(__dirname, "..", "..", "ma
   await p.waitForFunction(() => window.__g3d.porristas.rt > 9, null, { timeout: 150000 });
   const spam = await p.evaluate(() => { clearInterval(window.__spam); const g = window.__g3d.porristas; return { hits: g.hits, acc: g._accuracy() }; });
   ok(spam.hits.miss > spam.hits.perfect + spam.hits.good, `tocando sin parar casi todo sale «muy pronto» (${JSON.stringify(spam.hits)})`);
+  // celular con atraso (sonido/pantalla): la persona toca siempre 0,15 s tarde. El juego aprende el atraso y a los pocos
+  // toques ya los cuenta como buenos (prueba en el celular, 29-oct: "los tiempos medio desfasados").
+  await p.evaluate(() => {
+    const g = window.__g3d.porristas;
+    window.__res = [];
+    const j = g._judge.bind(g);
+    g._judge = (h, res, why) => { window.__res.push(res || "miss"); return j(h, res, why); };
+    const orig = g.update;
+    g.update = (dt) => {
+      orig(dt);
+      if (g.state !== "playing") return;
+      const h = g.parts.flatMap((q) => q.hits).find((x) => !x.res);
+      if (h && g.rt >= h.t + 0.15 && g.rt < h.t + 0.2) g.tap();
+    };
+    g.progress.porristasOffset = 0;
+    document.getElementById("porristas-btn-retry").click();
+  });
+  await p.waitForFunction(() => window.__res.length >= 12 || window.__g3d.porristas.state !== "playing", null, { timeout: 200000 });
+  const lag = await p.evaluate(() => ({ res: window.__res.slice(), off: window.__g3d.porristas.offset, guardado: window.__progress().porristasOffset }));
+  const ultimos = lag.res.slice(-6);
+  ok(lag.res.length >= 12 && ultimos.every((r) => r === "perfect"), `tocando siempre 0,15 s tarde, el juego se ajusta: ${lag.res.join(" ")}`);
+  ok(lag.off > 0.12 && lag.off < 0.18 && lag.guardado > 0.12, `aprendió el atraso (${(lag.off * 1000).toFixed(0)} ms) y queda guardado para la próxima`);
   // toque por la pantalla y por teclado
   const antes = await p.evaluate(() => window.__g3d.porristas.taps);
   await p.keyboard.press("Space");

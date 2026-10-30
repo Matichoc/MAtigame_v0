@@ -4,7 +4,57 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-30
+
+### Casa del árbol del Pueblo y muelle de la Ciudad (prueba en el celular)
+- **Qué mostró la persona dueña** (con capturas):
+  - En el Pueblo, la casa del árbol del bosque no se puede subir ni usar.
+  - En la Ciudad, en el muelle de la playa la Matichica se ve hundida: «debería pasar por arriba».
+  - Si se sale por un costado del muelle, la «tira a la arena, fuerte»: «debería hacerte chocar, no te podéis caer».
+- **Qué pasaba:**
+  - La casita era solo decorado.
+  - La tabla del muelle está a 0,65 de altura, pero la Ciudad no tenía alturas: todo se caminaba a ras de suelo, así que la Matichica quedaba hundida en las tablas.
+  - Al salirse por el costado sobre el mar, el límite de la playa la devolvía de golpe a la orilla.
+- **Qué se cambió:**
+  - **Muelle (Ciudad):**
+    - Se camina por encima, con una rampita para subir desde la arena.
+    - Arriba, los bordes funcionan como baranda: se choca y no se cae, ni por los costados ni por la punta.
+    - Se sube y se baja solo por la orilla. Desde la arena, el costado del muelle es un escalón con el que se choca.
+  - **Casita del árbol (Pueblo, cuando ya está construida en la aventura):**
+    - Al pie de la escalera aparece «🪜 Subir a la casita». La Matichica trepa con la animación de escalar y llega a una terraza nueva con baranda, donde no se cae.
+    - En la terraza: «🚪 Entrar a la casita» y «🪜 Bajar».
+    - Adentro hay una pieza de madera: ventana redonda entre las hojas, cojines para sentarse, un catalejo, un mapa del bosque, un baúl y lucecitas.
+    - Ahí vive la **Ardilla Nuez**, con su misión del día: encontrar 3 bellotas 🌰 (30 Matipuntos y una ⭐, como las otras visitas). Al salir se vuelve a la terraza.
+- **Prueba nueva:** `scripts/qa/casita-muelle.cjs`. Pasa contra la app y contra la copia web.
+  - Mientras se hacía, mostró dos detalles que se corrigieron:
+    - Al llegar arriba, un aviso abría un diálogo que había que cerrar antes de poder entrar. Ahora es un aviso flotante.
+    - Junto a la escalera, el botón ofrecía la puerta en vez de «Bajar». Ahora ofrece lo que está más cerca.
+  - `visitas.cjs` mostró que la ardilla tapaba «Mirar» en el mapa. Ahora espera al fondo de la pieza.
+- **Regresión:** pasan visitas, lago, ciudad-barrios, pueblo, interactivo y puertas-toque.
+- **APK de prueba:** compilación 97 (commit `fc0057c`), en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/41086505063. Trae también el ritmo de Porristas. La 96 se lanzó antes del último ajuste de la ardilla.
+- PR #52 (junto con el ritmo de Porristas) y su copia web matiweb #57.
+
 ## 2026-10-29
+
+### Porristas: ritmo ajustado a cada celular
+- **Qué notó la persona dueña:** en el APK 94, Saltos de Porristas «se pueden hacer las cosas», pero los tiempos se sienten «medio desfasados».
+- **Causa más probable:** en el celular, el sonido sale con atraso (una o dos décimas de segundo, según el aparato) y el toque también tarda un poco en llegar. El juego medía el tiempo justo según cuándo mandaba el sonido, no según cuándo se oye. Además, cada golpe de la música salía recién en el cuadro siguiente, con saltitos si el celular se atrasaba.
+- **Qué se cambió:**
+  - Los golpes de la música se programan un poco antes con el reloj del audio y se adelantan lo que el celular informa que tarda su parlante. Así se oyen justo cuando el aro se cierra.
+  - El juego aprende con los toques cuánto se atrasa cada persona en su celular (hasta 0,3 s) y lo descuenta. Queda guardado en el perfil para la próxima vez.
+  - Un arreglo en `audio.js`: un sonido programado para más adelante empezaba más bajito (el volumen ya venía bajando). Ahora parte con su volumen.
+- **Prueba:** `porristas-rutina.cjs` simula a alguien que toca siempre 0,15 s tarde; a los pocos toques todo sale «¡Perfecto!» y el ajuste queda guardado.
+- **APK de prueba:** compilación 95 (commit `228c561`), en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/40974899214. PR #52 y su copia web matiweb #57.
+
+### Prueba en el celular: APK 94
+- La persona dueña descargó el APK de la compilación 94 y probó:
+  - **Saltos de Porristas:** se puede jugar, pero los tiempos se sienten desfasados. Se corrigió arriba.
+  - **Crea tu Chocolate:** «mucho mejor»; ahora se ve cuáles ingredientes hay que ocupar.
+- No se anotó el modelo del celular.
+
+### Merges de la persona dueña
+- Hizo merge del PR #51 (grupo del 29-oct) y de su copia web matiweb #54: queda publicado en matichoc.cl.
+- La rama `claude/zealous-johnson-2ryf87` se rehízo desde `main` (`7b7889c`) para lo que sigue.
 
 ### Merges de la persona dueña
 - Hizo merge del **PR #50** (casas por dentro, mascotas, corrección del tema Android, `lintRelease` y capturas nuevas) y de su copia web **matiweb #53**: quedan publicados en matichoc.cl. `main` queda en `23e7355`.
