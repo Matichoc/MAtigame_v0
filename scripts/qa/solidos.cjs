@@ -1,7 +1,7 @@
 // Pedido de la dueña, 30-oct: «no debo atravesar nada» (bancas, rejas, faroles…). Camina derecho contra cada cosa
 // sólida del Pueblo y de la Ciudad y revisa que choca: bancas de la fuente, faroles de la plaza, pilares de las puertas
 // del Arcade, parlantes de la pista de baile, troncos de los árboles; en la Ciudad, la reja de Don Pepe, la del huerto
-// (que tiene una entrada al medio) y los árboles del borde.
+// (que tiene una entrada al medio) y los árboles del borde. Adentro de las casas, los maceteros.
 // Uso: NODE_PATH=$(npm root -g) node scripts/qa/solidos.cjs [url]
 const { abrir, nuevoPerfil } = require("./lib.cjs");
 
@@ -60,6 +60,20 @@ const PRUEBA = `window.__cruza = (g, desde, hacia, paso = 0.12) => {
   ok(pueblo.pilares.every((d) => d > 0.6), `los pilares de las puertas del Arcade chocan (${pueblo.pilares.map((d) => d.toFixed(2)).join(", ")})`);
   ok(pueblo.portalLibre < 0.2, `por el medio de la puerta del Arcade sí se pasa (${pueblo.portalLibre.toFixed(2)})`);
   ok(pueblo.parlantes.length === 2 && pueblo.parlantes.every((d) => d > 0.6), `los parlantes de la pista de baile chocan (${pueblo.parlantes.map((d) => d.toFixed(2)).join(", ")})`);
+  // ---- adentro de las casas: los maceteros ----
+  const macetero = await p.evaluate(() => {
+    const g = window.__g3d.town;
+    g.visits.enter("bombi", { x: 0, z: 0, yaw: 0 });
+    const a = g.visits.active;
+    const pot = (a.room.userData.solids || [])[0];
+    if (!pot) return null;
+    const q = { x: a.room.position.x + pot.x, z: a.room.position.z + pot.z };
+    g.visits.clamp(q);
+    const d = Math.hypot(q.x - a.room.position.x - pot.x, q.z - a.room.position.z - pot.z);
+    g.visits.leave();
+    return d;
+  });
+  ok(macetero != null && macetero > 0.5, `adentro de las casas, los maceteros chocan (${macetero == null ? "sin maceteros" : macetero.toFixed(2)})`);
   // ---- Ciudad ----
   await p.evaluate(() => { window.__g3d.town.stop?.(); const pr = window.__progress(); pr.unlockedGames = [...new Set([...(pr.unlockedGames || []), "ciudad"])]; pr.energy = 200; });
   await p.goto(p.url().split("#")[0], { waitUntil: "networkidle" });

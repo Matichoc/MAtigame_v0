@@ -6,6 +6,30 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-30
 
+### Revisión en todos los juegos: que nada se atraviese
+- **Pedido de la persona dueña:** «revisa en cada uno de los juegos, revísalo bien… No deberíamos poder atravesar cosas» (bancas, paredes, rejas), en este mismo PR.
+- **Revisión, juego por juego:**
+  - **Pueblo y Ciudad:** ver la entrada de abajo.
+  - **Adentro de las casas** (las 15 visitas del Pueblo y la Ciudad):
+    - Los muebles ya chocaban; solo se atravesaban los maceteros con plantas.
+    - Ahora chocan: cada pieza guarda lo que se arma con ella (`room.userData.solids`) y lo suma a los muebles.
+  - **Parkour:**
+    - Las plataformas y los muros ya chocaban por los lados.
+    - Se atravesaban los dos pilares del arco de la meta y la barra de chocolate gigante de atrás, y en el mundo infinito, la chimenea de las azoteas.
+    - Ahora son sólidos que van con su plataforma (`p.extras`): se choca por el lado y se puede pisar encima. Por el medio del arco de la meta se sigue pasando.
+  - **Recolecta y Corre:** muros, cajones y vallas ya chocaban. Incluso con el impulso a máxima velocidad (26 px por cuadro), no alcanza a saltarse el muro más delgado (16 px más el ancho del personaje).
+  - **Aventura de Chocolate:** el piso y los bloques ya chocaban; los árboles y los cerros quedan atrás del camino.
+  - **Pichanga y Básquet 2 contra 2:** los jugadores se empujan entre ellos y no alcanzan a llegar a los arcos ni al poste del aro.
+  - **Autos y Salto Choco:** chocar con los obstáculos es parte del juego (se pierde un corazón o se rebota). Las plataformas de Salto se cruzan desde abajo a propósito.
+  - **Juegos sin personaje que camine:** no aplica (Tetris, Memoria, Merge, Crea tu Chocolate, Porristas, Tiros de básquet, Dulces).
+- **Aparecieron en la revisión pero están bien:**
+  - En el Pueblo, el adorno amarillo era el marco de la puerta de una casita, pegado a la pared (choca con la casa).
+  - En el Parkour quedaron monedas, poderes y una plataforma que parpadea.
+- **Pendiente (no lo pidió la dueña):** los vecinos que caminan solos y la mascota todavía pueden cruzar por las bancas.
+- **Pruebas:**
+  - `scripts/qa/solidos.cjs` ahora revisa también los maceteros de adentro de las casas.
+  - `scripts/qa/parkour-escalar.cjs` usa una semilla fija para el mundo infinito, que antes salía distinto en cada corrida y a veces traía un solo muro de escalada en 400 tramos. Ahora revisa 800 tramos siempre iguales.
+
 ### Nada se atraviesa en el Pueblo ni en la Ciudad
 - **Pedido de la persona dueña:** «no debo atravesar nada»: pasaba a través de bancas y rejas.
 - **Cómo se buscó:** una revisión automática recorrió todos los objetos con altura de cada mundo, donde se alcanza a caminar, y anotó cuáles no tenían choque.

@@ -54,8 +54,13 @@ const foto = (p, n) => p.screenshot({ path: path.join(__dirname, "..", "..", "ma
     const figuras = {};
     const orig = g._figure.bind(g);
     g._figure = (k, c, o) => { figuras[k] = (figuras[k] || 0) + 1; return orig(k, c, o); };
+    // semilla fija: el mundo infinito sale distinto en cada partida y con algunas semillas trae un solo muro en 400 tramos
+    const azar = Math.random;
+    let s = 20261030;
+    Math.random = () => ((s = (s * 16807) % 2147483647) / 2147483647);
     g.startMode("inf");
-    for (let i = 0; i < 400; i++) g._genNext();
+    Math.random = azar;
+    for (let i = 0; i < 800; i++) g._genNext();
     g._figure = orig;
     const plats = g.platforms.filter((q) => q.active);
     const tipos = {};
@@ -74,7 +79,7 @@ const foto = (p, n) => p.screenshot({ path: path.join(__dirname, "..", "..", "ma
     return { tipos, figuras, props: g.props.length, minD };
   });
   const f = inf.figuras;
-  ok((f.climb || 0) >= 2, `el Mundo infinito pone muros para escalar (${f.climb || 0} en 400 tramos)`);
+  ok((f.climb || 0) >= 2, `el Mundo infinito pone muros para escalar (${f.climb || 0} en 800 tramos)`);
   ok((f.house || 0) >= 1 && (f.descent || 0) >= 2, `y también casas por los balcones (${f.house || 0}) y bajadas (${f.descent || 0}): ${JSON.stringify(f)}`);
   ok(inf.minD > 8, `los adornos quedan lejos del camino o bien abajo (el más cerca a ${inf.minD === Infinity ? "—" : inf.minD.toFixed(1)} m de una plataforma a su altura; ${inf.props} adornos)`);
   ok(reg.errores.length === 0, `sin errores (${reg.errores.join(" | ")})`);
