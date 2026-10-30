@@ -718,7 +718,7 @@ export class TownGame extends Game3D {
       if (c.i >= c.legs.length) {
         this.climbing = null;
         if (this.fun) this.fun.vy = 0;
-        if (c.up) this._say("🌳 ¡Llegaste a la casita del árbol! Toca la puerta para entrar.", 2.8);
+        if (c.up) this.popups.add(new THREE.Vector3(this.pos.x, this.pos.y + 3.2, this.pos.z), "🌳 ¡La casita del árbol!", "combo");
       }
     }
   }
