@@ -6,6 +6,32 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-30
 
+### Video promocional con más energía (vertical, 45 s y 30 s)
+- **Pedido de la persona dueña:** rearmar el video con lo nuevo del juego, que no se sienta «pasivo», con tono de «ven, prueba con nosotros… quédate para que seas parte de la historia de Matichoc», usando las voces del video anterior.
+- **Decisión de la persona dueña:** las frases nuevas las graba ella. Aquí no se pudo generar voz (los programas de voz sintética quedaron bloqueados en este entorno).
+- **Qué se hizo:**
+  - **Voces:** se recortaron las 9 frases del video anterior (`voces/original-1..9.wav`) y cada una va sobre la escena que acompañaba.
+  - **Grabaciones:** se regrabaron todas las escenas con el juego de hoy (`scripts/video/grabar.cjs`). Hay 5 escenas nuevas: Saltos de Porristas (hasta la pirámide), casita del árbol con la ardilla Nuez, Aventura de Chocolate, Fábrica de la Ciudad y la cocina de Crea tu Chocolate. Se arregló la escena «extras», que se trababa con la ficha de personaje escondida.
+  - **Música propia** (`scripts/video/musica.cjs`): 124 tiempos por minuto, alegre, con entrada que sube, cuerpo completo y golpe final. Sin derechos de nadie.
+  - **Montaje nuevo** (`scripts/video/dinamico.cjs`):
+    - Arranca con el gancho «¿LISTOS PARA JUGAR? ¡VAMOS!» en cuatro cortes rápidos.
+    - Todos los cortes caen en el tiempo de la música, con un acercamiento de golpe y un destello en cada uno.
+    - Cada escena tiene un cartel que entra deslizándose.
+    - Abajo queda siempre fija la invitación «🎮 ¡Ven a jugar con nosotros! · matichoc.cl/matijuego», que salta con el ritmo.
+    - El cierre muestra los juegos desenfocados detrás, y las frases entran una por una: «¡Ven a jugar con nosotros!», «y sé parte de la historia de Matichoc 🍫», «¿Tienes Android? ¡Sé tester!».
+    - La música baja sola cuando hay voz. El volumen final está en −14 LUFS, el que usan las redes.
+  - Se sacan dos versiones: `largo` (45,5 s, 16 escenas) y `corto` (29,5 s, para Reels, Shorts y TikTok).
+- **Guion para que la persona dueña grabe** (se lista con `node scripts/video/dinamico.cjs <salida> --guion`; cada archivo va en `<salida>/voces/nueva-N.wav`):
+  1. ~2 s: «¡Hey! ¿Te atreves a jugar con nosotros?»
+  2. ~2,5 s: «¡Arma la pirámide con tu equipo de porristas, al ritmo!»
+  3. ~2 s: «¡Sube a la casita del árbol y ayuda a la ardilla Nuez!»
+  4. ~2,5 s: «¡Cocina tu propio chocolate: junta, derrite, revuelve y decora!»
+  5. ~2 s: «¡Corre y salta por cinco mundos de chocolate!»
+  6. ~2 s: «¡Entra a la Fábrica Matichoc!»
+  7. ~4 s: «¡Ven a jugar con nosotros y sé parte de la historia de Matichoc! Gratis, sin anuncios. ¡Te esperamos!»
+  8. ~2,5 s: «¿Tienes Android? ¡Únete como tester en matichoc.cl!»
+- **Pendiente:** con las voces nuevas, volver a correr el montaje; cada voz entra sola en su escena. Mientras falten, esas escenas van con música y cartel.
+
 ### Prueba en el celular: APK 97
 - La persona dueña probó el APK de la compilación 97: Saltos de Porristas (ritmo ajustado), la casa del árbol del Pueblo y el muelle de la Ciudad. Dijo: «todo eso pude participar súper bien».
 - Hizo merge del PR #52 y de su copia web matiweb #57: queda publicado en matichoc.cl. Ya no queda ningún PR abierto.

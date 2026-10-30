@@ -430,7 +430,8 @@ const ESCENAS = {
       await p.waitForTimeout(800);
       const prof = await p.$("#profile-grid .profile-card:not(.add-profile)");
       if (prof) { await prof.click(); await p.waitForTimeout(500); }
-      if (await p.$("#character-grid .character-card")) { await p.click("#character-grid .character-card:nth-child(2)"); await p.waitForTimeout(800); }
+      const pj = await p.$("#character-grid .character-card:nth-child(2)");
+      if (pj && (await pj.isVisible())) { await pj.click(); await p.waitForTimeout(800); }
       await abrirJuego(p, nombre, inicio, id);
       await sinConsejos(p);
       await p.evaluate(() => window.__reloj.encender());
