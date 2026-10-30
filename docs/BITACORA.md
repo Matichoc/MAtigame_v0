@@ -6,6 +6,107 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-30
 
+### APK de prueba de este PR (#53)
+- Compilación 98 (escenario): bien. Compilación 99 (bancas, faroles, rejas y árboles): bien.
+- Compilación 100 (todo, con los interiores y el Parkour): bien. Es la que hay que probar en el celular.
+
+### Revisión en todos los juegos: que nada se atraviese
+- **Pedido de la persona dueña:** «revisa en cada uno de los juegos, revísalo bien… No deberíamos poder atravesar cosas» (bancas, paredes, rejas), en este mismo PR.
+- **Revisión, juego por juego:**
+  - **Pueblo y Ciudad:** ver la entrada de abajo.
+  - **Adentro de las casas** (las 15 visitas del Pueblo y la Ciudad):
+    - Los muebles ya chocaban; solo se atravesaban los maceteros con plantas.
+    - Ahora chocan: cada pieza guarda lo que se arma con ella (`room.userData.solids`) y lo suma a los muebles.
+  - **Parkour:**
+    - Las plataformas y los muros ya chocaban por los lados.
+    - Se atravesaban los dos pilares del arco de la meta y la barra de chocolate gigante de atrás, y en el mundo infinito, la chimenea de las azoteas.
+    - Ahora son sólidos que van con su plataforma (`p.extras`): se choca por el lado y se puede pisar encima. Por el medio del arco de la meta se sigue pasando.
+  - **Recolecta y Corre:** muros, cajones y vallas ya chocaban. Incluso con el impulso a máxima velocidad (26 px por cuadro), no alcanza a saltarse el muro más delgado (16 px más el ancho del personaje).
+  - **Aventura de Chocolate:** el piso y los bloques ya chocaban; los árboles y los cerros quedan atrás del camino.
+  - **Pichanga y Básquet 2 contra 2:** los jugadores se empujan entre ellos y no alcanzan a llegar a los arcos ni al poste del aro.
+  - **Autos y Salto Choco:** chocar con los obstáculos es parte del juego (se pierde un corazón o se rebota). Las plataformas de Salto se cruzan desde abajo a propósito.
+  - **Juegos sin personaje que camine:** no aplica (Tetris, Memoria, Merge, Crea tu Chocolate, Porristas, Tiros de básquet, Dulces).
+- **Aparecieron en la revisión pero están bien:**
+  - En el Pueblo, el adorno amarillo era el marco de la puerta de una casita, pegado a la pared (choca con la casa).
+  - En el Parkour quedaron monedas, poderes y una plataforma que parpadea.
+- **Pendiente (no lo pidió la dueña):** los vecinos que caminan solos y la mascota todavía pueden cruzar por las bancas.
+- **Pruebas:**
+  - `scripts/qa/solidos.cjs` ahora revisa también los maceteros de adentro de las casas.
+  - `scripts/qa/parkour-escalar.cjs` usa una semilla fija para el mundo infinito, que antes salía distinto en cada corrida y a veces traía un solo muro de escalada en 400 tramos. Ahora revisa 800 tramos siempre iguales.
+
+### Nada se atraviesa en el Pueblo ni en la Ciudad
+- **Pedido de la persona dueña:** «no debo atravesar nada»: pasaba a través de bancas y rejas.
+- **Cómo se buscó:** una revisión automática recorrió todos los objetos con altura de cada mundo, donde se alcanza a caminar, y anotó cuáles no tenían choque.
+  - Pueblo: 74 objetos sin choque.
+  - Ciudad: 147 objetos sin choque.
+- **Qué se arregló:**
+  - **Pueblo:**
+    - Las 3 bancas de la fuente (se sigue pudiendo sentarse en ellas).
+    - Los 12 faroles de la plaza.
+    - Los pilares de las puertas del Arcade. Por el medio de cada puerta se sigue pasando.
+    - Los 2 parlantes de la pista de baile.
+    - Los troncos de los árboles de adentro.
+  - **Ciudad:**
+    - Todas las rejas: la de Don Pepe, que se sigue pintando al pasar junto a ella, las de los vecinos y la del huerto de Doña Rosa. La del huerto ahora tiene una entrada al medio, frente al cartel.
+    - Los árboles del borde, hasta donde se puede caminar.
+- **Bancas de la fuente:** al darles choque, la banca de 290° tapaba el escalón del escenario (que está a 288°). Las dos bancas de ese lado se corrieron a 222° y 318°, parejas a cada lado, y el frente del escenario queda libre.
+- **Lo que queda sin choque, a propósito:** los trampolines (se salta encima), los cofres del tesoro y las manzanas (se recogen al tocarlos) y los vecinos. Queda además un adorno amarillo al norte del Pueblo que no se alcanzó a identificar.
+- **Prueba nueva:** `scripts/qa/solidos.cjs`. Camina derecho contra cada una de estas cosas y revisa que choca, y que por el medio de las puertas del Arcade y por la entrada del huerto sí se pasa.
+- **Video:** la toma del Pueblo se regrabó con la vuelta en patineta por dentro del escenario (8 m de la fuente), para que no se vea atravesándolo ni con la cámara metida en los letreros.
+
+### Revisión del video y escenario del Pueblo (lo que vio la persona dueña)
+- **Voces que no calzaban:**
+  - Lo que vio: en el corto se habla de básquet mientras se ve fútbol; en el largo se habla de la Ciudad mientras se ve básquet.
+  - Por qué: el video anterior no tenía básquet y su voz no seguía el orden de sus imágenes. Las voces se habían repartido según la imagen que acompañaban, así que quedaron corridas.
+  - Qué se sabe ahora: por lo que dijo la dueña, la voz 4 es del básquet y la 6 de la Ciudad, y se movieron a esas escenas.
+  - Las voces 3, 5, 7, 8 y 9 no se usan hasta saber qué dicen. Se armó un archivo para escucharlas y decirlo (`voces-por-identificar.mp4`).
+  - El guion suma 9 frases (9 a 17) para las escenas de siempre. Si la dueña las graba, reemplazan a las voces viejas: cada escena usa primero la frase nueva y, si falta, la vieja que sí calza.
+- **Voces nuevas de la persona dueña** (8 audios, del 00 al 07): el gancho, porristas, la casita, la cocina, la Aventura, la Fábrica y las dos invitaciones del final.
+  - Se recortaron los silencios y se dejaron al mismo volumen. Quedan como `voces/nueva-1..8.wav`.
+  - Varias duran más que su escena (la cocina 3,5 s; el cierre 5,4 s + 2,8 s). Ahora el montaje alarga cada escena en tiempos enteros de la música hasta que termine su voz, y dos voces nunca se pisan.
+  - El gancho sigue con sus cuatro golpes y su voz continúa sobre el logo.
+  - La versión corta dejó fuera la pichanga y «14 juegos», que no tenían voz, para quedar en 31 s. La larga quedó en 50 s.
+- **Voces viejas en los espacios vacíos** (pedido de la persona dueña): lo que dijo (la 4 habla del básquet y la 6 de la Ciudad) calza con el orden de los carteles del video anterior. Por ese orden se ubicaron la 3 en la pichanga, la 7 en el parkour, la 8 en el merge y la 9 en «14 juegos». La 5 queda fuera porque no tiene un lugar claro. La versión larga quedó en 52 s.
+- **Escenario del festival (Pueblo):**
+  - Lo que vio: en patineta se atravesaba el escenario «como si fuera transparente», y la imagen se descuadraba.
+  - Qué se cambió:
+    - El escenario ahora es sólido: por los costados y por atrás se choca.
+    - Se sube por un escalón amarillo nuevo al frente, el lado que mira a la fuente. Arriba chocan los parlantes y las columnas.
+    - Arriba aparece «🎤 Dar un show»: la Matichica baila unos segundos con papel picado y al final la aplauden («👏 ¡Bravo!»). Da +1 🍫✨, con el mismo tope diario que la pista de baile.
+  - Cómo se hizo: el Pueblo ahora tiene «bloques con techo» (`fun.blocks`). Un bloque se puede pisar si su altura queda a un escalón (0,5) de los pies. Si es más alto, es una pared. Pisar el borde del escalón ya cuenta, para que en patineta (21 m/s) no se lo salte.
+  - Prueba nueva: `scripts/qa/escenario.cjs`. Revisa que en patineta choca por los costados y por atrás, que se sube por el escalón, que aparece el botón y se baila, y que se baja por el costado. En el navegador de prueba la subida se hace corriendo: ahí van pocos cuadros por segundo y la patineta se salta el escalón; en un celular, a 30 cuadros, avanza 0,7 m por cuadro.
+
+### Video promocional con más energía (vertical, 45 s y 30 s)
+- **Pedido de la persona dueña:** rearmar el video con lo nuevo del juego, que no se sienta «pasivo», con tono de «ven, prueba con nosotros… quédate para que seas parte de la historia de Matichoc», usando las voces del video anterior.
+- **Decisión de la persona dueña:** las frases nuevas las graba ella. Aquí no se pudo generar voz (los programas de voz sintética quedaron bloqueados en este entorno).
+- **Qué se hizo:**
+  - **Voces:** se recortaron las 9 frases del video anterior (`voces/original-1..9.wav`) y cada una va sobre la escena que acompañaba.
+  - **Grabaciones:** se regrabaron todas las escenas con el juego de hoy (`scripts/video/grabar.cjs`). Hay 5 escenas nuevas: Saltos de Porristas (hasta la pirámide), casita del árbol con la ardilla Nuez, Aventura de Chocolate, Fábrica de la Ciudad y la cocina de Crea tu Chocolate. Se arregló la escena «extras», que se trababa con la ficha de personaje escondida.
+  - **Música propia** (`scripts/video/musica.cjs`): 124 tiempos por minuto, alegre, con entrada que sube, cuerpo completo y golpe final. Sin derechos de nadie.
+  - **Montaje nuevo** (`scripts/video/dinamico.cjs`):
+    - Arranca con el gancho «¿LISTOS PARA JUGAR? ¡VAMOS!» en cuatro cortes rápidos.
+    - Todos los cortes caen en el tiempo de la música, con un acercamiento de golpe y un destello en cada uno.
+    - Cada escena tiene un cartel que entra deslizándose.
+    - Abajo queda siempre fija la invitación «🎮 ¡Ven a jugar con nosotros! · matichoc.cl/matijuego», que salta con el ritmo.
+    - El cierre muestra los juegos desenfocados detrás, y las frases entran una por una: «¡Ven a jugar con nosotros!», «y sé parte de la historia de Matichoc 🍫», «¿Tienes Android? ¡Sé tester!».
+    - La música baja sola cuando hay voz. El volumen final está en −14 LUFS, el que usan las redes.
+  - Se sacan dos versiones: `largo` (45,5 s, 16 escenas) y `corto` (29,5 s, para Reels, Shorts y TikTok).
+- **Guion para que la persona dueña grabe** (se lista con `node scripts/video/dinamico.cjs <salida> --guion`; cada archivo va en `<salida>/voces/nueva-N.wav`):
+  1. ~2 s: «¡Hey! ¿Te atreves a jugar con nosotros?»
+  2. ~2,5 s: «¡Arma la pirámide con tu equipo de porristas, al ritmo!»
+  3. ~2 s: «¡Sube a la casita del árbol y ayuda a la ardilla Nuez!»
+  4. ~2,5 s: «¡Cocina tu propio chocolate: junta, derrite, revuelve y decora!»
+  5. ~2 s: «¡Corre y salta por cinco mundos de chocolate!»
+  6. ~2 s: «¡Entra a la Fábrica Matichoc!»
+  7. ~4 s: «¡Ven a jugar con nosotros y sé parte de la historia de Matichoc! Gratis, sin anuncios. ¡Te esperamos!»
+  8. ~2,5 s: «¿Tienes Android? ¡Únete como tester en matichoc.cl!»
+- **Pendiente:** con las voces nuevas, volver a correr el montaje; cada voz entra sola en su escena. Mientras falten, esas escenas van con música y cartel.
+
+### Prueba en el celular: APK 97
+- La persona dueña probó el APK de la compilación 97: Saltos de Porristas (ritmo ajustado), la casa del árbol del Pueblo y el muelle de la Ciudad. Dijo: «todo eso pude participar súper bien».
+- Hizo merge del PR #52 y de su copia web matiweb #57: queda publicado en matichoc.cl. Ya no queda ningún PR abierto.
+- La rama `claude/zealous-johnson-2ryf87` se rehízo desde `main` para lo que sigue. Esta anotación va en el próximo PR.
+
 ### Casa del árbol del Pueblo y muelle de la Ciudad (prueba en el celular)
 - **Qué mostró la persona dueña** (con capturas):
   - En el Pueblo, la casa del árbol del bosque no se puede subir ni usar.

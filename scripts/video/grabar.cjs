@@ -108,12 +108,14 @@ const ESCENAS = {
       const g = window.__g3d.town;
       g.moveIdx = 99; // la forma de moverse más rápida que tenga desbloqueada
       g._updateMoveBtn?.();
-      // una vuelta en monopatín alrededor de la fuente de chocolate (centro 0,0), con la cámara detrás
-      g.pos.set(0, 0, 13);
+      // una vuelta en monopatín alrededor de la fuente de chocolate (centro 0,0), con la cámara detrás; por dentro del
+      // escenario del festival (que ahora es sólido y empieza a 9,3 m de la fuente) y sin meter la cámara en los letreros
+      const R = 8;
+      g.pos.set(0, 0, R);
       g.camPitch = 0.62;
       g._input = () => {
         const a = Math.atan2(g.pos.x, g.pos.z) + 0.45;
-        const tx = Math.sin(a) * 13, tz = Math.cos(a) * 13;
+        const tx = Math.sin(a) * R, tz = Math.cos(a) * R;
         const dx = tx - g.pos.x, dz = tz - g.pos.z, d = Math.hypot(dx, dz) || 1;
         let dy = Math.atan2(-dx, -dz) + 0.5 - g.camYaw; // cámara detrás y un poco hacia afuera de la vuelta
         dy = Math.atan2(Math.sin(dy), Math.cos(dy));
@@ -291,6 +293,129 @@ const ESCENAS = {
     }
   },
 
+  /** Saltos de Porristas: la rutina de equipo (lanzamiento, figura, la reciben) y la pirámide, tocando siempre a tiempo. */
+  async porristas(p) {
+    await perfil(p);
+    await abrirJuego(p, "Saltos de Porristas", "#porristas-btn-start", "porristas");
+    await sinConsejos(p);
+    await p.evaluate(() => {
+      const g = window.__g3d.porristas;
+      g.goal = 1; // una figura y la pirámide (en el video no hay tiempo para más)
+      const orig = g.update.bind(g);
+      g.update = (dt) => {
+        orig(dt);
+        if (g.state !== "playing") return;
+        const h = g.parts.flatMap((q) => q.hits).find((x) => !x.res);
+        if (h && Math.abs(h.t - g.rt) < 0.03) g.tap();
+      };
+      window.__reloj.encender();
+    });
+    await calentar(p, 3.0);
+    await grabar(p, "porristas", 11);
+  },
+
+  /** Crea tu Chocolate: la cocina a mano (juntar, llevar a la olla, derretir, revolver y verter en el molde). */
+  async cocina(p) {
+    await perfil(p);
+    await abrirJuego(p, "Crea tu Chocolate", "#creador-btn-start", null);
+    await p.waitForFunction(() => window.__g3d?.creador?.ready, null, { timeout: 40000 });
+    await p.evaluate(() => {
+      const g = window.__g3d.creador;
+      g._create();
+      const k = g.kitchen;
+      k.need[0].n = 2; // en el video, una receta cortita
+      k.need[1].n = 1;
+      let f = 0, ang = 0, drag = null;
+      // el "chef" del video: hace cada paso como lo haría una persona (cada cuadro un poquito)
+      window.__chef = () => {
+        f++;
+        const ph = k.phase;
+        if (ph === "juntar" && f % 5 === 0) {
+          const miss = k.need.filter((n) => n.got < n.n).map((n) => n.icon);
+          const sl = k.slots.find((s) => s.item && !s.fly && s.s.visible && s.t > 0.25 && s.item.need && miss.includes(s.item.icon));
+          if (sl) k._pick(sl);
+        } else if (ph === "llevar") {
+          if (!drag) { const c = k.carry.find((x) => !x.done); if (c) drag = { c, t: 0, from: c.s.position.clone() }; }
+          if (drag) {
+            drag.t += 1 / 9;
+            const to = k.pot.position.clone(); to.y = 1.1;
+            drag.c.s.position.lerpVectors(drag.from, to, Math.min(1, drag.t));
+            drag.c.s.position.y += Math.sin(Math.min(1, drag.t) * Math.PI) * 0.8;
+            if (drag.t >= 1) { k._drop(drag.c); drag = null; }
+          }
+        } else if (ph === "derretir") k.holding = k.temp < 0.62;
+        else if (ph === "revolver") { ang += 0.32; k._stirBy(0.32, -ang); }
+        else if (ph === "moldear") { if (!k.cooling) { if (k.pour < 0.9) k.holding = true; else k.hold(false); } }
+      };
+      window.__reloj.encender();
+    });
+    const chef = () => p.evaluate(() => window.__chef());
+    const fase = () => p.evaluate(() => window.__g3d.creador.kitchen.active ? window.__g3d.creador.kitchen.phase : "listo");
+    const hasta = async (ph, max = 600) => { for (let i = 0; i < max && (await fase()) !== ph; i++) { await chef(); await p.evaluate((dt) => window.__reloj.avanzar(dt), DT); } };
+    let n = await grabar(p, "cocina", 2.2, chef); // juntar en la despensa
+    await hasta("llevar");
+    n = await grabar(p, "cocina", 1.6, chef, n); // a la olla
+    await hasta("derretir");
+    await calentar(p, 0.8, chef);
+    n = await grabar(p, "cocina", 1.4, chef, n); // derretir
+    await hasta("revolver");
+    n = await grabar(p, "cocina", 1.4, chef, n); // revolver
+    await hasta("moldear");
+    n = await grabar(p, "cocina", 2.2, chef, n); // al molde
+  },
+
+  /** Aventura Choco en 3D: corre a la derecha y salta. */
+  async aventura(p) {
+    await perfil(p);
+    await abrirJuego(p, "Aventura Choco", "#aventura-btn-start", "aventura");
+    await sinConsejos(p);
+    await p.evaluate(() => { const g = window.__g3d.aventura; g.keys.right = true; window.__reloj.encender(); });
+    const salto = (i) => p.evaluate((i) => { const g = window.__g3d.aventura; if (i % 34 === 0) { g.keys.jump = true; g.player.buffer = 0.13; } if (i % 34 === 14) g.keys.jump = false; }, i);
+    await calentar(p, 0.8, salto);
+    await grabar(p, "aventura", 4.5, salto);
+  },
+
+  /** Pueblo: la Matichica trepa a la casa del árbol y entra a ver a la ardilla Nuez. */
+  async casita(p) {
+    await perfil(p);
+    await abrirJuego(p, "Pueblo", "#town-btn-start", "town");
+    await sinConsejos(p);
+    await p.evaluate(() => {
+      const g = window.__g3d.town;
+      const T = g.zones.treehouse;
+      g.pos.set(T.foot.x + Math.sin(T.yaw + Math.PI) * 1.2, 0, T.foot.z + Math.cos(T.yaw + Math.PI) * 1.2);
+      g.heroYaw = T.yaw;
+      g.camYaw = T.yaw + Math.PI + 0.55; // desde atrás y en diagonal: se ve la escalera y la casita
+      g.camPitch = 0.32;
+      g._placeCamera(true);
+      window.__reloj.encender();
+    });
+    await calentar(p, 0.5);
+    await p.evaluate(() => window.__g3d.town._climb(true));
+    let n = await grabar(p, "casita", 3.3);
+    await p.evaluate(() => window.__g3d.town._enterTree());
+    await calentar(p, 0.4);
+    await p.evaluate(() => { const g = window.__g3d.town; g._input = () => ({ x: 0.5, z: -0.8, mag: 0.6 }); });
+    await grabar(p, "casita", 1.8, null, n);
+  },
+
+  /** Ciudad: adentro de la Fábrica Matichoc. */
+  async fabrica(p) {
+    await perfil(p);
+    await abrirJuego(p, "Ciudad", "#ciudad-btn-start", "ciudad");
+    await sinConsejos(p);
+    await p.evaluate(() => {
+      const g = window.__g3d.ciudad;
+      const d = g.homeDoors.find((x) => x.id === "fabrica");
+      g.visits.enter("fabrica", { x: d.x, z: d.z, yaw: d.yaw });
+      let t = 0;
+      g._input = () => { t += 1 / 30; return { ix: Math.sin(t * 0.9) * 0.6, iy: 0.55, mag: 0.7 }; };
+      window.__reloj.encender();
+    });
+    await calentar(p, 0.6);
+    await grabar(p, "fabrica", 3);
+  },
+
   /** Cortes rápidos de otros juegos (1,3 s cada uno). */
   async extras(p) {
     await perfil(p);
@@ -307,7 +432,8 @@ const ESCENAS = {
       await p.waitForTimeout(800);
       const prof = await p.$("#profile-grid .profile-card:not(.add-profile)");
       if (prof) { await prof.click(); await p.waitForTimeout(500); }
-      if (await p.$("#character-grid .character-card")) { await p.click("#character-grid .character-card:nth-child(2)"); await p.waitForTimeout(800); }
+      const pj = await p.$("#character-grid .character-card:nth-child(2)");
+      if (pj && (await pj.isVisible())) { await pj.click(); await p.waitForTimeout(800); }
       await abrirJuego(p, nombre, inicio, id);
       await sinConsejos(p);
       await p.evaluate(() => window.__reloj.encender());
