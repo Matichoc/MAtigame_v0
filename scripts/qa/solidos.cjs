@@ -31,7 +31,7 @@ const PRUEBA = `window.__cruza = (g, desde, hacia, paso = 0.12) => {
   await p.waitForTimeout(800);
   await p.evaluate(() => { const s = document.getElementById("town-btn-start"); if (s && s.offsetParent) s.click(); });
   await p.waitForTimeout(800);
-  await p.addScriptTag({ content: PRUEBA });
+  await p.evaluate(PRUEBA); // (evaluate y no addScriptTag: la web no deja correr scripts en línea)
   const pueblo = await p.evaluate(() => {
     const g = window.__g3d.town;
     const pol = (deg, r) => ({ x: Math.sin((deg * Math.PI) / 180) * r, z: -Math.cos((deg * Math.PI) / 180) * r });
@@ -70,7 +70,7 @@ const PRUEBA = `window.__cruza = (g, desde, hacia, paso = 0.12) => {
   await p.waitForTimeout(800);
   await p.evaluate(() => { const s = document.getElementById("ciudad-btn-start"); if (s && s.offsetParent) s.click(); });
   await p.waitForTimeout(800);
-  await p.addScriptTag({ content: PRUEBA });
+  await p.evaluate(PRUEBA); // (evaluate y no addScriptTag: la web no deja correr scripts en línea)
   const ciudad = await p.evaluate(() => {
     const g = window.__g3d.ciudad;
     const res = {};
