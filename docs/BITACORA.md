@@ -6,6 +6,11 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-30
 
+### Prueba en el celular: APK 97
+- La persona dueña probó el APK de la compilación 97: Saltos de Porristas (ritmo ajustado), la casa del árbol del Pueblo y el muelle de la Ciudad. Dijo: «todo eso pude participar súper bien».
+- Hizo merge del PR #52 y de su copia web matiweb #57: queda publicado en matichoc.cl. Ya no queda ningún PR abierto.
+- La rama `claude/zealous-johnson-2ryf87` se rehízo desde `main` para lo que sigue. Esta anotación va en el próximo PR.
+
 ### Casa del árbol del Pueblo y muelle de la Ciudad (prueba en el celular)
 - **Qué mostró la persona dueña** (con capturas):
   - En el Pueblo, la casa del árbol del bosque no se puede subir ni usar.
