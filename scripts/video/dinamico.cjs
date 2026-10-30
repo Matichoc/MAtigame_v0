@@ -68,8 +68,9 @@ const GANCHO = ["¿LISTOS", "PARA", "JUGAR?", "¡VAMOS!"];
 
 // Escenas: [id, tomas [[carpeta, primer cuadro, tiempos]], voz]. Los cortes caen siempre en un tiempo de la música.
 // Una voz puede ser una lista: se usa la primera que exista (la frase nueva y, si falta, la del video anterior).
-// Del video anterior solo se usan las que se sabe qué dicen (la 4 habla del básquet y la 6 de la Ciudad, según la dueña;
-// la 1 y la 2 acompañaban la portada y el Pueblo sin reclamos). Las demás (3, 5, 7, 8 y 9) no se usan hasta saberlo.
+// Del video anterior: la 4 habla del básquet y la 6 de la Ciudad (según la dueña), lo que calza con el orden de sus
+// carteles (portada, pueblo y renovar, pichanga, básquet, ciudad, parkour, merge, 14 juegos). Por ese orden, la 3 va en
+// la pichanga, la 7 en el parkour, la 8 en el merge y la 9 en «14 juegos». La 5 no tiene lugar claro y no se usa.
 const PLANES = {
   largo: [
     ["gancho", [["pichanga", 60, 1], ["porristas", 300, 1], ["parkour", 60, 1], ["aventura", 60, 1]], "nueva-1"],
@@ -78,15 +79,15 @@ const PLANES = {
     ["casita", [["casita", 20, 3], ["casita", 99, 3]], "nueva-3"],
     ["renovar", [["renovar", 60, 5]], "nueva-11"],
     ["porristas", [["porristas", 0, 2], ["porristas", 150, 3], ["porristas", 285, 3]], "nueva-2"],
-    ["pichanga", [["pichanga", 40, 4]], "nueva-12"],
+    ["pichanga", [["pichanga", 40, 4]], ["nueva-12", "original-3"]],
     ["basquet", [["basquet", 40, 4]], ["nueva-13", "original-4"]],
     ["ciudad", [["ciudad", 30, 6]], ["nueva-14", "original-6"]],
     ["fabrica", [["fabrica", 20, 4]], "nueva-6"],
     ["cocina", [["cocina", 10, 2], ["cocina", 70, 1], ["cocina", 125, 1], ["cocina", 160, 1], ["cocina", 205, 2]], "nueva-4"],
-    ["parkour", [["parkour", 40, 4]], "nueva-15"],
+    ["parkour", [["parkour", 40, 4]], ["nueva-15", "original-7"]],
     ["aventura", [["aventura", 30, 5]], "nueva-5"],
-    ["merge", [["merge", 40, 5]], "nueva-16"],
-    ["extras", [["extras", 5, 1], ["extras", 44, 1], ["extras", 83, 1], ["extras", 122, 2]], "nueva-17"],
+    ["merge", [["merge", 40, 5]], ["nueva-16", "original-8"]],
+    ["extras", [["extras", 5, 1], ["extras", 44, 1], ["extras", 83, 1], ["extras", 122, 2]], ["nueva-17", "original-9"]],
     ["final", 14, "nueva-7", "nueva-8"],
   ],
   corto: [
