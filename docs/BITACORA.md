@@ -31,7 +31,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
     - Junto a la escalera, el botón ofrecía la puerta en vez de «Bajar». Ahora ofrece lo que está más cerca.
   - `visitas.cjs` mostró que la ardilla tapaba «Mirar» en el mapa. Ahora espera al fondo de la pieza.
 - **Regresión:** pasan visitas, lago, ciudad-barrios, pueblo, interactivo y puertas-toque.
-- **APK de prueba:** la compilación 96 salió en verde, pero se lanzó antes del último ajuste de la ardilla. La que corresponde probar es la siguiente.
+- **APK de prueba:** compilación 97 (commit `fc0057c`), en verde: https://github.com/Matichoc/MAtigame_v0/actions/runs/41086505063. Trae también el ritmo de Porristas. La 96 se lanzó antes del último ajuste de la ardilla.
 - PR #52 (junto con el ritmo de Porristas) y su copia web matiweb #57.
 
 ## 2026-10-29
