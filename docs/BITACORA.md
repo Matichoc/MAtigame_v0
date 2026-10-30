@@ -21,6 +21,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - **Ciudad:**
     - Todas las rejas: la de Don Pepe, que se sigue pintando al pasar junto a ella, las de los vecinos y la del huerto de Doña Rosa. La del huerto ahora tiene una entrada al medio, frente al cartel.
     - Los árboles del borde, hasta donde se puede caminar.
+- **Bancas de la fuente:** al darles choque, la banca de 290° tapaba el escalón del escenario (que está a 288°). Las dos bancas de ese lado se corrieron a 222° y 318°, parejas a cada lado, y el frente del escenario queda libre.
 - **Lo que queda sin choque, a propósito:** los trampolines (se salta encima), los cofres del tesoro y las manzanas (se recogen al tocarlos) y los vecinos. Queda además un adorno amarillo al norte del Pueblo que no se alcanzó a identificar.
 - **Prueba nueva:** `scripts/qa/solidos.cjs`. Camina derecho contra cada una de estas cosas y revisa que choca, y que por el medio de las puertas del Arcade y por la entrada del huerto sí se pasa.
 - **Video:** la toma del Pueblo se regrabó con la vuelta en patineta por dentro del escenario (8 m de la fuente), para que no se vea atravesándolo ni con la cámara metida en los letreros.
@@ -37,6 +38,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - Varias duran más que su escena (la cocina 3,5 s; el cierre 5,4 s + 2,8 s). Ahora el montaje alarga cada escena en tiempos enteros de la música hasta que termine su voz, y dos voces nunca se pisan.
   - El gancho sigue con sus cuatro golpes y su voz continúa sobre el logo.
   - La versión corta dejó fuera la pichanga y «14 juegos», que no tenían voz, para quedar en 31 s. La larga quedó en 50 s.
+- **Voces viejas en los espacios vacíos** (pedido de la persona dueña): lo que dijo (la 4 habla del básquet y la 6 de la Ciudad) calza con el orden de los carteles del video anterior. Por ese orden se ubicaron la 3 en la pichanga, la 7 en el parkour, la 8 en el merge y la 9 en «14 juegos». La 5 queda fuera porque no tiene un lugar claro. La versión larga quedó en 52 s.
 - **Escenario del festival (Pueblo):**
   - Lo que vio: en patineta se atravesaba el escenario «como si fuera transparente», y la imagen se descuadraba.
   - Qué se cambió:

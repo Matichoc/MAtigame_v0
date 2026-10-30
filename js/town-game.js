@@ -328,7 +328,7 @@ export class TownGame extends Game3D {
     // bancas alrededor de la fuente, mirándola (para sentarse)
     const wood = new THREE.MeshStandardMaterial({ color: 0x7a3f22, roughness: 0.6 });
     const leg = new THREE.MeshStandardMaterial({ color: 0x4b2e1e, roughness: 0.7 });
-    for (const deg of [70, 250, 290]) {
+    for (const deg of [70, 222, 318]) { // las de 222° y 318° dejan libre el frente del escenario del festival (288°)
       const p = pol(deg, 7.6);
       const yaw = Math.atan2(-p.x, -p.z); // mira hacia la fuente
       const b = new THREE.Group();
