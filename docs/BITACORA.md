@@ -4,6 +4,29 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-10-30
+
+### Casa del árbol del Pueblo y muelle de la Ciudad (prueba en el celular)
+- **Qué mostró la persona dueña** (con capturas):
+  - En el Pueblo, la casa del árbol del bosque no se puede subir ni usar.
+  - En la Ciudad, en el muelle de la playa la Matichica se ve hundida: «debería pasar por arriba».
+  - Si se sale por un costado del muelle, la «tira a la arena, fuerte»: «debería hacerte chocar, no te podéis caer».
+- **Qué pasaba:**
+  - La casita era solo decorado.
+  - La tabla del muelle está a 0,65 de altura, pero la Ciudad no tenía alturas: todo se caminaba a ras de suelo, así que la Matichica quedaba hundida en las tablas.
+  - Al salirse por el costado sobre el mar, el límite de la playa la devolvía de golpe a la orilla.
+- **Qué se cambió:**
+  - **Muelle (Ciudad):**
+    - Se camina por encima, con una rampita para subir desde la arena.
+    - Arriba, los bordes funcionan como baranda: se choca y no se cae, ni por los costados ni por la punta.
+    - Se sube y se baja solo por la orilla. Desde la arena, el costado del muelle es un escalón con el que se choca.
+  - **Casita del árbol (Pueblo, cuando ya está construida en la aventura):**
+    - Al pie de la escalera aparece «🪜 Subir a la casita». La Matichica trepa con la animación de escalar y llega a una terraza nueva con baranda, donde no se cae.
+    - En la terraza: «🚪 Entrar a la casita» y «🪜 Bajar».
+    - Adentro hay una pieza de madera: ventana redonda entre las hojas, cojines para sentarse, un catalejo, un mapa del bosque, un baúl y lucecitas.
+    - Ahí vive la **Ardilla Nuez**, con su misión del día: encontrar 3 bellotas 🌰 (30 Matipuntos y una ⭐, como las otras visitas). Al salir se vuelve a la terraza.
+- **Prueba nueva:** `scripts/qa/casita-muelle.cjs`.
+
 ## 2026-10-29
 
 ### Porristas: ritmo ajustado a cada celular
