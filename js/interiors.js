@@ -68,7 +68,7 @@ export const LAYOUTS = {
   // la casita del árbol del bosque (Pueblo): chiquita, de madera, con ventana redonda entre las hojas
   treehouse: {
     W: 9, D: 7, floor: "wood",
-    host: { x: 2.4, z: -1.8 },
+    host: { x: 2.6, z: -2.3 }, // al fondo a la derecha: deja libre mirar el mapa y el baúl
     bench: { x: -2.9, z: -2.2, yaw: 0, seat: 0.5 },
     solids: [
       { x: -2.9, z: -2.4, hw: 0.9, hd: 0.55 }, // cojines
