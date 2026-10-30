@@ -6,6 +6,10 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-10-30
 
+### APK de prueba de este PR (#53)
+- Compilación 98 (escenario): bien. Compilación 99 (bancas, faroles, rejas y árboles): bien.
+- Compilación 100 (todo, con los interiores y el Parkour): bien. Es la que hay que probar en el celular.
+
 ### Revisión en todos los juegos: que nada se atraviese
 - **Pedido de la persona dueña:** «revisa en cada uno de los juegos, revísalo bien… No deberíamos poder atravesar cosas» (bancas, paredes, rejas), en este mismo PR.
 - **Revisión, juego por juego:**
