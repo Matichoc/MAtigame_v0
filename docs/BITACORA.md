@@ -4,6 +4,13 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-04
+
+### Merge del PR #53
+- La persona dueña hizo merge del PR #53: escenario sólido, revisión de que nada se atraviese en todos los juegos y video promocional nuevo.
+- La copia web (matiweb #58) sigue abierta, esperando su merge.
+- La rama `claude/zealous-johnson-2ryf87` se rehízo desde `main` para lo que sigue. Esta anotación va en el próximo PR.
+
 ## 2026-10-30
 
 ### APK de prueba de este PR (#53)
