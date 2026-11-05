@@ -4,6 +4,30 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-05
+
+### Video con la dueña presentando el juego (escenas al ritmo de su voz)
+- **Pedido de la persona dueña:** usar el video que grabó presentando el Matijuego (60 s, con su voz) y poner de fondo el juego andando, con mensajes en palabras. Ella va recortada sin fondo en una esquina de abajo, y cada escena calza con lo que va diciendo. «Primero entiende lo que yo digo en el video y después trata de meter las escenas justo en los tiempos».
+- **Cómo se entendió lo que dice:**
+  - Se transcribió su voz con faster-whisper (modelo `medium`, en el computador, sin subir nada), con el segundo de cada palabra.
+  - Los cortes caen ~0,1 s antes de la palabra: «fútbol» 18,9 s, «básquetbol» 20,1 s, «pichanguita» 22,1 s, «carritas» 29,6 s, «barriles» 38,0 s, «ciudad» 40,2 s, «pueblo» 40,7 s, «misiones» 47,7 s, «testers» 55,9 s y «Play Store» 58,1 s.
+- **Qué se hizo:** video vertical de 1080×1920 y 60 s (`video/presentador/matijuego-presentacion.mp4`):
+  - Arriba, el logo y «Matijuego». Al medio, el juego en una ventana con borde amarillo y, atrás, el mismo juego desenfocado.
+  - Abajo a la izquierda, 19 textos que siguen lo que dice: «⚽ Fútbol», «🍪 ¡Junta alfajores!», «🛢️ ¡Esquiva los barriles!», «🙋 ¡Únete como tester en matichoc.cl!», «📲 Pronto en Google Play», etc.
+  - Abajo a la derecha, ella recortada con borde blanco tipo sticker.
+  - Sonido: su voz (con un filtro de graves y un compresor suave) más la música propia bajita, a −14 LUFS como piden las redes.
+  - Para el autito se grabaron 11 s de Autos de Chocolate: los barriles con el aviso aparecen justo cuando dice «esquivando barriles».
+- **Scripts:**
+  - `scripts/video/recortar-persona.py` (nuevo): saca el fondo cuadro a cuadro con rembg (`u2net_human_seg`). Rellena los hoyos de adentro de la silueta, porque los parches verdes de su chaqueta salían como fondo, y agrega el borde blanco.
+  - `scripts/video/presentador.cjs` (nuevo): la pauta de escenas y textos con sus tiempos, y el armado con ffmpeg.
+- **Qué se revisó:**
+  - Cuadros de todo el video: cada escena y cada texto aparecen con su palabra, sin pantallas de «¡Se cayó!».
+  - El volumen queda parejo (−14,5 LUFS).
+  - Los textos largos se partían en una columna angosta de 3 líneas; se arregló.
+- **Pendiente:**
+  - Que la dueña lo vea y diga si cambia algún texto o escena.
+  - Su video de WhatsApp viene en baja resolución (478×850). Si manda el original del celular, ella se verá más nítida.
+
 ## 2026-11-04
 
 ### Videos verticales "jugando en vivo" para redes
