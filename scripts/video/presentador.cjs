@@ -2,7 +2,7 @@
 // esquina de abajo, y detrás el juego andando, con cada escena y cada texto puestos justo cuando ella nombra ese juego.
 // Los tiempos salen de la transcripción de su voz (faster-whisper, con el segundo de cada palabra).
 // Necesita: los cuadros del juego (<salida>/cuadros, ver clips.cjs) y los cuadros de ella sin fondo (recortar-persona.py).
-// Uso: NODE_PATH=... CHROMIUM_PATH=<msedge.exe> node scripts/video/presentador.cjs <salida> <video-original.mp4> <carpeta-persona>
+// Uso: NODE_PATH=... CHROMIUM_PATH=<msedge.exe> node scripts/video/presentador.cjs <salida> <video-original.mp4> <carpeta-persona> [pauta.json]
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
@@ -19,48 +19,10 @@ const W = 1080, H = 1920;
 const WIN = { x: 30, y: 160, w: 1020, h: 1040 }; // ventana del juego
 const YO = { h: 900 }; // alto de la persona recortada (abajo a la derecha)
 
-// Pauta del video del 4-nov-2026 (60 s). Escenas: [desde el segundo, escena, desde qué segundo de esa grabación].
-// Cada escena dura hasta que empieza la siguiente; los cortes caen ~0,1 s antes de la palabra.
-const ESCENAS = [
-  [0.0, "pueblo", 0.5], [1.2, "porristas", 14], [2.4, "ciudad", 1], [3.6, "aventura", 3], // «Hola, hola, amigos…»
-  [4.85, "merge", 0.5], [6.4, "cocina", 6], [8.0, "parkour", 1], // «…nuestros Matijuegos, vamos a estar lanzándolos…»
-  [9.25, "casita", 0.5], // «…juntando algunos testers…»
-  [13.05, "pueblo", 2.5], // «aquí les voy a mostrar…»
-  [18.8, "pichanga", 3], // «fútbol»
-  [20.0, "basquet", 2], // «básquetbol»
-  [21.95, "pichanga", 9], // «una pichanguita»
-  [24.75, "basquet", 11.5], // «básquetboteo dos contra dos para poder encestar»
-  [29.45, "autos-largo", 0], // «carritas de auto… alfajores… esquivando barriles»
-  [39.4, "ciudad", 4], // «una ciudad»
-  [40.6, "pueblo", 0], // «un pueblo Matichoc»
-  [44.4, "pueblo", 4.3], // «interactuar con personas»
-  [46.4, "renovar", 2.2], // «te mandan a hacer misiones, te piden favores»
-  [49.5, "porristas", 4], [50.3, "parkour", 3], [51.1, "aventura", 7], // «hay muchas cosas»
-  [51.9, "fabrica", 0.5], // «los invito a que puedan ofrecerse para testers»
-  [56.4, "porristas", 17.5], // «en la Play Store» (termina con «¡Nivel completado!» y tres estrellas)
-];
-// Textos: [desde, hasta, emoji, texto]
-const TEXTOS = [
-  [0.35, 3.05, "👋", "¡Hola, hola, amigos!"],
-  [3.05, 5.85, "🎮", "Les presento los Matijuegos"],
-  [5.85, 8.0, "🚀", "¡Muy pronto!"],
-  [8.0, 13.05, "🙋", "Estamos buscando testers"],
-  [13.05, 18.8, "👇", "Mira los juegos que tenemos"],
-  [18.8, 20.0, "⚽", "Fútbol"],
-  [20.0, 21.95, "🏀", "Básquetbol"],
-  [21.95, 24.75, "⚽", "¡Una pichanguita!"],
-  [24.75, 29.45, "🏀", "Dos contra dos, ¡a encestar!"],
-  [29.45, 33.9, "🚗", "Carritas de auto"],
-  [33.9, 37.25, "🍪", "¡Junta alfajores!"],
-  [37.25, 39.4, "🛢️", "¡Esquiva los barriles!"],
-  [39.4, 40.6, "🏙️", "Una ciudad"],
-  [40.6, 44.4, "🏡", "¡Y el pueblo Matichoc!"],
-  [44.4, 46.4, "💬", "Conversa con los vecinos"],
-  [46.4, 49.5, "⭐", "Misiones y favores"],
-  [49.5, 51.9, "✨", "¡Y muchas cosas más!"],
-  [51.9, 56.4, "🙋", "¡Únete como tester en matichoc.cl!"],
-  [56.4, 99, "📲", "Pronto en Google Play"],
-];
+// Pauta: qué escena y qué texto va en cada momento (ver scripts/video/pautas/*.json)
+const PAUTA = JSON.parse(fs.readFileSync(path.resolve(process.argv[5] || path.join(__dirname, "pautas", "presentacion-2026-11-04.json")), "utf8"));
+const ESCENAS = PAUTA.escenas;
+const TEXTOS = PAUTA.textos;
 const RECORTE = { merge: { cx: 690 }, aventura: { cx: 820 }, fabrica: { cy: 620, h: 860 }, renovar: { h: 1080, cy: 540 }, cocina: { caja: { x: 130, y: 150, w: 880, h: 680 } } };
 
 const ff = (args) => execFileSync("ffmpeg", ["-y", "-loglevel", "error", ...args], { stdio: "inherit" });
@@ -77,6 +39,7 @@ const CSS = `
 .titulo{color:var(--rosa);text-shadow:0 5px 0 var(--cafe2),0 0 24px rgba(0,0,0,.6);line-height:1}
 .texto{display:inline-flex;align-items:center;gap:.35em;background:var(--cafe);color:var(--crema);border:7px solid var(--amarillo);border-radius:40px;padding:.3em .7em .34em .5em;box-shadow:0 10px 0 var(--cafe2),0 18px 40px rgba(0,0,0,.55);line-height:1.1}
 .texto .e{font-size:1.25em;flex:none}
+.grande{color:var(--amarillo);-webkit-text-stroke:14px var(--cafe2);paint-order:stroke fill;text-shadow:0 12px 0 var(--cafe2),0 0 50px rgba(0,0,0,.55);line-height:1.02;text-align:center;transform:rotate(-4deg)}
 `;
 const logo = (w) => `<div class="logo" style="width:${w}px;height:${Math.round(w * 0.6)}px"><img src="data:image/png;base64,${b64("assets/brand/logo-horizontal.png")}" style="width:${Math.round(w * 0.88)}px"></div>`;
 
@@ -93,7 +56,13 @@ async function dibujar() {
   await foto("arriba", W, H, `<div style="position:absolute;left:0;right:0;top:22px;display:flex;justify-content:center;align-items:center;gap:26px">${logo(180)}<div class="titulo" style="font-size:100px">Matijuego</div></div>
     <div style="position:absolute;left:${WIN.x - 10}px;top:${WIN.y - 10}px;width:${WIN.w + 20}px;height:${WIN.h + 20}px;border:12px solid var(--amarillo);border-radius:50px"></div>`);
   await foto("mascara", WIN.w, WIN.h, `<div style="position:absolute;inset:0;background:#000"></div><div style="position:absolute;inset:0;border-radius:40px;background:#fff"></div>`, false);
-  for (const [k, [, , e, txt]] of TEXTOS.entries()) {
+  for (const [k, [, , e, txt, tipo]] of TEXTOS.entries()) {
+    if (tipo === "grande") {
+      // texto gigante al medio de la ventana del juego (para el gancho y los momentos fuertes); "|" = salto de línea
+      await foto(`t${k}`, W, H, `<div style="position:absolute;left:40px;right:40px;top:${WIN.y}px;height:${WIN.h}px;display:flex;align-items:center;justify-content:center">
+        <div class="grande" style="font-size:${txt.length > 18 ? 118 : 150}px">${e ? `${e}<br>` : ""}${txt.split("|").join("<br>")}</div></div>`);
+      continue;
+    }
     // ancho fijo (lo que queda a la izquierda de la persona), así el texto ocupa 1 o 2 líneas anchas y no una columna angosta
     await foto(`t${k}`, W, H, `<div style="position:absolute;left:30px;top:${WIN.y + WIN.h + 40}px;width:590px">
       <span class="texto" style="display:flex;font-size:${txt.length > 22 ? 50 : txt.length > 14 ? 56 : 64}px;${txt.length > 14 ? "" : "display:inline-flex"}"><span class="e">${e}</span><span class="t">${txt}</span></span></div>`);
@@ -144,10 +113,13 @@ function final(base, total) {
     "-framerate", "30", "-i", path.join(PERSONA, "c%05d.png")];
   const yw = Math.round((YO.h * 478) / 850);
   let f = `[0][1]overlay[c0]`;
-  TEXTOS.forEach(([ini, fin], k) => {
+  TEXTOS.forEach(([ini, fin, , , tipo], k) => {
     ent.push("-loop", "1", "-framerate", String(FPS), "-t", total.toFixed(3), "-i", png(`t${k}`));
     const st = ini.toFixed(3);
-    f += `;[${k + 3}]format=rgba,fade=t=in:st=${st}:d=0.15:alpha=1[t${k}];[c${k}][t${k}]overlay=x='if(gte(t,${st}),-90*exp(-11*(t-${st}))*cos(12*(t-${st})),0)':y=0:enable='between(t,${st},${Math.min(fin, total).toFixed(3)})'[c${k + 1}]`;
+    // los de abajo entran desde la izquierda con un saltito; los grandes caen desde arriba con rebote
+    const mov = tipo === "grande" ? `x=0:y='if(gte(t,${st}),-320*exp(-12*(t-${st}))*cos(14*(t-${st})),0)'`
+      : `x='if(gte(t,${st}),-90*exp(-11*(t-${st}))*cos(12*(t-${st})),0)':y=0`;
+    f += `;[${k + 3}]format=rgba,fade=t=in:st=${st}:d=0.15:alpha=1[t${k}];[c${k}][t${k}]overlay=${mov}:enable='between(t,${st},${Math.min(fin, total).toFixed(3)})'[c${k + 1}]`;
   });
   // la persona, abajo a la derecha, entrando desde abajo al principio
   f += `;[2]scale=-2:${YO.h}:flags=lanczos,format=rgba[yo];[c${TEXTOS.length}][yo]overlay=x=${W - yw + 10}:y='${H - YO.h}+${YO.h}*exp(-7*t)':shortest=1,fade=t=out:st=${(total - 0.5).toFixed(3)}:d=0.5,format=yuv420p[vid]`;
@@ -158,14 +130,14 @@ function final(base, total) {
   ent.push("-i", ORIGINAL, "-i", musica);
   f += `;[${iv}:a]aformat=sample_rates=44100:channel_layouts=stereo,highpass=f=80,acompressor=threshold=0.1:ratio=3:attack=10:release=200,volume=1.4[voz];` +
     `[${iv + 1}]volume=0.14,afade=t=out:st=${(total - 1).toFixed(3)}:d=1[mus];[voz][mus]amix=inputs=2:normalize=0:duration=first,loudnorm=I=-14:TP=-1.5:LRA=11,aresample=44100[aud]`;
-  const salida = path.join(DEST, "matijuego-presentacion.mp4");
+  const salida = path.join(DEST, `${PAUTA.salida || "matijuego-presentacion"}.mp4`);
   ff([...ent, "-filter_complex", f, "-map", "[vid]", "-map", "[aud]", "-t", total.toFixed(3),
     "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-pix_fmt", "yuv420p", "-r", String(FPS), "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", salida]);
   console.log(`${salida}: ${total.toFixed(1)} s, ${(fs.statSync(salida).size / 1e6).toFixed(1)} MB`);
 }
 
 (async () => {
-  if (!ORIGINAL || !PERSONA) { console.error("Uso: node presentador.cjs <salida> <video-original.mp4> <carpeta-persona>"); process.exit(1); }
+  if (!ORIGINAL || !PERSONA) { console.error("Uso: node presentador.cjs <salida> <video-original.mp4> <carpeta-persona> [pauta.json]"); process.exit(1); }
   fs.mkdirSync(TMP, { recursive: true });
   const total = durOriginal();
   await dibujar();

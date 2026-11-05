@@ -1,0 +1,43 @@
+{
+  "nota": "Video de la dueña del 4-nov-2026 (60 s). Escenas: [desde el segundo, escena, desde qué segundo de esa grabación]. Textos: [desde, hasta, emoji, texto]. Los cortes caen ~0,1 s antes de la palabra.",
+  "salida": "matijuego-presentacion",
+  "escenas": [
+    [0.0, "pueblo", 0.5], [1.2, "porristas", 14], [2.4, "ciudad", 1], [3.6, "aventura", 3],
+    [4.85, "merge", 0.5], [6.4, "cocina", 6], [8.0, "parkour", 1],
+    [9.25, "casita", 0.5],
+    [13.05, "pueblo", 2.5],
+    [18.8, "pichanga", 3],
+    [20.0, "basquet", 2],
+    [21.95, "pichanga", 9],
+    [24.75, "basquet", 11.5],
+    [29.45, "autos-largo", 0],
+    [39.4, "ciudad", 4],
+    [40.6, "pueblo", 0],
+    [44.4, "pueblo", 4.3],
+    [46.4, "renovar", 2.2],
+    [49.5, "porristas", 4], [50.3, "parkour", 3], [51.1, "aventura", 7],
+    [51.9, "fabrica", 0.5],
+    [56.4, "porristas", 17.5]
+  ],
+  "textos": [
+    [0.35, 3.05, "👋", "¡Hola, hola, amigos!"],
+    [3.05, 5.85, "🎮", "Les presento los Matijuegos"],
+    [5.85, 8.0, "🚀", "¡Muy pronto!"],
+    [8.0, 13.05, "🙋", "Estamos buscando testers"],
+    [13.05, 18.8, "👇", "Mira los juegos que tenemos"],
+    [18.8, 20.0, "⚽", "Fútbol"],
+    [20.0, 21.95, "🏀", "Básquetbol"],
+    [21.95, 24.75, "⚽", "¡Una pichanguita!"],
+    [24.75, 29.45, "🏀", "Dos contra dos, ¡a encestar!"],
+    [29.45, 33.9, "🚗", "Carritas de auto"],
+    [33.9, 37.25, "🍪", "¡Junta alfajores!"],
+    [37.25, 39.4, "🛢️", "¡Esquiva los barriles!"],
+    [39.4, 40.6, "🏙️", "Una ciudad"],
+    [40.6, 44.4, "🏡", "¡Y el pueblo Matichoc!"],
+    [44.4, 46.4, "💬", "Conversa con los vecinos"],
+    [46.4, 49.5, "⭐", "Misiones y favores"],
+    [49.5, 51.9, "✨", "¡Y muchas cosas más!"],
+    [51.9, 56.4, "🙋", "¡Únete como tester en matichoc.cl!"],
+    [56.4, 99, "📲", "Pronto en Google Play"]
+  ]
+}

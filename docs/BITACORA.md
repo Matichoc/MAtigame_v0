@@ -6,6 +6,24 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-05
 
+### Segundo video de la dueña presentando el juego (88 s, «súmate a la aventura»)
+- **Pedido de la persona dueña:** repetir el mismo trabajo con una segunda toma (88,6 s), «lo más rápido posible», con escenas que calcen y que sea «único, relevante, que impacte y que la gente se quiera sumar».
+- **Qué se hizo:** `video/presentador/matijuego-presentacion-2.mp4` (1080×1920, 88,6 s):
+  - Transcripción con faster-whisper y 29 cortes de escena al ritmo de sus palabras.
+  - Cuando nombra los juegos («fútbol, Tetris, aventura, salto, cheerleader, basketball») hay cortes rápidos de ~1 s con su nombre. Tetris se muestra como «Bloques», porque es marca registrada.
+  - Textos gigantes al medio que caen desde arriba en los momentos fuertes: «¡MATIJUEGO!», «¿QUIERES SER TESTER?» y «¡SÚMATE A LA AVENTURA!».
+  - Cierre con la invitación a ser tester («✉️ Mándame tu mail por interno»).
+- **Scripts:**
+  - `presentador.cjs` ahora lee la pauta (escenas y textos) desde un JSON en `scripts/video/pautas/`: una pauta por video. También se agregó el tipo de texto «grande».
+  - `recortar-persona.py` tiene la opción `--sin-azul`, que borra la cortina azul del fondo de esta toma y deja solo el pedazo más grande (ella), y la opción `--parte=k/n`, que reparte el trabajo en varios procesos a la vez.
+- **Qué se revisó:**
+  - Cuadros de los cortes rápidos, los pedidos, la cocina y los textos gigantes.
+  - El recorte quedó sin la cortina.
+  - El volumen es de −14,8 LUFS.
+- **Pendiente:**
+  - Que la dueña confirme cómo se escribe «Matilovers».
+  - Que la dueña diga si cambia algún texto.
+
 ### Video con la dueña presentando el juego (escenas al ritmo de su voz)
 - **Pedido de la persona dueña:** usar el video que grabó presentando el Matijuego (60 s, con su voz) y poner de fondo el juego andando, con mensajes en palabras. Ella va recortada sin fondo en una esquina de abajo, y cada escena calza con lo que va diciendo. «Primero entiende lo que yo digo en el video y después trata de meter las escenas justo en los tiempos».
 - **Cómo se entendió lo que dice:**
