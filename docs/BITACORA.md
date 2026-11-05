@@ -20,9 +20,8 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - Cuadros de los cortes rápidos, los pedidos, la cocina y los textos gigantes.
   - El recorte quedó sin la cortina.
   - El volumen es de −14,8 LUFS.
-- **Pendiente:**
-  - Que la dueña confirme cómo se escribe «Matilovers».
-  - Que la dueña diga si cambia algún texto.
+- **Decisión de la persona dueña:** se escribe «Matilovers» (así quedó en el video).
+- **Pendiente:** que la dueña diga si cambia algún texto.
 
 ### Video con la dueña presentando el juego (escenas al ritmo de su voz)
 - **Pedido de la persona dueña:** usar el video que grabó presentando el Matijuego (60 s, con su voz) y poner de fondo el juego andando, con mensajes en palabras. Ella va recortada sin fondo en una esquina de abajo, y cada escena calza con lo que va diciendo. «Primero entiende lo que yo digo en el video y después trata de meter las escenas justo en los tiempos».
