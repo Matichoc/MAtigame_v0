@@ -6,7 +6,7 @@
 //   --muestra: solo 3 cuadros por escena (principio, medio y final), para revisar rápido el encuadre.
 const fs = require("fs");
 const path = require("path");
-const { chromium } = require("playwright");
+const { chromium } = (() => { try { return require("playwright"); } catch { return require("playwright-core"); } })();
 const { RELOJ } = require("./reloj.cjs");
 
 const BASE = process.argv[2] || "http://127.0.0.1:8092/";
@@ -20,7 +20,10 @@ const BOT = path.join(__dirname, "..", "qa", "jugador-humano.mjs");
 async function abrir() {
   const b = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || "/opt/pw-browsers/chromium",
-    args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"],
+    // VIDEO_GPU=1: usa la tarjeta gráfica del computador (en Windows, con Edge o Chrome); si no, dibuja por software
+    args: process.env.VIDEO_GPU
+      ? ["--use-gl=angle", "--use-angle=d3d11", "--ignore-gpu-blocklist", "--enable-gpu", "--autoplay-policy=no-user-gesture-required"]
+      : ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"],
   });
   // 960×540 con densidad 2 = cuadros de 1920×1080 (el juego se ve como en un celular acostado, con sus botones táctiles)
   const ctx = await b.newContext({ viewport: { width: 960, height: 540 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
@@ -83,11 +86,14 @@ async function calentar(p, seg, cadaCuadro) {
   }
 }
 
+/** Opciones que cambia clips.cjs: `estirar` alarga cada toma (×N) y `metaPorristas` es cuántas figuras hace la rutina. */
+const OPC = { estirar: 1, metaPorristas: 1 };
+
 /** Graba `seg` segundos: antes de cada cuadro llama a cadaCuadro(i) (para mover al personaje, tocar, etc.). */
 async function grabar(p, escena, seg, cadaCuadro, desde = 0) {
   const dir = path.join(OUT, "cuadros", escena);
   if (!desde) { fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true }); }
-  const n = Math.round(seg * FPS);
+  const n = Math.round(seg * OPC.estirar * FPS);
   const elegidos = MUESTRA ? new Set([0, Math.floor(n / 2), n - 1]) : null;
   for (let i = 0; i < n; i++) {
     if (cadaCuadro) await cadaCuadro(i);
@@ -298,9 +304,9 @@ const ESCENAS = {
     await perfil(p);
     await abrirJuego(p, "Saltos de Porristas", "#porristas-btn-start", "porristas");
     await sinConsejos(p);
-    await p.evaluate(() => {
+    await p.evaluate((meta) => {
       const g = window.__g3d.porristas;
-      g.goal = 1; // una figura y la pirámide (en el video no hay tiempo para más)
+      g.goal = meta; // una figura y la pirámide (en el video no hay tiempo para más)
       const orig = g.update.bind(g);
       g.update = (dt) => {
         orig(dt);
@@ -309,7 +315,7 @@ const ESCENAS = {
         if (h && Math.abs(h.t - g.rt) < 0.03) g.tap();
       };
       window.__reloj.encender();
-    });
+    }, OPC.metaPorristas);
     await calentar(p, 3.0);
     await grabar(p, "porristas", 11);
   },
@@ -370,7 +376,8 @@ const ESCENAS = {
     await abrirJuego(p, "Aventura Choco", "#aventura-btn-start", "aventura");
     await sinConsejos(p);
     await p.evaluate(() => { const g = window.__g3d.aventura; g.keys.right = true; window.__reloj.encender(); });
-    const salto = (i) => p.evaluate((i) => { const g = window.__g3d.aventura; if (i % 34 === 0) { g.keys.jump = true; g.player.buffer = 0.13; } if (i % 34 === 14) g.keys.jump = false; }, i);
+    // en el video no se pierde: el piloto solo corre y salta, así que se le reponen los corazones (si no, a los ~10 s sale "te quedaste sin corazones")
+    const salto = (i) => p.evaluate((i) => { const g = window.__g3d.aventura; g.hearts = Math.max(g.hearts, 2); if (i % 34 === 0) { g.keys.jump = true; g.player.buffer = 0.13; } if (i % 34 === 14) g.keys.jump = false; }, i);
     await calentar(p, 0.8, salto);
     await grabar(p, "aventura", 4.5, salto);
   },
@@ -416,6 +423,18 @@ const ESCENAS = {
     await grabar(p, "fabrica", 3);
   },
 
+  /** Autos de Chocolate: acelerando por la carretera. */
+  async autos(p) {
+    await perfil(p);
+    await abrirJuego(p, "Autos de Chocolate", "#autos-btn-start", "autos");
+    await sinConsejos(p);
+    await p.evaluate(() => window.__reloj.encender());
+    await p.keyboard.down("ArrowUp");
+    await calentar(p, 1.2);
+    await grabar(p, "autos", 5);
+    await p.keyboard.up("ArrowUp");
+  },
+
   /** Cortes rápidos de otros juegos (1,3 s cada uno). */
   async extras(p) {
     await perfil(p);
@@ -445,7 +464,9 @@ const ESCENAS = {
   },
 };
 
-(async () => {
+module.exports = { abrir, ESCENAS, OPC, FPS, OUT, SOLO };
+
+if (require.main === module) (async () => {
   const lista = SOLO.length ? SOLO : Object.keys(ESCENAS);
   let mal = 0;
   for (const id of lista) {

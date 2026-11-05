@@ -4,6 +4,31 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-04
+
+### Videos verticales "jugando en vivo" para redes
+- **Pedido de la persona dueña:** videos cortos (~20 s) de distintas jugabilidades, para mostrar de qué se trata el juego. Después aclaró: «listos ya como con un fondo, esto en el medio vertical, con algún textito que yo después lo pueda reproducir en mi voz».
+- **Qué se hizo:** 7 videos de 1080×1920, de 18 a 21 s:
+  - Contenido: fútbol, básquet, porristas, parkour y aventura, Ciudad y Fábrica, Pueblo (casita y estrellas), y Merge con cocina y autos.
+  - Formato: el mismo marco del video promocional (logo arriba, juego al medio con borde amarillo, invitación abajo), con 3 textos por video y música propia suave.
+  - Las frases del guion ya acordado (`dinamico.cjs`, GUION) van textuales. Las nuevas quedan marcadas en `GUION.txt` para que la dueña las revise y las grabe con su voz.
+  - También quedaron los 7 clips horizontales sin textos (1920×1080).
+- **Cómo se grabó:** se grabó con la app armada de hoy (`node scripts/build.mjs app`), en Windows con Edge y la tarjeta gráfica (`VIDEO_GPU=1`). Así sale ~10 veces más rápido que con el dibujo por software: 5 s de juego en ~35 s.
+- **Scripts:**
+  - `scripts/video/clips.cjs` (nuevo): graba y arma los clips horizontales. Reintenta si el menú no carga, y con `--montar` solo los vuelve a armar.
+  - `scripts/video/verticales.cjs` (nuevo): arma los verticales y `GUION.txt`; con `--sin-musica` salen sin música.
+  - `grabar.cjs`:
+    - Ahora se puede usar desde otros scripts, alarga las tomas con `OPC.estirar` y elige cuántas figuras hace la rutina de porristas.
+    - Nueva escena `autos` (Autos de Chocolate).
+    - En la Aventura se reponen los corazones durante la grabación (antes, a los ~10 s salía «te quedaste sin corazones»).
+- **Qué se revisó en las grabaciones:** el piloto del parkour se cae pasados los ~6 s, así que en el clip solo va el comienzo. Se sacó la escena «extras» porque sus cortes caían en pantallas de «¡Se cayó!» y en menús.
+- **Videos:** en `video/clips/` y `video/verticales/`, que no se suben al repositorio (pesan).
+- **Pendiente:** que la dueña grabe la voz y apruebe las frases nuevas. No hay cambios en el juego, así que este PR no necesita APK ni PR en matiweb.
+
+### Merge del PR #53 y repositorio local al día
+- La copia local de `main` estaba 268 commits atrás: se actualizó.
+- Se mergeó el #53, a pedido de la dueña («Sí, mergear #53»): nada se atraviesa en los juegos, escenario con show y el video promocional nuevo. Con eso, `main` ya tiene lo de los APK 98, 99 y 100.
+
 ## 2026-10-30
 
 ### APK de prueba de este PR (#53)
