@@ -6,6 +6,11 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-09
 
+### Después del envío a revisión
+- Se mergearon el PR #54 y Matichoc/matiweb#82. matichoc.cl/matijuego/privacy.html ya muestra la versión 1.2 con Ember Holdings SpA. Se cerró matiweb#58, que quedó reemplazado por el #82.
+- **Video de la ficha:** la dueña lo subió a YouTube, al canal @Matichoc, como oculto: https://youtu.be/d80CXEZ9gFc (título «Matijuego · el arcade de Matichoc»). Se comprobó que se puede insertar. El enlace va en el campo «Video» de la ficha y se envía a revisión.
+- **Video para redes (idea conversada):** «Papá vs. hija», de 30 a 40 s en vertical, sin decir el nombre de la niña. La dueña lo graba y después se arma igual que los videos del presentador.
+
 ### Publicación en Google Play: ficha lista
 - **Ficha de la tienda:** la persona dueña completó el nombre, las descripciones (de `store/listing-es.md`), el gráfico de funciones y las capturas. En la declaración de recursos de IA se recomendó «No etiquetar»: las capturas y el gráfico son del juego real y el ícono es el logo de Matichoc. Los textos se escribieron con Claude.
 - **Nombre del paquete:** `cl.chocojuego.matichoc`. El `.aab` que se sube es el de la compilación del 30-oct (ejecución 41119847485, versión 1.0.0, número de versión 100, firmado con la llave de subida). Después de esa compilación solo cambió la bitácora.
