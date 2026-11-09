@@ -52,8 +52,9 @@ Juegos → Arcade (alternativa: Casual)
 Arcade, Aventura, Familia, Niños, 3D
 
 ## Contacto (obligatorio en la consola)
-- Correo: i.saavedra.nu@gmail.com  (confirmar que es el que quieres mostrar públicamente)
-- Política de privacidad (URL): **https://matichoc.cl/matijuego/privacy.html**
+- Desarrollador: Ember Holdings SpA (cuenta de organización, nombre `ember_dev`, sitio https://emberholdings.cl)
+- Correo: contacto@emberholdings.cl
+- Política de privacidad (URL cargada en la consola): **https://emberholdings.cl/privacidad.html** (la general de Ember Holdings). La del juego, más detallada y con el mismo responsable desde la versión 1.2, va dentro de la app y en **https://matichoc.cl/matijuego/privacy.html**.
   ✅ **Publicada y comprobada.** El 28-oct-2026 la persona dueña la abrió en su celular desde matichoc.cl.
   - **Qué se comparó:** su captura muestra el mismo título que `app/privacy.html`, la misma versión («Versión 1.1 · última actualización: 24 de octubre de 2026») y las mismas 10 secciones en el mismo orden. Además, el archivo publicado en matiweb (`main`, `7469fcb`) es idéntico al de la app.
   - **Lo que no se vio:** la barra del navegador muestra solo el dominio, no la ruta completa.

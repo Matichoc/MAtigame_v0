@@ -4,6 +4,21 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-09
+
+### Publicación en Google Play: ficha lista
+- **Ficha de la tienda:** la persona dueña completó el nombre, las descripciones (de `store/listing-es.md`), el gráfico de funciones y las capturas. En la declaración de recursos de IA se recomendó «No etiquetar»: las capturas y el gráfico son del juego real y el ícono es el logo de Matichoc. Los textos se escribieron con Claude.
+- **Nombre del paquete:** `cl.chocojuego.matichoc`. El `.aab` que se sube es el de la compilación del 30-oct (ejecución 41119847485, versión 1.0.0, número de versión 100, firmado con la llave de subida). Después de esa compilación solo cambió la bitácora.
+- **Decisión de la persona dueña:** la cuenta de desarrollador es de **organización**. Se hizo entre el 7 y el 9 de noviembre, en otra sesión:
+  - **Empresa:** Ember Holdings SpA, RUT 78.120.632-6, D-U-N-S 765638054.
+  - **Cuenta de Play:** la cuenta personal se convirtió a organización, un cambio que es permanente. Nombre de desarrollador `ember_dev` y sitio verificado emberholdings.cl.
+  - **Contacto:** contacto@emberholdings.cl. La política de privacidad que se cargó en la consola es emberholdings.cl/privacidad.html.
+  - Con cuenta de organización no se exige la prueba cerrada de 12 testers durante 14 días: se va directo a producción. Las anotaciones anteriores decían «cuenta personal».
+- **Comprobado en la compilación del 30-oct:** el APK pide solo `INTERNET` y `VIBRATE`, más un permiso interno de Android. No pide `AD_ID` y no lleva Firebase, analíticas ni anuncios.
+- **Ojo, por decidir:** la política que va dentro de la app (`app/privacy.html` y matichoc.cl/matijuego/privacy.html) nombra como responsable a Chocolatería Matichoc Inés Saavedra EIRL y al correo i.saavedra.nu@gmail.com. La ficha, en cambio, ahora es de Ember Holdings SpA, y Google pide que la política nombre al mismo desarrollador de la ficha.
+- **Pendientes legales (de la otra sesión):** revisar si los chocolates llevan sellos «ALTO EN» (Ley 20.606, art. 6) y, si el juego genera ingresos, agregar en el SII la actividad 582000.
+- **Video de la ficha:** se rearmó `video/matijuego-horizontal.mp4` (1920×1080) para subirlo a YouTube como oculto. `carteles.cjs` ahora también funciona con `playwright-core`.
+
 ## 2026-11-05
 
 ### Segundo video de la dueña presentando el juego (88 s, «súmate a la aventura»)
