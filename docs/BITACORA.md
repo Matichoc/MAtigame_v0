@@ -8,7 +8,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ### Merge del PR #53
 - La persona dueña hizo merge del PR #53: escenario sólido, revisión de que nada se atraviese en todos los juegos y video promocional nuevo.
-- La copia web (matiweb #58) sigue abierta, esperando su merge.
+- La copia web (matiweb #58) se cerró sin merge el 9-nov: la reemplazó matiweb #82 (ya mergeado), que trae estos cambios y la política de privacidad 1.2.
 - La rama `claude/zealous-johnson-2ryf87` se rehízo desde `main` para lo que sigue. Esta anotación va en el próximo PR.
 
 ## 2026-10-30
