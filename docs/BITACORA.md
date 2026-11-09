@@ -4,6 +4,99 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-09
+
+### Publicación en Google Play: ficha lista
+- **Ficha de la tienda:** la persona dueña completó el nombre, las descripciones (de `store/listing-es.md`), el gráfico de funciones y las capturas. En la declaración de recursos de IA se recomendó «No etiquetar»: las capturas y el gráfico son del juego real y el ícono es el logo de Matichoc. Los textos se escribieron con Claude.
+- **Nombre del paquete:** `cl.chocojuego.matichoc`. El `.aab` que se sube es el de la compilación del 30-oct (ejecución 41119847485, versión 1.0.0, número de versión 100, firmado con la llave de subida). Después de esa compilación solo cambió la bitácora.
+- **Decisión de la persona dueña:** la cuenta de desarrollador es de **organización**. Se hizo entre el 7 y el 9 de noviembre, en otra sesión:
+  - **Empresa:** Ember Holdings SpA, RUT 78.120.632-6, D-U-N-S 765638054.
+  - **Cuenta de Play:** la cuenta personal se convirtió a organización, un cambio que es permanente. Nombre de desarrollador `ember_dev` y sitio verificado emberholdings.cl.
+  - **Contacto:** contacto@emberholdings.cl. La política de privacidad que se cargó en la consola es emberholdings.cl/privacidad.html.
+  - Con cuenta de organización no se exige la prueba cerrada de 12 testers durante 14 días: se va directo a producción. Las anotaciones anteriores decían «cuenta personal».
+- **Comprobado en la compilación del 30-oct:** el APK pide solo `INTERNET` y `VIBRATE`, más un permiso interno de Android. No pide `AD_ID` y no lleva Firebase, analíticas ni anuncios.
+- **Ojo, por decidir:** la política que va dentro de la app (`app/privacy.html` y matichoc.cl/matijuego/privacy.html) nombra como responsable a Chocolatería Matichoc Inés Saavedra EIRL y al correo i.saavedra.nu@gmail.com. La ficha, en cambio, ahora es de Ember Holdings SpA, y Google pide que la política nombre al mismo desarrollador de la ficha.
+- **Se arregló (pedido de la persona dueña: «avanza»):**
+  - La política de la app pasa a la **versión 1.2**. El responsable ahora es Ember Holdings SpA (RUT 78.120.632-6, contacto@emberholdings.cl) y se aclara que la marca Matichoc pertenece a Chocolatería Matichoc Inés Saavedra EIRL. Los créditos dicen «publicado por Ember Holdings SpA». `store/listing-es.md` tiene el nuevo contacto y la URL de la consola.
+  - Se compiló un `.aab` nuevo desde esta rama (ejecución 42684307482, versión 1.0.0, firmado para la tienda). Es el que se sube a producción; el del 30-oct ya no se usa.
+  - Web: PR Matichoc/matiweb#82 con la política 1.2 y el juego al día (incluye lo del #58). Se probó contra la versión web servida en el computador: carga sin errores y la política muestra Ember Holdings. Se publica cuando la dueña haga merge.
+  - Video de la ficha: `matijuego-horizontal.mp4` (83 s). Se sacaron el final del parkour y el inicio de «extras», que mostraban «¡Se cayó el Matichico!». El cierre dice «📲 ¡Descárgalo gratis y a jugar!» (`VIDEO_CIERRE=play` en `carteles.cjs`) en vez de la invitación a ser tester.
+- **Enviado a revisión de Google (9-nov):** la persona dueña subió el `.aab` 101 (1.0.0) a **producción** con lanzamiento completo y lo envió junto con otros 11 cambios:
+  - Países: 177 más el resto del mundo.
+  - Ficha es-419 y categoría Arcade.
+  - Formularios: clasificación de contenido, audiencia de 0 años o más, política emberholdings.cl/privacidad.html, anuncios, seguridad de los datos y salud.
+  - Google Play Games en PC quedó habilitado.
+  - Play Console dio una sola advertencia: no hay archivo de desofuscación. Es normal, porque la app no usa R8/ProGuard.
+  - La publicación gestionada está desactivada: si Google aprueba, queda publicada de inmediato.
+- **Pendientes legales (de la otra sesión):** revisar si los chocolates llevan sellos «ALTO EN» (Ley 20.606, art. 6) y, si el juego genera ingresos, agregar en el SII la actividad 582000.
+- **Video de la ficha:** se rearmó `video/matijuego-horizontal.mp4` (1920×1080) para subirlo a YouTube como oculto. `carteles.cjs` ahora también funciona con `playwright-core`.
+
+## 2026-11-05
+
+### Segundo video de la dueña presentando el juego (88 s, «súmate a la aventura»)
+- **Pedido de la persona dueña:** repetir el mismo trabajo con una segunda toma (88,6 s), «lo más rápido posible», con escenas que calcen y que sea «único, relevante, que impacte y que la gente se quiera sumar».
+- **Qué se hizo:** `video/presentador/matijuego-presentacion-2.mp4` (1080×1920, 88,6 s):
+  - Transcripción con faster-whisper y 29 cortes de escena al ritmo de sus palabras.
+  - Cuando nombra los juegos («fútbol, Tetris, aventura, salto, cheerleader, basketball») hay cortes rápidos de ~1 s con su nombre. Tetris se muestra como «Bloques», porque es marca registrada.
+  - Textos gigantes al medio que caen desde arriba en los momentos fuertes: «¡MATIJUEGO!», «¿QUIERES SER TESTER?» y «¡SÚMATE A LA AVENTURA!».
+  - Cierre con la invitación a ser tester («✉️ Mándame tu mail por interno»).
+- **Scripts:**
+  - `presentador.cjs` ahora lee la pauta (escenas y textos) desde un JSON en `scripts/video/pautas/`: una pauta por video. También se agregó el tipo de texto «grande».
+  - `recortar-persona.py` tiene la opción `--sin-azul`, que borra la cortina azul del fondo de esta toma y deja solo el pedazo más grande (ella), y la opción `--parte=k/n`, que reparte el trabajo en varios procesos a la vez.
+- **Qué se revisó:**
+  - Cuadros de los cortes rápidos, los pedidos, la cocina y los textos gigantes.
+  - El recorte quedó sin la cortina.
+  - El volumen es de −14,8 LUFS.
+- **Decisión de la persona dueña:** se escribe «Matilovers» (así quedó en el video).
+- **Pendiente:** que la dueña diga si cambia algún texto.
+
+### Video con la dueña presentando el juego (escenas al ritmo de su voz)
+- **Pedido de la persona dueña:** usar el video que grabó presentando el Matijuego (60 s, con su voz) y poner de fondo el juego andando, con mensajes en palabras. Ella va recortada sin fondo en una esquina de abajo, y cada escena calza con lo que va diciendo. «Primero entiende lo que yo digo en el video y después trata de meter las escenas justo en los tiempos».
+- **Cómo se entendió lo que dice:**
+  - Se transcribió su voz con faster-whisper (modelo `medium`, en el computador, sin subir nada), con el segundo de cada palabra.
+  - Los cortes caen ~0,1 s antes de la palabra: «fútbol» 18,9 s, «básquetbol» 20,1 s, «pichanguita» 22,1 s, «carritas» 29,6 s, «barriles» 38,0 s, «ciudad» 40,2 s, «pueblo» 40,7 s, «misiones» 47,7 s, «testers» 55,9 s y «Play Store» 58,1 s.
+- **Qué se hizo:** video vertical de 1080×1920 y 60 s (`video/presentador/matijuego-presentacion.mp4`):
+  - Arriba, el logo y «Matijuego». Al medio, el juego en una ventana con borde amarillo y, atrás, el mismo juego desenfocado.
+  - Abajo a la izquierda, 19 textos que siguen lo que dice: «⚽ Fútbol», «🍪 ¡Junta alfajores!», «🛢️ ¡Esquiva los barriles!», «🙋 ¡Únete como tester en matichoc.cl!», «📲 Pronto en Google Play», etc.
+  - Abajo a la derecha, ella recortada con borde blanco tipo sticker.
+  - Sonido: su voz (con un filtro de graves y un compresor suave) más la música propia bajita, a −14 LUFS como piden las redes.
+  - Para el autito se grabaron 11 s de Autos de Chocolate: los barriles con el aviso aparecen justo cuando dice «esquivando barriles».
+- **Scripts:**
+  - `scripts/video/recortar-persona.py` (nuevo): saca el fondo cuadro a cuadro con rembg (`u2net_human_seg`). Rellena los hoyos de adentro de la silueta, porque los parches verdes de su chaqueta salían como fondo, y agrega el borde blanco.
+  - `scripts/video/presentador.cjs` (nuevo): la pauta de escenas y textos con sus tiempos, y el armado con ffmpeg.
+- **Qué se revisó:**
+  - Cuadros de todo el video: cada escena y cada texto aparecen con su palabra, sin pantallas de «¡Se cayó!».
+  - El volumen queda parejo (−14,5 LUFS).
+  - Los textos largos se partían en una columna angosta de 3 líneas; se arregló.
+- **Pendiente:**
+  - Que la dueña lo vea y diga si cambia algún texto o escena.
+  - Su video de WhatsApp viene en baja resolución (478×850). Si manda el original del celular, ella se verá más nítida.
+
+## 2026-11-04
+
+### Videos verticales "jugando en vivo" para redes
+- **Pedido de la persona dueña:** videos cortos (~20 s) de distintas jugabilidades, para mostrar de qué se trata el juego. Después aclaró: «listos ya como con un fondo, esto en el medio vertical, con algún textito que yo después lo pueda reproducir en mi voz».
+- **Qué se hizo:** 7 videos de 1080×1920, de 18 a 21 s:
+  - Contenido: fútbol, básquet, porristas, parkour y aventura, Ciudad y Fábrica, Pueblo (casita y estrellas), y Merge con cocina y autos.
+  - Formato: el mismo marco del video promocional (logo arriba, juego al medio con borde amarillo, invitación abajo), con 3 textos por video y música propia suave.
+  - Las frases del guion ya acordado (`dinamico.cjs`, GUION) van textuales. Las nuevas quedan marcadas en `GUION.txt` para que la dueña las revise y las grabe con su voz.
+  - También quedaron los 7 clips horizontales sin textos (1920×1080).
+- **Cómo se grabó:** se grabó con la app armada de hoy (`node scripts/build.mjs app`), en Windows con Edge y la tarjeta gráfica (`VIDEO_GPU=1`). Así sale ~10 veces más rápido que con el dibujo por software: 5 s de juego en ~35 s.
+- **Scripts:**
+  - `scripts/video/clips.cjs` (nuevo): graba y arma los clips horizontales. Reintenta si el menú no carga, y con `--montar` solo los vuelve a armar.
+  - `scripts/video/verticales.cjs` (nuevo): arma los verticales y `GUION.txt`; con `--sin-musica` salen sin música.
+  - `grabar.cjs`:
+    - Ahora se puede usar desde otros scripts, alarga las tomas con `OPC.estirar` y elige cuántas figuras hace la rutina de porristas.
+    - Nueva escena `autos` (Autos de Chocolate).
+    - En la Aventura se reponen los corazones durante la grabación (antes, a los ~10 s salía «te quedaste sin corazones»).
+- **Qué se revisó en las grabaciones:** el piloto del parkour se cae pasados los ~6 s, así que en el clip solo va el comienzo. Se sacó la escena «extras» porque sus cortes caían en pantallas de «¡Se cayó!» y en menús.
+- **Videos:** en `video/clips/` y `video/verticales/`, que no se suben al repositorio (pesan).
+- **Pendiente:** que la dueña grabe la voz y apruebe las frases nuevas. No hay cambios en el juego, así que este PR no necesita APK ni PR en matiweb.
+
+### Merge del PR #53 y repositorio local al día
+- La copia local de `main` estaba 268 commits atrás: se actualizó.
+- Se mergeó el #53, a pedido de la dueña («Sí, mergear #53»): nada se atraviesa en los juegos, escenario con show y el video promocional nuevo. Con eso, `main` ya tiene lo de los APK 98, 99 y 100.
+
 ## 2026-10-30
 
 ### APK de prueba de este PR (#53)

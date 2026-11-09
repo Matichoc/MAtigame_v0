@@ -4,7 +4,7 @@
 // Uso: NODE_PATH=$(npm root -g) node scripts/video/carteles.cjs <salida>
 const fs = require("fs");
 const path = require("path");
-const { chromium } = require("playwright");
+const { chromium } = (() => { try { return require("playwright"); } catch { return require("playwright-core"); } })();
 
 const OUT = path.resolve(process.argv[2] || "video", "carteles");
 const RAIZ = path.join(__dirname, "..", "..");
@@ -24,7 +24,8 @@ const TEXTOS = {
   },
   cierre: {
     lineas: ["Gratis · sin anuncios", "para niñas y niños"],
-    llamado: "🙋 ¿Tienes Android? ¡Sé tester!",
+    // VIDEO_CIERRE=play: para el video de la ficha de Google Play (quien lo ve ya está en la tienda)
+    llamado: process.env.VIDEO_CIERRE === "play" ? "📲 ¡Descárgalo gratis y a jugar!" : "🙋 ¿Tienes Android? ¡Sé tester!",
     web: "Pruébalo ya en matichoc.cl/matijuego",
   },
 };
