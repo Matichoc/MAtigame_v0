@@ -16,6 +16,11 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - Con cuenta de organización no se exige la prueba cerrada de 12 testers durante 14 días: se va directo a producción. Las anotaciones anteriores decían «cuenta personal».
 - **Comprobado en la compilación del 30-oct:** el APK pide solo `INTERNET` y `VIBRATE`, más un permiso interno de Android. No pide `AD_ID` y no lleva Firebase, analíticas ni anuncios.
 - **Ojo, por decidir:** la política que va dentro de la app (`app/privacy.html` y matichoc.cl/matijuego/privacy.html) nombra como responsable a Chocolatería Matichoc Inés Saavedra EIRL y al correo i.saavedra.nu@gmail.com. La ficha, en cambio, ahora es de Ember Holdings SpA, y Google pide que la política nombre al mismo desarrollador de la ficha.
+- **Se arregló (pedido de la persona dueña: «avanza»):**
+  - La política de la app pasa a la **versión 1.2**. El responsable ahora es Ember Holdings SpA (RUT 78.120.632-6, contacto@emberholdings.cl) y se aclara que la marca Matichoc pertenece a Chocolatería Matichoc Inés Saavedra EIRL. Los créditos dicen «publicado por Ember Holdings SpA». `store/listing-es.md` tiene el nuevo contacto y la URL de la consola.
+  - Se compiló un `.aab` nuevo desde esta rama (ejecución 42684307482, versión 1.0.0, firmado para la tienda). Es el que se sube a producción; el del 30-oct ya no se usa.
+  - Web: PR Matichoc/matiweb#82 con la política 1.2 y el juego al día (incluye lo del #58). Se probó contra la versión web servida en el computador: carga sin errores y la política muestra Ember Holdings. Se publica cuando la dueña haga merge.
+  - Video de la ficha: `matijuego-horizontal.mp4` (83 s). Se sacaron el final del parkour y el inicio de «extras», que mostraban «¡Se cayó el Matichico!». El cierre dice «📲 ¡Descárgalo gratis y a jugar!» (`VIDEO_CIERRE=play` en `carteles.cjs`) en vez de la invitación a ser tester.
 - **Pendientes legales (de la otra sesión):** revisar si los chocolates llevan sellos «ALTO EN» (Ley 20.606, art. 6) y, si el juego genera ingresos, agregar en el SII la actividad 582000.
 - **Video de la ficha:** se rearmó `video/matijuego-horizontal.mp4` (1920×1080) para subirlo a YouTube como oculto. `carteles.cjs` ahora también funciona con `playwright-core`.
 
