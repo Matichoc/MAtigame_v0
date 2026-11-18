@@ -6,6 +6,27 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-18
 
+### Bloques: la sombra de la pieza ahora es opcional (parte encendida)
+- **Pedido de la persona dueña:** «algunos me dicen que les sirve la sombra, y otros dicen que la sombra les molesta, debería ser opcional, partiendo con ella puesta».
+- **Qué se hizo:**
+  - En Bloques de Productos hay dos botones para la sombra de la pieza, la que muestra dónde va a caer. Uno está en la tarjeta de inicio («👁️ Sombra de la pieza: sí» / «🙈 Sombra de la pieza: no») y otro arriba, mientras se juega (👁️ / 🙈), con el aviso «Sombra encendida» o «Sombra apagada».
+  - Es un gusto **de cada jugador**: se guarda en su perfil (`progress.prefs.tetrisGhost`, un campo nuevo `prefs` que se limpia como los demás si el guardado viene dañado). Si no lo ha tocado, la sombra se ve.
+- **Qué se probó:**
+  - En la web servida en el computador: la sombra se ve de partida, se apaga y se enciende mientras se juega, y después de recargar la página sigue apagada para ese jugador.
+  - `juegos.cjs --solo=tetris`: 1/1 OK. `perfiles.cjs`: 13/13 OK. `verificar-app.mjs`: OK.
+- **Versión:** va en la 1.1.1. La 1.1.0 (105) todavía está solo en la prueba interna, así que se puede subir la 1.1.1 en su lugar y promocionar esa a producción.
+
+### Versión 1.1 lista para Google Play
+- **Pedido de la persona dueña:** subir la versión con música para hacer la promoción desde ahí. Antes de eso preguntó si tendría que instalar siempre el APK: se le explicó que no. El APK de prueba no se instala encima del juego de Play, porque está firmado con otra llave, y desinstalar el oficial borra el progreso. Desde ahora se prueba con la **prueba interna** de Play Console, que no pasa por revisión, y después se promociona a producción.
+- **Merge:** PR #56 (versión 1.1 con canciones, celebraciones, ficha EN/PT y aviso) y Matichoc/matiweb#84. La política 1.3 ya está en matichoc.cl/matijuego/privacy.html (comprobado).
+- **`.aab` 1.1.0, desde `main` (ejecución 44359700786):**
+  - Número de versión **105**, firmado con la llave de subida (la misma SHA-256 de antes, 47:FE:F7:…:E7:9F).
+  - Pide solo `INTERNET` y `VIBRATE`, y lleva las 5 canciones (`assets/music/*.m4a`). Pesa 20,3 MB.
+  - Quedó en `Descargas\matijuego-aab-1.1.0\app-release.aab`.
+- **Pendiente:**
+  - Que la dueña lo suba a la prueba interna, lo pruebe en su celular y lo promocione a producción.
+  - Junto con eso, enviar a revisión el video de la ficha (https://youtu.be/d80CXEZ9gFc) y, si quiere, la ficha en inglés y portugués.
+
 ### Aviso pagado: videos de 30 y 15 s con «Sube el nivel»
 - **Pedido de la persona dueña:** un video «altamente promocional», sin narración, con música y mensajes en pantalla, y un guion para publicarlo. Le va a hacer publicidad pagada para conseguir descargas.
 - **Cómo se armó (`scripts/video/anuncio.cjs`, pautas `anuncio-30s.json` y `anuncio-15s.json`):**
