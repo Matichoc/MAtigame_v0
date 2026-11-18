@@ -6,6 +6,14 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-18
 
+### ¡Matijuego publicado en Google Play!
+- La persona dueña vio la ficha publicada: https://play.google.com/store/apps/details?id=cl.chocojuego.matichoc (desarrollador ember_dev, clasificación ESRB «Para todos»). Se comprobó que el enlace responde. Fueron 9 días de revisión (enviado el 9-nov).
+- **Demo web con el enlace a la tienda (pedido de la persona dueña: «Sí, ponlo»):**
+  - El aviso de arriba de la demo ahora dice «📲 Descarga el Matijuego completo en Google Play», con enlace. El cartel que aparece al llegar al límite de la demo («Descargar en Google Play») ya lleva a la ficha.
+  - El enlace va en el HTML, dentro del bloque solo-web (`#demo-wall-link` en `app/index.template.html`), y `js/demo.js` lo lee de ahí. Así la app sigue sin enlaces externos: `verificar-app.mjs` lo comprobó (la primera prueba, con la URL en el JS, falló esa revisión y por eso se cambió).
+  - Se probó la demo servida en el computador: el aviso y el cartel tienen el enlace y no hay errores en la consola.
+- **Pendiente:** pegar el video de YouTube en la ficha (ahora sí, porque la app ya está publicada).
+
 ### Revisión de Google Play: llegó la clasificación IARC
 - Al noveno día de revisión llegó el «Aviso de clasificación en vivo» de la IARC para Matijuego (compañía ember_dev, tienda Google Play), con fecha 18-nov-2026. El ID de clasificación global es `6b14548e-c363-8bcb-8920-3fc54c31a0ca`: es el que se usa si otra tienda con licencia IARC lo pide.
 - Es una señal de que la revisión está avanzando. Aún no hay aprobación ni rechazo.
