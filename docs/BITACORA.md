@@ -13,7 +13,8 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - Número de versión **107**, firmado con la llave de subida (SHA-256 47:FE:F7:…:E7:9F, la misma de siempre).
   - Pide solo `INTERNET` y `VIBRATE`, lleva las 5 canciones y trae los botones de la sombra. Pesa 20,3 MB.
   - Quedó en `Descargas\matijuego-aab-1.1.1\app-release.aab`.
-- **Pendiente:** que la dueña lo suba a la prueba interna (si quiere probarlo) y lo promocione a producción, con el video de la ficha.
+- **Enviado a revisión (18-nov):** la dueña subió el `.aab` 1.1.1 (107) y lo envió a **producción**, con lanzamiento completo, junto con el video de la ficha (https://youtu.be/d80CXEZ9gFc). La publicación gestionada está desactivada: si Google aprueba, se publica de inmediato.
+- **Pendiente:** esperar la aprobación y después partir con los avisos pagados (`docs/ANUNCIO-MATIJUEGO.md`).
 
 ### Bloques: la sombra de la pieza ahora es opcional (parte encendida)
 - **Pedido de la persona dueña:** «algunos me dicen que les sirve la sombra, y otros dicen que la sombra les molesta, debería ser opcional, partiendo con ella puesta».
