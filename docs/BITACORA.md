@@ -6,6 +6,19 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-18
 
+### Aviso pagado: videos de 30 y 15 s con «Sube el nivel»
+- **Pedido de la persona dueña:** un video «altamente promocional», sin narración, con música y mensajes en pantalla, y un guion para publicarlo. Le va a hacer publicidad pagada para conseguir descargas.
+- **Cómo se armó (`scripts/video/anuncio.cjs`, pautas `anuncio-30s.json` y `anuncio-15s.json`):**
+  - Los tiempos de cada palabra de la canción salieron de la voz separada («0 Lead Vocals» de los stems), con faster-whisper. Cada escena entra ~0,1 s antes de su palabra: «alfajores, cuchuflís, bombones» → Merge, «del pueblo a la ciudad» → Pueblo y Ciudad, «puros campeones» → la pirámide de porristas, «¡Sube el nivel!» → parkour, «a la cancha… ¡ya llegó!» → el gol de la pichanga, «básquet» → la canasta, «salto hasta el cielo» → parkour, «chocolate en el corazón» → la cocina.
+  - Las escenas se grabaron de nuevo con la versión 1.1 (`video/anuncio/cuadros`) y no se reutilizaron las del 4 de noviembre.
+  - Los mensajes van pensados para los papás: «14 juegos 3D ¡gratis!», «Sin anuncios · sin compras · sin chat», «Para jugar en familia». Quedan entre la ventana del juego y los últimos ~360 px, que se dejan libres para los botones de Instagram y TikTok.
+  - Cierran con una tarjeta: el logo, «14 juegos y mundos en 3D para toda la familia», los sellos y «📲 Descárgalo en Google Play» en texto, sin el logo oficial de Google Play.
+- **Qué se revisó:**
+  - Hojas de cuadros de cada segundo de los dos videos. Se corrigió el botón final, que se partía en dos líneas, y el encuadre de la pichanga, que mostraba el lado vacío de la cancha (ahora va centrado en x=1280).
+  - Formato 1080×1920, volumen de −13,5 LUFS (30 s) y −14,1 LUFS (15 s).
+- **Guion para publicar (`docs/ANUNCIO-MATIJUEGO.md`):** el público (papás de 25 a 50 años, en Chile, solo Android), el objetivo de la campaña, tres textos principales para Meta, títulos, el texto para TikTok, el texto para el perfil con hashtags y el primer comentario con el enlace. También recuerda la Ley 20.606 (sellos «ALTO EN»): el aviso va dirigido a adultos.
+- **Archivos:** `video/anuncio/listos/` y una copia en `Descargas\anuncio-matijuego\`.
+
 ### Versión 1.1, segunda parte: las canciones de Suno dentro del juego
 - **La dueña creó las 6 canciones en Suno** con un plan pagado (usó «Get stems», que es del plan Pro). Están en `C:\Users\croco\Downloads\musica-matijuego\`.
   - `cancion.wav` es «Sube el nivel», con letra, para redes: la versión de 138 s, de la que salieron los stems.

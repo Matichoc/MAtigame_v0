@@ -1,0 +1,31 @@
+{
+  "nota": "Aviso corto de 15 s para publicidad pagada. Canción «Sube el nivel» desde el segundo 38,4 (parte el coro: «¡Sube el nivel!») hasta el 53,4. Tiempos del video = segundo de la canción − 38,4; cada corte cae ~0,1 s antes de la palabra. Mismo formato que anuncio-30s.json. Escenas grabadas el 18-nov-2026 con la versión 1.1 (video/anuncio/cuadros): la pirámide de porristas cae al final (~8-11 s), el gol de la pichanga a los 2 s y la canasta del básquet a los 2 s.",
+  "salida": "matijuego-anuncio-15s",
+  "cancion": {
+    "desde": 38.4,
+    "hasta": 53.4
+  },
+  "escenas": [
+    [0.0, "parkour", 0.3],
+    [1.85, "porristas", 8.6],
+    [4.2, "pueblo", 3],
+    [6.0, "pichanga", 1.0],
+    [9.65, "pichanga", 3.2],
+    [10.5, "basquet", 1.4],
+    [11.75, "parkour", 2.6]
+  ],
+  "textos": [
+    [0.0, 1.85, "", "¡SUBE EL|NIVEL!", "grande"],
+    [0.15, 4.2, "🎮", "14 juegos 3D gratis"],
+    [4.2, 9.65, "✅", "Sin anuncios · sin compras · sin chat"],
+    [9.65, 10.5, "⚽", "¡Pichanga!"],
+    [10.5, 11.75, "🏀", "¡Básquet!"],
+    [11.75, 12.9, "🚀", "¡Hasta el cielo!"]
+  ],
+  "cierre": {
+    "desde": 12.9,
+    "lema": "14 juegos y mundos en 3D<br>para toda la familia",
+    "sellos": ["Gratis", "Sin anuncios", "Sin compras"],
+    "boton": "📲 Descárgalo en Google Play"
+  }
+}
