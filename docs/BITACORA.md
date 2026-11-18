@@ -4,6 +4,16 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-18
+
+### Revisión de Google Play: llegó la clasificación IARC
+- Al noveno día de revisión llegó el «Aviso de clasificación en vivo» de la IARC para Matijuego (compañía ember_dev, tienda Google Play), con fecha 18-nov-2026. El ID de clasificación global es `6b14548e-c363-8bcb-8920-3fc54c31a0ca`: es el que se usa si otra tienda con licencia IARC lo pide.
+- Es una señal de que la revisión está avanzando. Aún no hay aprobación ni rechazo.
+- **Otros avisos de la consola:**
+  - «Servicios de Juegos de Google Play»: no se configura, porque el juego no pide cuentas.
+  - Estado de operador comercial de la UE: por ahora dice «No operador». Hay que decidirlo antes del 1-feb-2027 (la dirección registrada quedaría pública para usuarios de la UE).
+  - Cambios fiscales en Vietnam: no aplican, porque el juego es gratis.
+
 ## 2026-11-09
 
 ### Después del envío a revisión
