@@ -9,7 +9,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 ### Versión 1.1, primera parte: el juego listo para canciones de Suno, celebraciones y ficha en inglés y portugués
 - **Pedido de la persona dueña:** partir por la versión 1.1 del plan («música»).
 - **Música con Suno:**
-  - `docs/MUSICA-SUNO.md` tiene la letra de la canción «¡Vamos al Matijuego!» y el estilo de cada tema (menú, pueblo, deportes, aventura, cocina). La dueña los crea con un plan pagado de Suno y guarda el comprobante.
+  - `docs/MUSICA-SUNO.md` tiene la letra de la canción «Sube el nivel» y el estilo de cada tema (menú, pueblo, deportes, aventura, cocina). La dueña los crea con un plan pagado de Suno y guarda el comprobante.
   - `scripts/musica.mjs` deja cada canción lista en `assets/music/<nombre>.m4a`: sin silencios, con el final fundido sobre el principio para que se repita sin salto, a −18 LUFS y en AAC de 96 kbps. También actualiza la lista `SONG_FILES` de `js/audio.js`.
   - `js/audio.js` toca las canciones con un `<audio>` que va por un volumen propio. Así no decodifica la canción entera en memoria, y el volumen funciona también en iPhone.
   - Las canciones entran y salen con un fundido y siguen donde iban al volver a un juego o al menú. Se callan con el botón de sonido y al salir de la app.
@@ -31,6 +31,10 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 - **Compilación y web:**
   - APK de prueba versión 1.1.0 (ejecución 44329314997): compiló bien.
   - Web: PR Matichoc/matiweb#84. Se probó con `juegos.cjs`, sin red: 15/16 OK y 0 peticiones externas. El que no pasa es Choco Blaster (`fps3d`), que tampoco pasa en la web publicada hoy, porque la prueba no tiene definido su botón de inicio.
+- **Música para todas las edades (la dueña preguntó si no quedaba «muy de niño»):** se rehicieron la canción y los estilos.
+  - La primera versión («¡Vamos al Matijuego!», pop infantil con coro de niños) sonaba a canción para guaguas, y el juego lo juegan sobre todo niñas y niños de 6 a 13 años, que escuchan pop urbano, electro y lofi.
+  - Ahora la canción es «Sube el nivel», pop urbano latino juvenil y apto para niños (sin doble sentido ni malas palabras). Nombra lo que de verdad tiene el juego: los Matilovers, el Pueblo, el parkour, la chilena en la pichanga, las porristas, la cocina y el Mati Dubai.
+  - Los temas pasan a lofi (pueblo), beat de estadio (deportes), electro pop con chiptune (aventura) y funk suave (cocina).
 - **Guía de Suno en español:** a pedido de la dueña, los estilos y las etiquetas de la letra quedaron en español. Las canciones se dejan en `C:\Users\croco\Downloads\musica-matijuego\`, una carpeta que ya está creada.
 - **Pendiente:**
   - Que la dueña cree las canciones en Suno.

@@ -1,6 +1,6 @@
 # Música del Matijuego con Suno (versión 1.1)
 
-Hoy la música del juego son notas simples que arma el propio código. En la versión 1.1 se cambia por **6 canciones hechas con Suno**: una canción con letra («¡Vamos al Matijuego!») y 5 temas instrumentales, uno por tipo de juego. El juego ya está preparado: cuando una canción está, suena esa; si falta, sigue sonando la música de siempre.
+Hoy la música del juego son notas simples que arma el propio código. En la versión 1.1 se cambia por **6 canciones hechas con Suno**: una canción con letra («Sube el nivel») y 5 temas instrumentales, uno por tipo de juego. El juego ya está preparado: cuando una canción está, suena esa; si falta, sigue sonando la música de siempre.
 
 ## Antes de empezar (importante)
 
@@ -27,64 +27,76 @@ Hoy la música del juego son notas simples que arma el propio código. En la ver
 | `aventura.wav` | Parkour, Aventura Choco, Salto, Autos, Recolecta | Sí |
 | `cocina.wav` | Mati Merge, Bloques, Memoria, Choco Match | Sí |
 
-### 1. «¡Vamos al Matijuego!» (con letra) → `cancion.wav`
+### Para quién es la música
+
+El Matijuego lo juegan niñas y niños de unos 6 a 13 años, y lo comparten sus papás. A esa edad lo «muy de guagua» no se escucha: se escucha el pop urbano, el electro y el lofi de TikTok. Por eso la música suena **juvenil y bailable**, pero sin nada que no sea para niños: sin doble sentido, sin malas palabras y sin el baile del reggaetón. La letra habla del juego tal cual es: el Pueblo, el parkour, la pichanga con chilena, el básquet, las porristas, la cocina, los alfajores, los cuchuflís, el Mati Dubai y los Matilovers.
+
+### 1. «Sube el nivel» (con letra) → `cancion.wav`
+
+**Título:** Sube el nivel (Matijuego)
 
 **Estilo** (copiar tal cual):
 
 ```
-pop infantil alegre, pop latino, ukelele, marimba, palmas, voz femenina brillante con coro de niños, coro pegajoso para cantar, 118 bpm, feliz, en español
+pop urbano latino juvenil apto para niños, ritmo bailable, bajo potente, sintetizadores brillantes, palmas, voz joven con mucha energía y coro de grupo, gritos de hinchada, 100 bpm, coro pegajoso, en español
+```
+
+Si sale demasiado «urbano», cambia el estilo por este otro, más electro:
+
+```
+electro pop juvenil apto para niños, sintetizadores brillantes, bajo saltarín, batería con palmas, voz joven con energía y coro de grupo, 120 bpm, coro pegajoso, en español
 ```
 
 **Letra** (copiar tal cual, con los títulos entre corchetes):
 
 ```
 [Intro]
-¡Uno, dos, tres... a jugar!
+¡Matilovers! ¡Dale, sube el nivel!
 
 [Estrofa 1]
-Me levanto con ganas de jugar,
-mi Matichico me va a acompañar,
-por el pueblo de chocolate voy,
-saludando a todos: ¡aquí estoy!
+Llego al pueblo con mi Matichico,
+la fuente de chocolate brilla al tiro,
+salto en el parkour, no miro hacia atrás,
+tres estrellas más y voy por más.
 
 [Antes del coro]
-Junta estrellas, junta alfajores,
-pinta tu casa de mil colores...
+Alfajores, cuchuflís, bombones,
+del pueblo a la ciudad, puros campeones.
 
 [Coro]
-¡Ma-ti-jue-go! ¡Ma-ti-jue-go!
-Salta, corre, ¡vamos, que ya llego!
-Chocolate y diversión,
-¡late fuerte el corazón!
-¡Ma-ti-jue-go! ¡Ma-ti-jue-go!
+¡Sube el nivel, Matijuego!
+Del pueblo a la cancha, ¡ya llego!
+Pichanga, básquet, salto hasta el cielo,
+¡chocolate en el corazón, Matijuego!
+¡Oe, oe, oe!
 
 [Estrofa 2]
-Una pichanga, ¡golazo de chilena!
-En el básquet la hinchada truena,
-las porristas vuelan hasta el cielo,
-y en el parkour salto sin miedo.
+Gol de chilena en la pichanga,
+en el básquet la hinchada canta,
+porristas volando, pirámide arriba,
+en la cocina, mi receta favorita.
 
 [Antes del coro]
-Junta estrellas, junta alfajores,
-pinta tu casa de mil colores...
+Del alfajor hasta el Mati Dubai,
+junto y junto, ¡nadie me va a parar!
 
 [Coro]
-¡Ma-ti-jue-go! ¡Ma-ti-jue-go!
-Salta, corre, ¡vamos, que ya llego!
-Chocolate y diversión,
-¡late fuerte el corazón!
-¡Ma-ti-jue-go! ¡Ma-ti-jue-go!
+¡Sube el nivel, Matijuego!
+Del pueblo a la cancha, ¡ya llego!
+Pichanga, básquet, salto hasta el cielo,
+¡chocolate en el corazón, Matijuego!
+¡Oe, oe, oe!
 
 [Puente]
-Papá, mamá, ¿me acompañan a jugar?
-Con mis amigos, ¡nadie nos va a parar!
+Pásame el celu, te toca a ti,
+¿quién gana la revancha? ¡Dale, sí!
 
 [Coro final]
-¡Ma-ti-jue-go! ¡Ma-ti-jue-go!
-Salta, corre, ¡vamos, que ya llego!
-Chocolate y diversión,
-¡late fuerte el corazón!
-¡Ma-ti-jue-go! ¡Matichoc!
+¡Sube el nivel, Matijuego!
+Del pueblo a la cancha, ¡ya llego!
+Pichanga, básquet, salto hasta el cielo,
+¡chocolate en el corazón, Matijuego!
+¡Oe, oe, oe!
 
 [Final]
 Matichoc, pasión por el cacao.
@@ -93,31 +105,31 @@ Matichoc, pasión por el cacao.
 ### 2. Menú → `menu.wav`
 
 La misma canción, sin voz. Hay dos caminos:
-- **Lo mejor:** en la canción que elegiste, menú de los tres puntos → **Get Stems** o **Instrumental** (sacar la voz). Así la melodía es la misma.
-- **Si no aparece esa opción:** crea una canción nueva con el mismo estilo de arriba, el título «Matijuego (instrumental)» e **Instrumental** activado.
+- **Lo mejor:** en la canción que elegiste, menú de los tres puntos → **Stems** o **Instrumental** (separar la voz). Así la melodía es la misma.
+- **Si no aparece esa opción:** crea una canción nueva con el mismo estilo de arriba, el título «Sube el nivel instrumental» e **Instrumental** activado.
 
 ### 3. Pueblo y Ciudad → `pueblo.wav`
 
 ```
-música acústica tranquila de pueblo para un juego infantil, ukelele, glockenspiel, percusión suave de manos, cálida y relajada, 95 bpm, instrumental
+lofi chill relajado para pasear en un videojuego, guitarra acústica, piano eléctrico suave, ritmo tranquilo con vinilo, ambiente cálido de tarde, 85 bpm, instrumental
 ```
 
 ### 4. Deportes → `deportes.wav`
 
 ```
-himno deportivo enérgico para un juego infantil, palmas de estadio, batería potente, golpes de trompetas, cantos de hinchada sin palabras, 128 bpm, instrumental
+beat deportivo con energía de estadio, batería potente, bajo pesado, palmas y gritos de hinchada sin palabras, bocinas, 140 bpm, emocionante, instrumental
 ```
 
 ### 5. Aventura → `aventura.wav`
 
 ```
-música de aventura rápida y juguetona para un juego de plataformas, bajo de sintetizador saltarín, cuerdas en pizzicato, campanitas brillantes, 140 bpm, emocionante y amigable, instrumental
+electro pop de videojuego de acción, sintetizadores brillantes con toques chiptune, bajo rápido, ritmo emocionante sin parar, 128 bpm, instrumental
 ```
 
 ### 6. Cocina y puzzles → `cocina.wav`
 
 ```
-música juguetona de cocina para un juego infantil de cocinar, marimba, pizzicato, swing jazzero suave, escobillas, 105 bpm, dulce y acogedora, instrumental
+funk suave y buena onda para un juego de cocina, bajo groovy, guitarra rítmica, marimba, palmas, 100 bpm, alegre y relajado, instrumental
 ```
 
 ## Después (lo hago yo)
