@@ -6,6 +6,34 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-18
 
+### Versión 1.1, primera parte: el juego listo para canciones de Suno, celebraciones y ficha en inglés y portugués
+- **Pedido de la persona dueña:** partir por la versión 1.1 del plan («música»).
+- **Música con Suno:**
+  - `docs/MUSICA-SUNO.md` tiene la letra de la canción «¡Vamos al Matijuego!» y el estilo de cada tema (menú, pueblo, deportes, aventura, cocina). La dueña los crea con un plan pagado de Suno y guarda el comprobante.
+  - `scripts/musica.mjs` deja cada canción lista en `assets/music/<nombre>.m4a`: sin silencios, con el final fundido sobre el principio para que se repita sin salto, a −18 LUFS y en AAC de 96 kbps. También actualiza la lista `SONG_FILES` de `js/audio.js`.
+  - `js/audio.js` toca las canciones con un `<audio>` que va por un volumen propio. Así no decodifica la canción entera en memoria, y el volumen funciona también en iPhone.
+  - Las canciones entran y salen con un fundido y siguen donde iban al volver a un juego o al menú. Se callan con el botón de sonido y al salir de la app.
+  - En el menú suena la canción del menú desde el primer toque. **Si una canción no está, suena la música generada de siempre**, y el menú queda en silencio como antes.
+  - Mati Merge, Choco Match y Memoria pasan al tema «cozy» (canción de cocina); suena igual que «chill» mientras no haya canción. Los mundos tranquilos de Aventura Choco y el Castillo pasan a «cave» y «castle», que también suenan igual que antes.
+- **Celebraciones:**
+  - Al ganar un nivel, las estrellas aparecen una a una con un «ding» cada una y cae confeti de chocolate (`js/celebrate.js`).
+  - Al batir un récord, la tarjeta final dice «🏆 ¡Nuevo récord: N!», con confeti y sonido de victoria.
+  - El confeti son 20 a 34 piezas de HTML que solo cambian posición y opacidad, y se borran solas a los 2,8 s. No toca el dibujo 3D, y con «reducir movimiento» no aparece.
+- **Ficha en inglés y portugués:** `store/listing-en.md` (78/80 y 2.874/4.000 caracteres) y `store/listing-pt.md` (70/80 y 3.063/4.000). Aclaran que el juego está en español.
+- **Qué se probó (web servida en el computador, con 5 canciones de prueba hechas con tonos):**
+  - La canción del menú no se crea antes del primer toque, y no aparece el aviso del navegador.
+  - Parte con el primer toque, sigue de pantalla en pantalla y se apaga con fundido al entrar al Pueblo.
+  - Al empezar a explorar suena la canción del Pueblo. El botón de sonido la calla y la retoma en el mismo punto. Al salir y volver a la app se calla y vuelve.
+  - Al volver al menú, la canción del menú sigue donde iba. Sin errores en la consola.
+  - Sin canciones: el menú queda en silencio y en el Pueblo suena la música generada, como antes.
+  - El confeti aparece y se borra solo. `verificar-app.mjs` da OK. Las canciones de prueba no se guardaron.
+- **Pendiente:**
+  - Que la dueña cree las canciones en Suno.
+  - Pasarlas por `scripts/musica.mjs` y probarlas en el celular.
+  - Agregar la música hecha con IA a la política de privacidad.
+  - Subir la ficha en inglés y portugués en Play Console.
+  - Decidir el aviso para pedir reseñas, que necesita un complemento nativo.
+
 ### Plan de evolución para que el juego crezca (sin tocar la app)
 - **Pedido de la persona dueña:** un plan con sus ideas (mundo compartido online, minijuegos como pool y golf, mejoras visuales, música con Suno) y otras sugerencias.
 - **Dónde está:** el documento «Plan de evolución del Matijuego», en Claude Docs: https://claude.ai/artifact/SziVS3qTHKTru7VRjsjX6z

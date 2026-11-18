@@ -73,7 +73,7 @@ export class MemoriaGame extends Game3D {
     this.levelIndex = 0;
     this.cards = [];
     this.hover = null;
-    this.musicTheme = "chill";
+    this.musicTheme = "cozy";
   }
 
   // ---------- escena ----------

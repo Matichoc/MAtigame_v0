@@ -60,7 +60,7 @@ export class DulcesGame extends Game3D {
     super(GAME_ID, character, progress, els, { fov: 42 });
     this.kawaii = true; // ambiente kawaii: pastel, sombreado por tonos, pétalos y estrellitas
     this.ambientOpts = { petals: 18, hearts: 5, stars: 13, radius: 9, height: 9 };
-    this.musicTheme = "chill";
+    this.musicTheme = "cozy";
     this.q = els.q;
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
