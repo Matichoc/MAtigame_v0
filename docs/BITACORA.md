@@ -6,6 +6,15 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-18
 
+### Versión 1.1.1 para Google Play (reemplaza a la 1.1.0)
+- **Decisión de la persona dueña:** «Sí, hazlo». Se suben juntas la música, las celebraciones y la sombra opcional en una sola actualización. La 1.1.0 (105) se queda solo en la prueba interna y la que va a producción es la 1.1.1.
+- **Merge:** PR #57 (sombra opcional en Bloques) y Matichoc/matiweb#85.
+- **`.aab` 1.1.1, desde `main` (ejecución 44373600233):**
+  - Número de versión **107**, firmado con la llave de subida (SHA-256 47:FE:F7:…:E7:9F, la misma de siempre).
+  - Pide solo `INTERNET` y `VIBRATE`, lleva las 5 canciones y trae los botones de la sombra. Pesa 20,3 MB.
+  - Quedó en `Descargas\matijuego-aab-1.1.1\app-release.aab`.
+- **Pendiente:** que la dueña lo suba a la prueba interna (si quiere probarlo) y lo promocione a producción, con el video de la ficha.
+
 ### Bloques: la sombra de la pieza ahora es opcional (parte encendida)
 - **Pedido de la persona dueña:** «algunos me dicen que les sirve la sombra, y otros dicen que la sombra les molesta, debería ser opcional, partiendo con ella puesta».
 - **Qué se hizo:**
