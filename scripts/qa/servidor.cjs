@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const root = path.resolve(process.argv[2] || "app-www");
 const port = +(process.argv[3] || 8090);
-const tipos = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".ttf": "font/ttf", ".otf": "font/otf", ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8" };
+const tipos = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css", ".png": "image/png", ".jpg": "image/jpeg", ".ico": "image/x-icon", ".ttf": "font/ttf", ".otf": "font/otf", ".woff2": "font/woff2", ".txt": "text/plain; charset=utf-8", ".m4a": "audio/mp4", ".json": "application/json" };
 http.createServer((req, res) => {
   let p = decodeURIComponent(req.url.split("?")[0]);
   if (p.endsWith("/")) p += "index.html";

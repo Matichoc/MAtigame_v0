@@ -27,6 +27,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - Al volver al menú, la canción del menú sigue donde iba. Sin errores en la consola.
   - Sin canciones: el menú queda en silencio y en el Pueblo suena la música generada, como antes.
   - El confeti aparece y se borra solo. `verificar-app.mjs` da OK. Las canciones de prueba no se guardaron.
+  - `scripts/qa/juegos.cjs` sobre la app, sin red, con el servidor del proyecto: **15/15 juegos OK** y 0 peticiones externas. Una primera pasada con un servidor de Python falló en 6 juegos porque el servidor no alcanzaba a entregar los archivos, no por el juego. `scripts/qa/servidor.cjs` ahora también sirve `.m4a` y `.json`.
 - **Pendiente:**
   - Que la dueña cree las canciones en Suno.
   - Pasarlas por `scripts/musica.mjs` y probarlas en el celular.
