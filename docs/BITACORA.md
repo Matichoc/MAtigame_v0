@@ -6,6 +6,36 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-18
 
+### Versión 1.1, segunda parte: las canciones de Suno dentro del juego
+- **La dueña creó las 6 canciones en Suno** con un plan pagado (usó «Get stems», que es del plan Pro). Están en `C:\Users\croco\Downloads\musica-matijuego\`.
+  - `cancion.wav` es «Sube el nivel», con letra, para redes: la versión de 138 s, de la que salieron los stems.
+  - `menu.wav` es la misma canción sin voz: se armó juntando los stems 2 a 9 (batería, bajo, guitarra, teclado, percusión, sintetizador, otros y bronces) sin las dos pistas de voz.
+  - `pueblo`, `deportes` (bajó como `deporte.wav`), `aventura` y `cocina` se hicieron con «[Instrumental]».
+- **Convertidas con `scripts/musica.mjs`** a `assets/music/*.m4a`: 8,9 MB en total. La app armada pasa de ~5 MB a 13,6 MB.
+
+| Canción | Bucle | Peso | Volumen |
+| --- | --- | --- | --- |
+| menu | 135,5 s | 1,68 MB | −17,9 LUFS |
+| pueblo | 166,3 s | 2,10 MB | −16,9 LUFS |
+| deportes | 145,5 s | 1,79 MB | −16,6 LUFS |
+| aventura | 117,3 s | 1,47 MB | −17,2 LUFS |
+| cocina | 149,8 s | 1,85 MB | −17,6 LUFS |
+
+- **Revisado:** ninguna tiene silencio en la unión del bucle (probado con dos vueltas seguidas). Para escuchar la unión del menú está el clip `escuchar-union-del-bucle-menu.mp3`, en la misma carpeta.
+- **Probado en el navegador (web servida en el computador):**
+  - El menú toca «Sube el nivel» sin voz desde el primer toque.
+  - Mati Merge toca la canción de cocina, Lanzamientos de Básquet la de deportes y Parkour la de aventura.
+  - Al salir al menú vuelve la canción del menú. Los 5 archivos se sirven bien y no hay errores en la consola.
+- **Prueba automática de los juegos (`juegos.cjs`, app sin red): 15/15 OK y 0 peticiones externas.** Una primera pasada dio 14/15: Porristas quedó marcado porque el navegador canceló la descarga de la canción del juego anterior al cambiar de pantalla (`ERR_ABORTED`), sin que faltara ningún archivo. `scripts/qa/lib.cjs` ya no cuenta esas cancelaciones de la música; un archivo que no existe se sigue contando por su HTTP 404.
+- **Política de privacidad 1.3 y créditos:**
+  - Dicen que las canciones se crearon con Suno.
+  - Los créditos ya no dicen que «no se distribuyen archivos de audio».
+  - La auditoría de prepublicación anota las canciones y que falta guardar el comprobante de Suno.
+- **Pendiente:**
+  - Guardar el comprobante de la suscripción de Suno.
+  - Probar el APK en el celular, para escuchar el volumen de la música frente a los efectos.
+  - Publicar la política 1.3 en matichoc.cl antes de subir la versión 1.1 a Play.
+
 ### Versión 1.1, primera parte: el juego listo para canciones de Suno, celebraciones y ficha en inglés y portugués
 - **Pedido de la persona dueña:** partir por la versión 1.1 del plan («música»).
 - **Música con Suno:**
