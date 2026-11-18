@@ -1,0 +1,41 @@
+{
+  "nota": "Aviso de 30 s para publicidad pagada (Instagram, Facebook, TikTok). Canción «Sube el nivel» desde el segundo 29,5 («Alfajores, cuchuflís, bombones») hasta el 59,5 (coro completo y un poco del instrumental). Tiempos del video = segundo de la canción − 29,5; cada corte cae ~0,1 s antes de la palabra (faster-whisper sobre la voz separada). Escenas: [desde, escena, desde qué segundo de esa grabación]. Textos: [desde, hasta, emoji, texto, tipo]; tipo «grande» = texto gigante al medio («|» = salto de línea). Mensajes pensados para los papás, que son quienes descargan. Escenas grabadas el 18-nov-2026 con la versión 1.1 (video/anuncio/cuadros): la pirámide de porristas cae al final (~8-11 s), el gol de la pichanga a los 2 s y la canasta del básquet a los 2 s.",
+  "salida": "matijuego-anuncio-30s",
+  "cancion": {
+    "desde": 29.5,
+    "hasta": 59.5
+  },
+  "escenas": [
+    [0.0, "merge", 0.5],
+    [3.6, "pueblo", 0.5],
+    [4.95, "ciudad", 1],
+    [6.0, "porristas", 8.1],
+    [8.9, "parkour", 0.3],
+    [13.1, "pueblo", 3],
+    [14.9, "pichanga", 1.0],
+    [18.55, "pichanga", 3.2],
+    [19.4, "basquet", 1.4],
+    [20.65, "parkour", 2.6],
+    [22.4, "cocina", 5.0]
+  ],
+  "textos": [
+    [0.0, 2.3, "", "14 JUEGOS 3D|¡GRATIS!", "grande"],
+    [0.45, 3.6, "🍫", "Alfajores, cuchuflís y bombones"],
+    [3.6, 6.0, "🏘️", "Del pueblo a la ciudad"],
+    [6.0, 8.9, "📣", "¡Puros campeones!"],
+    [8.9, 10.8, "", "¡SUBE EL|NIVEL!", "grande"],
+    [9.0, 13.1, "✅", "Sin anuncios · sin compras · sin chat"],
+    [13.1, 14.9, "🏘️", "Del pueblo a la cancha"],
+    [14.9, 18.55, "👨‍👩‍👧", "Para jugar en familia"],
+    [18.55, 19.4, "⚽", "¡Pichanga!"],
+    [19.4, 20.65, "🏀", "¡Básquet!"],
+    [20.65, 22.4, "🚀", "¡Salto hasta el cielo!"],
+    [22.4, 25.8, "🍫", "Crea tu propio chocolate"]
+  ],
+  "cierre": {
+    "desde": 25.8,
+    "lema": "14 juegos y mundos en 3D<br>para toda la familia",
+    "sellos": ["Gratis", "Sin anuncios", "Sin compras"],
+    "boton": "📲 Descárgalo en Google Play"
+  }
+}

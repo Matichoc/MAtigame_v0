@@ -18,7 +18,13 @@ async function abrir({ viewport = { width: 1000, height: 640 }, offline = false,
     reg.peticiones.push(u);
     if (!u.startsWith(ORIGEN) && !u.startsWith("data:") && !u.startsWith("blob:") && !u.startsWith("about:")) reg.externas.push(u);
   });
-  p.on("requestfailed", (r) => reg.fallidas.push(`${r.url()} (${r.failure() && r.failure().errorText})`));
+  p.on("requestfailed", (r) => {
+    const err = (r.failure() && r.failure().errorText) || "";
+    // la música (<audio>) corta su propia descarga al pausarse o cambiar de canción: eso no es un archivo que falte
+    // (un archivo que no existe sí se cuenta, por su HTTP 404 de abajo)
+    if (r.resourceType() === "media" && /ERR_ABORTED/.test(err)) return;
+    reg.fallidas.push(`${r.url()} (${err})`);
+  });
   p.on("response", (r) => { if (r.status() >= 400) reg.fallidas.push(`${r.url()} → HTTP ${r.status()}`); });
   p.on("pageerror", (e) => reg.errores.push("pageerror: " + e.message));
   p.on("console", (m) => { if (m.type() === "error") reg.errores.push("console: " + m.text()); });

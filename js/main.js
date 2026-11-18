@@ -168,6 +168,9 @@ function showScreen(target) {
   if (target === screenHub && !selectedCharacter) setLobbyTab("me");
   ALL_SCREENS.forEach((s) => s.classList.toggle("hidden", s !== target));
   syncLobby(target === screenHub);
+  // en los menús suena la canción del menú (si ya está; ver js/audio.js); cada juego pone la suya al empezar a jugar
+  if (target === screenFps || Object.values(screen3d).includes(target)) audio.stopMusic();
+  else audio.startMusic("menu");
 }
 
 // ---------- JOYSTICK: flotante (aparece donde pones el dedo) o fijo ----------

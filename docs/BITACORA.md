@@ -6,6 +6,95 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-18
 
+### Aviso pagado: videos de 30 y 15 s con «Sube el nivel»
+- **Pedido de la persona dueña:** un video «altamente promocional», sin narración, con música y mensajes en pantalla, y un guion para publicarlo. Le va a hacer publicidad pagada para conseguir descargas.
+- **Cómo se armó (`scripts/video/anuncio.cjs`, pautas `anuncio-30s.json` y `anuncio-15s.json`):**
+  - Los tiempos de cada palabra de la canción salieron de la voz separada («0 Lead Vocals» de los stems), con faster-whisper. Cada escena entra ~0,1 s antes de su palabra: «alfajores, cuchuflís, bombones» → Merge, «del pueblo a la ciudad» → Pueblo y Ciudad, «puros campeones» → la pirámide de porristas, «¡Sube el nivel!» → parkour, «a la cancha… ¡ya llegó!» → el gol de la pichanga, «básquet» → la canasta, «salto hasta el cielo» → parkour, «chocolate en el corazón» → la cocina.
+  - Las escenas se grabaron de nuevo con la versión 1.1 (`video/anuncio/cuadros`) y no se reutilizaron las del 4 de noviembre.
+  - Los mensajes van pensados para los papás: «14 juegos 3D ¡gratis!», «Sin anuncios · sin compras · sin chat», «Para jugar en familia». Quedan entre la ventana del juego y los últimos ~360 px, que se dejan libres para los botones de Instagram y TikTok.
+  - Cierran con una tarjeta: el logo, «14 juegos y mundos en 3D para toda la familia», los sellos y «📲 Descárgalo en Google Play» en texto, sin el logo oficial de Google Play.
+- **Qué se revisó:**
+  - Hojas de cuadros de cada segundo de los dos videos. Se corrigió el botón final, que se partía en dos líneas, y el encuadre de la pichanga, que mostraba el lado vacío de la cancha (ahora va centrado en x=1280).
+  - Formato 1080×1920, volumen de −13,5 LUFS (30 s) y −14,1 LUFS (15 s).
+- **Guion para publicar (`docs/ANUNCIO-MATIJUEGO.md`):** el público (papás de 25 a 50 años, en Chile, solo Android), el objetivo de la campaña, tres textos principales para Meta, títulos, el texto para TikTok, el texto para el perfil con hashtags y el primer comentario con el enlace. También recuerda la Ley 20.606 (sellos «ALTO EN»): el aviso va dirigido a adultos.
+- **Archivos:** `video/anuncio/listos/` y una copia en `Descargas\anuncio-matijuego\`.
+
+### Versión 1.1, segunda parte: las canciones de Suno dentro del juego
+- **La dueña creó las 6 canciones en Suno** con un plan pagado (usó «Get stems», que es del plan Pro). Están en `C:\Users\croco\Downloads\musica-matijuego\`.
+  - `cancion.wav` es «Sube el nivel», con letra, para redes: la versión de 138 s, de la que salieron los stems.
+  - `menu.wav` es la misma canción sin voz: se armó juntando los stems 2 a 9 (batería, bajo, guitarra, teclado, percusión, sintetizador, otros y bronces) sin las dos pistas de voz.
+  - `pueblo`, `deportes` (bajó como `deporte.wav`), `aventura` y `cocina` se hicieron con «[Instrumental]».
+- **Convertidas con `scripts/musica.mjs`** a `assets/music/*.m4a`: 8,9 MB en total. La app armada pasa de ~5 MB a 13,6 MB.
+
+| Canción | Bucle | Peso | Volumen |
+| --- | --- | --- | --- |
+| menu | 135,5 s | 1,68 MB | −17,9 LUFS |
+| pueblo | 166,3 s | 2,10 MB | −16,9 LUFS |
+| deportes | 145,5 s | 1,79 MB | −16,6 LUFS |
+| aventura | 117,3 s | 1,47 MB | −17,2 LUFS |
+| cocina | 149,8 s | 1,85 MB | −17,6 LUFS |
+
+- **Revisado:** ninguna tiene silencio en la unión del bucle (probado con dos vueltas seguidas). Para escuchar la unión del menú está el clip `escuchar-union-del-bucle-menu.mp3`, en la misma carpeta.
+- **Probado en el navegador (web servida en el computador):**
+  - El menú toca «Sube el nivel» sin voz desde el primer toque.
+  - Mati Merge toca la canción de cocina, Lanzamientos de Básquet la de deportes y Parkour la de aventura.
+  - Al salir al menú vuelve la canción del menú. Los 5 archivos se sirven bien y no hay errores en la consola.
+- **Prueba automática de los juegos (`juegos.cjs`, app sin red): 15/15 OK y 0 peticiones externas.** Una primera pasada dio 14/15: Porristas quedó marcado porque el navegador canceló la descarga de la canción del juego anterior al cambiar de pantalla (`ERR_ABORTED`), sin que faltara ningún archivo. `scripts/qa/lib.cjs` ya no cuenta esas cancelaciones de la música; un archivo que no existe se sigue contando por su HTTP 404.
+- **Política de privacidad 1.3 y créditos:**
+  - Dicen que las canciones se crearon con Suno.
+  - Los créditos ya no dicen que «no se distribuyen archivos de audio».
+  - La auditoría de prepublicación anota las canciones y que falta guardar el comprobante de Suno.
+- **Pendiente:**
+  - Guardar el comprobante de la suscripción de Suno.
+  - Probar el APK en el celular, para escuchar el volumen de la música frente a los efectos.
+  - Publicar la política 1.3 en matichoc.cl antes de subir la versión 1.1 a Play.
+
+### Versión 1.1, primera parte: el juego listo para canciones de Suno, celebraciones y ficha en inglés y portugués
+- **Pedido de la persona dueña:** partir por la versión 1.1 del plan («música»).
+- **Música con Suno:**
+  - `docs/MUSICA-SUNO.md` tiene la letra de la canción «Sube el nivel» y el estilo de cada tema (menú, pueblo, deportes, aventura, cocina). La dueña los crea con un plan pagado de Suno y guarda el comprobante.
+  - `scripts/musica.mjs` deja cada canción lista en `assets/music/<nombre>.m4a`: sin silencios, con el final fundido sobre el principio para que se repita sin salto, a −18 LUFS y en AAC de 96 kbps. También actualiza la lista `SONG_FILES` de `js/audio.js`.
+  - `js/audio.js` toca las canciones con un `<audio>` que va por un volumen propio. Así no decodifica la canción entera en memoria, y el volumen funciona también en iPhone.
+  - Las canciones entran y salen con un fundido y siguen donde iban al volver a un juego o al menú. Se callan con el botón de sonido y al salir de la app.
+  - En el menú suena la canción del menú desde el primer toque. **Si una canción no está, suena la música generada de siempre**, y el menú queda en silencio como antes.
+  - Mati Merge, Choco Match y Memoria pasan al tema «cozy» (canción de cocina); suena igual que «chill» mientras no haya canción. Los mundos tranquilos de Aventura Choco y el Castillo pasan a «cave» y «castle», que también suenan igual que antes.
+- **Celebraciones:**
+  - Al ganar un nivel, las estrellas aparecen una a una con un «ding» cada una y cae confeti de chocolate (`js/celebrate.js`).
+  - Al batir un récord, la tarjeta final dice «🏆 ¡Nuevo récord: N!», con confeti y sonido de victoria.
+  - El confeti son 20 a 34 piezas de HTML que solo cambian posición y opacidad, y se borran solas a los 2,8 s. No toca el dibujo 3D, y con «reducir movimiento» no aparece.
+- **Ficha en inglés y portugués:** `store/listing-en.md` (78/80 y 2.874/4.000 caracteres) y `store/listing-pt.md` (70/80 y 3.063/4.000). Aclaran que el juego está en español.
+- **Qué se probó (web servida en el computador, con 5 canciones de prueba hechas con tonos):**
+  - La canción del menú no se crea antes del primer toque, y no aparece el aviso del navegador.
+  - Parte con el primer toque, sigue de pantalla en pantalla y se apaga con fundido al entrar al Pueblo.
+  - Al empezar a explorar suena la canción del Pueblo. El botón de sonido la calla y la retoma en el mismo punto. Al salir y volver a la app se calla y vuelve.
+  - Al volver al menú, la canción del menú sigue donde iba. Sin errores en la consola.
+  - Sin canciones: el menú queda en silencio y en el Pueblo suena la música generada, como antes.
+  - El confeti aparece y se borra solo. `verificar-app.mjs` da OK. Las canciones de prueba no se guardaron.
+  - `scripts/qa/juegos.cjs` sobre la app, sin red, con el servidor del proyecto: **15/15 juegos OK** y 0 peticiones externas. Una primera pasada con un servidor de Python falló en 6 juegos porque el servidor no alcanzaba a entregar los archivos, no por el juego. `scripts/qa/servidor.cjs` ahora también sirve `.m4a` y `.json`.
+- **Compilación y web:**
+  - APK de prueba versión 1.1.0 (ejecución 44329314997): compiló bien.
+  - Web: PR Matichoc/matiweb#84. Se probó con `juegos.cjs`, sin red: 15/16 OK y 0 peticiones externas. El que no pasa es Choco Blaster (`fps3d`), que tampoco pasa en la web publicada hoy, porque la prueba no tiene definido su botón de inicio.
+- **Música para todas las edades (la dueña preguntó si no quedaba «muy de niño»):** se rehicieron la canción y los estilos.
+  - La primera versión («¡Vamos al Matijuego!», pop infantil con coro de niños) sonaba a canción para guaguas, y el juego lo juegan sobre todo niñas y niños de 6 a 13 años, que escuchan pop urbano, electro y lofi.
+  - Ahora la canción es «Sube el nivel», pop urbano latino juvenil y apto para niños (sin doble sentido ni malas palabras). Nombra lo que de verdad tiene el juego: los Matilovers, el Pueblo, el parkour, la chilena en la pichanga, las porristas, la cocina y el Mati Dubai.
+  - Los temas pasan a lofi (pueblo), beat de estadio (deportes), electro pop con chiptune (aventura) y funk suave (cocina).
+- **Guía de Suno en español:** a pedido de la dueña, los estilos y las etiquetas de la letra quedaron en español. Las canciones se dejan en `C:\Users\croco\Downloads\musica-matijuego\`, una carpeta que ya está creada.
+- **Pendiente:**
+  - Que la dueña cree las canciones en Suno.
+  - Pasarlas por `scripts/musica.mjs` y probarlas en el celular.
+  - Agregar la música hecha con IA a la política de privacidad.
+  - Subir la ficha en inglés y portugués en Play Console.
+  - Decidir el aviso para pedir reseñas, que necesita un complemento nativo.
+
+### Plan de evolución para que el juego crezca (sin tocar la app)
+- **Pedido de la persona dueña:** un plan con sus ideas (mundo compartido online, minijuegos como pool y golf, mejoras visuales, música con Suno) y otras sugerencias.
+- **Dónde está:** el documento «Plan de evolución del Matijuego», en Claude Docs: https://claude.ai/artifact/SziVS3qTHKTru7VRjsjX6z
+- **Lo principal que propone:**
+  - Hoja de ruta: versión 1.1 en diciembre (música con Suno y celebraciones), 1.2 en enero (duelos en el mismo celular, Torre de alfajores, tarjeta de récords), 1.3 en febrero y marzo (Minigolf, Bolos, pueblo con «fantasmas») y 2.0 entre abril y junio (visitas con código y salas en vivo con amigos, sin chat libre).
+  - Suno solo con plan pagado.
+  - Los códigos en envoltorios dependen de los sellos «ALTO EN» (Ley 20.606).
+- **Pendiente:** que la dueña elija por dónde partir.
+
 ### ¡Matijuego publicado en Google Play!
 - La persona dueña vio la ficha publicada: https://play.google.com/store/apps/details?id=cl.chocojuego.matichoc (desarrollador ember_dev, clasificación ESRB «Para todos»). Se comprobó que el enlace responde. Fueron 9 días de revisión (enviado el 9-nov).
 - **Demo web con el enlace a la tienda (pedido de la persona dueña: «Sí, ponlo»):**

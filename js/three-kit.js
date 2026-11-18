@@ -13,6 +13,7 @@ import { campaignWin, campaignMode, campaignLevel, campaign, campaignComplete, c
 import { missionFor } from "./missions.js";
 import { costOf, spendEnergy, energyOf } from "./energy.js";
 import { vibrate } from "./native.js";
+import { celebrate } from "./celebrate.js";
 
 export { THREE };
 
@@ -773,6 +774,9 @@ export class Game3D {
     }
     this.haptic(60);
     this.showOverlay("win");
+    // celebración: confeti y un "ding" por cada estrella, al ritmo en que aparecen (ver .g3d-stars en el CSS)
+    celebrate({ big: stars >= 3 });
+    [0.15, 0.4, 0.65].slice(0, stars).forEach((t) => setTimeout(() => { if (this.state === "win") audio.playStar(); }, t * 1000 + 250));
   }
 
   /** Después del último nivel: empieza una vuelta nueva (premio + niveles desde el 1). */
@@ -789,7 +793,8 @@ export class Game3D {
     audio.stopMusic();
     this.state = "gameover";
     if (this.mission && !this._missionWon) text = `🎯 Misión ${this.mission.n} (${this.mission.text.toLowerCase()}): ¡todavía no! ${text}`;
-    reportScore(this.progress, this.gameId, this.score);
+    const record = (this.score || 0) > 0 && reportScore(this.progress, this.gameId, this.score);
+    if (record) text = `🏆 ¡Nuevo récord: ${this.score}! ${text}`;
     addToLeaderboard(this.progress, this.gameId, this.progress.playerName, this.score);
     // Matipuntos por terminar la partida, según el puntaje (cada juego puntúa distinto)
     const bonus = Math.round(runBonus(this.gameId, this.score) * (this.bonusMult || 1)); // algunos juegos dan más con mejoras (p. ej. autos del garaje)
@@ -804,6 +809,7 @@ export class Game3D {
     if (run.tokens) text += ` +${run.tokens} ${run.eventToken}`;
     if (this.els.gameoverText) this.els.gameoverText.textContent = text;
     this.showOverlay("gameover");
+    if (record) { celebrate({ big: true }); audio.playVictory(); }
   }
 
   _loop(ts) {

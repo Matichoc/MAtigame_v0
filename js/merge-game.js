@@ -26,7 +26,7 @@ export class MergeGame extends Game3D {
     super(GAME_ID, character, progress, els, coarse ? { fov: 40, bloom: false } : { fov: 40 });
     this.kawaii = true;
     this.ambientOpts = { petals: 18, hearts: 7, stars: 10, radius: 9, height: 9 };
-    this.musicTheme = "chill";
+    this.musicTheme = "cozy";
     this.q = els.q;
     this.raycaster = new THREE.Raycaster();
     this.pointer = new THREE.Vector2();
