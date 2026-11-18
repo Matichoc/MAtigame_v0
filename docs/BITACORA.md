@@ -4,7 +4,30 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-18
+
+### ¡Matijuego publicado en Google Play!
+- La persona dueña vio la ficha publicada: https://play.google.com/store/apps/details?id=cl.chocojuego.matichoc (desarrollador ember_dev, clasificación ESRB «Para todos»). Se comprobó que el enlace responde. Fueron 9 días de revisión (enviado el 9-nov).
+- **Demo web con el enlace a la tienda (pedido de la persona dueña: «Sí, ponlo»):**
+  - El aviso de arriba de la demo ahora dice «📲 Descarga el Matijuego completo en Google Play», con enlace. El cartel que aparece al llegar al límite de la demo («Descargar en Google Play») ya lleva a la ficha.
+  - El enlace va en el HTML, dentro del bloque solo-web (`#demo-wall-link` en `app/index.template.html`), y `js/demo.js` lo lee de ahí. Así la app sigue sin enlaces externos: `verificar-app.mjs` lo comprobó (la primera prueba, con la URL en el JS, falló esa revisión y por eso se cambió).
+  - Se probó la demo servida en el computador: el aviso y el cartel tienen el enlace y no hay errores en la consola.
+- **Pendiente:** pegar el video de YouTube en la ficha (ahora sí, porque la app ya está publicada).
+
+### Revisión de Google Play: llegó la clasificación IARC
+- Al noveno día de revisión llegó el «Aviso de clasificación en vivo» de la IARC para Matijuego (compañía ember_dev, tienda Google Play), con fecha 18-nov-2026. El ID de clasificación global es `6b14548e-c363-8bcb-8920-3fc54c31a0ca`: es el que se usa si otra tienda con licencia IARC lo pide.
+- Es una señal de que la revisión está avanzando. Aún no hay aprobación ni rechazo.
+- **Otros avisos de la consola:**
+  - «Servicios de Juegos de Google Play»: no se configura, porque el juego no pide cuentas.
+  - Estado de operador comercial de la UE: por ahora dice «No operador». Hay que decidirlo antes del 1-feb-2027 (la dirección registrada quedaría pública para usuarios de la UE).
+  - Cambios fiscales en Vietnam: no aplican, porque el juego es gratis.
+
 ## 2026-11-09
+
+### Después del envío a revisión
+- Se mergearon el PR #54 y Matichoc/matiweb#82. matichoc.cl/matijuego/privacy.html ya muestra la versión 1.2 con Ember Holdings SpA. Se cerró matiweb#58, que quedó reemplazado por el #82.
+- **Video de la ficha:** la dueña lo subió a YouTube, al canal @Matichoc, como oculto: https://youtu.be/d80CXEZ9gFc (título «Matijuego · el arcade de Matichoc»). Se comprobó que se puede insertar. El enlace va en el campo «Video» de la ficha y se envía a revisión.
+- **Video para redes (idea conversada):** «Papá vs. hija», de 30 a 40 s en vertical, sin decir el nombre de la niña. La dueña lo graba y después se arma igual que los videos del presentador.
 
 ### Publicación en Google Play: ficha lista
 - **Ficha de la tienda:** la persona dueña completó el nombre, las descripciones (de `store/listing-es.md`), el gráfico de funciones y las capturas. En la declaración de recursos de IA se recomendó «No etiquetar»: las capturas y el gráfico son del juego real y el ícono es el logo de Matichoc. Los textos se escribieron con Claude.
