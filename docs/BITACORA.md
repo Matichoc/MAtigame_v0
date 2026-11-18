@@ -6,6 +6,15 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-18
 
+### Plan de evolución para que el juego crezca (sin tocar la app)
+- **Pedido de la persona dueña:** un plan con sus ideas (mundo compartido online, minijuegos como pool y golf, mejoras visuales, música con Suno) y otras sugerencias.
+- **Dónde está:** el documento «Plan de evolución del Matijuego», en Claude Docs: https://claude.ai/artifact/SziVS3qTHKTru7VRjsjX6z
+- **Lo principal que propone:**
+  - Hoja de ruta: versión 1.1 en diciembre (música con Suno y celebraciones), 1.2 en enero (duelos en el mismo celular, Torre de alfajores, tarjeta de récords), 1.3 en febrero y marzo (Minigolf, Bolos, pueblo con «fantasmas») y 2.0 entre abril y junio (visitas con código y salas en vivo con amigos, sin chat libre).
+  - Suno solo con plan pagado.
+  - Los códigos en envoltorios dependen de los sellos «ALTO EN» (Ley 20.606).
+- **Pendiente:** que la dueña elija por dónde partir.
+
 ### ¡Matijuego publicado en Google Play!
 - La persona dueña vio la ficha publicada: https://play.google.com/store/apps/details?id=cl.chocojuego.matichoc (desarrollador ember_dev, clasificación ESRB «Para todos»). Se comprobó que el enlace responde. Fueron 9 días de revisión (enviado el 9-nov).
 - **Demo web con el enlace a la tienda (pedido de la persona dueña: «Sí, ponlo»):**
