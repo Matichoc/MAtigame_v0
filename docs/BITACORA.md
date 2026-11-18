@@ -28,6 +28,10 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - Sin canciones: el menú queda en silencio y en el Pueblo suena la música generada, como antes.
   - El confeti aparece y se borra solo. `verificar-app.mjs` da OK. Las canciones de prueba no se guardaron.
   - `scripts/qa/juegos.cjs` sobre la app, sin red, con el servidor del proyecto: **15/15 juegos OK** y 0 peticiones externas. Una primera pasada con un servidor de Python falló en 6 juegos porque el servidor no alcanzaba a entregar los archivos, no por el juego. `scripts/qa/servidor.cjs` ahora también sirve `.m4a` y `.json`.
+- **Compilación y web:**
+  - APK de prueba versión 1.1.0 (ejecución 44329314997): compiló bien.
+  - Web: PR Matichoc/matiweb#84. Se probó con `juegos.cjs`, sin red: 15/16 OK y 0 peticiones externas. El que no pasa es Choco Blaster (`fps3d`), que tampoco pasa en la web publicada hoy, porque la prueba no tiene definido su botón de inicio.
+- **Guía de Suno en español:** a pedido de la dueña, los estilos y las etiquetas de la letra quedaron en español. Las canciones se dejan en `C:\Users\croco\Downloads\musica-matijuego\`, una carpeta que ya está creada.
 - **Pendiente:**
   - Que la dueña cree las canciones en Suno.
   - Pasarlas por `scripts/musica.mjs` y probarlas en el celular.
