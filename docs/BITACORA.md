@@ -6,6 +6,17 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-18
 
+### Versión 1.1 lista para Google Play
+- **Pedido de la persona dueña:** subir la versión con música para hacer la promoción desde ahí. Antes de eso preguntó si tendría que instalar siempre el APK: se le explicó que no. El APK de prueba no se instala encima del juego de Play, porque está firmado con otra llave, y desinstalar el oficial borra el progreso. Desde ahora se prueba con la **prueba interna** de Play Console, que no pasa por revisión, y después se promociona a producción.
+- **Merge:** PR #56 (versión 1.1 con canciones, celebraciones, ficha EN/PT y aviso) y Matichoc/matiweb#84. La política 1.3 ya está en matichoc.cl/matijuego/privacy.html (comprobado).
+- **`.aab` 1.1.0, desde `main` (ejecución 44359700786):**
+  - Número de versión **105**, firmado con la llave de subida (la misma SHA-256 de antes, 47:FE:F7:…:E7:9F).
+  - Pide solo `INTERNET` y `VIBRATE`, y lleva las 5 canciones (`assets/music/*.m4a`). Pesa 20,3 MB.
+  - Quedó en `Descargas\matijuego-aab-1.1.0\app-release.aab`.
+- **Pendiente:**
+  - Que la dueña lo suba a la prueba interna, lo pruebe en su celular y lo promocione a producción.
+  - Junto con eso, enviar a revisión el video de la ficha (https://youtu.be/d80CXEZ9gFc) y, si quiere, la ficha en inglés y portugués.
+
 ### Aviso pagado: videos de 30 y 15 s con «Sube el nivel»
 - **Pedido de la persona dueña:** un video «altamente promocional», sin narración, con música y mensajes en pantalla, y un guion para publicarlo. Le va a hacer publicidad pagada para conseguir descargas.
 - **Cómo se armó (`scripts/video/anuncio.cjs`, pautas `anuncio-30s.json` y `anuncio-15s.json`):**
