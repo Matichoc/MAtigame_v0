@@ -4,6 +4,26 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-19
+
+### Volumen de la música y de los efectos (y más bajo de partida)
+- **Pedido de la persona dueña:** «igual suena fuerte el juego, debería tener volumen y config por ahí».
+- **Qué se hizo:**
+  - Una ventana **«🔊 Sonido»** con dos barras, **🎵 Música** y **🔔 Efectos** (de 0 a 100 %, de 5 en 5), y el botón «🔇 Silenciar todo» / «🔊 Activar el sonido».
+  - Se abre desde el menú (botón «🔊 Sonido» junto a Logros y Puntajes; en el celular, en la pestaña «Mi Matichico») y desde la pausa de cada juego (botón nuevo «🎚️ Volumen»). El «atrás» del celular la cierra.
+  - Al mover la barra de efectos suena un efecto de prueba, y la música cambia mientras suena.
+  - **Volumen de partida más bajo:** música al 60 % y efectos al 70 %. Como el oído percibe el volumen al cuadrado, eso es más o menos −9 dB la música y −6 dB los efectos respecto de antes.
+  - La elección se guarda **en el celular** (`localStorage` «matichoc_sonido»), no en cada perfil, porque es de la familia y del aparato. El silencio también queda guardado: antes se perdía al cerrar el juego.
+  - `js/audio.js`: la música generada tiene ahora su propia salida (`musicBus`), separada de los efectos, para que cada barra mueva solo lo suyo. Las canciones usan el volumen de la música.
+- **Qué se probó en la web servida en el computador:**
+  - De partida: efectos 0,392 (0,8 × 0,7²), música 0,288 y canción 0,18 (0,5 × 0,6²).
+  - Al bajar la música a 0 %, la canción del menú se calla al tiro.
+  - «Silenciar todo» la pausa y queda guardado.
+  - Después de recargar, la ventana muestra lo elegido (música 40 %, efectos 70 %).
+  - El botón «🎚️ Volumen» de la pausa abre la ventana.
+- **Pruebas automáticas sobre la app, sin red:** `juegos.cjs` 15/15 OK, `perfiles.cjs` 13/13 OK, `atras.cjs` todo OK y `verificar-app.mjs` OK.
+- **Versión:** va en la 1.1.2. La 1.1.1 (107) está en revisión en Google.
+
 ## 2026-11-18
 
 ### Versión 1.1.1 para Google Play (reemplaza a la 1.1.0)

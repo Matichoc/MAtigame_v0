@@ -2064,6 +2064,35 @@ function closePause() {
 }
 document.getElementById("pause-resume").addEventListener("click", closePause);
 pauseSound.addEventListener("click", () => { audio.setMuted(!audio.isMuted()); syncSoundLabels(); });
+
+// ---------- SONIDO: volumen de la música y de los efectos (menú "🔊 Sonido" y "🎚️ Volumen" de la pausa) ----------
+const soundDialog = document.getElementById("sound-dialog");
+const volMusic = document.getElementById("vol-music");
+const volSfx = document.getElementById("vol-sfx");
+const soundMute = document.getElementById("sound-mute");
+function paintSound() {
+  const v = audio.getVolume();
+  volMusic.value = v.music; volSfx.value = v.sfx;
+  document.getElementById("vol-music-n").textContent = `${v.music}%`;
+  document.getElementById("vol-sfx-n").textContent = `${v.sfx}%`;
+  soundMute.textContent = audio.isMuted() ? "🔊 Activar el sonido" : "🔇 Silenciar todo";
+  soundDialog.classList.toggle("is-muted", audio.isMuted());
+}
+function openSound() { paintSound(); soundDialog.classList.remove("hidden"); }
+function closeSound() { soundDialog.classList.add("hidden"); syncSoundLabels(); }
+let sfxProbe = 0;
+volMusic.addEventListener("input", () => { audio.setVolume("music", volMusic.value); paintSound(); });
+volSfx.addEventListener("input", () => {
+  audio.setVolume("sfx", volSfx.value);
+  paintSound();
+  const now = performance.now();
+  if (now - sfxProbe > 180) { sfxProbe = now; audio.playCollect(); } // para escuchar cómo queda
+});
+soundMute.addEventListener("click", () => { audio.setMuted(!audio.isMuted()); paintSound(); syncSoundLabels(); });
+document.getElementById("sound-close").addEventListener("click", closeSound);
+document.getElementById("btn-sound").addEventListener("click", openSound);
+document.getElementById("pause-volume").addEventListener("click", openSound);
+closeOnBackdrop(soundDialog, closeSound);
 document.getElementById("pause-exit").addEventListener("click", () => { closePause(); goToHub(); });
 closeOnBackdrop(pauseDialog, closePause);
 let activeGame = null; // el juego 3D en pantalla (para que el "atrás" del celular abra su pausa)
