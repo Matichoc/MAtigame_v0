@@ -23,6 +23,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
   - El botón «🎚️ Volumen» de la pausa abre la ventana.
 - **Pruebas automáticas sobre la app, sin red:** `juegos.cjs` 15/15 OK, `perfiles.cjs` 13/13 OK, `atras.cjs` todo OK y `verificar-app.mjs` OK.
 - **Versión:** va en la 1.1.2. La 1.1.1 (107) está en revisión en Google.
+- **Decisión de la persona dueña (20-nov):** no reemplazar la 1.1.1, que ya lleva 2 días en revisión. Se espera su aprobación y después se sube la 1.1.2 con el volumen.
 
 ## 2026-11-18
 
