@@ -982,6 +982,54 @@
   </section><!--/WEB-->
 
   <!-- PANTALLA DE JUEGO 3D: SALTO CHOCO 3D -->
+  <section id="screen-torre" class="screen game-screen hidden">
+    <div id="torre-hud" class="hud">
+      <div class="hud-left">
+        <button id="torre-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="torre-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level" id="torre-hud-title">Torre de Alfajores</div>
+          <div class="hud-mission" id="torre-hud-sub">Suelta los alfajores y apílalos bien alto</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">⭐ <span id="torre-hud-score">0</span></div>
+        <div class="hud-chip">🥞 <span id="torre-hud-floors">0</span></div>
+        <div class="hud-chip">❤ <span id="torre-hud-hearts">❤❤❤</span></div>
+        <div class="hud-chip">🔥 <span id="torre-hud-combo">x1</span></div>
+        <div class="hud-chip">🍫✨ <span id="torre-hud-coins">0</span></div>
+        <button id="torre-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="torre-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="torre-canvas"></canvas>
+      <div id="torre-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="torre-popups" class="fps-popups" aria-hidden="true"></div>
+
+      <div id="torre-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Torre de Alfajores</h2>
+          <p class="fps-tag">Nuevo ☀️ Verano</p>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>Un alfajor va y viene sobre la torre: toca la pantalla (o ESPACIO) para soltarlo. Si cae justo al centro es ¡Perfecto! y sumas combo. Si cae muy corrido se resbala y pierdes un ❤ (tienes 3). Ojo: si la torre queda muy cargada hacia un lado, ¡se derrumba! Cada 15 pisos cae un alfajor dorado Mati Dubai que da 10 Matipuntos.</p>
+          </details>
+
+          <button class="btn-primary" id="torre-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="torre-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="torre-gameover-title">¡Se acabó la torre!</h2>
+          <p id="torre-gameover-text"></p>
+          <button class="btn-primary" id="torre-btn-retry">Jugar de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" id="torre-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="screen-salto" class="screen game-screen hidden">
     <div id="salto-hud" class="hud">
       <div class="hud-left">

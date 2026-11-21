@@ -105,6 +105,22 @@ async function grabar(p, escena, seg, cadaCuadro, desde = 0) {
 
 // ---------------------------------------------------------------- escenas
 const ESCENAS = {
+  /** Torre de alfajores (verano): suelta cada alfajor cuando pasa por el centro; cada cinco, uno un poco corrido. */
+  async torre(p) {
+    await perfil(p);
+    await abrirJuego(p, "Torre de Alfajores", "#torre-btn-start", "torre");
+    await p.evaluate(() => { window.__drops = 0; window.__reloj.encender(); });
+    const jugar = () => p.evaluate(() => {
+      const g = window.__g3d.torre;
+      const c = g.cur;
+      if (!c || c.dropping || g.state !== "playing") return;
+      const want = g.topX + (window.__drops % 5 === 4 ? 0.5 : 0);
+      if (Math.abs(c.x - want) < 0.12) { g._drop(); window.__drops++; }
+    });
+    await calentar(p, 0.4, jugar);
+    await grabar(p, "torre", 16, jugar);
+  },
+
   /** Paseo por el Pueblo renovado, en monopatín, con la cámara girando despacio. */
   async pueblo(p) {
     await perfil(p, { lagoPendiente: false });

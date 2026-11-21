@@ -154,6 +154,15 @@ const ALL_GAMES = [
     status: "available",
     tag: "3D",
   },
+  {
+    id: "torre",
+    orient: "any", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
+    name: "Torre de Alfajores",
+    icon: "🥞",
+    tagline: "Suelta cada alfajor justo encima y arma la torre más alta de la playa. ¡Al centro es ¡Perfecto!",
+    status: "available",
+    tag: "Nuevo ☀️ Verano",
+  },
 ];
 
 export const GAMES_CATALOG = ALL_GAMES.filter((g) => !(IN_APP && g.appHidden));

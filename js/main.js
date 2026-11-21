@@ -68,6 +68,7 @@ const screen3d = {
   creador: document.getElementById("screen-creador"),
   pichanga: document.getElementById("screen-pichanga"),
   basquet2v2: document.getElementById("screen-bq2"),
+  torre: document.getElementById("screen-torre"),
 };
 const ALL_SCREENS = [
   screenProfiles, screenHub, screenShop, screenLeaderboard, screenAchievements, screenProgress, screenHouse, screenAdventure,
@@ -91,7 +92,7 @@ function goNextLevel(game) {
   game.nextLevel();
 }
 
-const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, merge: null, aventura: null, ciudad: null, creador: null, pichanga: null, basquet2v2: null };
+const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, merge: null, aventura: null, ciudad: null, creador: null, pichanga: null, basquet2v2: null, torre: null };
 
 let toastTimer = null;
 function showToast(message, ms = 2600) {
@@ -2611,6 +2612,7 @@ const GAMES_3D = {
   creador: { module: "./creador-game.js", cls: "CreadorGame", hud: ["score", "count", "coins"] },
   pichanga: { module: "./pichanga-game.js", cls: "PichangaGame", hud: [] },
   basquet2v2: { module: "./basquet2v2-game.js", cls: "Basquet2v2Game", hud: [], prefix: "bq2" },
+  torre: { module: "./torre-game.js", cls: "TorreGame", hud: ["score", "floors", "hearts", "combo", "coins"] },
 };
 
 async function launchOrResume3d(key) {
