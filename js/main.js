@@ -4,6 +4,7 @@ import { CHARACTERS, getOutfit, renderCharacterThumb } from "./characters.js";
 import { SLOTS, RARITIES, getItem, itemsOfSlot, lockReason, CUSTOM_COLORS, CUSTOM_EMBLEMS, customizeOutfit, isHexColor } from "./wardrobe-data.js";
 import * as audio from "./audio.js";
 import { initSplash, markAppReady } from "./splash.js";
+import { initIntro } from "./intro.js";
 import { IS_DEMO, demoAllows, showDemoWall, showDemoBanner } from "./demo.js";
 import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
@@ -40,6 +41,7 @@ let progress = null;
 let selectedCharacter = null;
 let shopCharacterId = CHARACTERS[0].id;
 
+initIntro(); // entrada de cine: parte cuando el sello se va
 initSplash(); // sello de inicio: lo primero que se ve
 if (IS_DEMO) showDemoBanner(); // aviso de la versión de prueba (web)
 const screenProfiles = document.getElementById("screen-profiles");

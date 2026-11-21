@@ -309,6 +309,45 @@ const ESCENAS = {
     await grabar(p, "billar", 20, jugador);
   },
 
+  /** Entrada de cine (se muestra al abrir el juego, ver js/intro.js): la cámara baja volando sobre el Pueblo al
+   * atardecer y llega hasta el Matichico, que baila frente a la fuente de chocolate. Sin botones ni carteles. */
+  async entrada(p) {
+    await perfil(p, { lagoPendiente: false });
+    await abrirJuego(p, "Pueblo", "#town-btn-start", "town");
+    await sinConsejos(p);
+    await p.addStyleTag({ content: "#town-canvas-wrap > *:not(canvas), #town-hud, .hud, .toast, #toast, [class*='toast'] { display: none !important } #town-canvas-wrap, #town-canvas { border: 0 !important; border-radius: 0 !important }" });
+    await p.evaluate(() => {
+      const g = window.__g3d.town;
+      const V = g.pos.constructor;
+      g.dayT = 0.535 * 300; // hora dorada (ver SKY en js/town-game.js)
+      g.pos.set(0, 0, 7.2); // frente a la fuente, mirando hacia donde termina la cámara
+      g.vel.set(0, 0, 0);
+      g.heroYaw = -0.55; // mira hacia donde termina la cámara
+      g._input = () => ({ x: 0, z: 0, mag: 0 });
+      if (g.fun) { g.fun.dancing = true; g.fun.heroMode = "dance"; }
+      // vuelo de cámara: de lo alto y lejos (A) a un plano medio del Matichico (C), pasando por B
+      const A = new V(-26, 19, 36), B = new V(12, 9, 27), C = new V(-2.5, 2.1, 11.4);
+      const LA = new V(0, 3.5, 0), LC = new V(0.1, 1.45, 7.2);
+      let t = 0;
+      const tmp = new V(), tmp2 = new V(), look = new V();
+      g._updateCamera = (dt) => {
+        t += dt;
+        const u = Math.min(1, t / 5.4), k = u * u * (3 - 2 * u); // suave al partir y al llegar
+        tmp.copy(A).lerp(B, k); tmp2.copy(B).lerp(C, k);
+        g.camera.position.copy(tmp.lerp(tmp2, k));
+        look.copy(LA).lerp(LC, k);
+        g.camera.lookAt(look);
+        if (g.fun) g.fun.heroMode = "dance";
+        // toma limpia: sin los cartelitos flotantes (nombres, globos de misión, letreros de cada lugar)
+        g.scene.traverse((o) => { if (o.isSprite) o.visible = false; });
+      };
+      window.__reloj.encender();
+    });
+    await calentar(p, 0.5);
+    await p.evaluate(() => { /* la cámara parte de nuevo desde arriba al empezar a grabar */ });
+    await grabar(p, "entrada", 6.6);
+  },
+
   /** Paseo por el Pueblo renovado, en monopatín, con la cámara girando despacio. */
   async pueblo(p) {
     await perfil(p, { lagoPendiente: false });
