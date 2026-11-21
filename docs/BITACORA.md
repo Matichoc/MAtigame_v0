@@ -4,6 +4,56 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-21
+
+### Versión 1.2 «Verano»: 5 juegos nuevos y regalo de fundador
+- **Pedido de la persona dueña:** apostar por todos los juegos de verano ahora («que funcionen bien, que se prueben») y subirlos junto con el volumen en una sola versión. Además, un bono para los primeros jugadores: 1.500 o 2.000 Matipuntos para elegir al tiro uno de los 5 juegos nuevos, mientras los otros quedan por comprar. También pidió videos de la jugabilidad de cada juego, que sea fácil de usar y que los juegos nuevos tengan buenas fotos, como los demás.
+- **Los 5 juegos** (archivos `js/<juego>-game.js`; las piezas comunes en `js/verano-kit.js`):
+
+| Juego | Cómo se juega | Energía | Precio |
+| --- | --- | --- | --- |
+| 🥞 Torre de alfajores (`torre`) | Tocar para soltar el alfajor que va y viene; al centro es ¡Perfecto! (combo). Muy corrido, se cae (3 ❤). Si la torre queda chueca, se derrumba. Cada 15 pisos, un alfajor dorado da +10 Matipuntos | 4 + 1 cada 8 pisos | 2.000 |
+| ✈️ Avioneta Choco (`avioneta`) | Mantener apretado para subir. Pasar por aros dorados (combo), juntar alfajores y esquivar globos y gaviotas (3 ❤). Al partir planea 1 s | 6 + 1 cada 150 m | 2.000 |
+| 🚤 Lanchas en el lago (`lanchas`) | ◀ ▶, flechas o arrastrar el dedo. Esquivar boyas y rocas de chocolate, saltar en las olas y juntar alfajores (3 ❤) | 6 + 1 cada 250 m | 2.000 |
+| ⛳ Minigolf en la playa (`minigolf`) | Arrastrar hacia atrás (honda) y soltar. 9 hoyos con castillos, palmeras, arena y cangrejos. **2 jugadores por turnos** en el mismo celular | 4 + 1 cada 3 golpes | 2.000 |
+| 🎱 Billar de bombones (`billar`) | Arrastrar y soltar. Meter 7 bombones en 6 cajas (25 tiros). **2 jugadores por turnos**: si metes, sigues | 4 + 1 cada 3 tiros | 2.000 |
+
+- **Regalo de fundador (`js/founder.js`):**
+  - No se puede saber quién es «el usuario número 50» sin enviar datos a un servidor, y el juego no envía nada (lo dice la política). Por eso la regla es por fecha: cada perfil que entra **hasta el 31-dic-2026** recibe una vez **2.000 Matipuntos** y elige al tiro uno de los 5 juegos nuevos. También puede guardar los Matipuntos.
+  - La ventana aparece cuando el jugador ya eligió su Matichico y está en el menú, sin otra ventana abierta. En la demo web no aparece.
+- **Registro:** cada juego quedó en el catálogo, en el menú (con su pantalla), en la energía, en las recompensas y en el precio.
+- **Fotos del menú:** `scripts/video/tarjetas.cjs` saca fotos limpias del juego de verdad (sin carteles ni botones, con el Matichico a la vista) en `assets/games/<juego>.jpg`, de 740×418.
+- **Rendimiento (lo pide la dueña: celulares de gama media-baja).** Se midió todo lo dibujado en un cuadro mientras se juega, contando también la sombra:
+
+| Juego | Piezas por cuadro | Triángulos |
+| --- | --- | --- |
+| Salto Choco (ya anda bien en su celular) | 397 | 44.463 |
+| Autos de Chocolate (ídem) | 714 | 50.093 |
+| Bloques de Productos (ídem) | 225 | 27.453 |
+| Torre de alfajores | 187 | 21.350 |
+| Avioneta Choco | 62 | 5.692 |
+| Lanchas en el lago | 147 | 18.624 |
+| Minigolf en la playa | 198 | 23.406 |
+| Billar de bombones | 236 | 28.012 |
+
+  - Para llegar a eso, cada palmera y cada quitasol se juntó en 2 piezas (antes eran 15 y 9; `mergeParts` en `verano-kit.js`), y no se dibujan las caras de los alfajores que nunca se ven.
+  - Los juegos nuevos no usan el brillo de pantalla completa, y su sombra es una sola y chica (se apaga sola si el celular va lento).
+- **Videos de la jugabilidad (para la dueña):** `Descargas\juegos-verano\1-…5-*.mp4`. Se grabaron con `scripts/video/grabar.cjs` y jugadores automáticos: la torre suelta al centro, la avioneta y las lanchas llevan piloto automático, y en minigolf y billar el jugador prueba los tiros «en la cabeza» y elige el mejor.
+- **Arreglos que salieron de los videos:**
+  - Avioneta: los aros se veían de canto y los alfajores oscuros; además, al partir caía al agua.
+  - Minigolf: la cámara pasó de costado, para que la cancha cruce la pantalla acostada.
+  - Billar: un bombón que caía se volvía a contar en cada paso (salía «21/7»).
+  - Regalo: la ventana salía antes de elegir el Matichico.
+- **Pruebas sobre la app, sin red:**
+  - `juegos.cjs` **20/20 OK** (los 15 de antes y los 5 nuevos) y 0 peticiones externas.
+  - `perfiles.cjs` 13/13 OK, `atras.cjs` todo OK y `verificar-app.mjs` OK.
+  - `scripts/qa/lib.cjs` apaga la ventana del regalo en las pruebas (`matichoc_sin_regalo_fundador`), porque tapaba los botones.
+- **Ficha de Play:** `store/listing-*.md` pasan de 14 a 19 juegos y suman un párrafo de los juegos de verano (es 3.175, en 3.044 y pt 3.246 de 4.000 caracteres).
+- **Pendiente:**
+  - Que la dueña revise los videos y juegue la app de prueba.
+  - Rearmar los avisos pagados con «19 juegos» cuando la 1.2 esté publicada.
+  - La pregunta de la dueña por «los cuadros de colores» del menú en el navegador: son los tres botones de arriba (Continuar mi aventura, Jugar libremente, Mi personaje), que no cambiaron. Falta saber si los quiere distintos.
+
 ## 2026-11-19
 
 ### Volumen de la música y de los efectos (y más bajo de partida)

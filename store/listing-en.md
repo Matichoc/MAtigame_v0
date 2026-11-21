@@ -11,7 +11,9 @@ Parkour, basketball, soccer and more: 3D chocolate games for kids and families
 ## Full description (max. 4000)
 Welcome to Matijuego, the Matichoc arcade! 🍫
 
-Pick your Matichico, change their hair, clothes, hats and much more in the shop with the Matipoints you earn by playing, and explore 14 games and 3D worlds, plus a workshop to create your own chocolate, all made with lots of cacao:
+Pick your Matichico, change their hair, clothes, hats and much more in the shop with the Matipoints you earn by playing, and explore 19 games and 3D worlds, plus a workshop to create your own chocolate, all made with lots of cacao:
+
+☀️ NEW SUMMER GAMES — ⛳ Beach Mini Golf and 🎱 Bonbon Billiards (play with 2 players, taking turns on the same phone!), 🚤 Lake Boats, ✈️ Choco Plane and 🥞 Alfajor Tower.
 
 🧗 CHOCO PARKOUR — An endless world! Run and jump across platforms that move, break or blink through 10 worlds (meadows, caramel, clouds, galaxies…), grab power-ups 🧲🛡️⚡🦘 and beat your distance record. There is also a 7-stage adventure (with a house to climb, walls, red lines and a tricky stage) with a cape, goggles and a crown.
 
