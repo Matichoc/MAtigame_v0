@@ -6,6 +6,21 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-21
 
+### Entrada de cine regrabada en alta calidad y nuevo «antes y después» lado a lado
+- **Comentario de la persona dueña** (al ver la primera versión): la entrada «se ve extraño, se ve como muy cuadrado, pixelado», y en el video del antes y después «no lo veo completo realmente, como para poder ver las diferencias».
+- **Por qué se veía mal la entrada:** se había grabado como un celular barato (resolución reducida y sin suavizado de bordes), el video era chico (960×540) y en un celular parado se estiraba y se recortaba; además una moneda giraba justo delante del Matichico y los faros de luz tapaban media pantalla al partir.
+- **Qué se cambió en la grabación** (escenas `entrada` y `entrada-v` de `scripts/video/grabar.cjs`, función `entradaDeCine`):
+  - Se graba en calidad completa (como computador: bordes suaves, resolución completa y brillo), a pantalla completa, en dos formatos: celular acostado (1920×1080) y celular parado (1080×1920).
+  - Tres sub-cuadros por cuadro, que al mezclarse dan el desenfoque de movimiento del cine (el vuelo ya no se ve «a saltos»).
+  - Solo para la toma: cielo de atardecer en degradé (el del juego es de un color), sol más bajo y dorado (sombras largas), faros de luz finos que se apagan cerca de la cámara, sin monedas delante del Matichico y sin vecinos cruzándose entre él y la cámara.
+  - Plano final más cercano: el Matichico celebra frente a la fuente (antes no alcanzaba a moverse: el Pueblo borraba la animación en cada cuadro).
+- **En el juego (`js/intro.js`):** ahora hay dos videos y se elige según cómo está el celular: `assets/intro/entrada.mp4` (acostado, 1280×720, 1,7 MB) y `assets/intro/entrada-v.mp4` (parado, 720×1280, 1,4 MB). Duran 6,8 s. La app armada pasa de 14,8 a 16,9 MB.
+- **Comparación «antes y después» con la misma jugada:** `grabar.cjs` acepta `--antes` (y `--estirar=N`): cada cuadro se vuelve a dibujar como se veía antes (sin acercamiento, giro ni franjas) y se anota a qué velocidad corría el juego, para quitarle la cámara lenta en el montaje. Así los dos lados muestran exactamente la misma jugada.
+- **Videos para la dueña** (en `Descargas\juegos-verano\`): `6-momentos-de-gloria-antes-y-despues.mp4` (72 s: pichanga, minigolf y lanchas, «antes» a la izquierda y «después» a la derecha, cada jugada con repetición lenta), `7-entrada-de-cine-celular-parado.mp4` y `7-entrada-de-cine-celular-acostado.mp4` (la entrada tal como se ve en el juego, con el título). El `7-entrada-de-cine.mp4` anterior se borró porque quedó superado.
+- **Qué se revisó:** hojas de cuadros de las dos tomas (nitidez, encuadre, saludo final); fotos de la entrada dentro de la app en vertical y en horizontal (cada una carga su video: 720×1280 y 1280×720, sin errores de página); un cuadro «antes» y «después» de cada jugada.
+- **Pruebas sobre la app, sin red:** `juegos.cjs` 20/20 OK, `perfiles.cjs` 13/13, `atras.cjs` todo OK y `verificar-app.mjs` OK.
+- **Nueva idea de la persona dueña:** le gustaron estas tomas cercanas y quiere evaluar una cinemática promocional del juego con escenas así (del Pueblo y de los juegos). Se le propone el guion; se hace solo si lo aprueba.
+
 ### Imagen de cine, primera parte: momentos de gloria y entrada al abrir el juego
 - **Pedido de la persona dueña:** «necesito que tú le des la imagen cinemática real… cómo y dónde mejorar nuestro juego». Se le propusieron siete lugares, en orden (quedaron en el plan de evolución, sección «Imagen de cine»), y eligió partir por los momentos de gloria y la entrada.
 - **Idea de fondo:** en un juego liviano, lo cinematográfico sale de la cámara, el ritmo y el sonido, no de gráficos más pesados. Nada de esto agrega efectos de pantalla completa.

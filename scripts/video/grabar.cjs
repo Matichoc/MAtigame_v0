@@ -17,7 +17,8 @@ const FPS = 30;
 const DT = 1000 / FPS;
 const BOT = path.join(__dirname, "..", "qa", "jugador-humano.mjs");
 
-async function abrir() {
+/** `opc.escritorio` = sin modo celular (bordes suaves y resolución completa); `opc.vertical` = pantalla parada. */
+async function abrir(opc = {}) {
   const b = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || "/opt/pw-browsers/chromium",
     // VIDEO_GPU=1: usa la tarjeta gráfica del computador (en Windows, con Edge o Chrome); si no, dibuja por software
@@ -26,7 +27,8 @@ async function abrir() {
       : ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"],
   });
   // 960×540 con densidad 2 = cuadros de 1920×1080 (el juego se ve como en un celular acostado, con sus botones táctiles)
-  const ctx = await b.newContext({ viewport: { width: 960, height: 540 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
+  const vp = opc.vertical ? { width: 540, height: 960 } : { width: 960, height: 540 };
+  const ctx = await b.newContext({ viewport: vp, deviceScaleFactor: 2, hasTouch: !opc.escritorio, isMobile: !opc.escritorio });
   await ctx.addInitScript(RELOJ);
   // sin la ventana del regalo de fundador (js/founder.js), que tapa los botones del menú
   await ctx.addInitScript(() => { try { localStorage.setItem("matichoc_sin_regalo_fundador", "1"); } catch (e) { /* nada */ } });
@@ -89,8 +91,10 @@ async function calentar(p, seg, cadaCuadro) {
   }
 }
 
-/** Opciones que cambia clips.cjs: `estirar` alarga cada toma (×N) y `metaPorristas` es cuántas figuras hace la rutina. */
-const OPC = { estirar: 1, metaPorristas: 1 };
+/** Opciones que cambia clips.cjs: `estirar` alarga cada toma (×N) y `metaPorristas` es cuántas figuras hace la rutina.
+ * `antes` guarda además cada cuadro sin los momentos de gloria (ver cuadroSinGloria). Con `--antes` se activa al grabar. */
+const OPC = { estirar: 1, metaPorristas: 1, antes: process.argv.includes("--antes") };
+{ const e = process.argv.find((a) => a.startsWith("--estirar=")); if (e) OPC.estirar = Number(e.split("=")[1]) || 1; }
 
 /** Graba `seg` segundos: antes de cada cuadro llama a cadaCuadro(i) (para mover al personaje, tocar, etc.). */
 async function grabar(p, escena, seg, cadaCuadro, desde = 0) {
@@ -101,9 +105,174 @@ async function grabar(p, escena, seg, cadaCuadro, desde = 0) {
   for (let i = 0; i < n; i++) {
     if (cadaCuadro) await cadaCuadro(i);
     await p.evaluate((dt) => window.__reloj.avanzar(dt), DT);
-    if (!elegidos || elegidos.has(i)) await p.screenshot({ path: path.join(dir, `c${String(desde + i).padStart(5, "0")}.jpg`), type: "jpeg", quality: 92 });
+    const archivo = path.join(dir, `c${String(desde + i).padStart(5, "0")}.jpg`);
+    if (!elegidos || elegidos.has(i)) await p.screenshot({ path: archivo, type: "jpeg", quality: 92 });
+    if (OPC.antes) await cuadroSinGloria(p, escena, desde + i, archivo);
   }
   return desde + n;
+}
+
+/** Para comparar el "antes y después" de los momentos de gloria (Game3D.glory en js/three-kit.js) con la MISMA jugada:
+ * con `OPC.antes`, cada cuadro se vuelve a dibujar como se veía antes (sin el acercamiento, el giro ni las franjas) y
+ * se guarda en `cuadros/<escena>-antes/`, junto con `ritmo.json`: a qué velocidad corría el juego en cada cuadro
+ * (1 = normal, 0,3 = cámara lenta), para que el montaje le quite la cámara lenta al "antes". */
+const RITMO = {};
+async function cuadroSinGloria(p, escena, i, archivo) {
+  const dir = path.join(OUT, "cuadros", `${escena}-antes`);
+  if (!RITMO[escena]) { RITMO[escena] = []; fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true }); }
+  const destino = path.join(dir, path.basename(archivo));
+  const ritmo = await p.evaluate(() => {
+    const g = Object.values(window.__g3d || {}).find((x) => x && x.running);
+    const gl = g && g._gl;
+    if (!gl) return 1;
+    const cam = g.camera, fov = cam.fov, q = cam.quaternion.clone();
+    cam.fov = gl.fov;
+    cam.updateProjectionMatrix();
+    if (gl.focus && gl.baseQ) cam.quaternion.copy(gl.baseQ);
+    for (const b of g._bars || []) b.style.visibility = "hidden";
+    if (g.composer) g.composer.render(0); else g.renderer.render(g.scene, cam);
+    cam.fov = fov;
+    cam.updateProjectionMatrix();
+    cam.quaternion.copy(q);
+    return Math.min(0.999, 1 + (gl.slow - 1) * gl.w);
+  });
+  if (ritmo === 1) fs.copyFileSync(archivo, destino); // sin momento de gloria en este cuadro: es igual
+  else {
+    await p.screenshot({ path: destino, type: "jpeg", quality: 92 });
+    await p.evaluate(() => { const g = Object.values(window.__g3d || {}).find((x) => x && x.running); for (const b of (g && g._bars) || []) b.style.visibility = ""; });
+  }
+  RITMO[escena][i] = ritmo;
+  fs.writeFileSync(path.join(dir, "ritmo.json"), JSON.stringify(RITMO[escena]));
+}
+
+/** El vuelo de cámara de la entrada de cine (ver ESCENAS.entrada).
+ * Se graba con SUB sub-cuadros por cuadro: al mezclarlos (ver docs/BITACORA.md, 21-nov-2026) el movimiento queda
+ * con el desenfoque suave del cine en vez de verse "a saltos". */
+const ENTRADA_SEG = 6.8;
+const ENTRADA_SUB = 3;
+async function entradaDeCine(p, nombre, vertical) {
+  await perfil(p, { lagoPendiente: false });
+  await abrirJuego(p, "Pueblo", "#town-btn-start", "town");
+  await sinConsejos(p);
+  // el escenario a pantalla completa, sin nada encima
+  await p.addStyleTag({ content: `#town-canvas-wrap > *:not(canvas), #town-hud, .hud, .toast, #toast, [class*='toast'], .modal, #orientation-hint, [id*='rotate'] { display: none !important }
+    #town-canvas-wrap { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; max-width: none !important; aspect-ratio: auto !important; z-index: 99999 !important; border-radius: 0 !important; margin: 0 !important }
+    #town-canvas { width: 100% !important; height: 100% !important; border: 0 !important; border-radius: 0 !important }` });
+  const datos = await p.evaluate((vertical) => {
+    const g = window.__g3d.town;
+    const V = g.pos.constructor;
+    // calidad completa para la grabación (en el celular se ve como video)
+    g.pixelRatio = 2;
+    g.renderer.setPixelRatio(2);
+    g.qualityDone = true; g.qualityStep = 0;
+    window.dispatchEvent(new Event("resize"));
+    g._onResize();
+    g.dayT = 0.535 * 300; // hora dorada (ver SKY en js/town-game.js)
+    const HX = 0, HZ = 7.2; // el Matichico, frente a la fuente
+    g.pos.set(HX, 0, HZ);
+    g.vel.set(0, 0, 0);
+    g._input = () => ({ x: 0, z: 0, mag: 0 });
+    if (g.pet && g.pet.group) g.pet.group.visible = false;
+    // vuelo: de lo alto y lejos (A) a un plano medio del Matichico con la fuente detrás (C), pasando por B.
+    // Acostado, el Matichico queda a la derecha (el nombre del juego va a la izquierda); parado, al centro y abajo.
+    const A = new V(-26, 19, 36), B = new V(12, 9, 27);
+    const C = vertical ? new V(-1.3, 1.9, 12.0) : new V(-2.0, 1.85, 11.4);
+    const LA = new V(0, 3.5, 0), LC = vertical ? new V(0, 1.75, HZ) : new V(-1.1, 1.8, 6);
+    g.heroYaw = Math.atan2(C.x - HX, C.z - HZ); // mira a la cámara del final
+
+    // --- cielo de atardecer en degradé (el del juego es de un solo color) ---
+    const beam0 = g.fun.beacons[0].beam;
+    const Mesh = beam0.constructor, Basic = beam0.material.constructor, Tex = beam0.material.map.constructor;
+    let Sphere = null;
+    g.scene.traverse((o) => { if (!Sphere && o.isMesh && o.geometry && o.geometry.type === "SphereGeometry") Sphere = o.geometry.constructor; });
+    g._updateSky();
+    const fondo = "#" + g.scene.background.getHexString();
+    const cv = document.createElement("canvas");
+    cv.width = 8; cv.height = 512;
+    const c2 = cv.getContext("2d");
+    const gr = c2.createLinearGradient(0, 0, 0, 512); // arriba = cenit, al medio = horizonte
+    gr.addColorStop(0.0, "#4b47b8");
+    gr.addColorStop(0.28, "#7a5ccc");
+    gr.addColorStop(0.37, "#c874c6");
+    gr.addColorStop(0.42, "#ff93ad");
+    gr.addColorStop(0.47, "#ffb89c");
+    gr.addColorStop(0.5, "#ffd49a"); // resplandor dorado en el horizonte
+    gr.addColorStop(0.6, "#ffcba0");
+    gr.addColorStop(0.75, fondo);
+    gr.addColorStop(1.0, fondo);
+    c2.fillStyle = gr; c2.fillRect(0, 0, 8, 512);
+    const tex = new Tex(cv);
+    if ("colorSpace" in tex) tex.colorSpace = "srgb";
+    tex.needsUpdate = true;
+    const cielo = new Mesh(new Sphere(170, 32, 24), new Basic({ map: tex, side: 1 /* BackSide */, fog: false, depthWrite: false }));
+    cielo.renderOrder = -10;
+    cielo.frustumCulled = false;
+    cielo.userData.noToon = true;
+    g.scene.add(cielo);
+    // sol más bajo y dorado: sombras largas de atardecer
+    g.sun.color.setHex(0xffd9a8);
+    const cieloDelJuego = g._updateSky.bind(g);
+    g._updateSky = () => { cieloDelJuego(); g.sun.position.y = g.pos.y + 15; };
+
+    // los vecinos pasean, pero no se cruzan entre el Matichico y la cámara del final
+    const vecinos = g._updateNeighbors.bind(g);
+    g._updateNeighbors = (dt) => {
+      vecinos(dt);
+      const abx = C.x - HX, abz = C.z - HZ, ab2 = abx * abx + abz * abz, R = 4.3;
+      for (const n of g.npcs) {
+        const k = Math.max(0, Math.min(1, ((n.x - HX) * abx + (n.z - HZ) * abz) / ab2));
+        const px = HX + abx * k, pz = HZ + abz * k;
+        const dx = n.x - px, dz = n.z - pz, d = Math.hypot(dx, dz) || 0.001;
+        if (d >= R) continue;
+        n.x = px + (dx / d) * R; n.z = pz + (dz / d) * R;
+        n.tx = px + (dx / d) * (R + 6); n.tz = pz + (dz / d) * (R + 6); n.wait = 0;
+        n.hero.group.position.set(n.x, 0, n.z);
+      }
+    };
+
+    let t = 0;
+    // al final el Matichico celebra (el modo se pone justo antes de animarlo: el Pueblo lo borra en cada cuadro)
+    const animar = g._syncHero.bind(g);
+    g._syncHero = (dt) => { if (g.fun) g.fun.heroMode = t > 4.3 ? "cheer" : null; animar(dt); };
+    const tmp = new V(), tmp2 = new V(), look = new V();
+    g._updateCamera = (dt) => {
+      t += dt;
+      const u = Math.min(1, t / 5.6), k = u * u * (3 - 2 * u); // suave al partir y al llegar
+      tmp.copy(A).lerp(B, k); tmp2.copy(B).lerp(C, k);
+      g.camera.position.copy(tmp.lerp(tmp2, k));
+      look.copy(LA).lerp(LC, k);
+      g.camera.lookAt(look);
+      cielo.position.copy(g.camera.position);
+      if (g.pet && g.pet.group) g.pet.group.visible = false;
+      // faros de luz: columnas finas y suaves, y se apagan cerca de la cámara (de cerca tapaban media pantalla)
+      const cam = g.camera.position;
+      for (const b of g.fun.beacons) {
+        const d = Math.hypot(b.x - cam.x, b.z - cam.z);
+        const q = Math.min(1, Math.max(0, (d - 13) / 16)), f = q * q * (3 - 2 * q);
+        b.beam.scale.set(0.5, 1, 0.5);
+        b.beam.material.opacity = 0.3 * f;
+        b.ring.material.opacity *= 0.5 * f;
+      }
+      // sin monedas girando delante del Matichico
+      for (const it of g.collect) if (Math.hypot(it.x - HX, it.z - HZ) < 10) it.mesh.visible = false;
+      // toma limpia: sin los cartelitos flotantes (nombres, globos de misión, letreros de cada lugar)
+      g.scene.traverse((o) => { if (o.isSprite) o.visible = false; });
+    };
+    window.__reloj.encender();
+    window.__resetVuelo = () => { t = 0; };
+    return { fov: g.camera.fov, fondo, bloom: !!g.composer };
+  }, vertical);
+  console.log(`  ${nombre}: fov ${datos.fov}, fondo ${datos.fondo}, brillo ${datos.bloom ? "sí" : "no"}`);
+  await calentar(p, 0.5);
+  await p.evaluate(() => window.__resetVuelo());
+  const dir = path.join(OUT, "cuadros", nombre);
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+  const n = Math.round(ENTRADA_SEG * FPS) * ENTRADA_SUB;
+  for (let i = 0; i < n; i++) {
+    await p.evaluate((dt) => window.__reloj.avanzar(dt), DT / ENTRADA_SUB);
+    if (!MUESTRA || i % 90 === 89 || i === n - 1) await p.screenshot({ path: path.join(dir, `c${String(i).padStart(5, "0")}.jpg`), type: "jpeg", quality: 95 });
+  }
 }
 
 // ---------------------------------------------------------------- escenas
@@ -310,43 +479,11 @@ const ESCENAS = {
   },
 
   /** Entrada de cine (se muestra al abrir el juego, ver js/intro.js): la cámara baja volando sobre el Pueblo al
-   * atardecer y llega hasta el Matichico, que baila frente a la fuente de chocolate. Sin botones ni carteles. */
-  async entrada(p) {
-    await perfil(p, { lagoPendiente: false });
-    await abrirJuego(p, "Pueblo", "#town-btn-start", "town");
-    await sinConsejos(p);
-    await p.addStyleTag({ content: "#town-canvas-wrap > *:not(canvas), #town-hud, .hud, .toast, #toast, [class*='toast'] { display: none !important } #town-canvas-wrap, #town-canvas { border: 0 !important; border-radius: 0 !important }" });
-    await p.evaluate(() => {
-      const g = window.__g3d.town;
-      const V = g.pos.constructor;
-      g.dayT = 0.535 * 300; // hora dorada (ver SKY en js/town-game.js)
-      g.pos.set(0, 0, 7.2); // frente a la fuente, mirando hacia donde termina la cámara
-      g.vel.set(0, 0, 0);
-      g.heroYaw = -0.55; // mira hacia donde termina la cámara
-      g._input = () => ({ x: 0, z: 0, mag: 0 });
-      if (g.fun) { g.fun.dancing = true; g.fun.heroMode = "dance"; }
-      // vuelo de cámara: de lo alto y lejos (A) a un plano medio del Matichico (C), pasando por B
-      const A = new V(-26, 19, 36), B = new V(12, 9, 27), C = new V(-2.5, 2.1, 11.4);
-      const LA = new V(0, 3.5, 0), LC = new V(0.1, 1.45, 7.2);
-      let t = 0;
-      const tmp = new V(), tmp2 = new V(), look = new V();
-      g._updateCamera = (dt) => {
-        t += dt;
-        const u = Math.min(1, t / 5.4), k = u * u * (3 - 2 * u); // suave al partir y al llegar
-        tmp.copy(A).lerp(B, k); tmp2.copy(B).lerp(C, k);
-        g.camera.position.copy(tmp.lerp(tmp2, k));
-        look.copy(LA).lerp(LC, k);
-        g.camera.lookAt(look);
-        if (g.fun) g.fun.heroMode = "dance";
-        // toma limpia: sin los cartelitos flotantes (nombres, globos de misión, letreros de cada lugar)
-        g.scene.traverse((o) => { if (o.isSprite) o.visible = false; });
-      };
-      window.__reloj.encender();
-    });
-    await calentar(p, 0.5);
-    await p.evaluate(() => { /* la cámara parte de nuevo desde arriba al empezar a grabar */ });
-    await grabar(p, "entrada", 6.6);
-  },
+   * atardecer y llega hasta el Matichico, que saluda frente a la fuente de chocolate. Sin botones ni carteles.
+   * Se graba en ALTA calidad (como computador: bordes suaves, resolución completa y brillo), a pantalla completa, en
+   * dos formatos: "entrada" (celular acostado, 1920×1080) y "entrada-v" (celular parado, 1080×1920). */
+  async entrada(p) { await entradaDeCine(p, "entrada", false); },
+  async "entrada-v"(p) { await entradaDeCine(p, "entrada-v", true); },
 
   /** Paseo por el Pueblo renovado, en monopatín, con la cámara girando despacio. */
   async pueblo(p) {
@@ -707,6 +844,9 @@ const ESCENAS = {
   },
 };
 
+// Escenas que no se graban como celular acostado
+const CONTEXTOS = { entrada: { escritorio: true }, "entrada-v": { escritorio: true, vertical: true } };
+
 module.exports = { abrir, ESCENAS, OPC, FPS, OUT, SOLO };
 
 if (require.main === module) (async () => {
@@ -714,7 +854,7 @@ if (require.main === module) (async () => {
   let mal = 0;
   for (const id of lista) {
     const t0 = Date.now();
-    const { b, p, errores } = await abrir();
+    const { b, p, errores } = await abrir(CONTEXTOS[id]);
     try {
       await ESCENAS[id](p);
       console.log(`${id}: lista en ${Math.round((Date.now() - t0) / 1000)} s${errores.length ? ` (errores de página: ${errores.join(" | ")})` : ""}`);
