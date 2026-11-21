@@ -11,7 +11,9 @@ Parkour, basquete, futebol e mais: jogos 3D de chocolate para crianças
 ## Descrição completa (máx. 4000)
 Bem-vindo ao Matijuego, o fliperama da Matichoc! 🍫
 
-Escolha o seu Matichico, mude o cabelo, as roupas, os chapéus e muito mais na loja com os Matipontos que você ganha jogando, e explore 14 jogos e mundos em 3D, além de uma oficina para criar o seu próprio chocolate, tudo feito com muito cacau:
+Escolha o seu Matichico, mude o cabelo, as roupas, os chapéus e muito mais na loja com os Matipontos que você ganha jogando, e explore 19 jogos e mundos em 3D, além de uma oficina para criar o seu próprio chocolate, tudo feito com muito cacau:
+
+☀️ NOVOS JOGOS DE VERÃO — ⛳ Minigolfe na praia e 🎱 Bilhar de bombons (para jogar em 2, por turnos, no mesmo celular!), 🚤 Lanchas no lago, ✈️ Aviãozinho Choco e 🥞 Torre de alfajores.
 
 🧗 PARKOUR CHOCO — Um mundo infinito! Corra e pule por plataformas que se movem, quebram ou piscam em 10 mundos (campos, caramelo, nuvens, galáxias…), pegue poderes 🧲🛡️⚡🦘 e bata o seu recorde de metros. Também há uma aventura de 7 etapas (com casa para escalar, paredes, linhas vermelhas e uma etapa cheia de pegadinhas) com capa, óculos e coroa.
 

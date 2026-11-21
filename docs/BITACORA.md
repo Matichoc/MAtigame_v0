@@ -4,7 +4,88 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-21
+
+### Versión 1.2 «Verano»: 5 juegos nuevos y regalo de fundador
+- **Pedido de la persona dueña:** apostar por todos los juegos de verano ahora («que funcionen bien, que se prueben») y subirlos junto con el volumen en una sola versión. Además, un bono para los primeros jugadores: 1.500 o 2.000 Matipuntos para elegir al tiro uno de los 5 juegos nuevos, mientras los otros quedan por comprar. También pidió videos de la jugabilidad de cada juego, que sea fácil de usar y que los juegos nuevos tengan buenas fotos, como los demás.
+- **Los 5 juegos** (archivos `js/<juego>-game.js`; las piezas comunes en `js/verano-kit.js`):
+
+| Juego | Cómo se juega | Energía | Precio |
+| --- | --- | --- | --- |
+| 🥞 Torre de alfajores (`torre`) | Tocar para soltar el alfajor que va y viene; al centro es ¡Perfecto! (combo). Muy corrido, se cae (3 ❤). Si la torre queda chueca, se derrumba. Cada 15 pisos, un alfajor dorado da +10 Matipuntos | 4 + 1 cada 8 pisos | 2.000 |
+| ✈️ Avioneta Choco (`avioneta`) | Mantener apretado para subir. Pasar por aros dorados (combo), juntar alfajores y esquivar globos y gaviotas (3 ❤). Al partir planea 1 s | 6 + 1 cada 150 m | 2.000 |
+| 🚤 Lanchas en el lago (`lanchas`) | ◀ ▶, flechas o arrastrar el dedo. Esquivar boyas y rocas de chocolate, saltar en las olas y juntar alfajores (3 ❤) | 6 + 1 cada 250 m | 2.000 |
+| ⛳ Minigolf en la playa (`minigolf`) | Arrastrar hacia atrás (honda) y soltar. 9 hoyos con castillos, palmeras, arena y cangrejos. **2 jugadores por turnos** en el mismo celular | 4 + 1 cada 3 golpes | 2.000 |
+| 🎱 Billar de bombones (`billar`) | Arrastrar y soltar. Meter 7 bombones en 6 cajas (25 tiros). **2 jugadores por turnos**: si metes, sigues | 4 + 1 cada 3 tiros | 2.000 |
+
+- **Regalo de fundador (`js/founder.js`):**
+  - No se puede saber quién es «el usuario número 50» sin enviar datos a un servidor, y el juego no envía nada (lo dice la política). Por eso la regla es por fecha: cada perfil que entra **hasta el 31-dic-2026** recibe una vez **2.000 Matipuntos** y elige al tiro uno de los 5 juegos nuevos. También puede guardar los Matipuntos.
+  - La ventana aparece cuando el jugador ya eligió su Matichico y está en el menú, sin otra ventana abierta. En la demo web no aparece.
+- **Registro:** cada juego quedó en el catálogo, en el menú (con su pantalla), en la energía, en las recompensas y en el precio.
+- **Fotos del menú:** `scripts/video/tarjetas.cjs` saca fotos limpias del juego de verdad (sin carteles ni botones, con el Matichico a la vista) en `assets/games/<juego>.jpg`, de 740×418.
+- **Rendimiento (lo pide la dueña: celulares de gama media-baja).** Se midió todo lo dibujado en un cuadro mientras se juega, contando también la sombra:
+
+| Juego | Piezas por cuadro | Triángulos |
+| --- | --- | --- |
+| Salto Choco (ya anda bien en su celular) | 397 | 44.463 |
+| Autos de Chocolate (ídem) | 714 | 50.093 |
+| Bloques de Productos (ídem) | 225 | 27.453 |
+| Torre de alfajores | 187 | 21.350 |
+| Avioneta Choco | 62 | 5.692 |
+| Lanchas en el lago | 147 | 18.624 |
+| Minigolf en la playa | 198 | 23.406 |
+| Billar de bombones | 236 | 28.012 |
+
+  - Para llegar a eso, cada palmera y cada quitasol se juntó en 2 piezas (antes eran 15 y 9; `mergeParts` en `verano-kit.js`), y no se dibujan las caras de los alfajores que nunca se ven.
+  - Los juegos nuevos no usan el brillo de pantalla completa, y su sombra es una sola y chica (se apaga sola si el celular va lento).
+- **Videos de la jugabilidad (para la dueña):** `Descargas\juegos-verano\1-…5-*.mp4`. Se grabaron con `scripts/video/grabar.cjs` y jugadores automáticos: la torre suelta al centro, la avioneta y las lanchas llevan piloto automático, y en minigolf y billar el jugador prueba los tiros «en la cabeza» y elige el mejor.
+- **Arreglos que salieron de los videos:**
+  - Avioneta: los aros se veían de canto y los alfajores oscuros; además, al partir caía al agua.
+  - Minigolf: la cámara pasó de costado, para que la cancha cruce la pantalla acostada.
+  - Billar: un bombón que caía se volvía a contar en cada paso (salía «21/7»).
+  - Regalo: la ventana salía antes de elegir el Matichico.
+- **Pruebas sobre la app, sin red:**
+  - `juegos.cjs` **20/20 OK** (los 15 de antes y los 5 nuevos) y 0 peticiones externas.
+  - `perfiles.cjs` 13/13 OK, `atras.cjs` todo OK y `verificar-app.mjs` OK.
+  - `scripts/qa/lib.cjs` apaga la ventana del regalo en las pruebas (`matichoc_sin_regalo_fundador`), porque tapaba los botones.
+- **Ficha de Play:** `store/listing-*.md` pasan de 14 a 19 juegos y suman un párrafo de los juegos de verano (es 3.175, en 3.044 y pt 3.246 de 4.000 caracteres).
+- **Pendiente:**
+  - Que la dueña revise los videos y juegue la app de prueba.
+  - Rearmar los avisos pagados con «19 juegos» cuando la 1.2 esté publicada.
+- **Decisión de la persona dueña:** los «cuadros de colores» que vio en el navegador son los tres botones de arriba del menú (Continuar mi aventura, Jugar libremente, Mi personaje), que no cambiaron. Se dejan así.
+
+## 2026-11-19
+
+### Volumen de la música y de los efectos (y más bajo de partida)
+- **Pedido de la persona dueña:** «igual suena fuerte el juego, debería tener volumen y config por ahí».
+- **Qué se hizo:**
+  - Una ventana **«🔊 Sonido»** con dos barras, **🎵 Música** y **🔔 Efectos** (de 0 a 100 %, de 5 en 5), y el botón «🔇 Silenciar todo» / «🔊 Activar el sonido».
+  - Se abre desde el menú (botón «🔊 Sonido» junto a Logros y Puntajes; en el celular, en la pestaña «Mi Matichico») y desde la pausa de cada juego (botón nuevo «🎚️ Volumen»). El «atrás» del celular la cierra.
+  - Al mover la barra de efectos suena un efecto de prueba, y la música cambia mientras suena.
+  - **Volumen de partida más bajo:** música al 60 % y efectos al 70 %. Como el oído percibe el volumen al cuadrado, eso es más o menos −9 dB la música y −6 dB los efectos respecto de antes.
+  - La elección se guarda **en el celular** (`localStorage` «matichoc_sonido»), no en cada perfil, porque es de la familia y del aparato. El silencio también queda guardado: antes se perdía al cerrar el juego.
+  - `js/audio.js`: la música generada tiene ahora su propia salida (`musicBus`), separada de los efectos, para que cada barra mueva solo lo suyo. Las canciones usan el volumen de la música.
+- **Qué se probó en la web servida en el computador:**
+  - De partida: efectos 0,392 (0,8 × 0,7²), música 0,288 y canción 0,18 (0,5 × 0,6²).
+  - Al bajar la música a 0 %, la canción del menú se calla al tiro.
+  - «Silenciar todo» la pausa y queda guardado.
+  - Después de recargar, la ventana muestra lo elegido (música 40 %, efectos 70 %).
+  - El botón «🎚️ Volumen» de la pausa abre la ventana.
+- **Pruebas automáticas sobre la app, sin red:** `juegos.cjs` 15/15 OK, `perfiles.cjs` 13/13 OK, `atras.cjs` todo OK y `verificar-app.mjs` OK.
+- **Versión:** va en la 1.1.2. La 1.1.1 (107) está en revisión en Google.
+- **Decisión de la persona dueña (20-nov):** no reemplazar la 1.1.1, que ya lleva 2 días en revisión. Se espera su aprobación y después se sube la 1.1.2 con el volumen.
+
 ## 2026-11-18
+
+### Versión 1.1.1 para Google Play (reemplaza a la 1.1.0)
+- **Decisión de la persona dueña:** «Sí, hazlo». Se suben juntas la música, las celebraciones y la sombra opcional en una sola actualización. La 1.1.0 (105) se queda solo en la prueba interna y la que va a producción es la 1.1.1.
+- **Merge:** PR #57 (sombra opcional en Bloques) y Matichoc/matiweb#85.
+- **`.aab` 1.1.1, desde `main` (ejecución 44373600233):**
+  - Número de versión **107**, firmado con la llave de subida (SHA-256 47:FE:F7:…:E7:9F, la misma de siempre).
+  - Pide solo `INTERNET` y `VIBRATE`, lleva las 5 canciones y trae los botones de la sombra. Pesa 20,3 MB.
+  - Quedó en `Descargas\matijuego-aab-1.1.1\app-release.aab`.
+- **Enviado a revisión (18-nov):** la dueña subió el `.aab` 1.1.1 (107) y lo envió a **producción**, con lanzamiento completo, junto con el video de la ficha (https://youtu.be/d80CXEZ9gFc). La publicación gestionada está desactivada: si Google aprueba, se publica de inmediato.
+- **Pendiente:** esperar la aprobación y después partir con los avisos pagados (`docs/ANUNCIO-MATIJUEGO.md`).
 
 ### Bloques: la sombra de la pieza ahora es opcional (parte encendida)
 - **Pedido de la persona dueña:** «algunos me dicen que les sirve la sombra, y otros dicen que la sombra les molesta, debería ser opcional, partiendo con ella puesta».

@@ -56,6 +56,7 @@ async function perfil(p, { lagoPendiente = true } = {}) {
     pr.energy = 999;
     pr.coins = 2480;
     pr.xp = Math.max(pr.xp || 0, 60000);
+    pr.founderGift = { date: "video" }; // sin la ventana del regalo de fundador
     const adv = A.adventureOf(pr);
     adv.started = true;
     adv.introSeen = true;
@@ -105,6 +106,207 @@ async function grabar(p, escena, seg, cadaCuadro, desde = 0) {
 
 // ---------------------------------------------------------------- escenas
 const ESCENAS = {
+  /** Torre de alfajores (verano): suelta cada alfajor cuando pasa por el centro; cada cinco, uno un poco corrido. */
+  async torre(p) {
+    await perfil(p);
+    await abrirJuego(p, "Torre de Alfajores", "#torre-btn-start", "torre");
+    await p.evaluate(() => { window.__drops = 0; window.__reloj.encender(); });
+    const jugar = () => p.evaluate(() => {
+      const g = window.__g3d.torre;
+      const c = g.cur;
+      if (!c || c.dropping || g.state !== "playing") return;
+      const want = g.topX + (window.__drops % 5 === 4 ? 0.5 : 0);
+      if (Math.abs(c.x - want) < 0.12) { g._drop(); window.__drops++; }
+    });
+    await calentar(p, 0.4, jugar);
+    await grabar(p, "torre", 16, jugar);
+  },
+
+  /** Avioneta Choco (verano): piloto automático que busca el próximo aro (y los alfajores) y esquiva lo demás. */
+  async avioneta(p) {
+    await perfil(p);
+    await abrirJuego(p, "Avioneta Choco", "#avioneta-btn-start", "avioneta");
+    await p.evaluate(() => window.__reloj.encender());
+    const piloto = () => p.evaluate(() => {
+      const g = window.__g3d.avioneta;
+      if (g.state !== "playing") return;
+      const next = g.things.filter((t) => !t.done && t.x > g.x - 0.5 && (t.kind === "ring" || t.kind === "coin")).sort((a, b) => a.x - b.x)[0];
+      let target = next && next.x - g.x < 14 ? next.y : 5;
+      for (const t of g.things) { // si viene un globo o una gaviota a la altura del objetivo, pasa por arriba o por abajo
+        if (t.done || (t.kind !== "balloon" && t.kind !== "gull") || t.x < g.x || t.x - g.x > 9) continue;
+        if (Math.abs(t.y - target) < 2.2) target = t.y > 5 ? t.y - 2.6 : t.y + 2.6;
+      }
+      g.hold = g.y + g.vy * 0.3 < Math.max(2.4, target);
+    });
+    await calentar(p, 0.4, piloto);
+    await grabar(p, "avioneta", 16, piloto);
+  },
+
+  /** Lanchas en el lago (verano): piloto automático que busca rampas y alfajores y esquiva boyas y rocas. */
+  async lanchas(p) {
+    await perfil(p);
+    await abrirJuego(p, "Lanchas en el Lago", "#lanchas-btn-start", "lanchas");
+    await p.evaluate(() => window.__reloj.encender());
+    const piloto = () => p.evaluate(() => {
+      const g = window.__g3d.lanchas;
+      if (g.state !== "playing") return;
+      const near = g.things.filter((t) => !t.done && t.z < g.bz && g.bz - t.z < 22);
+      // candidato: el x con menos peligro y más premios en los próximos metros
+      let best = g.bx, bestV = -1e9;
+      for (let x = -5; x <= 5; x += 0.5) {
+        let v = -Math.abs(x - g.bx) * 0.15;
+        for (const t of near) {
+          const d = Math.abs(t.x - x), w = 1 - (g.bz - t.z) / 26;
+          if (t.kind === "buoy" || t.kind === "rock") v -= d < 1.6 ? 10 * w : 0;
+          else if (t.kind === "ramp") v += d < 1.2 ? 3 * w : 0;
+          else if (t.kind === "coin") v += d < 0.9 ? 1 * w : 0;
+        }
+        if (v > bestV) { bestV = v; best = x; }
+      }
+      g.pointerX = best;
+    });
+    await calentar(p, 0.4, piloto);
+    await grabar(p, "lanchas", 16, piloto);
+  },
+
+  /** Minigolf en la playa (verano): un jugador automático que prueba tiros "en la cabeza" y elige el que deja la
+   * pelota más cerca del hoyo; se ve la flecha de apuntar un momento antes de cada golpe. */
+  async minigolf(p) {
+    await perfil(p);
+    await abrirJuego(p, "Minigolf en la Playa", "#minigolf-btn-start", "minigolf");
+    await p.evaluate(() => {
+      window.__reloj.encender();
+      // simulación simple de un tiro (misma física del juego, sin los cangrejos moviéndose)
+      window.__golfSim = (g, dx, dz, v) => {
+        const h = g.hole, R = 0.14;
+        let x = g.bx, z = g.bz, vx = dx * v, vz = dz * v;
+        const cl = (a, lo, hi) => Math.max(lo, Math.min(hi, a));
+        for (let i = 0; i < 1200; i++) {
+          const sdt = 1 / 240, sp = Math.hypot(vx, vz);
+          if (sp < 0.06) break;
+          let fr = 2.4 + sp * 0.35;
+          for (const [sx, sz, w, d] of h.sand || []) if (Math.abs(x - sx) < w / 2 && Math.abs(z - sz) < d / 2) fr = 9 + sp * 1.5;
+          const ns = Math.max(0, sp - fr * sdt); vx *= ns / sp; vz *= ns / sp;
+          x += vx * sdt; z += vz * sdt;
+          const X = h.w / 2 - R, Z = h.d / 2 - R;
+          if (x < -X) { x = -X; vx = Math.abs(vx) * 0.78; } if (x > X) { x = X; vx = -Math.abs(vx) * 0.78; }
+          if (z < -Z) { z = -Z; vz = Math.abs(vz) * 0.78; } if (z > Z) { z = Z; vz = -Math.abs(vz) * 0.78; }
+          for (const [rx, rz, w, d] of h.walls || []) {
+            const px = cl(x, rx - w / 2, rx + w / 2), pz = cl(z, rz - d / 2, rz + d / 2), ex = x - px, ez = z - pz, dd = Math.hypot(ex, ez);
+            if (dd < R && dd > 0) { const nx = ex / dd, nz = ez / dd; x = px + nx * R; z = pz + nz * R; const vn = vx * nx + vz * nz; if (vn < 0) { vx -= 1.78 * vn * nx; vz -= 1.78 * vn * nz; } }
+          }
+          for (const [cx, cz, r] of [...(h.round || []), ...g.crabs.map((c) => [c.x, c.z, c.r])]) {
+            const ex = x - cx, ez = z - cz, dd = Math.hypot(ex, ez), m = r + R;
+            if (dd < m && dd > 0) { const nx = ex / dd, nz = ez / dd; x = cx + nx * m; z = cz + nz * m; const vn = vx * nx + vz * nz; if (vn < 0) { vx -= 1.75 * vn * nx; vz -= 1.75 * vn * nz; } }
+          }
+          const dc = Math.hypot(x - h.cup[0], z - h.cup[1]);
+          if (dc < 0.24 && Math.hypot(vx, vz) < 4.2) return 0;
+        }
+        return Math.hypot(x - h.cup[0], z - h.cup[1]);
+      };
+      window.__golfPlan = (g) => {
+        let best = null;
+        for (let a = 0; a < 72; a++) for (let k = 1; k <= 12; k++) {
+          const ang = (a / 72) * Math.PI * 2, dx = Math.sin(ang), dz = Math.cos(ang), pw = k / 12;
+          const d = window.__golfSim(g, dx, dz, 1.2 + pw * (9.5 - 1.2));
+          if (!best || d < best.d - 1e-6) best = { d, dx, dz, pw };
+        }
+        return best;
+      };
+    });
+    let espera = 0, plan = null;
+    const jugador = async () => {
+      if (espera > 0) { espera--; return; }
+      const st = await p.evaluate(() => { const g = window.__g3d.minigolf; return { ok: g.state === "playing" && g.ballStill && !g.inCup }; });
+      if (!st.ok) { plan = null; return; }
+      if (!plan) {
+        plan = await p.evaluate(() => { const g = window.__g3d.minigolf; const b = window.__golfPlan(g); g.onAimShow = b; return b; });
+        await p.evaluate((b) => { const g = window.__g3d.minigolf; const THREE = g.ball.position.constructor; const dir = new THREE(b.dx, 0, b.dz); window.__setArrow(g, dir, b.pw); }, plan);
+        espera = 18; // se ve la flecha ~0,6 s
+        return;
+      }
+      await p.evaluate((b) => { const g = window.__g3d.minigolf; const THREE = g.ball.position.constructor; g._shoot(new THREE(b.dx, 0, b.dz), b.pw); }, plan);
+      plan = null;
+      espera = 6;
+    };
+    await p.evaluate(async () => {
+      const m = await import("/js/verano-kit.js");
+      window.__setArrow = (g, dir, pw) => m.setAimArrow(g.arrow, g.ball.position, dir, pw);
+    });
+    await calentar(p, 0.6, jugador);
+    await grabar(p, "minigolf", 22, jugador);
+  },
+
+  /** Billar de bombones (verano): un jugador automático que prueba tiros "en la cabeza" y elige el que mete más
+   * bombones sin que caiga el blanco; se ve la flecha un momento antes de cada golpe. */
+  async billar(p) {
+    await perfil(p);
+    await abrirJuego(p, "Billar de Bombones", "#billar-btn-start", "billar");
+    await p.evaluate(async () => {
+      window.__reloj.encender();
+      const m = await import("/js/verano-kit.js");
+      window.__setArrow = (g, dir, pw) => m.setAimArrow(g.arrow, g.cue.mesh.position, dir, pw, 1.6);
+      const W = 2.4, L = 4.4, BR = 0.12, PR = 0.19, P = [[-W / 2, -L / 2], [W / 2, -L / 2], [-W / 2, 0], [W / 2, 0], [-W / 2, L / 2], [W / 2, L / 2]];
+      window.__billSim = (g, dx, dz, v) => {
+        const bs = g.balls.filter((b) => !b.in).map((b) => ({ x: b.x, z: b.z, vx: b.cue ? dx * v : 0, vz: b.cue ? dz * v : 0, cue: b.cue, in: false }));
+        let got = 0, scratch = false;
+        for (let step = 0; step < 900; step++) {
+          const sdt = 1 / 360;
+          let moving = false;
+          for (const b of bs) {
+            if (b.in) continue;
+            const sp = Math.hypot(b.vx, b.vz);
+            if (sp > 0) { const ns = Math.max(0, sp - (0.7 + sp * 0.22) * sdt); b.vx *= ns / sp; b.vz *= ns / sp; }
+            if (sp > 0.03) moving = true;
+            b.x += b.vx * sdt; b.z += b.vz * sdt;
+            for (const [px, pz] of P) if (Math.hypot(b.x - px, b.z - pz) < PR) { b.in = true; if (b.cue) scratch = true; else got++; break; }
+            const X = W / 2 - BR, Z = L / 2 - BR;
+            if (b.x < -X) { b.x = -X; b.vx = Math.abs(b.vx) * 0.8; } if (b.x > X) { b.x = X; b.vx = -Math.abs(b.vx) * 0.8; }
+            if (b.z < -Z) { b.z = -Z; b.vz = Math.abs(b.vz) * 0.8; } if (b.z > Z) { b.z = Z; b.vz = -Math.abs(b.vz) * 0.8; }
+          }
+          for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) {
+            const a = bs[i], c = bs[j];
+            if (a.in || c.in) continue;
+            const ex = c.x - a.x, ez = c.z - a.z, d = Math.hypot(ex, ez);
+            if (d >= 2 * BR || d === 0) continue;
+            const nx = ex / d, nz = ez / d, o = 2 * BR - d;
+            a.x -= nx * o / 2; a.z -= nz * o / 2; c.x += nx * o / 2; c.z += nz * o / 2;
+            const rv = (c.vx - a.vx) * nx + (c.vz - a.vz) * nz;
+            if (rv < 0) { const imp = -rv * 0.97; a.vx -= imp * nx; a.vz -= imp * nz; c.vx += imp * nx; c.vz += imp * nz; }
+          }
+          if (!moving) break;
+        }
+        return got - (scratch ? 2 : 0);
+      };
+      window.__billPlan = (g) => {
+        let best = null;
+        for (let a = 0; a < 90; a++) for (const pw of [0.35, 0.55, 0.75, 0.95]) {
+          const ang = (a / 90) * Math.PI * 2, dx = Math.sin(ang), dz = Math.cos(ang);
+          const v = window.__billSim(g, dx, dz, 0.6 + pw * (6.5 - 0.6));
+          if (!best || v > best.v) best = { v, dx, dz, pw };
+        }
+        return best;
+      };
+    });
+    let espera = 0, plan = null;
+    const jugador = async () => {
+      if (espera > 0) { espera--; return; }
+      const ok = await p.evaluate(() => { const g = window.__g3d.billar; return g.state === "playing" && g.still; });
+      if (!ok) { plan = null; return; }
+      if (!plan) {
+        plan = await p.evaluate(() => window.__billPlan(window.__g3d.billar));
+        await p.evaluate((b) => { const g = window.__g3d.billar; const V = g.cue.mesh.position.constructor; window.__setArrow(g, new V(b.dx, 0, b.dz), b.pw); }, plan);
+        espera = 18;
+        return;
+      }
+      await p.evaluate((b) => { const g = window.__g3d.billar; const V = g.cue.mesh.position.constructor; g._shoot(new V(b.dx, 0, b.dz), b.pw); }, plan);
+      plan = null;
+      espera = 8;
+    };
+    await calentar(p, 0.6, jugador);
+    await grabar(p, "billar", 20, jugador);
+  },
+
   /** Paseo por el Pueblo renovado, en monopatín, con la cámara girando despacio. */
   async pueblo(p) {
     await perfil(p, { lagoPendiente: false });
