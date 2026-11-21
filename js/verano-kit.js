@@ -28,60 +28,74 @@ export function beachLights(game, { shadow = 9, mapSize = 1024 } = {}) {
   return { hemi, sun };
 }
 
+/**
+ * Junta varias piezas (geometría + posición/giro/escala) en UNA sola geometría: así una palmera o un quitasol se dibujan
+ * en 1 o 2 pasadas en vez de 10 o 15 (en celulares baratos lo que más pesa es la cantidad de piezas por cuadro).
+ */
+export function mergeParts(parts) {
+  const pos = [], nor = [];
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), sc = new THREE.Vector3();
+  for (const { geo, p = [0, 0, 0], r = [0, 0, 0], s = [1, 1, 1] } of parts) {
+    const g = (geo.index ? geo.toNonIndexed() : geo.clone());
+    m.compose(v.set(...p), q.setFromEuler(e.set(...r)), sc.set(...s));
+    g.applyMatrix4(m);
+    pos.push(...g.attributes.position.array);
+    nor.push(...g.attributes.normal.array);
+    g.dispose();
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  out.setAttribute("normal", new THREE.Float32BufferAttribute(nor, 3));
+  out.computeBoundingSphere();
+  return out;
+}
+
 const palmMats = {};
-/** Palmera low-poly (tronco en segmentos y 6 hojas). */
+const palmGeos = []; // 3 formas de palmera (con distinta inclinación), compartidas por todas
+/** Palmera low-poly: 2 piezas (tronco con cocos, y hojas). */
 export function makePalm(scale = 1) {
   if (!palmMats.trunk) {
     palmMats.trunk = new THREE.MeshStandardMaterial({ color: 0x9a6b3e, roughness: 0.9, flatShading: true });
     palmMats.leaf = new THREE.MeshStandardMaterial({ color: 0x4fae4a, roughness: 0.8, flatShading: true, side: THREE.DoubleSide });
-    palmMats.coco = new THREE.MeshStandardMaterial({ color: 0x6b4423, roughness: 0.7 });
-    palmMats.seg = new THREE.CylinderGeometry(0.16, 0.2, 0.7, 6);
-    palmMats.leafGeo = new THREE.ConeGeometry(0.35, 2.2, 4, 1, true);
-    palmMats.cocoGeo = new THREE.SphereGeometry(0.16, 6, 5);
+    const seg = new THREE.CylinderGeometry(0.16, 0.2, 0.7, 6), leafGeo = new THREE.ConeGeometry(0.35, 2.2, 4, 1, true), coco = new THREE.SphereGeometry(0.16, 6, 5);
+    for (const lean of [-0.22, 0.05, 0.25]) {
+      const trunk = [], leaves = [];
+      let y = 0, x = 0;
+      for (let i = 0; i < 6; i++) { x += lean * 0.12 * i; trunk.push({ geo: seg, p: [x, y + 0.35, 0], r: [0, 0, -lean * 0.3] }); y += 0.62; }
+      for (let i = 0; i < 3; i++) trunk.push({ geo: coco, p: [x + Math.cos(i * 2.1) * 0.22, y - 0.15, Math.sin(i * 2.1) * 0.22] });
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2;
+        leaves.push({ geo: leafGeo, p: [x + Math.cos(a) * 0.9, y + 0.1, Math.sin(a) * 0.9], r: [Math.sin(a) * 1.25, 0, -Math.cos(a) * 1.25], s: [1, 1, 0.25] });
+      }
+      palmGeos.push([mergeParts(trunk), mergeParts(leaves)]);
+    }
   }
+  const [tg, lg] = palmGeos[Math.floor(Math.random() * palmGeos.length)];
   const g = new THREE.Group();
-  const lean = rand(-0.25, 0.25);
-  let y = 0, x = 0;
-  for (let i = 0; i < 6; i++) {
-    const seg = new THREE.Mesh(palmMats.seg, palmMats.trunk);
-    x += lean * 0.12 * i;
-    seg.position.set(x, y + 0.35, 0);
-    seg.rotation.z = -lean * 0.3;
-    g.add(seg);
-    y += 0.62;
-  }
-  for (let i = 0; i < 6; i++) {
-    const leaf = new THREE.Mesh(palmMats.leafGeo, palmMats.leaf);
-    const a = (i / 6) * Math.PI * 2;
-    leaf.position.set(x + Math.cos(a) * 0.9, y + 0.1, Math.sin(a) * 0.9);
-    leaf.rotation.set(Math.sin(a) * 1.25, 0, -Math.cos(a) * 1.25);
-    leaf.scale.set(1, 1, 0.25);
-    g.add(leaf);
-  }
-  for (let i = 0; i < 3; i++) {
-    const c = new THREE.Mesh(palmMats.cocoGeo, palmMats.coco);
-    c.position.set(x + Math.cos(i * 2.1) * 0.22, y - 0.15, Math.sin(i * 2.1) * 0.22);
-    g.add(c);
-  }
+  g.add(new THREE.Mesh(tg, palmMats.trunk), new THREE.Mesh(lg, palmMats.leaf));
+  g.rotation.y = rand(0, Math.PI * 2);
   g.scale.setScalar(scale);
   return g;
 }
 
-/** Quitasol de playa a rayas (rosado y blanco). */
+const umbrellaCache = {};
+/** Quitasol de playa a rayas (rosado y blanco): 2 piezas. */
 export function makeUmbrella(scale = 1, colors = [0xd4216c, 0xfff6e6]) {
-  const g = new THREE.Group();
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.4, 6), new THREE.MeshStandardMaterial({ color: 0xffffff }));
-  pole.position.y = 1.2;
-  g.add(pole);
-  for (let i = 0; i < 8; i++) {
-    const slice = new THREE.Mesh(new THREE.ConeGeometry(1.4, 0.55, 3, 1, true, (i / 8) * Math.PI * 2, Math.PI / 4),
-      new THREE.MeshStandardMaterial({ color: colors[i % 2], side: THREE.DoubleSide, roughness: 0.7 }));
-    slice.position.y = 2.45;
-    g.add(slice);
+  const key = colors.join("-");
+  if (!umbrellaCache[key]) {
+    const parts = [[], []];
+    parts[1].push({ geo: new THREE.CylinderGeometry(0.05, 0.05, 2.4, 6), p: [0, 1.2, 0] });
+    for (let i = 0; i < 8; i++) parts[i % 2].push({ geo: new THREE.ConeGeometry(1.4, 0.55, 3, 1, true, (i / 8) * Math.PI * 2, Math.PI / 4), p: [0, 2.45, 0] });
+    umbrellaCache[key] = parts.map((list, k) => [mergeParts(list), new THREE.MeshStandardMaterial({ color: colors[k], side: THREE.DoubleSide, roughness: 0.7 })]);
   }
+  const g = new THREE.Group();
+  for (const [geo, mat] of umbrellaCache[key]) g.add(new THREE.Mesh(geo, mat));
   g.scale.setScalar(scale);
   return g;
 }
+
+/** Material que no se dibuja (para caras de una pieza que nunca se ven). */
+export const HIDDEN = new THREE.MeshBasicMaterial({ visible: false });
 
 let alfTex = null;
 let alfSide = null;
@@ -96,10 +110,8 @@ export function alfajorMaterials() {
     });
   }
   const side = new THREE.MeshStandardMaterial({ map: alfSide, roughness: 0.75 });
-  return alfTex.map((t) => {
-    const top = new THREE.MeshStandardMaterial({ map: t, roughness: 0.6 });
-    return [side, top, top];
-  });
+  // la cara de abajo nunca se ve (en la torre está apoyada; las monedas miran a la cámara): no se dibuja
+  return alfTex.map((t) => [side, new THREE.MeshStandardMaterial({ map: t, roughness: 0.6 }), HIDDEN]);
 }
 
 // ---------------------------------------------------------------- 2 jugadores por turnos (Minigolf y Billar)

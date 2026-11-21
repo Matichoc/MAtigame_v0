@@ -8,7 +8,7 @@ import { THREE, Game3D, clamp, lerp, rand } from "./three-kit.js";
 import { createMatichico } from "./matichico3d.js";
 import { earnCoins, saveProgress } from "./storage.js";
 import * as audio from "./audio.js";
-import { BEACH, beachLights, makePalm, makeUmbrella, alfajorMaterials } from "./verano-kit.js";
+import { BEACH, beachLights, makePalm, makeUmbrella, alfajorMaterials, HIDDEN } from "./verano-kit.js";
 
 const R = 1.0; // radio del alfajor
 const H = 0.34; // alto del alfajor
@@ -64,7 +64,7 @@ export class TorreGame extends Game3D {
     this.geo = new THREE.CylinderGeometry(R, R, H, 32);
     this.mats = alfajorMaterials();
     const gold = new THREE.MeshStandardMaterial({ color: 0xffc800, roughness: 0.25, metalness: 0.7, emissive: 0x5a3a00, emissiveIntensity: 0.4 });
-    this.goldMats = [gold, gold, gold];
+    this.goldMats = [gold, gold, HIDDEN];
     this.tower = new THREE.Group(); // se mece un poquito según lo cargada que esté
     s.add(this.tower);
     this.falling = []; // alfajores que se caen (solo animación)
@@ -178,6 +178,9 @@ export class TorreGame extends Game3D {
       this.score += 10;
       audio.playCollect();
     }
+    // el alfajor de abajo queda tapado: ya no se dibuja su tapa (en celulares cuenta cada pieza dibujada)
+    const under = this.pieces[this.pieces.length - 1];
+    if (under) under.mesh.material = [under.mesh.material[0], HIDDEN, HIDDEN];
     // queda pegado a la torre
     this.scene.remove(c.mesh);
     this.tower.add(c.mesh);

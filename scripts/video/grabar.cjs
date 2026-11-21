@@ -56,6 +56,7 @@ async function perfil(p, { lagoPendiente = true } = {}) {
     pr.energy = 999;
     pr.coins = 2480;
     pr.xp = Math.max(pr.xp || 0, 60000);
+    pr.founderGift = { date: "video" }; // sin la ventana del regalo de fundador
     const adv = A.adventureOf(pr);
     adv.started = true;
     adv.introSeen = true;

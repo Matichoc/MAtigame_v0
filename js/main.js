@@ -7,6 +7,7 @@ import { initSplash, markAppReady } from "./splash.js";
 import { IS_DEMO, demoAllows, showDemoWall, showDemoBanner } from "./demo.js";
 import { bindStick, joyMode, setJoyMode } from "./stick.js";
 import { UNLOCK_COST, needsUnlock, isUnlocked, unlockGame } from "./unlocks.js";
+import { offerFounderGift } from "./founder.js";
 import { GAMES_CATALOG } from "./games-catalog.js";
 import {
   loadProgress, saveProgress, storageKeyForProfile, ownsItem, getLook, equipItem, setOutfitCustom, buyItem, wearers, canWear, takeOff, wardrobeCopies,
@@ -496,6 +497,16 @@ function chooseProfile(id) {
   showScreen(screenHub);
   if (refunds.length) setTimeout(() => showToast(refunds.map((r) => `${r.event.icon} Terminó ${r.event.name}: tus ${r.tokens} ${r.event.token} se cambiaron por ${r.coins} Matipuntos 🍫✨`).join(" · ")), 900);
   advUI.showWelcome(); // al volver después de un rato: resumen corto del avance y del siguiente objetivo
+  // regalo de fundador (v1.2): 2.000 Matipuntos y elegir uno de los juegos de verano (ver js/founder.js)
+  offerFounderGift(progress, {
+    ready: () => !!selectedCharacter && !screenHub.classList.contains("hidden"),
+    onChange: (id) => {
+      refreshHubStats();
+      renderGameGrid();
+      const g = id && GAMES_CATALOG.find((x) => x.id === id);
+      showToast(g ? `🎁 ¡Ya puedes jugar ${g.icon} ${g.name}! Búscalo en Juegos.` : "🎁 ¡Te regalamos 2.000 Matipuntos! 🍫✨", 4200);
+    },
+  });
 }
 
 function goToProfiles() {
