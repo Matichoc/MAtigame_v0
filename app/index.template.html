@@ -1176,6 +1176,52 @@
     </div>
   </section>
 
+  <section id="screen-billar" class="screen game-screen hidden">
+    <div id="billar-hud" class="hud">
+      <div class="hud-left">
+        <button id="billar-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="billar-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level" id="billar-hud-title">Billar de Bombones</div>
+          <div class="hud-mission" id="billar-hud-sub">Arrastra hacia atrás y suelta para golpear</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">🍫 <span id="billar-hud-balls">0/7</span></div>
+        <div class="hud-chip">🎱 <span id="billar-hud-shots">0/25</span></div>
+        <div class="hud-chip">⭐ <span id="billar-hud-score">0</span></div>
+        <button id="billar-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="billar-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="billar-canvas"></canvas>
+      <div id="billar-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="billar-popups" class="fps-popups" aria-hidden="true"></div>
+
+      <div id="billar-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Billar de Bombones</h2>
+          <p class="fps-tag">Nuevo ☀️ Verano</p>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>Arrastra el dedo (o el mouse) hacia atrás, como una honda: la flecha muestra hacia dónde sale el bombón blanco y su color, la fuerza. Suelta para golpear. Mete los 7 bombones de colores en las 6 cajas doradas. Meter dos en un tiro da puntos extra. Si cae el bombón blanco, vuelve a su lugar y pierdes 50 puntos. De a 1 tienes 25 tiros. Con «2 jugadores» juegan por turnos en el mismo celular: si metes uno sigues tú y, si no, le toca al otro. Gana el que mete más.</p>
+          </details>
+          <button class="btn-secondary ghost-toggle" id="billar-btn-players" type="button" aria-pressed="false">👤 1 jugador</button>
+          <button class="btn-primary" id="billar-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="billar-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="billar-gameover-title">¡Mesa limpia!</h2>
+          <p id="billar-gameover-text"></p>
+          <button class="btn-primary" id="billar-btn-retry">Jugar de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" id="billar-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="screen-salto" class="screen game-screen hidden">
     <div id="salto-hud" class="hud">
       <div class="hud-left">

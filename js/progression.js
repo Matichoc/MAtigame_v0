@@ -15,7 +15,7 @@ import { isUnlocked } from "./unlocks.js";
 // ---------- partidas ----------
 
 /** Puntaje que equivale a 1 Matipunto al terminar una partida (cada juego puntúa distinto). */
-export const RUN_DIVISOR = { tetris: 40, basquet_tiros: 12, porristas: 8, salto: 25, autos: 30, memoria: 10, parkour: 40, futbol: 10, dulces: 15, merge: 300, aventura: 20, ciudad: 12, pichanga: 10, basquet2v2: 6, minigolf: 15, lanchas: 25, avioneta: 25, torre: 12 };
+export const RUN_DIVISOR = { tetris: 40, basquet_tiros: 12, porristas: 8, salto: 25, autos: 30, memoria: 10, parkour: 40, futbol: 10, dulces: 15, merge: 300, aventura: 20, ciudad: 12, pichanga: 10, basquet2v2: 6, billar: 15, minigolf: 15, lanchas: 25, avioneta: 25, torre: 12 };
 const RUN_BONUS_CAP = 60;
 
 export function runBonus(gameId, score) {
@@ -29,6 +29,7 @@ export const GAME_NAMES = {
   porristas: "Saltos de Porristas", creador: "Crea tu Chocolate", fps3d: "Choco Blaster",
   futbol: "Fútbol Choco", dulces: "Choco Match", merge: "Mati Merge", aventura: "Aventura Choco", ciudad: "Ciudad Choco",
   pichanga: "Pichanga Choco", basquet2v2: "Básquet 2 contra 2",
+  billar: "Billar de Bombones",
   minigolf: "Minigolf en la Playa",
   lanchas: "Lanchas en el Lago",
   avioneta: "Avioneta Choco",

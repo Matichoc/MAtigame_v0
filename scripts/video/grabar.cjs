@@ -236,6 +236,76 @@ const ESCENAS = {
     await grabar(p, "minigolf", 22, jugador);
   },
 
+  /** Billar de bombones (verano): un jugador automático que prueba tiros "en la cabeza" y elige el que mete más
+   * bombones sin que caiga el blanco; se ve la flecha un momento antes de cada golpe. */
+  async billar(p) {
+    await perfil(p);
+    await abrirJuego(p, "Billar de Bombones", "#billar-btn-start", "billar");
+    await p.evaluate(async () => {
+      window.__reloj.encender();
+      const m = await import("/js/verano-kit.js");
+      window.__setArrow = (g, dir, pw) => m.setAimArrow(g.arrow, g.cue.mesh.position, dir, pw, 1.6);
+      const W = 2.4, L = 4.4, BR = 0.12, PR = 0.19, P = [[-W / 2, -L / 2], [W / 2, -L / 2], [-W / 2, 0], [W / 2, 0], [-W / 2, L / 2], [W / 2, L / 2]];
+      window.__billSim = (g, dx, dz, v) => {
+        const bs = g.balls.filter((b) => !b.in).map((b) => ({ x: b.x, z: b.z, vx: b.cue ? dx * v : 0, vz: b.cue ? dz * v : 0, cue: b.cue, in: false }));
+        let got = 0, scratch = false;
+        for (let step = 0; step < 900; step++) {
+          const sdt = 1 / 360;
+          let moving = false;
+          for (const b of bs) {
+            if (b.in) continue;
+            const sp = Math.hypot(b.vx, b.vz);
+            if (sp > 0) { const ns = Math.max(0, sp - (0.7 + sp * 0.22) * sdt); b.vx *= ns / sp; b.vz *= ns / sp; }
+            if (sp > 0.03) moving = true;
+            b.x += b.vx * sdt; b.z += b.vz * sdt;
+            for (const [px, pz] of P) if (Math.hypot(b.x - px, b.z - pz) < PR) { b.in = true; if (b.cue) scratch = true; else got++; break; }
+            const X = W / 2 - BR, Z = L / 2 - BR;
+            if (b.x < -X) { b.x = -X; b.vx = Math.abs(b.vx) * 0.8; } if (b.x > X) { b.x = X; b.vx = -Math.abs(b.vx) * 0.8; }
+            if (b.z < -Z) { b.z = -Z; b.vz = Math.abs(b.vz) * 0.8; } if (b.z > Z) { b.z = Z; b.vz = -Math.abs(b.vz) * 0.8; }
+          }
+          for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) {
+            const a = bs[i], c = bs[j];
+            if (a.in || c.in) continue;
+            const ex = c.x - a.x, ez = c.z - a.z, d = Math.hypot(ex, ez);
+            if (d >= 2 * BR || d === 0) continue;
+            const nx = ex / d, nz = ez / d, o = 2 * BR - d;
+            a.x -= nx * o / 2; a.z -= nz * o / 2; c.x += nx * o / 2; c.z += nz * o / 2;
+            const rv = (c.vx - a.vx) * nx + (c.vz - a.vz) * nz;
+            if (rv < 0) { const imp = -rv * 0.97; a.vx -= imp * nx; a.vz -= imp * nz; c.vx += imp * nx; c.vz += imp * nz; }
+          }
+          if (!moving) break;
+        }
+        return got - (scratch ? 2 : 0);
+      };
+      window.__billPlan = (g) => {
+        let best = null;
+        for (let a = 0; a < 90; a++) for (const pw of [0.35, 0.55, 0.75, 0.95]) {
+          const ang = (a / 90) * Math.PI * 2, dx = Math.sin(ang), dz = Math.cos(ang);
+          const v = window.__billSim(g, dx, dz, 0.6 + pw * (6.5 - 0.6));
+          if (!best || v > best.v) best = { v, dx, dz, pw };
+        }
+        return best;
+      };
+    });
+    let espera = 0, plan = null;
+    const jugador = async () => {
+      if (espera > 0) { espera--; return; }
+      const ok = await p.evaluate(() => { const g = window.__g3d.billar; return g.state === "playing" && g.still; });
+      if (!ok) { plan = null; return; }
+      if (!plan) {
+        plan = await p.evaluate(() => window.__billPlan(window.__g3d.billar));
+        await p.evaluate((b) => { const g = window.__g3d.billar; const V = g.cue.mesh.position.constructor; window.__setArrow(g, new V(b.dx, 0, b.dz), b.pw); }, plan);
+        espera = 18;
+        return;
+      }
+      await p.evaluate((b) => { const g = window.__g3d.billar; const V = g.cue.mesh.position.constructor; g._shoot(new V(b.dx, 0, b.dz), b.pw); }, plan);
+      plan = null;
+      espera = 8;
+    };
+    await calentar(p, 0.6, jugador);
+    await grabar(p, "billar", 20, jugador);
+  },
+
   /** Paseo por el Pueblo renovado, en monopatín, con la cámara girando despacio. */
   async pueblo(p) {
     await perfil(p, { lagoPendiente: false });
