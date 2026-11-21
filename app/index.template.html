@@ -1129,6 +1129,53 @@
     </div>
   </section>
 
+  <section id="screen-minigolf" class="screen game-screen hidden">
+    <div id="minigolf-hud" class="hud">
+      <div class="hud-left">
+        <button id="minigolf-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="minigolf-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level" id="minigolf-hud-title">Minigolf en la Playa</div>
+          <div class="hud-mission" id="minigolf-hud-sub">Arrastra hacia atrás y suelta para golpear</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">⛳ <span id="minigolf-hud-hole">1/9</span></div>
+        <div class="hud-chip">🏌️ <span id="minigolf-hud-strokes">0</span></div>
+        <div class="hud-chip">Σ <span id="minigolf-hud-total">0</span></div>
+        <div class="hud-chip">⭐ <span id="minigolf-hud-score">0</span></div>
+        <button id="minigolf-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="minigolf-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="minigolf-canvas"></canvas>
+      <div id="minigolf-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="minigolf-popups" class="fps-popups" aria-hidden="true"></div>
+
+      <div id="minigolf-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Minigolf en la Playa</h2>
+          <p class="fps-tag">Nuevo ☀️ Verano</p>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>Arrastra el dedo (o el mouse) hacia atrás, como una honda: la flecha muestra hacia dónde va la pelota y su color, la fuerza. Suelta para golpear. Mete la pelota en el hoyo con la menor cantidad de golpes: la arena la frena, los bordes y los castillos la hacen rebotar y los cangrejos se mueven. Son 9 hoyos. Con «2 jugadores» juegan por turnos en el mismo celular y gana el que hace menos golpes. ¡Un hoyo en uno vale 150 puntos extra!</p>
+          </details>
+          <button class="btn-secondary ghost-toggle" id="minigolf-btn-players" type="button" aria-pressed="false">👤 1 jugador</button>
+          <button class="btn-primary" id="minigolf-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="minigolf-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="minigolf-gameover-title">¡Terminaste los 9 hoyos!</h2>
+          <p id="minigolf-gameover-text"></p>
+          <button class="btn-primary" id="minigolf-btn-retry">Jugar de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" id="minigolf-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="screen-salto" class="screen game-screen hidden">
     <div id="salto-hud" class="hud">
       <div class="hud-left">

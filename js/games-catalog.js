@@ -181,6 +181,15 @@ const ALL_GAMES = [
     status: "available",
     tag: "Nuevo ☀️ Verano",
   },
+  {
+    id: "minigolf",
+    orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
+    name: "Minigolf en la Playa",
+    icon: "⛳",
+    tagline: "9 hoyos en la playa con castillos de arena, palmeras y cangrejos. ¡Juega de a 2 por turnos en el mismo celular!",
+    status: "available",
+    tag: "Nuevo ☀️ Verano",
+  },
 ];
 
 export const GAMES_CATALOG = ALL_GAMES.filter((g) => !(IN_APP && g.appHidden));

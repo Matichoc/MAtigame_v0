@@ -68,6 +68,7 @@ const screen3d = {
   creador: document.getElementById("screen-creador"),
   pichanga: document.getElementById("screen-pichanga"),
   basquet2v2: document.getElementById("screen-bq2"),
+  minigolf: document.getElementById("screen-minigolf"),
   lanchas: document.getElementById("screen-lanchas"),
   avioneta: document.getElementById("screen-avioneta"),
   torre: document.getElementById("screen-torre"),
@@ -94,7 +95,7 @@ function goNextLevel(game) {
   game.nextLevel();
 }
 
-const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, merge: null, aventura: null, ciudad: null, creador: null, pichanga: null, basquet2v2: null, lanchas: null, avioneta: null, torre: null };
+const instances = { town: null, parkour: null, recolecta: null, tetris: null, basquet_tiros: null, porristas: null, fps: null, salto: null, autos: null, memoria: null, futbol: null, dulces: null, merge: null, aventura: null, ciudad: null, creador: null, pichanga: null, basquet2v2: null, minigolf: null, lanchas: null, avioneta: null, torre: null };
 
 let toastTimer = null;
 function showToast(message, ms = 2600) {
@@ -2614,6 +2615,7 @@ const GAMES_3D = {
   creador: { module: "./creador-game.js", cls: "CreadorGame", hud: ["score", "count", "coins"] },
   pichanga: { module: "./pichanga-game.js", cls: "PichangaGame", hud: [] },
   basquet2v2: { module: "./basquet2v2-game.js", cls: "Basquet2v2Game", hud: [], prefix: "bq2" },
+  minigolf: { module: "./minigolf-game.js", cls: "MinigolfGame", hud: ["hole", "strokes", "total", "score"] },
   lanchas: { module: "./lanchas-game.js", cls: "LanchasGame", hud: ["score", "dist", "speed", "hearts", "coins"] },
   avioneta: { module: "./avioneta-game.js", cls: "AvionetaGame", hud: ["score", "dist", "hearts", "combo", "coins"] },
   torre: { module: "./torre-game.js", cls: "TorreGame", hud: ["score", "floors", "hearts", "combo", "coins"] },

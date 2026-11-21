@@ -31,6 +31,7 @@ export const ENERGY_COST = {
   pichanga: 4, basquet2v2: 4, // partidos de los deportes nuevos: solo la entrada (sin gasto por acción)
   ciudad: 0, // explorar es gratis; cada misión cuesta ENERGY_MISSION
   town: 0, creador: 0,
+  minigolf: 4,
   lanchas: 6,
   avioneta: 6,
   torre: 4,
@@ -40,6 +41,7 @@ export const ENERGY_RULE = {
   basquet_tiros: "1 por tiro", futbol: "1 por tiro", tetris: "1 cada 4 piezas", dulces: "1 por movimiento",
   memoria: "1 cada 2 intentos", autos: "1 cada 250 m", parkour: "1 cada 60 m", salto: "1 cada 15 m alto",
   porristas: "1 cada 2 figuras", recolecta: "1 cada 12 s", aventura: "1 cada 20 s", merge: "1 por producto nuevo",
+  minigolf: "1 cada 3 golpes",
   lanchas: "1 cada 250 m",
   avioneta: "1 cada 150 m",
   torre: "1 cada 8 pisos",

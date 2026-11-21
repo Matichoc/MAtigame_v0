@@ -168,6 +168,74 @@ const ESCENAS = {
     await grabar(p, "lanchas", 16, piloto);
   },
 
+  /** Minigolf en la playa (verano): un jugador automático que prueba tiros "en la cabeza" y elige el que deja la
+   * pelota más cerca del hoyo; se ve la flecha de apuntar un momento antes de cada golpe. */
+  async minigolf(p) {
+    await perfil(p);
+    await abrirJuego(p, "Minigolf en la Playa", "#minigolf-btn-start", "minigolf");
+    await p.evaluate(() => {
+      window.__reloj.encender();
+      // simulación simple de un tiro (misma física del juego, sin los cangrejos moviéndose)
+      window.__golfSim = (g, dx, dz, v) => {
+        const h = g.hole, R = 0.14;
+        let x = g.bx, z = g.bz, vx = dx * v, vz = dz * v;
+        const cl = (a, lo, hi) => Math.max(lo, Math.min(hi, a));
+        for (let i = 0; i < 1200; i++) {
+          const sdt = 1 / 240, sp = Math.hypot(vx, vz);
+          if (sp < 0.06) break;
+          let fr = 2.4 + sp * 0.35;
+          for (const [sx, sz, w, d] of h.sand || []) if (Math.abs(x - sx) < w / 2 && Math.abs(z - sz) < d / 2) fr = 9 + sp * 1.5;
+          const ns = Math.max(0, sp - fr * sdt); vx *= ns / sp; vz *= ns / sp;
+          x += vx * sdt; z += vz * sdt;
+          const X = h.w / 2 - R, Z = h.d / 2 - R;
+          if (x < -X) { x = -X; vx = Math.abs(vx) * 0.78; } if (x > X) { x = X; vx = -Math.abs(vx) * 0.78; }
+          if (z < -Z) { z = -Z; vz = Math.abs(vz) * 0.78; } if (z > Z) { z = Z; vz = -Math.abs(vz) * 0.78; }
+          for (const [rx, rz, w, d] of h.walls || []) {
+            const px = cl(x, rx - w / 2, rx + w / 2), pz = cl(z, rz - d / 2, rz + d / 2), ex = x - px, ez = z - pz, dd = Math.hypot(ex, ez);
+            if (dd < R && dd > 0) { const nx = ex / dd, nz = ez / dd; x = px + nx * R; z = pz + nz * R; const vn = vx * nx + vz * nz; if (vn < 0) { vx -= 1.78 * vn * nx; vz -= 1.78 * vn * nz; } }
+          }
+          for (const [cx, cz, r] of [...(h.round || []), ...g.crabs.map((c) => [c.x, c.z, c.r])]) {
+            const ex = x - cx, ez = z - cz, dd = Math.hypot(ex, ez), m = r + R;
+            if (dd < m && dd > 0) { const nx = ex / dd, nz = ez / dd; x = cx + nx * m; z = cz + nz * m; const vn = vx * nx + vz * nz; if (vn < 0) { vx -= 1.75 * vn * nx; vz -= 1.75 * vn * nz; } }
+          }
+          const dc = Math.hypot(x - h.cup[0], z - h.cup[1]);
+          if (dc < 0.24 && Math.hypot(vx, vz) < 4.2) return 0;
+        }
+        return Math.hypot(x - h.cup[0], z - h.cup[1]);
+      };
+      window.__golfPlan = (g) => {
+        let best = null;
+        for (let a = 0; a < 72; a++) for (let k = 1; k <= 12; k++) {
+          const ang = (a / 72) * Math.PI * 2, dx = Math.sin(ang), dz = Math.cos(ang), pw = k / 12;
+          const d = window.__golfSim(g, dx, dz, 1.2 + pw * (9.5 - 1.2));
+          if (!best || d < best.d - 1e-6) best = { d, dx, dz, pw };
+        }
+        return best;
+      };
+    });
+    let espera = 0, plan = null;
+    const jugador = async () => {
+      if (espera > 0) { espera--; return; }
+      const st = await p.evaluate(() => { const g = window.__g3d.minigolf; return { ok: g.state === "playing" && g.ballStill && !g.inCup }; });
+      if (!st.ok) { plan = null; return; }
+      if (!plan) {
+        plan = await p.evaluate(() => { const g = window.__g3d.minigolf; const b = window.__golfPlan(g); g.onAimShow = b; return b; });
+        await p.evaluate((b) => { const g = window.__g3d.minigolf; const THREE = g.ball.position.constructor; const dir = new THREE(b.dx, 0, b.dz); window.__setArrow(g, dir, b.pw); }, plan);
+        espera = 18; // se ve la flecha ~0,6 s
+        return;
+      }
+      await p.evaluate((b) => { const g = window.__g3d.minigolf; const THREE = g.ball.position.constructor; g._shoot(new THREE(b.dx, 0, b.dz), b.pw); }, plan);
+      plan = null;
+      espera = 6;
+    };
+    await p.evaluate(async () => {
+      const m = await import("/js/verano-kit.js");
+      window.__setArrow = (g, dir, pw) => m.setAimArrow(g.arrow, g.ball.position, dir, pw);
+    });
+    await calentar(p, 0.6, jugador);
+    await grabar(p, "minigolf", 22, jugador);
+  },
+
   /** Paseo por el Pueblo renovado, en monopatín, con la cámara girando despacio. */
   async pueblo(p) {
     await perfil(p, { lagoPendiente: false });
