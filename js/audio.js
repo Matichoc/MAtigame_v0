@@ -271,6 +271,15 @@ export function latency() {
   return (ctx.outputLatency || 0) + (ctx.baseLatency || 0);
 }
 
+/** Golpe de cine para los momentos de gloria (gol, canasta, hoyo en uno): un bombo grave, un soplido y un brillo que sube. */
+export function playGlory() {
+  if (muted) return;
+  tone(70, 0.55, "sine", 0.5);
+  tone(105, 0.4, "sine", 0.25);
+  noise(0.45, 0.1, 5200);
+  [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, 0.3, "triangle", 0.1, 0.1 + i * 0.07));
+}
+
 export function playStar() {
   [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.18, "triangle", 0.13, i * 0.08));
 }

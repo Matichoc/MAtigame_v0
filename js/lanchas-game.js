@@ -315,6 +315,7 @@ export class LanchasGame extends Game3D {
         if (Math.abs(dx) < 1.4 && Math.abs(dz) < 1.2 && this.by === 0) {
           t.done = true; this.vy = 11; this.by = 0.01; this.jumps++; this.score += 40;
           this.banner("¡Al aire! 🌊"); audio.playJump(); this.haptic(25);
+          this.glory(null, { slow: 0.5, hold: 0.5, zoom: 0.12, sound: false });
         }
       } else if (this.by < 0.6 && dx * dx + dz * dz < (t.r + 0.75) ** 2) {
         t.done = true;

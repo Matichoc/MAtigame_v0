@@ -195,7 +195,7 @@ export class TorreGame extends Game3D {
       this.banner("✨ ¡Alfajor Mati Dubai! +10 Matipuntos");
       audio.playBonusCollect();
     }
-    if (this.floors % 10 === 0) { this.banner(`🏆 ¡${this.floors} pisos!`); audio.playStar(); this.cheer = 1.5; }
+    if (this.floors % 10 === 0) { this.banner(`🏆 ¡${this.floors} pisos!`); audio.playStar(); this.cheer = 1.5; this.glory(new THREE.Vector3(0, this.topY, 0), { slow: 1, hold: 0.7, zoom: 0.16 }); }
     this.cur = null;
     this.haptic(perfect ? 25 : 12);
     this.countEnergy("pisos", 8); // 1 de energía cada 8 pisos

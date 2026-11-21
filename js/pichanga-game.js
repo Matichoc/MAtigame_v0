@@ -261,7 +261,7 @@ export class PichangaGame extends MatchGame {
       const gx = e.team === 0 ? L / 2 : -L / 2;
       this.banner(mine ? "⚽ ¡GOOOL!" : `Gol de ${this.rival().name}`);
       this.particles.burst(new THREE.Vector3(gx, 1.2, 0), mine ? [0xffc800, 0xd4216c, 0xffffff] : [0xaaaaaa, 0xffffff], mine ? 40 : 14, 6, 1.2, 5, 1.2);
-      if (mine) { audio.playCombo(3); this.haptic(70); } else audio.playBump();
+      if (mine) { audio.playCombo(3); this.haptic(70); this.glory(new THREE.Vector3(gx * 0.9, 1.2, 0)); } else audio.playBump();
       for (let i = 0; i < 6; i++) this.models[i].mood = m.players[i].team === e.team ? "cheer" : "sad";
       this._moodT = 2.2;
     } else if (e.type === "save") {

@@ -28,6 +28,8 @@ async function abrir() {
   // 960×540 con densidad 2 = cuadros de 1920×1080 (el juego se ve como en un celular acostado, con sus botones táctiles)
   const ctx = await b.newContext({ viewport: { width: 960, height: 540 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
   await ctx.addInitScript(RELOJ);
+  // sin la ventana del regalo de fundador (js/founder.js), que tapa los botones del menú
+  await ctx.addInitScript(() => { try { localStorage.setItem("matichoc_sin_regalo_fundador", "1"); } catch (e) { /* nada */ } });
   // el "jugador humano" de las pruebas maneja los partidos (se sirve desde el repo, sin copiarlo a la app)
   await ctx.route("**/__video/jugador-humano.js", (r) => r.fulfill({ contentType: "text/javascript", body: fs.readFileSync(BOT, "utf8").replace(/\.\.\/\.\.\/js\//g, "/js/") }));
   const p = await ctx.newPage();

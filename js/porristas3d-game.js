@@ -548,6 +548,7 @@ export class Porristas3DGame extends Game3D {
       if (h.label === "¡Ta-dá!") {
         this.cheer = 1;
         audio.playStar();
+        this.glory(new THREE.Vector3(0, PYR_TOP_Y + 0.4, 0), { slow: 1, hold: 0.9, zoom: 0.2 });
         this.particles.burst(new THREE.Vector3(0, PYR_TOP_Y + 1, 0.4), [0xffc800, 0xd4216c, 0x2fa8d6, 0xfff6e6], 40, 6, 1.2, 5, 1.3);
         if (this.parts.find((p) => p.hits.includes(h)).hits.every((x) => x.res && x.res !== "miss")) {
           earnCoins(this.progress, 10); // pirámide sin errores: premio como el pompón dorado de antes

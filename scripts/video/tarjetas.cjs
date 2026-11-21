@@ -67,6 +67,7 @@ const PREPARAR = {
   const b = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || "/opt/pw-browsers/chromium",
     args: ["--use-gl=angle", "--use-angle=d3d11", "--ignore-gpu-blocklist", "--enable-gpu"] });
   const p = await (await b.newContext({ viewport: { width: 1100, height: 620 }, deviceScaleFactor: 1.5, hasTouch: true, isMobile: true })).newPage();
+  await p.context().addInitScript(() => { try { localStorage.setItem("matichoc_sin_regalo_fundador", "1"); } catch (e) { /* nada */ } });
   await p.goto(BASE + "?debug3d", { waitUntil: "networkidle" });
   await p.evaluate(() => localStorage.clear());
   await p.reload({ waitUntil: "networkidle" });

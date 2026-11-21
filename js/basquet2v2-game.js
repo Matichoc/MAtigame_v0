@@ -245,7 +245,7 @@ export class Basquet2v2Game extends MatchGame {
     if (e.type === "score") {
       this.banner(mine ? (e.pts === 3 ? "🔥 ¡TRIPLE!" : "🏀 ¡Canasta!") : `Canasta de ${this.rival().name}`);
       this.particles.burst(rim, mine ? [0xffc800, 0xd4216c, 0xffffff] : [0xaaaaaa, 0xffffff], mine ? 30 : 10, 4, 1, 4, 1);
-      if (mine) { audio.playCombo(e.pts); this.haptic(60); } else audio.playBump();
+      if (mine) { audio.playCombo(e.pts); this.haptic(60); this.glory(rim, { hold: e.pts === 3 ? 0.75 : 0.45, zoom: 0.2 }); } else audio.playBump();
       this.netT = 0.6;
       for (let i = 0; i < 4; i++) this.models[i].mood = m.players[i].team === e.team ? "cheer" : null;
       this._moodT = 1.4;

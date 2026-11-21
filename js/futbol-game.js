@@ -1153,6 +1153,7 @@ export class FutbolGame extends Game3D {
       this.particles.burst(new THREE.Vector3(info.x, info.y, -0.6), [0xffc800, 0xd4216c, 0xfff6e6, 0x35f0ff], 36, 6, 1, 4);
       audio.playMissionComplete();
       audio.playCombo(this.streak);
+      this.glory(new THREE.Vector3(info.x, info.y, -0.6), { hold: diana || corner ? 0.7 : 0.45, zoom: 0.18 });
       this.shake = 0.12;
       this.haptic(40);
     } else {

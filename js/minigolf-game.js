@@ -327,8 +327,9 @@ export class MinigolfGame extends Game3D {
       const diff = this.strokes - h.par;
       const msg = this.strokes === 1 ? "⛳ ¡HOYO EN UNO!" : diff <= -2 ? "🦅 ¡Águila!" : diff === -1 ? "🐦 ¡Birdie!" : diff === 0 ? "👍 ¡Par!" : `+${diff} sobre el par`;
       this.banner(msg);
-      if (this.strokes === 1) { this.holesInOne++; celebrate({ big: true }); audio.playVictory(); this.haptic(80); }
-      else if (diff <= 0) { audio.playStar(); celebrate(); }
+      const cupAt = new THREE.Vector3(h.cup[0], 0.3, h.cup[1]);
+      if (this.strokes === 1) { this.holesInOne++; celebrate({ big: true }); audio.playVictory(); this.haptic(80); this.glory(cupAt, { slow: 0.5, hold: 0.9, zoom: 0.3 }); }
+      else if (diff <= 0) { audio.playStar(); celebrate(); if (diff < 0) this.glory(cupAt, { slow: 0.6, hold: 0.5, zoom: 0.22 }); }
       else audio.playCollect();
       this.particles.burst(new THREE.Vector3(h.cup[0], 0.3, h.cup[1]), [0xffc800, 0xd4216c, 0xfff6e6], 24, 4, 0.7, 4);
       this.cheer = 1.6;

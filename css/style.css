@@ -927,6 +927,12 @@ h1, h2, h3 {
 .g3d-tbtn:active { background: rgba(212,33,108,0.95); }
 .g3d-stars { font-size: 2.4rem; letter-spacing: 6px; color: var(--dorado); text-shadow: 0 0 12px rgba(255,200,0,0.6), 2px 2px 0 var(--marron-osc); margin-bottom: 8px; }
 .g3d-stars .off { color: rgba(255,255,255,0.22); text-shadow: none; }
+/* Franjas de cine de los momentos de gloria (Game3D.glory en js/three-kit.js): solo cambian de alto */
+.cine-bar { position: absolute; left: 0; right: 0; height: 0; background: #000; pointer-events: none; z-index: 3; transition: height 0.16s ease-out; }
+.cine-bar.cine-top { top: 0; }
+.cine-bar.cine-bottom { bottom: 0; }
+.cine-bar.on { height: 9%; }
+@media (prefers-reduced-motion: reduce) { .cine-bar { display: none; } }
 /* Regalo de fundador (js/founder.js) */
 .founder-card { max-width: 560px; text-align: center; }
 .founder-card p { margin: 6px 0 12px; line-height: 1.35; }

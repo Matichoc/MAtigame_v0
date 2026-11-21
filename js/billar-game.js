@@ -208,6 +208,8 @@ export class BillarGame extends Game3D {
     this.haptic(30);
     this.cheer = 1.2;
     this.banner(this.shotPocketed > 1 ? `¡Doble! x${this.shotPocketed}` : "¡Adentro! 🍫");
+    const left = this.balls.filter((x) => !x.in && !x.cue).length;
+    if (this.shotPocketed > 1 || left === 0) this.glory(b.mesh.position, { slow: 0.35, hold: 0.6, zoom: 0.2 });
     this._updateHud();
   }
 

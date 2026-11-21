@@ -313,6 +313,7 @@ export class AvionetaGame extends Game3D {
             audio.playStar(); this.haptic(20);
             this.particles.burst(new THREE.Vector3(t.x, t.y, 0), [0xffc800, 0xfff6e6, 0xd4216c], 20, 4, 0.6, 2);
             if (this.combo > 1) this.banner(`¡Aro x${this.combo}!`);
+            if (this.combo >= 3 && this.combo % 3 === 0) this.glory(null, { slow: 0.45, hold: 0.45, zoom: 0.12 });
             t.mesh.material = this.ringMat; t.mesh.scale.setScalar(1.25);
           } else { this.combo = 0; }
         }

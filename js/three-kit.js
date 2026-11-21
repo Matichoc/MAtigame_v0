@@ -708,6 +708,79 @@ export class Game3D {
     el.classList.add("show");
   }
 
+  /**
+   * Momento de gloria (gol, canasta, hoyo en uno...): por un instante el juego va en cámara lenta, la cámara se acerca
+   * y gira hacia `focus`, aparecen las franjas de cine y suena un golpe. No usa efectos de pantalla completa: solo
+   * cambia el tiempo, el ángulo de la cámara y dos franjas de HTML, así que corre igual en celulares baratos.
+   * `slow` = velocidad del juego (1 = sin cámara lenta), `hold` = cuánto dura, `zoom` = cuánto se acerca (0 a 0,4).
+   */
+  glory(focus, { slow = 0.3, hold = 0.55, zoom = 0.22, bars = true, sound = true } = {}) {
+    if (this._gl) return; // ya hay uno en curso
+    let calm = false;
+    try { calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { /* sin matchMedia */ }
+    if (sound) audio.playGlory();
+    if (calm) return; // con "reducir movimiento": solo el sonido
+    this._gl = { focus: focus ? focus.clone() : null, slow, zoom, hold, t: 0, w: 0, fov: this.camera.fov };
+    if (bars) this._cineBars(true);
+  }
+
+  /** Avanza el momento de gloria con el tiempo REAL y devuelve a qué velocidad corre el juego (1 = normal). */
+  _gloryStep(real) {
+    const g = this._gl;
+    if (!g) return 1;
+    const IN = 0.12, OUT = 0.45;
+    g.t += real;
+    const ease = (x) => x * x * (3 - 2 * x);
+    if (g.t < IN) g.w = ease(g.t / IN);
+    else if (g.t < IN + g.hold) g.w = 1;
+    else if (g.t < IN + g.hold + OUT) g.w = 1 - ease((g.t - IN - g.hold) / OUT);
+    else {
+      this._gloryEnd();
+      return 1;
+    }
+    return 1 + (g.slow - 1) * g.w;
+  }
+
+  /** Termina el momento de gloria y deja la cámara como la tenía el juego. */
+  _gloryEnd() {
+    const g = this._gl;
+    if (!g) return;
+    this.camera.fov = g.fov;
+    this.camera.updateProjectionMatrix();
+    if (g.lastQ && this.camera.quaternion.equals(g.lastQ)) this.camera.quaternion.copy(g.baseQ);
+    this._gl = null;
+    this._cineBars(false);
+  }
+
+  /** Después de que el juego puso su cámara: acercamiento y giro hacia el punto del momento de gloria. */
+  _gloryCamera() {
+    const g = this._gl;
+    if (!g || g.w <= 0) return;
+    this.camera.fov = g.fov * (1 - g.zoom * g.w);
+    this.camera.updateProjectionMatrix();
+    if (g.focus) {
+      // Si el juego no movió su cámara en este cuadro (cámara fija, como la del billar), se parte de su ángulo
+      // original y no del que dejó el cuadro anterior: si no, el giro se iría sumando.
+      if (g.lastQ && this.camera.quaternion.equals(g.lastQ)) this.camera.quaternion.copy(g.baseQ);
+      g.baseQ = this.camera.quaternion.clone();
+      this.camera.lookAt(g.focus);
+      const q1 = this.camera.quaternion.clone();
+      this.camera.quaternion.copy(g.baseQ).slerp(q1, 0.7 * g.w);
+      g.lastQ = this.camera.quaternion.clone();
+    }
+  }
+
+  /** Franjas negras de cine arriba y abajo del escenario (dos tiras de HTML que entran y salen). */
+  _cineBars(on) {
+    const wrap = this.els.wrap;
+    if (!wrap) return;
+    if (!this._bars) {
+      this._bars = ["top", "bottom"].map((k) => { const d = document.createElement("div"); d.className = `cine-bar cine-${k}`; d.setAttribute("aria-hidden", "true"); wrap.appendChild(d); return d; });
+      void wrap.offsetWidth; // para que la primera vez también entren deslizándose
+    }
+    for (const b of this._bars) b.classList.toggle("on", on);
+  }
+
   /** Vibración corta en el celular (golpes, premios). */
   haptic(ms = 30) {
     vibrate(ms); // en la app: vibración nativa (también en iPhone); en la web: navigator.vibrate si existe
@@ -728,6 +801,7 @@ export class Game3D {
 
   pauseForMenu() {
     audio.stopMusic();
+    this._gloryEnd();
     if (this.running) reportScore(this.progress, this.gameId, this.score || 0);
     this._held = false;
     this.running = false;
@@ -817,7 +891,7 @@ export class Game3D {
     this.renderer.__glUse = ts; // es el juego en uso: si hace falta soltar un contexto, que sea otro (ver glEvict)
     if (this._held) { this.lastTs = null; requestAnimationFrame(this._loop); return; } // en pausa: quieto, sin gastar
     if (this.lastTs == null) this.lastTs = ts;
-    const dt = Math.min(0.05, (ts - this.lastTs) / 1000);
+    let dt = Math.min(0.05, (ts - this.lastTs) / 1000);
     this.lastTs = ts;
     if (this._freeze > 0) {
       this._freeze -= dt;
@@ -826,9 +900,12 @@ export class Game3D {
       requestAnimationFrame(this._loop);
       return;
     }
+    const real = dt;
+    dt *= this._gloryStep(real); // momento de gloria: el juego corre más lento un instante (ver glory)
     this.time += dt;
-    this._adaptQuality(dt);
+    this._adaptQuality(real);
     this.update(dt);
+    this._gloryCamera();
     this._missionTick(dt);
     if (this.state === "playing" && this.energyEvery) {
       // juegos de correr/avanzar sin acciones claras: gastan 1 cada cierto tiempo
