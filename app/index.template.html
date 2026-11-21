@@ -1030,6 +1030,54 @@
     </div>
   </section>
 
+  <section id="screen-avioneta" class="screen game-screen hidden">
+    <div id="avioneta-hud" class="hud">
+      <div class="hud-left">
+        <button id="avioneta-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="avioneta-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level" id="avioneta-hud-title">Avioneta Choco</div>
+          <div class="hud-mission" id="avioneta-hud-sub">Mantén apretado para subir y pasa por los aros</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">⭐ <span id="avioneta-hud-score">0</span></div>
+        <div class="hud-chip">✈️ <span id="avioneta-hud-dist">0 m</span></div>
+        <div class="hud-chip">❤ <span id="avioneta-hud-hearts">❤❤❤</span></div>
+        <div class="hud-chip">🔥 <span id="avioneta-hud-combo">x1</span></div>
+        <div class="hud-chip">🍫✨ <span id="avioneta-hud-coins">0</span></div>
+        <button id="avioneta-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="avioneta-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="avioneta-canvas"></canvas>
+      <div id="avioneta-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="avioneta-popups" class="fps-popups" aria-hidden="true"></div>
+
+      <div id="avioneta-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Avioneta Choco</h2>
+          <p class="fps-tag">Nuevo ☀️ Verano</p>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>Mantén apretada la pantalla (o ESPACIO / ↑) para subir y suelta para bajar. Pasa por los aros dorados: cada aro seguido suma combo. Junta los alfajores y esquiva los globos y las gaviotas. Si tocas el agua o chocas pierdes un ❤ (tienes 3). La avioneta va cada vez más rápido: ¿hasta cuántos metros llegas?</p>
+          </details>
+
+          <button class="btn-primary" id="avioneta-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="avioneta-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="avioneta-gameover-title">¡Aterrizaje forzoso!</h2>
+          <p id="avioneta-gameover-text"></p>
+          <button class="btn-primary" id="avioneta-btn-retry">Jugar de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" id="avioneta-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="screen-salto" class="screen game-screen hidden">
     <div id="salto-hud" class="hud">
       <div class="hud-left">

@@ -14,6 +14,7 @@ export const UNLOCK_COST = {
   dulces: UNLOCK_PRICE,
   aventura: UNLOCK_PRICE,
   ciudad: UNLOCK_PRICE,
+  avioneta: UNLOCK_PRICE, // juego de verano (v1.2)
   torre: UNLOCK_PRICE, // juego de verano (v1.2)
 };
 

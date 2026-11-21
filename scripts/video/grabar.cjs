@@ -121,6 +121,26 @@ const ESCENAS = {
     await grabar(p, "torre", 16, jugar);
   },
 
+  /** Avioneta Choco (verano): piloto automático que busca el próximo aro (y los alfajores) y esquiva lo demás. */
+  async avioneta(p) {
+    await perfil(p);
+    await abrirJuego(p, "Avioneta Choco", "#avioneta-btn-start", "avioneta");
+    await p.evaluate(() => window.__reloj.encender());
+    const piloto = () => p.evaluate(() => {
+      const g = window.__g3d.avioneta;
+      if (g.state !== "playing") return;
+      const next = g.things.filter((t) => !t.done && t.x > g.x - 0.5 && (t.kind === "ring" || t.kind === "coin")).sort((a, b) => a.x - b.x)[0];
+      let target = next && next.x - g.x < 14 ? next.y : 5;
+      for (const t of g.things) { // si viene un globo o una gaviota a la altura del objetivo, pasa por arriba o por abajo
+        if (t.done || (t.kind !== "balloon" && t.kind !== "gull") || t.x < g.x || t.x - g.x > 9) continue;
+        if (Math.abs(t.y - target) < 2.2) target = t.y > 5 ? t.y - 2.6 : t.y + 2.6;
+      }
+      g.hold = g.y + g.vy * 0.3 < Math.max(2.4, target);
+    });
+    await calentar(p, 0.4, piloto);
+    await grabar(p, "avioneta", 16, piloto);
+  },
+
   /** Paseo por el Pueblo renovado, en monopatín, con la cámara girando despacio. */
   async pueblo(p) {
     await perfil(p, { lagoPendiente: false });

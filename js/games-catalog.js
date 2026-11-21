@@ -163,6 +163,15 @@ const ALL_GAMES = [
     status: "available",
     tag: "Nuevo ☀️ Verano",
   },
+  {
+    id: "avioneta",
+    orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
+    name: "Avioneta Choco",
+    icon: "✈️",
+    tagline: "Vuela sobre el mar de la playa: pasa por los aros dorados, junta alfajores y esquiva globos y gaviotas.",
+    status: "available",
+    tag: "Nuevo ☀️ Verano",
+  },
 ];
 
 export const GAMES_CATALOG = ALL_GAMES.filter((g) => !(IN_APP && g.appHidden));
