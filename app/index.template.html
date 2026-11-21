@@ -1078,6 +1078,57 @@
     </div>
   </section>
 
+  <section id="screen-lanchas" class="screen game-screen hidden">
+    <div id="lanchas-hud" class="hud">
+      <div class="hud-left">
+        <button id="lanchas-btn-menu" class="btn-icon" title="Volver al menú">🏠</button>
+        <img id="lanchas-hud-avatar" class="hud-avatar" alt="">
+        <div>
+          <div class="hud-level" id="lanchas-hud-title">Lanchas en el Lago</div>
+          <div class="hud-mission" id="lanchas-hud-sub">Esquiva las boyas y salta las olas</div>
+        </div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-chip">⭐ <span id="lanchas-hud-score">0</span></div>
+        <div class="hud-chip">🚤 <span id="lanchas-hud-dist">0 m</span></div>
+        <div class="hud-chip">💨 <span id="lanchas-hud-speed">43 km/h</span></div>
+        <div class="hud-chip">❤ <span id="lanchas-hud-hearts">❤❤❤</span></div>
+        <div class="hud-chip">🍫✨ <span id="lanchas-hud-coins">0</span></div>
+        <button id="lanchas-btn-mute" class="btn-icon" title="Silenciar sonido">🔊</button>
+      </div>
+    </div>
+
+    <div id="lanchas-canvas-wrap" class="canvas-wrap g3d-wrap">
+      <canvas id="lanchas-canvas"></canvas>
+      <div id="lanchas-banner" class="fps-banner" aria-live="polite"></div>
+      <div id="lanchas-popups" class="fps-popups" aria-hidden="true"></div>
+      <div class="g3d-touch" id="lanchas-touch">
+        <button class="g3d-tbtn" id="lanchas-btn-left" aria-label="Izquierda">◀</button>
+        <button class="g3d-tbtn" id="lanchas-btn-right" aria-label="Derecha">▶</button>
+      </div>
+
+      <div id="lanchas-overlay-intro" class="overlay hidden">
+        <div class="overlay-card">
+          <h2>Lanchas en el Lago</h2>
+          <p class="fps-tag">Nuevo ☀️ Verano</p>
+          <details class="how"><summary>📖 Cómo se juega</summary>
+          <p>La lancha avanza sola: muévela a los lados con ◀ ▶, las flechas o arrastrando el dedo sobre el agua. Esquiva las boyas y las rocas de chocolate, pasa por las olas celestes para saltar y junta los alfajores (también los que están en el aire). Cada choque quita un ❤ (tienes 3) y la lancha va cada vez más rápido. ¿Hasta cuántos metros llegas?</p>
+          </details>
+          <button class="btn-primary" id="lanchas-btn-start">¡Vamos!</button>
+        </div>
+      </div>
+
+      <div id="lanchas-overlay-gameover" class="overlay hidden">
+        <div class="overlay-card">
+          <h2 id="lanchas-gameover-title">¡La lancha quedó en pana!</h2>
+          <p id="lanchas-gameover-text"></p>
+          <button class="btn-primary" id="lanchas-btn-retry">Jugar de nuevo</button>
+          <button class="btn-secondary overlay-secondary-btn" id="lanchas-btn-gameover-menu">Volver al menú</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="screen-salto" class="screen game-screen hidden">
     <div id="salto-hud" class="hud">
       <div class="hud-left">

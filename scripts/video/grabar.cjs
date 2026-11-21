@@ -141,6 +141,33 @@ const ESCENAS = {
     await grabar(p, "avioneta", 16, piloto);
   },
 
+  /** Lanchas en el lago (verano): piloto automático que busca rampas y alfajores y esquiva boyas y rocas. */
+  async lanchas(p) {
+    await perfil(p);
+    await abrirJuego(p, "Lanchas en el Lago", "#lanchas-btn-start", "lanchas");
+    await p.evaluate(() => window.__reloj.encender());
+    const piloto = () => p.evaluate(() => {
+      const g = window.__g3d.lanchas;
+      if (g.state !== "playing") return;
+      const near = g.things.filter((t) => !t.done && t.z < g.bz && g.bz - t.z < 22);
+      // candidato: el x con menos peligro y más premios en los próximos metros
+      let best = g.bx, bestV = -1e9;
+      for (let x = -5; x <= 5; x += 0.5) {
+        let v = -Math.abs(x - g.bx) * 0.15;
+        for (const t of near) {
+          const d = Math.abs(t.x - x), w = 1 - (g.bz - t.z) / 26;
+          if (t.kind === "buoy" || t.kind === "rock") v -= d < 1.6 ? 10 * w : 0;
+          else if (t.kind === "ramp") v += d < 1.2 ? 3 * w : 0;
+          else if (t.kind === "coin") v += d < 0.9 ? 1 * w : 0;
+        }
+        if (v > bestV) { bestV = v; best = x; }
+      }
+      g.pointerX = best;
+    });
+    await calentar(p, 0.4, piloto);
+    await grabar(p, "lanchas", 16, piloto);
+  },
+
   /** Paseo por el Pueblo renovado, en monopatín, con la cámara girando despacio. */
   async pueblo(p) {
     await perfil(p, { lagoPendiente: false });

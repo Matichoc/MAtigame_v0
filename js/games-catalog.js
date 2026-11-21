@@ -172,6 +172,15 @@ const ALL_GAMES = [
     status: "available",
     tag: "Nuevo ☀️ Verano",
   },
+  {
+    id: "lanchas",
+    orient: "landscape", // "landscape" = hay que jugarlo con el celular acostado; "any" = sirve en vertical y horizontal
+    name: "Lanchas en el Lago",
+    icon: "🚤",
+    tagline: "Maneja tu lancha por el lago: esquiva boyas y rocas de chocolate, salta las olas y junta alfajores.",
+    status: "available",
+    tag: "Nuevo ☀️ Verano",
+  },
 ];
 
 export const GAMES_CATALOG = ALL_GAMES.filter((g) => !(IN_APP && g.appHidden));
