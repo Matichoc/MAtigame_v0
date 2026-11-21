@@ -49,6 +49,7 @@ const ENTRADAS = {
   basquet_tiros: { teclas: ["Space", "Space"] },
   futbol: { teclas: ["ArrowLeft", "Space", "ArrowRight"] },
   torre: { teclas: ["Space", "Space", "Space"] },
+  lanchas: { teclas: ["ArrowRight", "ArrowRight", "ArrowRight"] }, // solo a un lado: derecha e izquierda seguidas la dejaban casi donde mismo
   minigolf: { arrastres: [[[0.55, 0.5], [0.75, 0.55]]], teclas: [] },
   billar: { arrastres: [[[0.5, 0.5], [0.7, 0.45]]], teclas: [] },
 };

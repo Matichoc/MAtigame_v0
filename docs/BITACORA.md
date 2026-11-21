@@ -6,6 +6,26 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ## 2026-11-21
 
+### Imagen de cine, primera parte: momentos de gloria y entrada al abrir el juego
+- **Pedido de la persona dueña:** «necesito que tú le des la imagen cinemática real… cómo y dónde mejorar nuestro juego». Se le propusieron siete lugares, en orden (quedaron en el plan de evolución, sección «Imagen de cine»), y eligió partir por los momentos de gloria y la entrada.
+- **Idea de fondo:** en un juego liviano, lo cinematográfico sale de la cámara, el ritmo y el sonido, no de gráficos más pesados. Nada de esto agrega efectos de pantalla completa.
+- **Momentos de gloria (`Game3D.glory` en `js/three-kit.js`):**
+  - Por un instante el juego corre en cámara lenta, la cámara se acerca (cambia el ángulo de visión) y gira hacia el punto de la jugada, entran dos franjas negras de cine (dos tiras de HTML) y suena un golpe (`audio.playGlory`).
+  - El tiempo lento se aplica en el bucle común; la calidad adaptativa sigue midiendo el tiempo real. Con «reducir movimiento» solo suena el golpe.
+  - También funciona con cámaras fijas, como la del billar: el giro parte siempre del ángulo original y no se va sumando.
+  - Dónde se usa: gol propio en la Pichanga, canasta propia en el Básquet 2 contra 2 (el triple dura más), gol en Fútbol Choco, la pirámide de Porristas (sin cámara lenta, porque va al ritmo de la música), hoyo en uno y birdie en Minigolf, doble o último bombón en Billar, el salto en Lanchas, cada 10 pisos en la Torre y cada 3 aros seguidos en la Avioneta.
+- **Entrada de cine (`js/intro.js`):**
+  - Al irse el sello de carga se ve un vuelo de cámara sobre el Pueblo al atardecer, que termina en el Matichico frente a la fuente de chocolate, y aparece el nombre del juego. Dura 6,6 s, se muestra una vez al día y se salta con un toque.
+  - Es un video grabado del propio juego (`assets/intro/entrada.mp4`, 960×540, 1,0 MB; escena `entrada` de `scripts/video/grabar.cjs`, sin cartelitos flotantes). Así el celular solo reproduce un video en vez de dibujar el Pueblo entero al partir, y se ve igual en un equipo barato que en uno caro.
+  - Si el video no se puede reproducir, la entrada simplemente no aparece. En horizontal el título va al costado izquierdo, para no tapar al Matichico.
+- **Qué se revisó:**
+  - Hojas de cuadros del hoyo en uno y del gol: franjas, acercamiento y confeti.
+  - La entrada, con el grabador automático: parte al irse el sello, el título aparece a los 3,4 s y al terminar queda el menú. Fotos en vertical y en horizontal.
+  - Un error que salió al grabar: el bucle cambiaba un valor declarado fijo (`const dt`) y el juego se detenía. Quedó corregido.
+- **Pruebas sobre la app, sin red:** `juegos.cjs` 20/20 OK (Lanchas falló una pasada de cuatro: la prueba apretaba derecha y luego izquierda y a veces la lancha quedaba donde mismo; ahora aprieta solo a un lado), `perfiles.cjs` 13/13, `atras.cjs` todo OK y `verificar-app.mjs` OK. La app armada pesa 14,8 MB.
+- **Videos para la dueña:** `Descargas\juegos-verano\6-momentos-de-gloria-antes-y-despues.mp4` y `7-entrada-de-cine.mp4`.
+- **Pendiente (lo que sigue del plan):** transiciones con cortina de chocolate, luz y color por mundo, el Matichico como actor, el sonido y el tráiler.
+
 ### Versión 1.2 «Verano»: 5 juegos nuevos y regalo de fundador
 - **Pedido de la persona dueña:** apostar por todos los juegos de verano ahora («que funcionen bien, que se prueben») y subirlos junto con el volumen en una sola versión. Además, un bono para los primeros jugadores: 1.500 o 2.000 Matipuntos para elegir al tiro uno de los 5 juegos nuevos, mientras los otros quedan por comprar. También pidió videos de la jugabilidad de cada juego, que sea fácil de usar y que los juegos nuevos tengan buenas fotos, como los demás.
 - **Los 5 juegos** (archivos `js/<juego>-game.js`; las piezas comunes en `js/verano-kit.js`):
