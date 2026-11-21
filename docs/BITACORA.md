@@ -52,7 +52,7 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 - **Pendiente:**
   - Que la dueña revise los videos y juegue la app de prueba.
   - Rearmar los avisos pagados con «19 juegos» cuando la 1.2 esté publicada.
-  - La pregunta de la dueña por «los cuadros de colores» del menú en el navegador: son los tres botones de arriba (Continuar mi aventura, Jugar libremente, Mi personaje), que no cambiaron. Falta saber si los quiere distintos.
+- **Decisión de la persona dueña:** los «cuadros de colores» que vio en el navegador son los tres botones de arriba del menú (Continuar mi aventura, Jugar libremente, Mi personaje), que no cambiaron. Se dejan así.
 
 ## 2026-11-19
 
