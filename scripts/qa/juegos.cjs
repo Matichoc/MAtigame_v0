@@ -16,6 +16,7 @@ const INICIO = {
   town: "#town-btn-start", recolecta: "#screen-recolecta [data-action=begin]", parkour: "#parkour-btn-campaign", salto: "#salto-btn-start", autos: "#autos-btn-start",
   tetris: "#tetris-btn-start", memoria: "#memoria-btn-start", basquet_tiros: "#basquet-btn-start", porristas: "#porristas-btn-start", futbol: "#futbol-btn-start",
   dulces: "#dulces-btn-start", ciudad: "#ciudad-btn-start", merge: "#merge-btn-start", aventura: "#aventura-btn-start", creador: "#creador-btn-start",
+  torre: "#torre-btn-start", avioneta: "#avioneta-btn-start", lanchas: "#lanchas-btn-start", minigolf: "#minigolf-btn-start", billar: "#billar-btn-start",
 };
 const PANTALLA = { basquet_tiros: "basquet" };
 
@@ -28,11 +29,12 @@ async function perfil(p) {
   await p.fill("#new-profile-name", "QA");
   await p.click("#btn-create-profile");
   await p.waitForTimeout(300);
+  await p.evaluate(() => { if (window.__progress) window.__progress().founderGift = { date: "qa" }; }); // sin la ventana del regalo de fundador
   await p.click("#character-grid .character-card:nth-child(2)");
   await p.waitForTimeout(800);
   await p.evaluate(() => {
     for (const k of Object.keys(localStorage)) if (k.includes("profile_")) {
-      try { const o = JSON.parse(localStorage.getItem(k)); if (o && typeof o.coins === "number") { o.coins = 5000; o.unlockedGames = ["futbol", "dulces", "aventura", "ciudad"]; localStorage.setItem(k, JSON.stringify(o)); } } catch (e) { /* no es un perfil */ }
+      try { const o = JSON.parse(localStorage.getItem(k)); if (o && typeof o.coins === "number") { o.coins = 5000; o.unlockedGames = ["futbol", "dulces", "aventura", "ciudad", "torre", "avioneta", "lanchas", "minigolf", "billar"]; o.founderGift = { date: "qa" }; localStorage.setItem(k, JSON.stringify(o)); } } catch (e) { /* no es un perfil */ }
     }
   });
 }
@@ -46,6 +48,10 @@ const ENTRADAS = {
   tetris: { teclas: ["ArrowLeft", "ArrowUp", "ArrowRight", "Space"] },
   basquet_tiros: { teclas: ["Space", "Space"] },
   futbol: { teclas: ["ArrowLeft", "Space", "ArrowRight"] },
+  torre: { teclas: ["Space", "Space", "Space"] },
+  lanchas: { teclas: ["ArrowRight", "ArrowRight", "ArrowRight"] }, // solo a un lado: derecha e izquierda seguidas la dejaban casi donde mismo
+  minigolf: { arrastres: [[[0.55, 0.5], [0.75, 0.55]]], teclas: [] },
+  billar: { arrastres: [[[0.5, 0.5], [0.7, 0.45]]], teclas: [] },
 };
 const TECLAS_POR_DEFECTO = ["ArrowRight", "ArrowUp", "Space", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Space"];
 

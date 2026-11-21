@@ -17,7 +17,8 @@ const FPS = 30;
 const DT = 1000 / FPS;
 const BOT = path.join(__dirname, "..", "qa", "jugador-humano.mjs");
 
-async function abrir() {
+/** `opc.escritorio` = sin modo celular (bordes suaves y resolución completa); `opc.vertical` = pantalla parada. */
+async function abrir(opc = {}) {
   const b = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || "/opt/pw-browsers/chromium",
     // VIDEO_GPU=1: usa la tarjeta gráfica del computador (en Windows, con Edge o Chrome); si no, dibuja por software
@@ -26,8 +27,11 @@ async function abrir() {
       : ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"],
   });
   // 960×540 con densidad 2 = cuadros de 1920×1080 (el juego se ve como en un celular acostado, con sus botones táctiles)
-  const ctx = await b.newContext({ viewport: { width: 960, height: 540 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true });
+  const vp = opc.vertical ? { width: 540, height: 960 } : { width: 960, height: 540 };
+  const ctx = await b.newContext({ viewport: vp, deviceScaleFactor: 2, hasTouch: !opc.escritorio, isMobile: !opc.escritorio });
   await ctx.addInitScript(RELOJ);
+  // sin la ventana del regalo de fundador (js/founder.js), que tapa los botones del menú
+  await ctx.addInitScript(() => { try { localStorage.setItem("matichoc_sin_regalo_fundador", "1"); } catch (e) { /* nada */ } });
   // el "jugador humano" de las pruebas maneja los partidos (se sirve desde el repo, sin copiarlo a la app)
   await ctx.route("**/__video/jugador-humano.js", (r) => r.fulfill({ contentType: "text/javascript", body: fs.readFileSync(BOT, "utf8").replace(/\.\.\/\.\.\/js\//g, "/js/") }));
   const p = await ctx.newPage();
@@ -56,6 +60,7 @@ async function perfil(p, { lagoPendiente = true } = {}) {
     pr.energy = 999;
     pr.coins = 2480;
     pr.xp = Math.max(pr.xp || 0, 60000);
+    pr.founderGift = { date: "video" }; // sin la ventana del regalo de fundador
     const adv = A.adventureOf(pr);
     adv.started = true;
     adv.introSeen = true;
@@ -86,8 +91,10 @@ async function calentar(p, seg, cadaCuadro) {
   }
 }
 
-/** Opciones que cambia clips.cjs: `estirar` alarga cada toma (×N) y `metaPorristas` es cuántas figuras hace la rutina. */
-const OPC = { estirar: 1, metaPorristas: 1 };
+/** Opciones que cambia clips.cjs: `estirar` alarga cada toma (×N) y `metaPorristas` es cuántas figuras hace la rutina.
+ * `antes` guarda además cada cuadro sin los momentos de gloria (ver cuadroSinGloria). Con `--antes` se activa al grabar. */
+const OPC = { estirar: 1, metaPorristas: 1, antes: process.argv.includes("--antes") };
+{ const e = process.argv.find((a) => a.startsWith("--estirar=")); if (e) OPC.estirar = Number(e.split("=")[1]) || 1; }
 
 /** Graba `seg` segundos: antes de cada cuadro llama a cadaCuadro(i) (para mover al personaje, tocar, etc.). */
 async function grabar(p, escena, seg, cadaCuadro, desde = 0) {
@@ -98,13 +105,386 @@ async function grabar(p, escena, seg, cadaCuadro, desde = 0) {
   for (let i = 0; i < n; i++) {
     if (cadaCuadro) await cadaCuadro(i);
     await p.evaluate((dt) => window.__reloj.avanzar(dt), DT);
-    if (!elegidos || elegidos.has(i)) await p.screenshot({ path: path.join(dir, `c${String(desde + i).padStart(5, "0")}.jpg`), type: "jpeg", quality: 92 });
+    const archivo = path.join(dir, `c${String(desde + i).padStart(5, "0")}.jpg`);
+    if (!elegidos || elegidos.has(i)) await p.screenshot({ path: archivo, type: "jpeg", quality: 92 });
+    if (OPC.antes) await cuadroSinGloria(p, escena, desde + i, archivo);
   }
   return desde + n;
 }
 
+/** Para comparar el "antes y después" de los momentos de gloria (Game3D.glory en js/three-kit.js) con la MISMA jugada:
+ * con `OPC.antes`, cada cuadro se vuelve a dibujar como se veía antes (sin el acercamiento, el giro ni las franjas) y
+ * se guarda en `cuadros/<escena>-antes/`, junto con `ritmo.json`: a qué velocidad corría el juego en cada cuadro
+ * (1 = normal, 0,3 = cámara lenta), para que el montaje le quite la cámara lenta al "antes". */
+const RITMO = {};
+async function cuadroSinGloria(p, escena, i, archivo) {
+  const dir = path.join(OUT, "cuadros", `${escena}-antes`);
+  if (!RITMO[escena]) { RITMO[escena] = []; fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true }); }
+  const destino = path.join(dir, path.basename(archivo));
+  const ritmo = await p.evaluate(() => {
+    const g = Object.values(window.__g3d || {}).find((x) => x && x.running);
+    const gl = g && g._gl;
+    if (!gl) return 1;
+    const cam = g.camera, fov = cam.fov, q = cam.quaternion.clone();
+    cam.fov = gl.fov;
+    cam.updateProjectionMatrix();
+    if (gl.focus && gl.baseQ) cam.quaternion.copy(gl.baseQ);
+    for (const b of g._bars || []) b.style.visibility = "hidden";
+    if (g.composer) g.composer.render(0); else g.renderer.render(g.scene, cam);
+    cam.fov = fov;
+    cam.updateProjectionMatrix();
+    cam.quaternion.copy(q);
+    return Math.min(0.999, 1 + (gl.slow - 1) * gl.w);
+  });
+  if (ritmo === 1) fs.copyFileSync(archivo, destino); // sin momento de gloria en este cuadro: es igual
+  else {
+    await p.screenshot({ path: destino, type: "jpeg", quality: 92 });
+    await p.evaluate(() => { const g = Object.values(window.__g3d || {}).find((x) => x && x.running); for (const b of (g && g._bars) || []) b.style.visibility = ""; });
+  }
+  RITMO[escena][i] = ritmo;
+  fs.writeFileSync(path.join(dir, "ritmo.json"), JSON.stringify(RITMO[escena]));
+}
+
+/** El vuelo de cámara de la entrada de cine (ver ESCENAS.entrada).
+ * Se graba con SUB sub-cuadros por cuadro: al mezclarlos (ver docs/BITACORA.md, 21-nov-2026) el movimiento queda
+ * con el desenfoque suave del cine en vez de verse "a saltos". */
+const ENTRADA_SEG = 6.8;
+const ENTRADA_SUB = 3;
+async function entradaDeCine(p, nombre, vertical) {
+  await perfil(p, { lagoPendiente: false });
+  await abrirJuego(p, "Pueblo", "#town-btn-start", "town");
+  await sinConsejos(p);
+  // el escenario a pantalla completa, sin nada encima
+  await p.addStyleTag({ content: `#town-canvas-wrap > *:not(canvas), #town-hud, .hud, .toast, #toast, [class*='toast'], .modal, #orientation-hint, [id*='rotate'] { display: none !important }
+    #town-canvas-wrap { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; max-width: none !important; aspect-ratio: auto !important; z-index: 99999 !important; border-radius: 0 !important; margin: 0 !important }
+    #town-canvas { width: 100% !important; height: 100% !important; border: 0 !important; border-radius: 0 !important }` });
+  const datos = await p.evaluate((vertical) => {
+    const g = window.__g3d.town;
+    const V = g.pos.constructor;
+    // calidad completa para la grabación (en el celular se ve como video)
+    g.pixelRatio = 2;
+    g.renderer.setPixelRatio(2);
+    g.qualityDone = true; g.qualityStep = 0;
+    window.dispatchEvent(new Event("resize"));
+    g._onResize();
+    g.dayT = 0.535 * 300; // hora dorada (ver SKY en js/town-game.js)
+    const HX = 0, HZ = 7.2; // el Matichico, frente a la fuente
+    g.pos.set(HX, 0, HZ);
+    g.vel.set(0, 0, 0);
+    g._input = () => ({ x: 0, z: 0, mag: 0 });
+    if (g.pet && g.pet.group) g.pet.group.visible = false;
+    // vuelo: de lo alto y lejos (A) a un plano medio del Matichico con la fuente detrás (C), pasando por B.
+    // Acostado, el Matichico queda a la derecha (el nombre del juego va a la izquierda); parado, al centro y abajo.
+    const A = new V(-26, 19, 36), B = new V(12, 9, 27);
+    const C = vertical ? new V(-1.3, 1.9, 12.0) : new V(-2.0, 1.85, 11.4);
+    const LA = new V(0, 3.5, 0), LC = vertical ? new V(0, 1.75, HZ) : new V(-1.1, 1.8, 6);
+    g.heroYaw = Math.atan2(C.x - HX, C.z - HZ); // mira a la cámara del final
+
+    // --- cielo de atardecer en degradé (el del juego es de un solo color) ---
+    const beam0 = g.fun.beacons[0].beam;
+    const Mesh = beam0.constructor, Basic = beam0.material.constructor, Tex = beam0.material.map.constructor;
+    let Sphere = null;
+    g.scene.traverse((o) => { if (!Sphere && o.isMesh && o.geometry && o.geometry.type === "SphereGeometry") Sphere = o.geometry.constructor; });
+    g._updateSky();
+    const fondo = "#" + g.scene.background.getHexString();
+    const cv = document.createElement("canvas");
+    cv.width = 8; cv.height = 512;
+    const c2 = cv.getContext("2d");
+    const gr = c2.createLinearGradient(0, 0, 0, 512); // arriba = cenit, al medio = horizonte
+    gr.addColorStop(0.0, "#4b47b8");
+    gr.addColorStop(0.28, "#7a5ccc");
+    gr.addColorStop(0.37, "#c874c6");
+    gr.addColorStop(0.42, "#ff93ad");
+    gr.addColorStop(0.47, "#ffb89c");
+    gr.addColorStop(0.5, "#ffd49a"); // resplandor dorado en el horizonte
+    gr.addColorStop(0.6, "#ffcba0");
+    gr.addColorStop(0.75, fondo);
+    gr.addColorStop(1.0, fondo);
+    c2.fillStyle = gr; c2.fillRect(0, 0, 8, 512);
+    const tex = new Tex(cv);
+    if ("colorSpace" in tex) tex.colorSpace = "srgb";
+    tex.needsUpdate = true;
+    const cielo = new Mesh(new Sphere(170, 32, 24), new Basic({ map: tex, side: 1 /* BackSide */, fog: false, depthWrite: false }));
+    cielo.renderOrder = -10;
+    cielo.frustumCulled = false;
+    cielo.userData.noToon = true;
+    g.scene.add(cielo);
+    // sol más bajo y dorado: sombras largas de atardecer
+    g.sun.color.setHex(0xffd9a8);
+    const cieloDelJuego = g._updateSky.bind(g);
+    g._updateSky = () => { cieloDelJuego(); g.sun.position.y = g.pos.y + 15; };
+
+    // los vecinos pasean, pero no se cruzan entre el Matichico y la cámara del final
+    const vecinos = g._updateNeighbors.bind(g);
+    g._updateNeighbors = (dt) => {
+      vecinos(dt);
+      const abx = C.x - HX, abz = C.z - HZ, ab2 = abx * abx + abz * abz, R = 4.3;
+      for (const n of g.npcs) {
+        const k = Math.max(0, Math.min(1, ((n.x - HX) * abx + (n.z - HZ) * abz) / ab2));
+        const px = HX + abx * k, pz = HZ + abz * k;
+        const dx = n.x - px, dz = n.z - pz, d = Math.hypot(dx, dz) || 0.001;
+        if (d >= R) continue;
+        n.x = px + (dx / d) * R; n.z = pz + (dz / d) * R;
+        n.tx = px + (dx / d) * (R + 6); n.tz = pz + (dz / d) * (R + 6); n.wait = 0;
+        n.hero.group.position.set(n.x, 0, n.z);
+      }
+    };
+
+    let t = 0;
+    // al final el Matichico celebra (el modo se pone justo antes de animarlo: el Pueblo lo borra en cada cuadro)
+    const animar = g._syncHero.bind(g);
+    g._syncHero = (dt) => { if (g.fun) g.fun.heroMode = t > 4.3 ? "cheer" : null; animar(dt); };
+    const tmp = new V(), tmp2 = new V(), look = new V();
+    g._updateCamera = (dt) => {
+      t += dt;
+      const u = Math.min(1, t / 5.6), k = u * u * (3 - 2 * u); // suave al partir y al llegar
+      tmp.copy(A).lerp(B, k); tmp2.copy(B).lerp(C, k);
+      g.camera.position.copy(tmp.lerp(tmp2, k));
+      look.copy(LA).lerp(LC, k);
+      g.camera.lookAt(look);
+      cielo.position.copy(g.camera.position);
+      if (g.pet && g.pet.group) g.pet.group.visible = false;
+      // faros de luz: columnas finas y suaves, y se apagan cerca de la cámara (de cerca tapaban media pantalla)
+      const cam = g.camera.position;
+      for (const b of g.fun.beacons) {
+        const d = Math.hypot(b.x - cam.x, b.z - cam.z);
+        const q = Math.min(1, Math.max(0, (d - 13) / 16)), f = q * q * (3 - 2 * q);
+        b.beam.scale.set(0.5, 1, 0.5);
+        b.beam.material.opacity = 0.3 * f;
+        b.ring.material.opacity *= 0.5 * f;
+      }
+      // sin monedas girando delante del Matichico
+      for (const it of g.collect) if (Math.hypot(it.x - HX, it.z - HZ) < 10) it.mesh.visible = false;
+      // toma limpia: sin los cartelitos flotantes (nombres, globos de misión, letreros de cada lugar)
+      g.scene.traverse((o) => { if (o.isSprite) o.visible = false; });
+    };
+    window.__reloj.encender();
+    window.__resetVuelo = () => { t = 0; };
+    return { fov: g.camera.fov, fondo, bloom: !!g.composer };
+  }, vertical);
+  console.log(`  ${nombre}: fov ${datos.fov}, fondo ${datos.fondo}, brillo ${datos.bloom ? "sí" : "no"}`);
+  await calentar(p, 0.5);
+  await p.evaluate(() => window.__resetVuelo());
+  const dir = path.join(OUT, "cuadros", nombre);
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+  const n = Math.round(ENTRADA_SEG * FPS) * ENTRADA_SUB;
+  for (let i = 0; i < n; i++) {
+    await p.evaluate((dt) => window.__reloj.avanzar(dt), DT / ENTRADA_SUB);
+    if (!MUESTRA || i % 90 === 89 || i === n - 1) await p.screenshot({ path: path.join(dir, `c${String(i).padStart(5, "0")}.jpg`), type: "jpeg", quality: 95 });
+  }
+}
+
 // ---------------------------------------------------------------- escenas
 const ESCENAS = {
+  /** Torre de alfajores (verano): suelta cada alfajor cuando pasa por el centro; cada cinco, uno un poco corrido. */
+  async torre(p) {
+    await perfil(p);
+    await abrirJuego(p, "Torre de Alfajores", "#torre-btn-start", "torre");
+    await p.evaluate(() => { window.__drops = 0; window.__reloj.encender(); });
+    const jugar = () => p.evaluate(() => {
+      const g = window.__g3d.torre;
+      const c = g.cur;
+      if (!c || c.dropping || g.state !== "playing") return;
+      const want = g.topX + (window.__drops % 5 === 4 ? 0.5 : 0);
+      if (Math.abs(c.x - want) < 0.12) { g._drop(); window.__drops++; }
+    });
+    await calentar(p, 0.4, jugar);
+    await grabar(p, "torre", 16, jugar);
+  },
+
+  /** Avioneta Choco (verano): piloto automático que busca el próximo aro (y los alfajores) y esquiva lo demás. */
+  async avioneta(p) {
+    await perfil(p);
+    await abrirJuego(p, "Avioneta Choco", "#avioneta-btn-start", "avioneta");
+    await p.evaluate(() => window.__reloj.encender());
+    const piloto = () => p.evaluate(() => {
+      const g = window.__g3d.avioneta;
+      if (g.state !== "playing") return;
+      const next = g.things.filter((t) => !t.done && t.x > g.x - 0.5 && (t.kind === "ring" || t.kind === "coin")).sort((a, b) => a.x - b.x)[0];
+      let target = next && next.x - g.x < 14 ? next.y : 5;
+      for (const t of g.things) { // si viene un globo o una gaviota a la altura del objetivo, pasa por arriba o por abajo
+        if (t.done || (t.kind !== "balloon" && t.kind !== "gull") || t.x < g.x || t.x - g.x > 9) continue;
+        if (Math.abs(t.y - target) < 2.2) target = t.y > 5 ? t.y - 2.6 : t.y + 2.6;
+      }
+      g.hold = g.y + g.vy * 0.3 < Math.max(2.4, target);
+    });
+    await calentar(p, 0.4, piloto);
+    await grabar(p, "avioneta", 16, piloto);
+  },
+
+  /** Lanchas en el lago (verano): piloto automático que busca rampas y alfajores y esquiva boyas y rocas. */
+  async lanchas(p) {
+    await perfil(p);
+    await abrirJuego(p, "Lanchas en el Lago", "#lanchas-btn-start", "lanchas");
+    await p.evaluate(() => window.__reloj.encender());
+    const piloto = () => p.evaluate(() => {
+      const g = window.__g3d.lanchas;
+      if (g.state !== "playing") return;
+      const near = g.things.filter((t) => !t.done && t.z < g.bz && g.bz - t.z < 22);
+      // candidato: el x con menos peligro y más premios en los próximos metros
+      let best = g.bx, bestV = -1e9;
+      for (let x = -5; x <= 5; x += 0.5) {
+        let v = -Math.abs(x - g.bx) * 0.15;
+        for (const t of near) {
+          const d = Math.abs(t.x - x), w = 1 - (g.bz - t.z) / 26;
+          if (t.kind === "buoy" || t.kind === "rock") v -= d < 1.6 ? 10 * w : 0;
+          else if (t.kind === "ramp") v += d < 1.2 ? 3 * w : 0;
+          else if (t.kind === "coin") v += d < 0.9 ? 1 * w : 0;
+        }
+        if (v > bestV) { bestV = v; best = x; }
+      }
+      g.pointerX = best;
+    });
+    await calentar(p, 0.4, piloto);
+    await grabar(p, "lanchas", 16, piloto);
+  },
+
+  /** Minigolf en la playa (verano): un jugador automático que prueba tiros "en la cabeza" y elige el que deja la
+   * pelota más cerca del hoyo; se ve la flecha de apuntar un momento antes de cada golpe. */
+  async minigolf(p) {
+    await perfil(p);
+    await abrirJuego(p, "Minigolf en la Playa", "#minigolf-btn-start", "minigolf");
+    await p.evaluate(() => {
+      window.__reloj.encender();
+      // simulación simple de un tiro (misma física del juego, sin los cangrejos moviéndose)
+      window.__golfSim = (g, dx, dz, v) => {
+        const h = g.hole, R = 0.14;
+        let x = g.bx, z = g.bz, vx = dx * v, vz = dz * v;
+        const cl = (a, lo, hi) => Math.max(lo, Math.min(hi, a));
+        for (let i = 0; i < 1200; i++) {
+          const sdt = 1 / 240, sp = Math.hypot(vx, vz);
+          if (sp < 0.06) break;
+          let fr = 2.4 + sp * 0.35;
+          for (const [sx, sz, w, d] of h.sand || []) if (Math.abs(x - sx) < w / 2 && Math.abs(z - sz) < d / 2) fr = 9 + sp * 1.5;
+          const ns = Math.max(0, sp - fr * sdt); vx *= ns / sp; vz *= ns / sp;
+          x += vx * sdt; z += vz * sdt;
+          const X = h.w / 2 - R, Z = h.d / 2 - R;
+          if (x < -X) { x = -X; vx = Math.abs(vx) * 0.78; } if (x > X) { x = X; vx = -Math.abs(vx) * 0.78; }
+          if (z < -Z) { z = -Z; vz = Math.abs(vz) * 0.78; } if (z > Z) { z = Z; vz = -Math.abs(vz) * 0.78; }
+          for (const [rx, rz, w, d] of h.walls || []) {
+            const px = cl(x, rx - w / 2, rx + w / 2), pz = cl(z, rz - d / 2, rz + d / 2), ex = x - px, ez = z - pz, dd = Math.hypot(ex, ez);
+            if (dd < R && dd > 0) { const nx = ex / dd, nz = ez / dd; x = px + nx * R; z = pz + nz * R; const vn = vx * nx + vz * nz; if (vn < 0) { vx -= 1.78 * vn * nx; vz -= 1.78 * vn * nz; } }
+          }
+          for (const [cx, cz, r] of [...(h.round || []), ...g.crabs.map((c) => [c.x, c.z, c.r])]) {
+            const ex = x - cx, ez = z - cz, dd = Math.hypot(ex, ez), m = r + R;
+            if (dd < m && dd > 0) { const nx = ex / dd, nz = ez / dd; x = cx + nx * m; z = cz + nz * m; const vn = vx * nx + vz * nz; if (vn < 0) { vx -= 1.75 * vn * nx; vz -= 1.75 * vn * nz; } }
+          }
+          const dc = Math.hypot(x - h.cup[0], z - h.cup[1]);
+          if (dc < 0.24 && Math.hypot(vx, vz) < 4.2) return 0;
+        }
+        return Math.hypot(x - h.cup[0], z - h.cup[1]);
+      };
+      window.__golfPlan = (g) => {
+        let best = null;
+        for (let a = 0; a < 72; a++) for (let k = 1; k <= 12; k++) {
+          const ang = (a / 72) * Math.PI * 2, dx = Math.sin(ang), dz = Math.cos(ang), pw = k / 12;
+          const d = window.__golfSim(g, dx, dz, 1.2 + pw * (9.5 - 1.2));
+          if (!best || d < best.d - 1e-6) best = { d, dx, dz, pw };
+        }
+        return best;
+      };
+    });
+    let espera = 0, plan = null;
+    const jugador = async () => {
+      if (espera > 0) { espera--; return; }
+      const st = await p.evaluate(() => { const g = window.__g3d.minigolf; return { ok: g.state === "playing" && g.ballStill && !g.inCup }; });
+      if (!st.ok) { plan = null; return; }
+      if (!plan) {
+        plan = await p.evaluate(() => { const g = window.__g3d.minigolf; const b = window.__golfPlan(g); g.onAimShow = b; return b; });
+        await p.evaluate((b) => { const g = window.__g3d.minigolf; const THREE = g.ball.position.constructor; const dir = new THREE(b.dx, 0, b.dz); window.__setArrow(g, dir, b.pw); }, plan);
+        espera = 18; // se ve la flecha ~0,6 s
+        return;
+      }
+      await p.evaluate((b) => { const g = window.__g3d.minigolf; const THREE = g.ball.position.constructor; g._shoot(new THREE(b.dx, 0, b.dz), b.pw); }, plan);
+      plan = null;
+      espera = 6;
+    };
+    await p.evaluate(async () => {
+      const m = await import("/js/verano-kit.js");
+      window.__setArrow = (g, dir, pw) => m.setAimArrow(g.arrow, g.ball.position, dir, pw);
+    });
+    await calentar(p, 0.6, jugador);
+    await grabar(p, "minigolf", 22, jugador);
+  },
+
+  /** Billar de bombones (verano): un jugador automático que prueba tiros "en la cabeza" y elige el que mete más
+   * bombones sin que caiga el blanco; se ve la flecha un momento antes de cada golpe. */
+  async billar(p) {
+    await perfil(p);
+    await abrirJuego(p, "Billar de Bombones", "#billar-btn-start", "billar");
+    await p.evaluate(async () => {
+      window.__reloj.encender();
+      const m = await import("/js/verano-kit.js");
+      window.__setArrow = (g, dir, pw) => m.setAimArrow(g.arrow, g.cue.mesh.position, dir, pw, 1.6);
+      const W = 2.4, L = 4.4, BR = 0.12, PR = 0.19, P = [[-W / 2, -L / 2], [W / 2, -L / 2], [-W / 2, 0], [W / 2, 0], [-W / 2, L / 2], [W / 2, L / 2]];
+      window.__billSim = (g, dx, dz, v) => {
+        const bs = g.balls.filter((b) => !b.in).map((b) => ({ x: b.x, z: b.z, vx: b.cue ? dx * v : 0, vz: b.cue ? dz * v : 0, cue: b.cue, in: false }));
+        let got = 0, scratch = false;
+        for (let step = 0; step < 900; step++) {
+          const sdt = 1 / 360;
+          let moving = false;
+          for (const b of bs) {
+            if (b.in) continue;
+            const sp = Math.hypot(b.vx, b.vz);
+            if (sp > 0) { const ns = Math.max(0, sp - (0.7 + sp * 0.22) * sdt); b.vx *= ns / sp; b.vz *= ns / sp; }
+            if (sp > 0.03) moving = true;
+            b.x += b.vx * sdt; b.z += b.vz * sdt;
+            for (const [px, pz] of P) if (Math.hypot(b.x - px, b.z - pz) < PR) { b.in = true; if (b.cue) scratch = true; else got++; break; }
+            const X = W / 2 - BR, Z = L / 2 - BR;
+            if (b.x < -X) { b.x = -X; b.vx = Math.abs(b.vx) * 0.8; } if (b.x > X) { b.x = X; b.vx = -Math.abs(b.vx) * 0.8; }
+            if (b.z < -Z) { b.z = -Z; b.vz = Math.abs(b.vz) * 0.8; } if (b.z > Z) { b.z = Z; b.vz = -Math.abs(b.vz) * 0.8; }
+          }
+          for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) {
+            const a = bs[i], c = bs[j];
+            if (a.in || c.in) continue;
+            const ex = c.x - a.x, ez = c.z - a.z, d = Math.hypot(ex, ez);
+            if (d >= 2 * BR || d === 0) continue;
+            const nx = ex / d, nz = ez / d, o = 2 * BR - d;
+            a.x -= nx * o / 2; a.z -= nz * o / 2; c.x += nx * o / 2; c.z += nz * o / 2;
+            const rv = (c.vx - a.vx) * nx + (c.vz - a.vz) * nz;
+            if (rv < 0) { const imp = -rv * 0.97; a.vx -= imp * nx; a.vz -= imp * nz; c.vx += imp * nx; c.vz += imp * nz; }
+          }
+          if (!moving) break;
+        }
+        return got - (scratch ? 2 : 0);
+      };
+      window.__billPlan = (g) => {
+        let best = null;
+        for (let a = 0; a < 90; a++) for (const pw of [0.35, 0.55, 0.75, 0.95]) {
+          const ang = (a / 90) * Math.PI * 2, dx = Math.sin(ang), dz = Math.cos(ang);
+          const v = window.__billSim(g, dx, dz, 0.6 + pw * (6.5 - 0.6));
+          if (!best || v > best.v) best = { v, dx, dz, pw };
+        }
+        return best;
+      };
+    });
+    let espera = 0, plan = null;
+    const jugador = async () => {
+      if (espera > 0) { espera--; return; }
+      const ok = await p.evaluate(() => { const g = window.__g3d.billar; return g.state === "playing" && g.still; });
+      if (!ok) { plan = null; return; }
+      if (!plan) {
+        plan = await p.evaluate(() => window.__billPlan(window.__g3d.billar));
+        await p.evaluate((b) => { const g = window.__g3d.billar; const V = g.cue.mesh.position.constructor; window.__setArrow(g, new V(b.dx, 0, b.dz), b.pw); }, plan);
+        espera = 18;
+        return;
+      }
+      await p.evaluate((b) => { const g = window.__g3d.billar; const V = g.cue.mesh.position.constructor; g._shoot(new V(b.dx, 0, b.dz), b.pw); }, plan);
+      plan = null;
+      espera = 8;
+    };
+    await calentar(p, 0.6, jugador);
+    await grabar(p, "billar", 20, jugador);
+  },
+
+  /** Entrada de cine (se muestra al abrir el juego, ver js/intro.js): la cámara baja volando sobre el Pueblo al
+   * atardecer y llega hasta el Matichico, que saluda frente a la fuente de chocolate. Sin botones ni carteles.
+   * Se graba en ALTA calidad (como computador: bordes suaves, resolución completa y brillo), a pantalla completa, en
+   * dos formatos: "entrada" (celular acostado, 1920×1080) y "entrada-v" (celular parado, 1080×1920). */
+  async entrada(p) { await entradaDeCine(p, "entrada", false); },
+  async "entrada-v"(p) { await entradaDeCine(p, "entrada-v", true); },
+
   /** Paseo por el Pueblo renovado, en monopatín, con la cámara girando despacio. */
   async pueblo(p) {
     await perfil(p, { lagoPendiente: false });
@@ -464,6 +844,9 @@ const ESCENAS = {
   },
 };
 
+// Escenas que no se graban como celular acostado
+const CONTEXTOS = { entrada: { escritorio: true }, "entrada-v": { escritorio: true, vertical: true } };
+
 module.exports = { abrir, ESCENAS, OPC, FPS, OUT, SOLO };
 
 if (require.main === module) (async () => {
@@ -471,7 +854,7 @@ if (require.main === module) (async () => {
   let mal = 0;
   for (const id of lista) {
     const t0 = Date.now();
-    const { b, p, errores } = await abrir();
+    const { b, p, errores } = await abrir(CONTEXTOS[id]);
     try {
       await ESCENAS[id](p);
       console.log(`${id}: lista en ${Math.round((Date.now() - t0) / 1000)} s${errores.length ? ` (errores de página: ${errores.join(" | ")})` : ""}`);

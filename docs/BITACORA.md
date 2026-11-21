@@ -4,7 +4,124 @@ Registro de todo lo que se cambia, se decide y se prueba: lo más reciente arrib
 
 ---
 
+## 2026-11-21
+
+### Entrada de cine regrabada en alta calidad y nuevo «antes y después» lado a lado
+- **Comentario de la persona dueña** (al ver la primera versión): la entrada «se ve extraño, se ve como muy cuadrado, pixelado», y en el video del antes y después «no lo veo completo realmente, como para poder ver las diferencias».
+- **Por qué se veía mal la entrada:** se había grabado como un celular barato (resolución reducida y sin suavizado de bordes), el video era chico (960×540) y en un celular parado se estiraba y se recortaba; además una moneda giraba justo delante del Matichico y los faros de luz tapaban media pantalla al partir.
+- **Qué se cambió en la grabación** (escenas `entrada` y `entrada-v` de `scripts/video/grabar.cjs`, función `entradaDeCine`):
+  - Se graba en calidad completa (como computador: bordes suaves, resolución completa y brillo), a pantalla completa, en dos formatos: celular acostado (1920×1080) y celular parado (1080×1920).
+  - Tres sub-cuadros por cuadro, que al mezclarse dan el desenfoque de movimiento del cine (el vuelo ya no se ve «a saltos»).
+  - Solo para la toma: cielo de atardecer en degradé (el del juego es de un color), sol más bajo y dorado (sombras largas), faros de luz finos que se apagan cerca de la cámara, sin monedas delante del Matichico y sin vecinos cruzándose entre él y la cámara.
+  - Plano final más cercano: el Matichico celebra frente a la fuente (antes no alcanzaba a moverse: el Pueblo borraba la animación en cada cuadro).
+- **En el juego (`js/intro.js`):** ahora hay dos videos y se elige según cómo está el celular: `assets/intro/entrada.mp4` (acostado, 1280×720, 1,7 MB) y `assets/intro/entrada-v.mp4` (parado, 720×1280, 1,4 MB). Duran 6,8 s. La app armada pasa de 14,8 a 16,9 MB.
+- **Comparación «antes y después» con la misma jugada:** `grabar.cjs` acepta `--antes` (y `--estirar=N`): cada cuadro se vuelve a dibujar como se veía antes (sin acercamiento, giro ni franjas) y se anota a qué velocidad corría el juego, para quitarle la cámara lenta en el montaje. Así los dos lados muestran exactamente la misma jugada.
+- **Videos para la dueña** (en `Descargas\juegos-verano\`): `6-momentos-de-gloria-antes-y-despues.mp4` (72 s: pichanga, minigolf y lanchas, «antes» a la izquierda y «después» a la derecha, cada jugada con repetición lenta), `7-entrada-de-cine-celular-parado.mp4` y `7-entrada-de-cine-celular-acostado.mp4` (la entrada tal como se ve en el juego, con el título). El `7-entrada-de-cine.mp4` anterior se borró porque quedó superado.
+- **Qué se revisó:** hojas de cuadros de las dos tomas (nitidez, encuadre, saludo final); fotos de la entrada dentro de la app en vertical y en horizontal (cada una carga su video: 720×1280 y 1280×720, sin errores de página); un cuadro «antes» y «después» de cada jugada.
+- **Pruebas sobre la app, sin red:** `juegos.cjs` 20/20 OK, `perfiles.cjs` 13/13, `atras.cjs` todo OK y `verificar-app.mjs` OK.
+- **Dónde quedó:** PR `Matichoc/MAtigame_v0#59` (rama `claude/cine`); app de prueba: compilación 44918679372 de «Compilar app Android» (OK); versión web: PR `Matichoc/matiweb#88` (incluye también lo del #86, porque parte de la rama de cine; probada en local: la entrada carga el video correcto en vertical y horizontal, y `juegos.cjs` da 20 de 21: falla solo Choco Blaster 3D, igual que en el sitio publicado, porque a la prueba le falta su botón de inicio). No se mergea sin aprobación de la dueña.
+- **Nueva idea de la persona dueña:** le gustaron estas tomas cercanas y quiere evaluar una cinemática promocional del juego con escenas así (del Pueblo y de los juegos). Se le propone el guion; se hace solo si lo aprueba.
+
+### Imagen de cine, primera parte: momentos de gloria y entrada al abrir el juego
+- **Pedido de la persona dueña:** «necesito que tú le des la imagen cinemática real… cómo y dónde mejorar nuestro juego». Se le propusieron siete lugares, en orden (quedaron en el plan de evolución, sección «Imagen de cine»), y eligió partir por los momentos de gloria y la entrada.
+- **Idea de fondo:** en un juego liviano, lo cinematográfico sale de la cámara, el ritmo y el sonido, no de gráficos más pesados. Nada de esto agrega efectos de pantalla completa.
+- **Momentos de gloria (`Game3D.glory` en `js/three-kit.js`):**
+  - Por un instante el juego corre en cámara lenta, la cámara se acerca (cambia el ángulo de visión) y gira hacia el punto de la jugada, entran dos franjas negras de cine (dos tiras de HTML) y suena un golpe (`audio.playGlory`).
+  - El tiempo lento se aplica en el bucle común; la calidad adaptativa sigue midiendo el tiempo real. Con «reducir movimiento» solo suena el golpe.
+  - También funciona con cámaras fijas, como la del billar: el giro parte siempre del ángulo original y no se va sumando.
+  - Dónde se usa: gol propio en la Pichanga, canasta propia en el Básquet 2 contra 2 (el triple dura más), gol en Fútbol Choco, la pirámide de Porristas (sin cámara lenta, porque va al ritmo de la música), hoyo en uno y birdie en Minigolf, doble o último bombón en Billar, el salto en Lanchas, cada 10 pisos en la Torre y cada 3 aros seguidos en la Avioneta.
+- **Entrada de cine (`js/intro.js`):**
+  - Al irse el sello de carga se ve un vuelo de cámara sobre el Pueblo al atardecer, que termina en el Matichico frente a la fuente de chocolate, y aparece el nombre del juego. Dura 6,6 s, se muestra una vez al día y se salta con un toque.
+  - Es un video grabado del propio juego (`assets/intro/entrada.mp4`, 960×540, 1,0 MB; escena `entrada` de `scripts/video/grabar.cjs`, sin cartelitos flotantes). Así el celular solo reproduce un video en vez de dibujar el Pueblo entero al partir, y se ve igual en un equipo barato que en uno caro.
+  - Si el video no se puede reproducir, la entrada simplemente no aparece. En horizontal el título va al costado izquierdo, para no tapar al Matichico.
+- **Qué se revisó:**
+  - Hojas de cuadros del hoyo en uno y del gol: franjas, acercamiento y confeti.
+  - La entrada, con el grabador automático: parte al irse el sello, el título aparece a los 3,4 s y al terminar queda el menú. Fotos en vertical y en horizontal.
+  - Un error que salió al grabar: el bucle cambiaba un valor declarado fijo (`const dt`) y el juego se detenía. Quedó corregido.
+- **Pruebas sobre la app, sin red:** `juegos.cjs` 20/20 OK (Lanchas falló una pasada de cuatro: la prueba apretaba derecha y luego izquierda y a veces la lancha quedaba donde mismo; ahora aprieta solo a un lado), `perfiles.cjs` 13/13, `atras.cjs` todo OK y `verificar-app.mjs` OK. La app armada pesa 14,8 MB.
+- **Videos para la dueña:** `Descargas\juegos-verano\6-momentos-de-gloria-antes-y-despues.mp4` y `7-entrada-de-cine.mp4`.
+- **Pendiente (lo que sigue del plan):** transiciones con cortina de chocolate, luz y color por mundo, el Matichico como actor, el sonido y el tráiler.
+
+### Versión 1.2 «Verano»: 5 juegos nuevos y regalo de fundador
+- **Pedido de la persona dueña:** apostar por todos los juegos de verano ahora («que funcionen bien, que se prueben») y subirlos junto con el volumen en una sola versión. Además, un bono para los primeros jugadores: 1.500 o 2.000 Matipuntos para elegir al tiro uno de los 5 juegos nuevos, mientras los otros quedan por comprar. También pidió videos de la jugabilidad de cada juego, que sea fácil de usar y que los juegos nuevos tengan buenas fotos, como los demás.
+- **Los 5 juegos** (archivos `js/<juego>-game.js`; las piezas comunes en `js/verano-kit.js`):
+
+| Juego | Cómo se juega | Energía | Precio |
+| --- | --- | --- | --- |
+| 🥞 Torre de alfajores (`torre`) | Tocar para soltar el alfajor que va y viene; al centro es ¡Perfecto! (combo). Muy corrido, se cae (3 ❤). Si la torre queda chueca, se derrumba. Cada 15 pisos, un alfajor dorado da +10 Matipuntos | 4 + 1 cada 8 pisos | 2.000 |
+| ✈️ Avioneta Choco (`avioneta`) | Mantener apretado para subir. Pasar por aros dorados (combo), juntar alfajores y esquivar globos y gaviotas (3 ❤). Al partir planea 1 s | 6 + 1 cada 150 m | 2.000 |
+| 🚤 Lanchas en el lago (`lanchas`) | ◀ ▶, flechas o arrastrar el dedo. Esquivar boyas y rocas de chocolate, saltar en las olas y juntar alfajores (3 ❤) | 6 + 1 cada 250 m | 2.000 |
+| ⛳ Minigolf en la playa (`minigolf`) | Arrastrar hacia atrás (honda) y soltar. 9 hoyos con castillos, palmeras, arena y cangrejos. **2 jugadores por turnos** en el mismo celular | 4 + 1 cada 3 golpes | 2.000 |
+| 🎱 Billar de bombones (`billar`) | Arrastrar y soltar. Meter 7 bombones en 6 cajas (25 tiros). **2 jugadores por turnos**: si metes, sigues | 4 + 1 cada 3 tiros | 2.000 |
+
+- **Regalo de fundador (`js/founder.js`):**
+  - No se puede saber quién es «el usuario número 50» sin enviar datos a un servidor, y el juego no envía nada (lo dice la política). Por eso la regla es por fecha: cada perfil que entra **hasta el 31-dic-2026** recibe una vez **2.000 Matipuntos** y elige al tiro uno de los 5 juegos nuevos. También puede guardar los Matipuntos.
+  - La ventana aparece cuando el jugador ya eligió su Matichico y está en el menú, sin otra ventana abierta. En la demo web no aparece.
+- **Registro:** cada juego quedó en el catálogo, en el menú (con su pantalla), en la energía, en las recompensas y en el precio.
+- **Fotos del menú:** `scripts/video/tarjetas.cjs` saca fotos limpias del juego de verdad (sin carteles ni botones, con el Matichico a la vista) en `assets/games/<juego>.jpg`, de 740×418.
+- **Rendimiento (lo pide la dueña: celulares de gama media-baja).** Se midió todo lo dibujado en un cuadro mientras se juega, contando también la sombra:
+
+| Juego | Piezas por cuadro | Triángulos |
+| --- | --- | --- |
+| Salto Choco (ya anda bien en su celular) | 397 | 44.463 |
+| Autos de Chocolate (ídem) | 714 | 50.093 |
+| Bloques de Productos (ídem) | 225 | 27.453 |
+| Torre de alfajores | 187 | 21.350 |
+| Avioneta Choco | 62 | 5.692 |
+| Lanchas en el lago | 147 | 18.624 |
+| Minigolf en la playa | 198 | 23.406 |
+| Billar de bombones | 236 | 28.012 |
+
+  - Para llegar a eso, cada palmera y cada quitasol se juntó en 2 piezas (antes eran 15 y 9; `mergeParts` en `verano-kit.js`), y no se dibujan las caras de los alfajores que nunca se ven.
+  - Los juegos nuevos no usan el brillo de pantalla completa, y su sombra es una sola y chica (se apaga sola si el celular va lento).
+- **Videos de la jugabilidad (para la dueña):** `Descargas\juegos-verano\1-…5-*.mp4`. Se grabaron con `scripts/video/grabar.cjs` y jugadores automáticos: la torre suelta al centro, la avioneta y las lanchas llevan piloto automático, y en minigolf y billar el jugador prueba los tiros «en la cabeza» y elige el mejor.
+- **Arreglos que salieron de los videos:**
+  - Avioneta: los aros se veían de canto y los alfajores oscuros; además, al partir caía al agua.
+  - Minigolf: la cámara pasó de costado, para que la cancha cruce la pantalla acostada.
+  - Billar: un bombón que caía se volvía a contar en cada paso (salía «21/7»).
+  - Regalo: la ventana salía antes de elegir el Matichico.
+- **Pruebas sobre la app, sin red:**
+  - `juegos.cjs` **20/20 OK** (los 15 de antes y los 5 nuevos) y 0 peticiones externas.
+  - `perfiles.cjs` 13/13 OK, `atras.cjs` todo OK y `verificar-app.mjs` OK.
+  - `scripts/qa/lib.cjs` apaga la ventana del regalo en las pruebas (`matichoc_sin_regalo_fundador`), porque tapaba los botones.
+- **Ficha de Play:** `store/listing-*.md` pasan de 14 a 19 juegos y suman un párrafo de los juegos de verano (es 3.175, en 3.044 y pt 3.246 de 4.000 caracteres).
+- **Pendiente:**
+  - Que la dueña revise los videos y juegue la app de prueba.
+  - Rearmar los avisos pagados con «19 juegos» cuando la 1.2 esté publicada.
+- **Decisión de la persona dueña:** los «cuadros de colores» que vio en el navegador son los tres botones de arriba del menú (Continuar mi aventura, Jugar libremente, Mi personaje), que no cambiaron. Se dejan así.
+
+## 2026-11-19
+
+### Volumen de la música y de los efectos (y más bajo de partida)
+- **Pedido de la persona dueña:** «igual suena fuerte el juego, debería tener volumen y config por ahí».
+- **Qué se hizo:**
+  - Una ventana **«🔊 Sonido»** con dos barras, **🎵 Música** y **🔔 Efectos** (de 0 a 100 %, de 5 en 5), y el botón «🔇 Silenciar todo» / «🔊 Activar el sonido».
+  - Se abre desde el menú (botón «🔊 Sonido» junto a Logros y Puntajes; en el celular, en la pestaña «Mi Matichico») y desde la pausa de cada juego (botón nuevo «🎚️ Volumen»). El «atrás» del celular la cierra.
+  - Al mover la barra de efectos suena un efecto de prueba, y la música cambia mientras suena.
+  - **Volumen de partida más bajo:** música al 60 % y efectos al 70 %. Como el oído percibe el volumen al cuadrado, eso es más o menos −9 dB la música y −6 dB los efectos respecto de antes.
+  - La elección se guarda **en el celular** (`localStorage` «matichoc_sonido»), no en cada perfil, porque es de la familia y del aparato. El silencio también queda guardado: antes se perdía al cerrar el juego.
+  - `js/audio.js`: la música generada tiene ahora su propia salida (`musicBus`), separada de los efectos, para que cada barra mueva solo lo suyo. Las canciones usan el volumen de la música.
+- **Qué se probó en la web servida en el computador:**
+  - De partida: efectos 0,392 (0,8 × 0,7²), música 0,288 y canción 0,18 (0,5 × 0,6²).
+  - Al bajar la música a 0 %, la canción del menú se calla al tiro.
+  - «Silenciar todo» la pausa y queda guardado.
+  - Después de recargar, la ventana muestra lo elegido (música 40 %, efectos 70 %).
+  - El botón «🎚️ Volumen» de la pausa abre la ventana.
+- **Pruebas automáticas sobre la app, sin red:** `juegos.cjs` 15/15 OK, `perfiles.cjs` 13/13 OK, `atras.cjs` todo OK y `verificar-app.mjs` OK.
+- **Versión:** va en la 1.1.2. La 1.1.1 (107) está en revisión en Google.
+- **Decisión de la persona dueña (20-nov):** no reemplazar la 1.1.1, que ya lleva 2 días en revisión. Se espera su aprobación y después se sube la 1.1.2 con el volumen.
+
 ## 2026-11-18
+
+### Versión 1.1.1 para Google Play (reemplaza a la 1.1.0)
+- **Decisión de la persona dueña:** «Sí, hazlo». Se suben juntas la música, las celebraciones y la sombra opcional en una sola actualización. La 1.1.0 (105) se queda solo en la prueba interna y la que va a producción es la 1.1.1.
+- **Merge:** PR #57 (sombra opcional en Bloques) y Matichoc/matiweb#85.
+- **`.aab` 1.1.1, desde `main` (ejecución 44373600233):**
+  - Número de versión **107**, firmado con la llave de subida (SHA-256 47:FE:F7:…:E7:9F, la misma de siempre).
+  - Pide solo `INTERNET` y `VIBRATE`, lleva las 5 canciones y trae los botones de la sombra. Pesa 20,3 MB.
+  - Quedó en `Descargas\matijuego-aab-1.1.1\app-release.aab`.
+- **Enviado a revisión (18-nov):** la dueña subió el `.aab` 1.1.1 (107) y lo envió a **producción**, con lanzamiento completo, junto con el video de la ficha (https://youtu.be/d80CXEZ9gFc). La publicación gestionada está desactivada: si Google aprueba, se publica de inmediato.
+- **Pendiente:** esperar la aprobación y después partir con los avisos pagados (`docs/ANUNCIO-MATIJUEGO.md`).
 
 ### Bloques: la sombra de la pieza ahora es opcional (parte encendida)
 - **Pedido de la persona dueña:** «algunos me dicen que les sirve la sombra, y otros dicen que la sombra les molesta, debería ser opcional, partiendo con ella puesta».

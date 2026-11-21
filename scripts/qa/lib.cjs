@@ -9,6 +9,8 @@ const CHROMIUM = process.env.CHROMIUM_PATH || "/opt/pw-browsers/chromium";
 async function abrir({ viewport = { width: 1000, height: 640 }, offline = false, touch = false, dsf = 1, sinRed = false } = {}) {
   const b = await chromium.launch({ executablePath: CHROMIUM, args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
   const ctx = await b.newContext({ viewport, hasTouch: touch, isMobile: touch, offline, deviceScaleFactor: dsf });
+  // las pruebas revisan otras cosas: sin la ventana del regalo de fundador (js/founder.js), que tapa los botones
+  await ctx.addInitScript(() => { try { localStorage.setItem("matichoc_sin_regalo_fundador", "1"); } catch (e) { /* nada */ } });
   // sinRed: se corta TODO lo que no sea el propio servidor de la prueba (simula "sin internet" sin tumbar la carga de la página)
   if (sinRed) await ctx.route("**/*", (r) => (r.request().url().startsWith(ORIGEN) || /^(data|blob|about):/.test(r.request().url()) ? r.continue() : r.abort("internetdisconnected")));
   const p = await ctx.newPage();

@@ -26,6 +26,7 @@ function hide() {
   if (!el || el.classList.contains("out")) return;
   clearTimeout(timer);
   el.classList.add("out");
+  try { window.dispatchEvent(new CustomEvent("splash-out")); } catch (e) { /* sin ventana */ } // parte la entrada de cine (js/intro.js)
   setTimeout(() => { if (el.classList.contains("out")) el.classList.add("gone"); }, 700);
 }
 

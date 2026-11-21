@@ -9,7 +9,9 @@ Parkour, básquet, memoria y más: juegos 3D de Matichoc para niñas y niños
 ## Descripción completa (máx. 4000 caracteres)
 ¡Bienvenido al Matijuego, el arcade de Matichoc! 🍫
 
-Elige a tu Matichico, cámbiale peinado, ropa, sombreros y mucho más en la tienda con los Matipuntos que ganas jugando y recorre 14 juegos y mundos en 3D, más un taller para crear tu propio chocolate, hechos con mucho cacao:
+Elige a tu Matichico, cámbiale peinado, ropa, sombreros y mucho más en la tienda con los Matipuntos que ganas jugando y recorre 19 juegos y mundos en 3D, más un taller para crear tu propio chocolate, hechos con mucho cacao:
+
+☀️ NUEVOS JUEGOS DE VERANO — ⛳ Minigolf en la playa y 🎱 Billar de bombones (¡para jugar de a 2 por turnos en el mismo celular!), 🚤 Lanchas en el lago, ✈️ Avioneta Choco y 🥞 Torre de alfajores.
 
 🧗 PARKOUR CHOCO — ¡Un mundo infinito! Corre y salta por plataformas que se mueven, se rompen o parpadean a través de 10 mundos (praderas, caramelo, nubes, galaxias…), junta poderes 🧲🛡️⚡🦘 y bate tu récord de metros. También hay una aventura de 7 etapas (con casa para escalar, paredes, líneas rojas y una etapa troll) con capa, gafas y corona.
 
